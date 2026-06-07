@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "git: status all tracked projects",
+      "type": "shell",
+      "command": "git status --short; git -C ../flex-api-gateway status --short",
+      "options": {
+        "cwd": "${workspaceFolder:flex-workstation}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "git: status flex-workstation",
+      "type": "shell",
+      "command": "git status --short",
+      "options": {
+        "cwd": "${workspaceFolder:flex-workstation}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "git: status flex-api-gateway",
+      "type": "shell",
+      "command": "git status --short",
+      "options": {
+        "cwd": "${workspaceFolder:flex-api-gateway}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

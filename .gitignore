@@ -1,0 +1,20 @@
+# VS Code personal settings
+.vscode/settings.json
+.vscode/launch.json
+.vscode/*.log
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp

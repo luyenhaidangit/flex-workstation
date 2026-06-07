@@ -14,12 +14,16 @@
 
 ```text
 flex-workstation/
+|-- .vscode/
+|   +-- tasks.json
 |-- docs/
 |   |-- architecture.md
+|   |-- projects.md
 |   +-- tasks.md
 |-- skills/
 |   +-- README.md
 |-- .gitattributes
+|-- flex-workstation.code-workspace
 +-- README.md
 ```
 
@@ -27,7 +31,23 @@ flex-workstation/
 
 - [docs/tasks.md](docs/tasks.md): danh sách task cần triển khai, trạng thái, độ ưu tiên và ghi chú thực hiện.
 - [docs/architecture.md](docs/architecture.md): mô tả kiến trúc tổng quan, danh sách project, trách nhiệm của từng project và quy ước tích hợp.
+- [docs/projects.md](docs/projects.md): danh sách các Git project được theo dõi chung trong workspace.
 - [skills/README.md](skills/README.md): mô tả cách tổ chức skill dùng chung trong workspace.
+
+## Mở workspace trong VS Code
+
+Để VS Code theo dõi đồng thời các Git repo đã khai báo, mở file:
+
+```powershell
+code flex-workstation.code-workspace
+```
+
+File workspace hiện khai báo:
+
+- `flex-workstation`
+- `flex-api-gateway`
+
+Sau khi mở bằng file này, tab Source Control của VS Code sẽ hiển thị các repository trong cùng một workspace.
 
 ## Quy ước triển khai
 

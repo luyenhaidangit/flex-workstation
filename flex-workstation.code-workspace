@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "flex-workstation",
+      "path": "."
+    },
+    {
+      "name": "flex-api-gateway",
+      "path": "../flex-api-gateway"
+    }
+  ],
+  "settings": {
+    "git.autoRepositoryDetection": true,
+    "git.detectSubmodules": true
+  }
+}
