@@ -20,7 +20,7 @@ Trong đó:
 - `flex-workstation` là repo điều phối, chứa tài liệu, bootstrap và chỉ dẫn cho AI.
 - `flex-frontend`, `flex-backend`, `flex-api-gateway` là ví dụ các repo nghiệp vụ hoặc kỹ thuật sẽ được clone thêm.
 - Các repo project không đặt bên trong `flex-workstation`.
-- Nếu người onboard dùng đường dẫn khác, cần cập nhật lại `docs/projects.md` và `flex-workstation.code-workspace`.
+- Nếu người onboard dùng đường dẫn khác, cần cập nhật lại `docs/projects.md`, `OPEN_PROJECT.cmd` và các task VS Code liên quan nếu có.
 
 Câu xác nhận gợi ý:
 
@@ -106,12 +106,6 @@ Hoặc chạy bootstrap kèm mở workspace:
 
 ```powershell
 .\bootstrap.ps1 -OpenWorkspace
-```
-
-Nếu cần dùng file workspace cụ thể:
-
-```powershell
-code flex-workstation.code-workspace
 ```
 
 ## Ghi chú

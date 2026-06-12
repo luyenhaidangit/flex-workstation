@@ -26,7 +26,6 @@ flex-workstation/
 |-- .gitattributes
 |-- bootstrap.ps1
 |-- CLAUDE.md
-|-- flex-workstation.code-workspace
 |-- OPEN_PROJECT.cmd
 |-- README.md
 +-- START_HERE.cmd
@@ -115,25 +114,11 @@ OPEN_PROJECT.cmd
 
 Hoặc chạy trực tiếp:
 
-```powershell
+```
 code C:\Workspace\Project
 ```
 
-Ngoài ra repo vẫn có file workspace:
-
-```powershell
-code flex-workstation.code-workspace
-```
-
-File workspace hiện khai báo:
-
-- `Project`
-- `flex-workstation`
-- `flex-frontend`
-- `flex-backend`
-- `flex-api-gateway`
-
-Sau khi mở bằng file này, tab Source Control của VS Code sẽ hiển thị các repository trong cùng một workspace.
+Sau khi mở thư mục cha, tab Source Control của VS Code sẽ hiển thị các repository nằm trong `C:\Workspace\Project`.
 
 ## Quy ước triển khai
 

@@ -18,7 +18,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Trung bình | Tạo thư mục skill dùng chung | Xem `skills/README.md`. |
 | Done | Cao | Xác định danh sách project con | Đã thêm `flex-api-gateway` vào `docs/projects.md`. |
 | Done | Cao | Ghi nhận Git project `flex-api-gateway` | Local path mục tiêu: `C:\Workspace\Project\flex-api-gateway`. |
-| Done | Cao | Tạo VS Code multi-root workspace | Xem `flex-workstation.code-workspace` và `.vscode/tasks.json`. |
+| Done | Cao | Tạo task VS Code cho workstation | Xem `.vscode/tasks.json`. |
 | Done | Cao | Tạo bootstrap cho máy mới | Xem `bootstrap.ps1` và `docs/onboarding.md`. |
 | Done | Cao | Tạo chỉ dẫn Claude Code tổng quan | Xem `CLAUDE.md`. |
 | Done | Cao | Tạo entrypoint double-click cho Windows | Xem `START_HERE.cmd`. |

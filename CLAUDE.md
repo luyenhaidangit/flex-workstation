@@ -38,7 +38,7 @@ Nếu task liên quan trực tiếp đến một project con, đọc thêm `READ
 2. Kiểm tra tài liệu liên quan trước khi đề xuất hoặc sửa.
 3. Khi onboarding người mới hoặc thêm repo mới, xác nhận cấu trúc thư mục mục tiêu trước khi clone, tạo thư mục hoặc cập nhật workspace.
 4. Nếu triển khai thay đổi, giữ phạm vi nhỏ và đúng mục tiêu.
-5. Nếu thêm project, cập nhật `docs/projects.md`, `flex-workstation.code-workspace` và task liên quan trong `docs/tasks.md`.
+5. Nếu thêm project, cập nhật `docs/projects.md`, `.vscode/tasks.json` nếu cần, và task liên quan trong `docs/tasks.md`.
 6. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
 7. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
 8. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`.
@@ -126,7 +126,7 @@ Danh sách chính nằm trong `docs/projects.md`. Hiện workspace đang theo d�
 - `flex-backend`: backend cho nhóm project Flex, cần xác nhận repository URL trước khi clone.
 - `flex-api-gateway`: API Gateway cho nhóm project Flex.
 
-Mặc định các project con nằm ngang hàng với `flex-workstation` trong thư mục cha đã xác nhận. Luôn kiểm tra `docs/projects.md`, file `.code-workspace` và thư mục thực tế trước khi thao tác.
+Mặc định các project con nằm ngang hàng với `flex-workstation` trong thư mục cha đã xác nhận. Luôn kiểm tra `docs/projects.md`, `OPEN_PROJECT.cmd`, `.vscode/tasks.json` và thư mục thực tế trước khi thao tác.
 
 ## Tiêu chuẩn hoàn tất
 

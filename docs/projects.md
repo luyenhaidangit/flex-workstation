@@ -8,7 +8,7 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 - Mặc định các repo Flex nằm ngang hàng trong thư mục cha `C:\Workspace\Project`.
 - Mỗi project được ghi bằng tên repo, đường dẫn local, vai trò, công nghệ chính và trạng thái.
 - Khi thêm project mới, cập nhật bảng bên dưới và bổ sung task liên quan trong `docs/tasks.md`.
-- Khi muốn VS Code theo dõi project trong Source Control, cập nhật thêm `flex-workstation.code-workspace`.
+- Khi muốn VS Code theo dõi project trong Source Control, mở thư mục cha bằng `OPEN_PROJECT.cmd`.
 - Nếu cần liên kết version giữa nhiều repo, cân nhắc dùng Git submodule hoặc Git subtree sau khi có yêu cầu rõ ràng.
 
 ## Cấu trúc local cần xác nhận
@@ -24,7 +24,7 @@ C:\Workspace\Project\
 +-- ...
 ```
 
-Nếu người onboard chọn thư mục khác, cập nhật lại bảng project và file `flex-workstation.code-workspace` theo đường dẫn thực tế.
+Nếu người onboard chọn thư mục khác, cập nhật lại bảng project, `OPEN_PROJECT.cmd` và các task VS Code liên quan theo đường dẫn thực tế.
 
 ## Project đang theo dõi
 
@@ -55,12 +55,6 @@ Hoặc chạy:
 
 ```powershell
 code C:\Workspace\Project
-```
-
-Các project cũng được khai báo trong `flex-workstation.code-workspace`. Mở file workspace bằng lệnh:
-
-```powershell
-code C:\Workspace\Project\flex-workstation\flex-workstation.code-workspace
 ```
 
 Task VS Code có sẵn:
