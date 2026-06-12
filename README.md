@@ -21,10 +21,11 @@ flex-workstation/
 |   |-- onboarding.md
 |   |-- projects.md
 |   +-- tasks.md
+|-- scripts/
+|   +-- bootstrap.ps1
 |-- skills/
 |   +-- README.md
 |-- .gitattributes
-|-- bootstrap.ps1
 |-- CLAUDE.md
 |-- OPEN_PROJECT.cmd
 |-- README.md
@@ -61,7 +62,7 @@ Nếu đang dùng Windows và muốn thao tác đơn giản nhất, double-click
 START_HERE.cmd
 ```
 
-File này sẽ tự gọi `bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để đọc kết quả.
+File này sẽ tự gọi `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để đọc kết quả.
 
 Để mở nhanh toàn bộ thư mục cha `C:\Workspace\Project` trong VS Code, double-click:
 
@@ -73,7 +74,7 @@ Mở PowerShell tại thư mục repo và chạy:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\bootstrap.ps1
+.\scripts\bootstrap.ps1
 ```
 
 Script bootstrap sẽ kiểm tra các công cụ tối thiểu và tự cài Claude Code bằng native installer chính thức nếu máy chưa có `claude`.
@@ -93,7 +94,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 Nếu muốn dùng WinGet trên Windows thay vì native installer:
 
 ```powershell
-.\bootstrap.ps1 -UseWinget
+.\scripts\bootstrap.ps1 -UseWinget
 ```
 
 Sau khi cài xong, chạy:
@@ -123,7 +124,7 @@ Sau khi mở thư mục cha, tab Source Control của VS Code sẽ hiển thị 
 ## Quy ước triển khai
 
 - Mỗi project con nên có thư mục riêng, tài liệu mục đích riêng và hướng dẫn chạy tối thiểu.
-- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `bootstrap.ps1`, entrypoint thân thiện nên đặt tại `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`, và ghi lại tại `docs/onboarding.md`.
+- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `scripts/bootstrap.ps1`, entrypoint thân thiện nên đặt tại `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`, và ghi lại tại `docs/onboarding.md`.
 - Task mới nên được ghi vào `docs/tasks.md` trước khi triển khai để tránh mất ngữ cảnh.
 - Thay đổi kiến trúc hoặc cách tổ chức thư mục cần được cập nhật vào `docs/architecture.md`.
 - Skill dùng chung nên đặt trong `skills/` và có mô tả rõ: khi nào dùng, đầu vào cần có, quy trình thực hiện, và kết quả mong đợi.

@@ -7,10 +7,10 @@ echo ============================================================
 echo  flex-workstation setup
 echo ============================================================
 echo.
-echo This window will run bootstrap.ps1 with PowerShell.
+echo This window will run scripts\bootstrap.ps1 with PowerShell.
 echo.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0bootstrap.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\bootstrap.ps1"
 
 echo.
 echo ============================================================

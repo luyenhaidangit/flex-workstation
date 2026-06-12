@@ -36,13 +36,13 @@ Trên Windows, cách đơn giản nhất là double-click file ở root repo:
 START_HERE.cmd
 ```
 
-File này sẽ tự chạy `bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để bạn đọc kết quả.
+File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để bạn đọc kết quả.
 
 Nếu muốn chạy thủ công, mở PowerShell tại thư mục repo và chạy:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\bootstrap.ps1
+.\scripts\bootstrap.ps1
 ```
 
 Script sẽ:
@@ -64,7 +64,7 @@ curl -fsSL https://claude.ai/install.sh | bash
 Nếu muốn dùng WinGet trên Windows thay vì native installer:
 
 ```powershell
-.\bootstrap.ps1 -UseWinget
+.\scripts\bootstrap.ps1 -UseWinget
 ```
 
 ## Đăng nhập Claude Code
@@ -105,12 +105,12 @@ code C:\Workspace\Project
 Hoặc chạy bootstrap kèm mở workspace:
 
 ```powershell
-.\bootstrap.ps1 -OpenWorkspace
+.\scripts\bootstrap.ps1 -OpenWorkspace
 ```
 
 ## Ghi chú
 
-- Không nên double-click trực tiếp `bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
+- Không nên double-click trực tiếp `scripts/bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
 - Dùng `OPEN_PROJECT.cmd` khi muốn mở VS Code tại thư mục cha `C:\Workspace\Project`.
 - Claude Code yêu cầu tài khoản có quyền dùng Claude Code, ví dụ Pro, Max, Team, Enterprise hoặc Console.
 - Git for Windows được khuyến nghị để Claude Code có thể dùng Git Bash trên Windows.

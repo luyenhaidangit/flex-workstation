@@ -40,7 +40,7 @@ Nếu task liên quan trực tiếp đến một project con, đọc thêm `READ
 4. Nếu triển khai thay đổi, giữ phạm vi nhỏ và đúng mục tiêu.
 5. Nếu thêm project, cập nhật `docs/projects.md`, `.vscode/tasks.json` nếu cần, và task liên quan trong `docs/tasks.md`.
 6. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
-7. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
+7. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `scripts/bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
 8. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`.
 9. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
 
@@ -84,7 +84,7 @@ Anh/chị xác nhận cấu trúc local sẽ là C:\Workspace\Project\ với cá
 Script bootstrap chính nằm tại:
 
 ```powershell
-.\bootstrap.ps1
+.\scripts\bootstrap.ps1
 ```
 
 Entrypoint thân thiện cho người dùng Windows là:
@@ -93,7 +93,7 @@ Entrypoint thân thiện cho người dùng Windows là:
 START_HERE.cmd
 ```
 
-Người mới nên double-click `START_HERE.cmd` thay vì double-click trực tiếp `bootstrap.ps1`, vì Windows thường mở hộp thoại chọn app cho file `.ps1`.
+Người mới nên double-click `START_HERE.cmd` thay vì double-click trực tiếp `scripts/bootstrap.ps1`, vì Windows thường mở hộp thoại chọn app cho file `.ps1`.
 
 Entrypoint mở nhanh VS Code là:
 
@@ -114,7 +114,7 @@ Mục tiêu của script:
 Khi thay đổi script này, cần chạy tối thiểu:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\bootstrap.ps1 -SkipClaudeInstall
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1 -SkipClaudeInstall
 ```
 
 ## Project đang theo dõi

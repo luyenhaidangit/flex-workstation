@@ -135,7 +135,7 @@ Write-Host "   .\OPEN_PROJECT.cmd"
 
 if ($OpenWorkspace) {
     if (Test-Command "code") {
-        code (Resolve-Path "$PSScriptRoot\..")
+        code (Resolve-Path "$PSScriptRoot\..\..")
     }
     else {
         Write-Warn "Cannot open workspace because the VS Code CLI is missing."
