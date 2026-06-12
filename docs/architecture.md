@@ -11,6 +11,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | Thành phần | Vai trò |
 | --- | --- |
 | `README.md` | Tài liệu định hướng chính của workspace. |
+| `CLAUDE.md` | Chỉ dẫn tổng quan cho Claude Code khi làm việc trong workstation. |
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
 | `bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
 | `skills/` | Nơi lưu skill dùng chung cho Codex hoặc quy trình làm việc lặp lại. |

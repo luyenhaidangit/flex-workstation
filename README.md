@@ -25,6 +25,7 @@ flex-workstation/
 |   +-- README.md
 |-- .gitattributes
 |-- bootstrap.ps1
+|-- CLAUDE.md
 |-- flex-workstation.code-workspace
 +-- README.md
 ```
@@ -36,6 +37,7 @@ flex-workstation/
 - [docs/onboarding.md](docs/onboarding.md): hướng dẫn bootstrap máy mới sau khi clone workspace.
 - [docs/projects.md](docs/projects.md): danh sách các Git project được theo dõi chung trong workspace.
 - [skills/README.md](skills/README.md): mô tả cách tổ chức skill dùng chung trong workspace.
+- [CLAUDE.md](CLAUDE.md): chỉ dẫn tổng quan để Claude Code hiểu vai trò, quy trình và quy ước làm việc trong workstation.
 
 ## Khởi tạo nhanh sau khi clone
 
