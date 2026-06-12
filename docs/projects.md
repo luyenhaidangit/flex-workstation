@@ -45,7 +45,19 @@ Nếu lệnh không trả về dòng nào, working tree của project đang sạ
 
 ## Cấu hình VS Code
 
-Các project đang được khai báo trong `flex-workstation.code-workspace`. Mở workspace bằng lệnh:
+Mở nhanh toàn bộ thư mục cha chứa các repo Flex bằng cách double-click:
+
+```text
+OPEN_PROJECT.cmd
+```
+
+Hoặc chạy:
+
+```powershell
+code C:\Workspace\Project
+```
+
+Các project cũng được khai báo trong `flex-workstation.code-workspace`. Mở file workspace bằng lệnh:
 
 ```powershell
 code C:\Workspace\Project\flex-workstation\flex-workstation.code-workspace

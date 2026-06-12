@@ -16,4 +16,6 @@ echo.
 echo ============================================================
 echo  Setup finished. You can close this window.
 echo ============================================================
+echo.
+echo To open the whole Flex project folder, double-click OPEN_PROJECT.cmd.
 pause

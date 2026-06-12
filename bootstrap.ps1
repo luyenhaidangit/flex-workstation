@@ -131,11 +131,11 @@ Write-Step "Next steps"
 Write-Host "1. Run 'claude' in this repository and complete browser login."
 Write-Host "2. Run 'claude doctor' if login or shell integration fails."
 Write-Host "3. Open the shared workspace with:"
-Write-Host "   code flex-workstation.code-workspace"
+Write-Host "   .\OPEN_PROJECT.cmd"
 
 if ($OpenWorkspace) {
     if (Test-Command "code") {
-        code "$PSScriptRoot\flex-workstation.code-workspace"
+        code (Resolve-Path "$PSScriptRoot\..")
     }
     else {
         Write-Warn "Cannot open workspace because the VS Code CLI is missing."

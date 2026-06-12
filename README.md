@@ -27,6 +27,7 @@ flex-workstation/
 |-- bootstrap.ps1
 |-- CLAUDE.md
 |-- flex-workstation.code-workspace
+|-- OPEN_PROJECT.cmd
 |-- README.md
 +-- START_HERE.cmd
 ```
@@ -62,6 +63,12 @@ START_HERE.cmd
 ```
 
 File này sẽ tự gọi `bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để đọc kết quả.
+
+Để mở nhanh toàn bộ thư mục cha `C:\Workspace\Project` trong VS Code, double-click:
+
+```text
+OPEN_PROJECT.cmd
+```
 
 Mở PowerShell tại thư mục repo và chạy:
 
@@ -100,7 +107,19 @@ claude
 
 ## Mở workspace trong VS Code
 
-Để VS Code theo dõi đồng thời các Git repo đã khai báo, mở file:
+Để VS Code theo dõi toàn bộ thư mục cha chứa các repo Flex, double-click:
+
+```text
+OPEN_PROJECT.cmd
+```
+
+Hoặc chạy trực tiếp:
+
+```powershell
+code C:\Workspace\Project
+```
+
+Ngoài ra repo vẫn có file workspace:
 
 ```powershell
 code flex-workstation.code-workspace
@@ -108,7 +127,10 @@ code flex-workstation.code-workspace
 
 File workspace hiện khai báo:
 
+- `Project`
 - `flex-workstation`
+- `flex-frontend`
+- `flex-backend`
 - `flex-api-gateway`
 
 Sau khi mở bằng file này, tab Source Control của VS Code sẽ hiển thị các repository trong cùng một workspace.
@@ -116,7 +138,7 @@ Sau khi mở bằng file này, tab Source Control của VS Code sẽ hiển th�
 ## Quy ước triển khai
 
 - Mỗi project con nên có thư mục riêng, tài liệu mục đích riêng và hướng dẫn chạy tối thiểu.
-- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `bootstrap.ps1`, entrypoint thân thiện nên đặt tại `START_HERE.cmd`, và ghi lại tại `docs/onboarding.md`.
+- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `bootstrap.ps1`, entrypoint thân thiện nên đặt tại `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`, và ghi lại tại `docs/onboarding.md`.
 - Task mới nên được ghi vào `docs/tasks.md` trước khi triển khai để tránh mất ngữ cảnh.
 - Thay đổi kiến trúc hoặc cách tổ chức thư mục cần được cập nhật vào `docs/architecture.md`.
 - Skill dùng chung nên đặt trong `skills/` và có mô tả rõ: khi nào dùng, đầu vào cần có, quy trình thực hiện, và kết quả mong đợi.

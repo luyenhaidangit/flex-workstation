@@ -84,8 +84,22 @@ claude doctor
 
 ## Mở workspace
 
+Để mở nhanh toàn bộ thư mục cha chứa các repo Flex, double-click:
+
+```text
+OPEN_PROJECT.cmd
+```
+
+File này sẽ mở:
+
+```text
+C:\Workspace\Project
+```
+
+Đây là cách thân thiện nhất khi các repo nằm ngang hàng với `flex-workstation`.
+
 ```powershell
-code flex-workstation.code-workspace
+code C:\Workspace\Project
 ```
 
 Hoặc chạy bootstrap kèm mở workspace:
@@ -94,9 +108,16 @@ Hoặc chạy bootstrap kèm mở workspace:
 .\bootstrap.ps1 -OpenWorkspace
 ```
 
+Nếu cần dùng file workspace cụ thể:
+
+```powershell
+code flex-workstation.code-workspace
+```
+
 ## Ghi chú
 
 - Không nên double-click trực tiếp `bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
+- Dùng `OPEN_PROJECT.cmd` khi muốn mở VS Code tại thư mục cha `C:\Workspace\Project`.
 - Claude Code yêu cầu tài khoản có quyền dùng Claude Code, ví dụ Pro, Max, Team, Enterprise hoặc Console.
 - Git for Windows được khuyến nghị để Claude Code có thể dùng Git Bash trên Windows.
 - Hướng dẫn cài đặt Claude Code chính thức: <https://code.claude.com/docs/en/setup>.

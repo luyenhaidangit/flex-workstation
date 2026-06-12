@@ -15,6 +15,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
 | `bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
 | `START_HERE.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
+| `OPEN_PROJECT.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
 | `skills/` | Nơi lưu skill dùng chung cho Codex hoặc quy trình làm việc lặp lại. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |
 

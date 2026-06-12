@@ -41,7 +41,7 @@ Nếu task liên quan trực tiếp đến một project con, đọc thêm `READ
 5. Nếu thêm project, cập nhật `docs/projects.md`, `flex-workstation.code-workspace` và task liên quan trong `docs/tasks.md`.
 6. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
 7. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
-8. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd`.
+8. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`.
 9. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
 
 ## Cấu trúc thư mục cần xác nhận khi onboarding
@@ -95,12 +95,21 @@ START_HERE.cmd
 
 Người mới nên double-click `START_HERE.cmd` thay vì double-click trực tiếp `bootstrap.ps1`, vì Windows thường mở hộp thoại chọn app cho file `.ps1`.
 
+Entrypoint mở nhanh VS Code là:
+
+```text
+OPEN_PROJECT.cmd
+```
+
+File này phải mở thư mục cha của `flex-workstation`, ví dụ `C:\Workspace\Project`, để VS Code nhìn thấy các repo nằm ngang hàng như `flex-frontend`, `flex-backend`, `flex-api-gateway`.
+
 Mục tiêu của script:
 
 - Kiểm tra các công cụ tối thiểu như `git`, VS Code CLI `code`, `winget` và Claude Code CLI `claude`.
 - Cài Claude Code bằng native installer chính thức nếu máy chưa có `claude`.
 - Cho phép dùng WinGet qua tùy chọn `-UseWinget` khi cần.
 - Mở workspace bằng `-OpenWorkspace` nếu VS Code CLI có sẵn.
+- Khi dùng `-OpenWorkspace`, mở thư mục cha `C:\Workspace\Project` thay vì chỉ mở riêng `flex-workstation`.
 
 Khi thay đổi script này, cần chạy tối thiểu:
 
