@@ -1,52 +1,16 @@
 # CLAUDE.md
 
-Tài liệu này là chỉ dẫn tổng quan cho Claude Code khi làm việc trong repository `flex-workstation`.
+Chỉ dẫn nền cho Claude Code trong repo `flex-workstation`. Giữ file này ngắn để giảm token nền; đọc tài liệu chi tiết trong `README.md` và `docs/` khi task cần.
 
-## Vai trò của repository
+## Vai trò repo
 
-`flex-workstation` là workstation trung tâm để điều phối nhiều project trong cùng hệ thống Flex. Repository này không phải nơi chứa toàn bộ mã nguồn nghiệp vụ. Nó giữ vai trò:
+`flex-workstation` là repo điều phối cho nhóm project Flex. Repo này chứa tài liệu, bootstrap, entrypoint mở VS Code và quy ước làm việc; không chứa mã nguồn nghiệp vụ của các project con.
 
-- Quản lý tài liệu định hướng chung cho hệ thống.
-- Theo dõi danh sách project con, trạng thái, task và ghi chú triển khai.
-- Lưu quy ước kiến trúc, cách tổ chức thư mục và quyết định kỹ thuật.
-- Lưu skill, checklist hoặc quy trình có thể tái sử dụng.
-- Bootstrap máy mới để người mới clone repo có thể bắt đầu làm việc nhanh.
+Repo nghiệp vụ phải nằm ngang hàng với `flex-workstation`, không nằm bên trong repo này.
 
-## Ngôn ngữ và phong cách
+## Cấu trúc local mặc định
 
-- Dùng tiếng Việt có dấu trong tài liệu, ghi chú, mô tả task và nội dung hướng dẫn.
-- Giữ nguyên tiếng Anh cho tên file, thư mục, command, biến môi trường, package, API, framework và thuật ngữ kỹ thuật phổ biến.
-- Viết ngắn, rõ, trực tiếp. Ưu tiên hướng dẫn có thể thực hiện được.
-- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repository.
-
-## Tài liệu cần đọc trước
-
-Khi bắt đầu một phiên làm việc mới, đọc theo thứ tự:
-
-1. `README.md`: mục đích workspace, cách mở workspace và cách khởi tạo nhanh.
-2. `docs/tasks.md`: danh sách task, trạng thái và ưu tiên hiện tại.
-3. `docs/projects.md`: các Git project đang được theo dõi.
-4. `docs/architecture.md`: cách tổ chức workspace và quy ước kiến trúc.
-5. `docs/onboarding.md`: bootstrap máy mới và cài Claude Code.
-6. `skills/README.md`: cách tổ chức skill dùng chung.
-
-Nếu task liên quan trực tiếp đến một project con, đọc thêm `README.md` và tài liệu riêng của project đó trước khi sửa.
-
-## Quy trình làm việc mặc định
-
-1. Xác định yêu cầu thuộc `flex-workstation` hay thuộc một project con.
-2. Kiểm tra tài liệu liên quan trước khi đề xuất hoặc sửa.
-3. Khi onboarding người mới hoặc thêm repo mới, xác nhận cấu trúc thư mục mục tiêu trước khi clone, tạo thư mục hoặc cập nhật workspace.
-4. Nếu triển khai thay đổi, giữ phạm vi nhỏ và đúng mục tiêu.
-5. Nếu thêm project, cập nhật `docs/projects.md`, `.vscode/tasks.json` nếu cần, và task liên quan trong `docs/tasks.md`.
-6. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
-7. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `scripts/bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
-8. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`.
-9. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
-
-## Cấu trúc thư mục cần xác nhận khi onboarding
-
-Trước khi hướng dẫn người mới clone repo hoặc trước khi tự động thêm project vào workspace, cần xác nhận với người onboard rằng cấu trúc local sẽ theo dạng:
+Trước khi clone repo mới, tạo thư mục, hoặc cập nhật task/workspace, xác nhận với người onboard cấu trúc:
 
 ```text
 C:\Workspace\Project\
@@ -57,82 +21,44 @@ C:\Workspace\Project\
 +-- ...
 ```
 
-Quy ước:
-
-- `C:\Workspace\Project` là thư mục cha chứa toàn bộ repository trong nhóm Flex.
-- `flex-workstation` là repo điều phối, tài liệu và bootstrap.
-- Các repo nghiệp vụ như `flex-frontend`, `flex-backend`, `flex-api-gateway` nằm ngang hàng với `flex-workstation`, không nằm bên trong `flex-workstation`.
-- Không tự giả định repo đã tồn tại. Luôn kiểm tra thư mục thực tế và hỏi lại nếu tên repo, đường dẫn hoặc danh sách project chưa rõ.
-
-Câu xác nhận nên ngắn gọn, ví dụ:
+Câu xác nhận gợi ý:
 
 ```text
-Anh/chị xác nhận cấu trúc local sẽ là C:\Workspace\Project\ với các repo nằm ngang hàng như flex-workstation, flex-frontend, flex-backend, flex-api-gateway... đúng không?
+Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, ngang hàng với flex-workstation, ví dụ flex-frontend, flex-backend, flex-api-gateway... đúng không?
 ```
 
-## Quy ước khi chỉnh sửa
+## Quy tắc làm việc
 
-- Không refactor hoặc đổi cấu trúc ngoài phạm vi yêu cầu.
-- Không xóa thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo ra.
-- Không tự động sửa mã nguồn của project con nếu người dùng chỉ yêu cầu cập nhật workstation.
-- Không tạo submodule, subtree hoặc liên kết version giữa repo nếu chưa có yêu cầu rõ ràng.
-- Khi sửa Markdown, giữ tiêu đề, bullet và mô tả bằng tiếng Việt có dấu.
-- Khi thêm lệnh shell, ưu tiên PowerShell cho Windows vì workstation hiện đang dùng Windows.
+- Dùng tiếng Việt có dấu trong tài liệu, ghi chú và mô tả task.
+- Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật phổ biến.
+- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo.
+- Không tự tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
+- Không sửa mã nguồn project con khi yêu cầu chỉ thuộc `flex-workstation`.
+- Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
 
-## Bootstrap và công cụ
+## Điểm vào cho người dùng
 
-Script bootstrap chính nằm tại:
+- `START_HERE.cmd`: double-click để chạy bootstrap trên Windows.
+- `OPEN_PROJECT.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
+- `scripts/bootstrap.ps1`: script kỹ thuật, không phải entrypoint double-click.
 
-```powershell
-.\scripts\bootstrap.ps1
-```
+Nếu sửa onboarding hoặc công cụ cài đặt, cập nhật các file liên quan: `README.md`, `docs/onboarding.md`, `docs/tasks.md`, và entrypoint tương ứng.
 
-Entrypoint thân thiện cho người dùng Windows là:
+## Tài liệu cần đọc theo task
 
-```text
-START_HERE.cmd
-```
+- Tổng quan: `README.md`.
+- Onboarding/bootstrap: `docs/onboarding.md`.
+- Danh sách repo: `docs/projects.md`.
+- Kiến trúc/quy ước: `docs/architecture.md`.
+- Task hiện tại: `docs/tasks.md`.
+- Skill dùng chung: `skills/README.md`.
 
-Người mới nên double-click `START_HERE.cmd` thay vì double-click trực tiếp `scripts/bootstrap.ps1`, vì Windows thường mở hộp thoại chọn app cho file `.ps1`.
+## Kiểm tra tối thiểu
 
-Entrypoint mở nhanh VS Code là:
-
-```text
-OPEN_PROJECT.cmd
-```
-
-File này phải mở thư mục cha của `flex-workstation`, ví dụ `C:\Workspace\Project`, để VS Code nhìn thấy các repo nằm ngang hàng như `flex-frontend`, `flex-backend`, `flex-api-gateway`.
-
-Mục tiêu của script:
-
-- Kiểm tra các công cụ tối thiểu như `git`, VS Code CLI `code`, `winget` và Claude Code CLI `claude`.
-- Cài Claude Code bằng native installer chính thức nếu máy chưa có `claude`.
-- Cho phép dùng WinGet qua tùy chọn `-UseWinget` khi cần.
-- Mở workspace bằng `-OpenWorkspace` nếu VS Code CLI có sẵn.
-- Khi dùng `-OpenWorkspace`, mở thư mục cha `C:\Workspace\Project` thay vì chỉ mở riêng `flex-workstation`.
-
-Khi thay đổi script này, cần chạy tối thiểu:
+Sau thay đổi, chạy kiểm tra phù hợp với phạm vi. Ví dụ:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1 -SkipClaudeInstall
+Get-Content -Raw -Encoding UTF8 .vscode\tasks.json | ConvertFrom-Json | Out-Null
+git status --short
 ```
-
-## Project đang theo dõi
-
-Danh sách chính nằm trong `docs/projects.md`. Hiện workspace đang theo dõi:
-
-- `flex-workstation`: repository điều phối.
-- `flex-frontend`: frontend cho nhóm project Flex, cần xác nhận repository URL trước khi clone.
-- `flex-backend`: backend cho nhóm project Flex, cần xác nhận repository URL trước khi clone.
-- `flex-api-gateway`: API Gateway cho nhóm project Flex.
-
-Mặc định các project con nằm ngang hàng với `flex-workstation` trong thư mục cha đã xác nhận. Luôn kiểm tra `docs/projects.md`, `OPEN_PROJECT.cmd`, `.vscode/tasks.json` và thư mục thực tế trước khi thao tác.
-
-## Tiêu chuẩn hoàn tất
-
-Một thay đổi được xem là hoàn tất khi:
-
-- Yêu cầu chính đã được xử lý.
-- Tài liệu liên quan đã được cập nhật nếu hành vi, cấu trúc hoặc quy trình thay đổi.
-- Lệnh kiểm tra phù hợp đã chạy hoặc có ghi chú rõ vì sao chưa chạy.
-- `git status --short` được kiểm tra để nắm phạm vi file thay đổi.
