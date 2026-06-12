@@ -27,7 +27,8 @@ flex-workstation/
 |-- bootstrap.ps1
 |-- CLAUDE.md
 |-- flex-workstation.code-workspace
-+-- README.md
+|-- README.md
++-- START_HERE.cmd
 ```
 
 ## Tài liệu chính
@@ -40,6 +41,14 @@ flex-workstation/
 - [CLAUDE.md](CLAUDE.md): chỉ dẫn tổng quan để Claude Code hiểu vai trò, quy trình và quy ước làm việc trong workstation.
 
 ## Khởi tạo nhanh sau khi clone
+
+Nếu đang dùng Windows và muốn thao tác đơn giản nhất, double-click:
+
+```text
+START_HERE.cmd
+```
+
+File này sẽ tự gọi `bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để đọc kết quả.
 
 Mở PowerShell tại thư mục repo và chạy:
 
@@ -94,7 +103,7 @@ Sau khi mở bằng file này, tab Source Control của VS Code sẽ hiển th�
 ## Quy ước triển khai
 
 - Mỗi project con nên có thư mục riêng, tài liệu mục đích riêng và hướng dẫn chạy tối thiểu.
-- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `bootstrap.ps1` và ghi lại tại `docs/onboarding.md`.
+- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `bootstrap.ps1`, entrypoint thân thiện nên đặt tại `START_HERE.cmd`, và ghi lại tại `docs/onboarding.md`.
 - Task mới nên được ghi vào `docs/tasks.md` trước khi triển khai để tránh mất ngữ cảnh.
 - Thay đổi kiến trúc hoặc cách tổ chức thư mục cần được cập nhật vào `docs/architecture.md`.
 - Skill dùng chung nên đặt trong `skills/` và có mô tả rõ: khi nào dùng, đầu vào cần có, quy trình thực hiện, và kết quả mong đợi.

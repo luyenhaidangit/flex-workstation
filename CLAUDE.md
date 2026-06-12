@@ -40,7 +40,8 @@ Nếu task liên quan trực tiếp đến một project con, đọc thêm `READ
 4. Nếu thêm project, cập nhật `docs/projects.md`, `flex-workstation.code-workspace` và task liên quan trong `docs/tasks.md`.
 5. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
 6. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
-7. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
+7. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd`.
+8. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
 
 ## Quy ước khi chỉnh sửa
 
@@ -58,6 +59,14 @@ Script bootstrap chính nằm tại:
 ```powershell
 .\bootstrap.ps1
 ```
+
+Entrypoint thân thiện cho người dùng Windows là:
+
+```text
+START_HERE.cmd
+```
+
+Người mới nên double-click `START_HERE.cmd` thay vì double-click trực tiếp `bootstrap.ps1`, vì Windows thường mở hộp thoại chọn app cho file `.ps1`.
 
 Mục tiêu của script:
 

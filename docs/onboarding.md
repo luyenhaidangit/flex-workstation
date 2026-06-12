@@ -4,7 +4,15 @@ Tài liệu này dành cho người mới clone `flex-workstation` trên máy Wi
 
 ## Chạy bootstrap
 
-Mở PowerShell tại thư mục repo và chạy:
+Trên Windows, cách đơn giản nhất là double-click file ở root repo:
+
+```text
+START_HERE.cmd
+```
+
+File này sẽ tự chạy `bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để bạn đọc kết quả.
+
+Nếu muốn chạy thủ công, mở PowerShell tại thư mục repo và chạy:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
@@ -62,6 +70,7 @@ Hoặc chạy bootstrap kèm mở workspace:
 
 ## Ghi chú
 
+- Không nên double-click trực tiếp `bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
 - Claude Code yêu cầu tài khoản có quyền dùng Claude Code, ví dụ Pro, Max, Team, Enterprise hoặc Console.
 - Git for Windows được khuyến nghị để Claude Code có thể dùng Git Bash trên Windows.
 - Hướng dẫn cài đặt Claude Code chính thức: <https://code.claude.com/docs/en/setup>.
