@@ -18,11 +18,13 @@ flex-workstation/
 |   +-- tasks.json
 |-- docs/
 |   |-- architecture.md
+|   |-- onboarding.md
 |   |-- projects.md
 |   +-- tasks.md
 |-- skills/
 |   +-- README.md
 |-- .gitattributes
+|-- bootstrap.ps1
 |-- flex-workstation.code-workspace
 +-- README.md
 ```
@@ -31,8 +33,46 @@ flex-workstation/
 
 - [docs/tasks.md](docs/tasks.md): danh sách task cần triển khai, trạng thái, độ ưu tiên và ghi chú thực hiện.
 - [docs/architecture.md](docs/architecture.md): mô tả kiến trúc tổng quan, danh sách project, trách nhiệm của từng project và quy ước tích hợp.
+- [docs/onboarding.md](docs/onboarding.md): hướng dẫn bootstrap máy mới sau khi clone workspace.
 - [docs/projects.md](docs/projects.md): danh sách các Git project được theo dõi chung trong workspace.
 - [skills/README.md](skills/README.md): mô tả cách tổ chức skill dùng chung trong workspace.
+
+## Khởi tạo nhanh sau khi clone
+
+Mở PowerShell tại thư mục repo và chạy:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\bootstrap.ps1
+```
+
+Script bootstrap sẽ kiểm tra các công cụ tối thiểu và tự cài Claude Code bằng native installer chính thức nếu máy chưa có `claude`.
+
+Trên Windows, script dùng lệnh PowerShell chính thức:
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
+Trên macOS, Linux hoặc WSL, lệnh native installer tương ứng là:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+Nếu muốn dùng WinGet trên Windows thay vì native installer:
+
+```powershell
+.\bootstrap.ps1 -UseWinget
+```
+
+Sau khi cài xong, chạy:
+
+```powershell
+claude
+```
+
+để đăng nhập và bắt đầu làm việc với repo.
 
 ## Mở workspace trong VS Code
 
@@ -52,6 +92,7 @@ Sau khi mở bằng file này, tab Source Control của VS Code sẽ hiển th�
 ## Quy ước triển khai
 
 - Mỗi project con nên có thư mục riêng, tài liệu mục đích riêng và hướng dẫn chạy tối thiểu.
+- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `bootstrap.ps1` và ghi lại tại `docs/onboarding.md`.
 - Task mới nên được ghi vào `docs/tasks.md` trước khi triển khai để tránh mất ngữ cảnh.
 - Thay đổi kiến trúc hoặc cách tổ chức thư mục cần được cập nhật vào `docs/architecture.md`.
 - Skill dùng chung nên đặt trong `skills/` và có mô tả rõ: khi nào dùng, đầu vào cần có, quy trình thực hiện, và kết quả mong đợi.

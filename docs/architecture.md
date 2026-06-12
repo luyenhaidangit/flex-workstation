@@ -12,6 +12,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | --- | --- |
 | `README.md` | Tài liệu định hướng chính của workspace. |
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
+| `bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
 | `skills/` | Nơi lưu skill dùng chung cho Codex hoặc quy trình làm việc lặp lại. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |
 

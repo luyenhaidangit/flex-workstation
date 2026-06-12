@@ -2,6 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "workstation: bootstrap",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\bootstrap.ps1",
+      "options": {
+        "cwd": "${workspaceFolder:flex-workstation}"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "git: status all tracked projects",
       "type": "shell",
       "command": "git status --short; git -C ../flex-api-gateway status --short",
