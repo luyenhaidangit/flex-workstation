@@ -20,6 +20,19 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 
 ## Kiến trúc project con
 
+Các repository thuộc hệ thống Flex nên nằm ngang hàng trong cùng một thư mục cha. Cấu trúc local khuyến nghị:
+
+```text
+C:\Workspace\Project\
+|-- flex-workstation\
+|-- flex-frontend\
+|-- flex-backend\
+|-- flex-api-gateway\
++-- ...
+```
+
+`flex-workstation` không chứa mã nguồn của các repo nghiệp vụ. Nó chỉ giữ vai trò điều phối, tài liệu, bootstrap và cấu hình workspace. Trước khi onboarding hoặc thêm repo mới, cần xác nhận lại đường dẫn này với người dùng.
+
 Khi thêm project mới, nên dùng cấu trúc tối thiểu:
 
 ```text
@@ -51,7 +64,7 @@ Workspace này không cần chứa trực tiếp toàn bộ mã nguồn của c�
 Quy ước này phù hợp khi muốn dùng `flex-workstation` như một trung tâm điều phối:
 
 - Giữ tài liệu tổng hợp, task chung và skill chung tại `flex-workstation`.
-- Giữ mã nguồn của từng project trong repo riêng.
+- Giữ mã nguồn của từng project trong repo riêng, đặt ngang hàng với `flex-workstation` trong thư mục cha đã xác nhận.
 - Ghi rõ đường dẫn local, vai trò, stack và trạng thái của từng project.
 - Không dùng submodule nếu chưa có nhu cầu version hóa quan hệ giữa các repo.
 
@@ -61,7 +74,7 @@ Danh sách chi tiết được quản lý tại [docs/projects.md](projects.md).
 
 | Project | Mục đích | Công nghệ | Trạng thái | Ghi chú |
 | --- | --- | --- | --- | --- |
-| `flex-api-gateway` | API Gateway cho nhóm project Flex | .NET solution, Docker, Jenkins | Đang theo dõi | Local path: `C:\Workspace\Personal\flex-api-gateway`. |
+| `flex-api-gateway` | API Gateway cho nhóm project Flex | .NET solution, Docker, Jenkins | Dự kiến | Local path mục tiêu: `C:\Workspace\Project\flex-api-gateway`. |
 
 ## Hướng phát triển tiếp theo
 

@@ -42,6 +42,19 @@ flex-workstation/
 
 ## Khởi tạo nhanh sau khi clone
 
+Trước khi clone thêm repo nghiệp vụ, cần xác nhận cấu trúc local dự kiến:
+
+```text
+C:\Workspace\Project\
+|-- flex-workstation\
+|-- flex-frontend\
+|-- flex-backend\
+|-- flex-api-gateway\
++-- ...
+```
+
+Các repo như `flex-frontend`, `flex-backend`, `flex-api-gateway` nên nằm ngang hàng với `flex-workstation`, không nằm bên trong `flex-workstation`.
+
 Nếu đang dùng Windows và muốn thao tác đơn giản nhất, double-click:
 
 ```text

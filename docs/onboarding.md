@@ -2,6 +2,32 @@
 
 Tài liệu này dành cho người mới clone `flex-workstation` trên máy Windows.
 
+## Xác nhận cấu trúc thư mục
+
+Trước khi clone thêm project hoặc cập nhật workspace, cần xác nhận với người onboard rằng các repository sẽ được đặt ngang hàng trong thư mục cha:
+
+```text
+C:\Workspace\Project\
+|-- flex-workstation\
+|-- flex-frontend\
+|-- flex-backend\
+|-- flex-api-gateway\
++-- ...
+```
+
+Trong đó:
+
+- `flex-workstation` là repo điều phối, chứa tài liệu, bootstrap và chỉ dẫn cho AI.
+- `flex-frontend`, `flex-backend`, `flex-api-gateway` là ví dụ các repo nghiệp vụ hoặc kỹ thuật sẽ được clone thêm.
+- Các repo project không đặt bên trong `flex-workstation`.
+- Nếu người onboard dùng đường dẫn khác, cần cập nhật lại `docs/projects.md` và `flex-workstation.code-workspace`.
+
+Câu xác nhận gợi ý:
+
+```text
+Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, ngang hàng với flex-workstation, ví dụ flex-frontend, flex-backend, flex-api-gateway... đúng không?
+```
+
 ## Chạy bootstrap
 
 Trên Windows, cách đơn giản nhất là double-click file ở root repo:

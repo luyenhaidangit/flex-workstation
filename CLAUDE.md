@@ -36,12 +36,39 @@ Nếu task liên quan trực tiếp đến một project con, đọc thêm `READ
 
 1. Xác định yêu cầu thuộc `flex-workstation` hay thuộc một project con.
 2. Kiểm tra tài liệu liên quan trước khi đề xuất hoặc sửa.
-3. Nếu triển khai thay đổi, giữ phạm vi nhỏ và đúng mục tiêu.
-4. Nếu thêm project, cập nhật `docs/projects.md`, `flex-workstation.code-workspace` và task liên quan trong `docs/tasks.md`.
-5. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
-6. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
-7. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd`.
-8. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
+3. Khi onboarding người mới hoặc thêm repo mới, xác nhận cấu trúc thư mục mục tiêu trước khi clone, tạo thư mục hoặc cập nhật workspace.
+4. Nếu triển khai thay đổi, giữ phạm vi nhỏ và đúng mục tiêu.
+5. Nếu thêm project, cập nhật `docs/projects.md`, `flex-workstation.code-workspace` và task liên quan trong `docs/tasks.md`.
+6. Nếu thêm quy trình lặp lại, cân nhắc đưa vào `skills/` hoặc tài liệu trong `docs/`.
+7. Nếu thay đổi onboarding hoặc công cụ cài đặt, cập nhật `bootstrap.ps1`, `docs/onboarding.md` và phần liên quan trong `README.md`.
+8. Nếu thay đổi trải nghiệm khởi tạo cho người dùng Windows, cập nhật thêm `START_HERE.cmd`.
+9. Sau khi sửa, chạy kiểm tra phù hợp, ví dụ parse JSON, chạy script ở chế độ an toàn hoặc kiểm tra Git status.
+
+## Cấu trúc thư mục cần xác nhận khi onboarding
+
+Trước khi hướng dẫn người mới clone repo hoặc trước khi tự động thêm project vào workspace, cần xác nhận với người onboard rằng cấu trúc local sẽ theo dạng:
+
+```text
+C:\Workspace\Project\
+|-- flex-workstation\
+|-- flex-frontend\
+|-- flex-backend\
+|-- flex-api-gateway\
++-- ...
+```
+
+Quy ước:
+
+- `C:\Workspace\Project` là thư mục cha chứa toàn bộ repository trong nhóm Flex.
+- `flex-workstation` là repo điều phối, tài liệu và bootstrap.
+- Các repo nghiệp vụ như `flex-frontend`, `flex-backend`, `flex-api-gateway` nằm ngang hàng với `flex-workstation`, không nằm bên trong `flex-workstation`.
+- Không tự giả định repo đã tồn tại. Luôn kiểm tra thư mục thực tế và hỏi lại nếu tên repo, đường dẫn hoặc danh sách project chưa rõ.
+
+Câu xác nhận nên ngắn gọn, ví dụ:
+
+```text
+Anh/chị xác nhận cấu trúc local sẽ là C:\Workspace\Project\ với các repo nằm ngang hàng như flex-workstation, flex-frontend, flex-backend, flex-api-gateway... đúng không?
+```
 
 ## Quy ước khi chỉnh sửa
 
@@ -86,9 +113,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\bootstrap.ps1 -SkipClaudeI
 Danh sách chính nằm trong `docs/projects.md`. Hiện workspace đang theo dõi:
 
 - `flex-workstation`: repository điều phối.
+- `flex-frontend`: frontend cho nhóm project Flex, cần xác nhận repository URL trước khi clone.
+- `flex-backend`: backend cho nhóm project Flex, cần xác nhận repository URL trước khi clone.
 - `flex-api-gateway`: API Gateway cho nhóm project Flex.
 
-Không giả định project con luôn nằm trong cùng thư mục với `flex-workstation`. Luôn kiểm tra `docs/projects.md` và file `.code-workspace` trước khi thao tác.
+Mặc định các project con nằm ngang hàng với `flex-workstation` trong thư mục cha đã xác nhận. Luôn kiểm tra `docs/projects.md`, file `.code-workspace` và thư mục thực tế trước khi thao tác.
 
 ## Tiêu chuẩn hoàn tất
 
