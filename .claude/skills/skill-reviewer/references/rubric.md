@@ -8,18 +8,22 @@ Phân bổ điểm: **Trục 1 (25) + Trục 2 (15) + Trục 3 (25) + Trục 4 (
 
 ## Trục 1 — Description/Trigger (tối đa 25đ)
 
-Description là cơ chế trigger chính — Claude quyết định có invoke skill không dựa vào đây.
+Frontmatter là điều kiện để skill load đúng; description là cơ chế trigger chính — Claude quyết định có invoke skill không dựa vào đây.
 
 | Tiêu chí | Điểm |
 |---|---|
-| Viết third-person ("Dùng khi...", "Use when...") | 4 |
+| **Frontmatter YAML hợp lệ** — có `---` mở/đóng, parse được, có `name` + `description`, `name` khớp thư mục skill | 5 |
+| Viết third-person ("Dùng khi...", "Use when...") | 3 |
 | Có ít nhất 3 trigger phrase cụ thể | 4 |
-| "Pushy" — liệt kê nhiều ngữ cảnh trigger | 4 |
-| Có **explicit NOT-trigger** — "Không dùng khi..." hoặc phân biệt với skill liền kề | 5 |
-| Không mơ hồ — mục tiêu skill rõ (làm gì, với gì, ra gì) | 4 |
-| **Definition of done rõ** — skill biết khi nào task coi là xong | 4 |
+| "Pushy" — liệt kê nhiều ngữ cảnh trigger | 3 |
+| Có **explicit NOT-trigger** — "Không dùng khi..." hoặc phân biệt với skill liền kề | 4 |
+| Không mơ hồ — mục tiêu skill rõ (làm gì, với gì, ra gì) | 3 |
+| **Definition of done rõ** — skill biết khi nào task coi là xong | 3 |
 
 ### Dấu hiệu vấn đề
+- Frontmatter không parse được do `description` chứa dấu `:` chưa quote hoặc chưa dùng block scalar (`description: >`)
+- Thiếu `name` hoặc `description` trong metadata
+- `name` trong frontmatter không khớp tên thư mục skill
 - Description chỉ mô tả tính năng, không có trigger context
 - Không có "Do not use when" → agent dùng sai skill
 - Mục tiêu mơ hồ kiểu "hỗ trợ code tốt hơn" thay vì "Review API endpoint theo repository pattern, validate naming + error handling + async/await"

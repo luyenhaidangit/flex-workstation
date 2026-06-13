@@ -35,6 +35,7 @@ Nhận diện skill cần review từ yêu cầu:
 
 Đọc song song:
 - `SKILL.md` của skill target
+- Kiểm tra frontmatter YAML: có `---` mở/đóng, parse được, có đủ `name` + `description`, và `name` khớp tên thư mục skill
 - Kiểm tra sự tồn tại của các file/thư mục được nhắc đến trong body (references/, scripts/, assets/)
 - Kiểm tra `flex-workstation/config/workspace-skills.json` để xem skill có được đăng ký chưa
 
@@ -82,8 +83,10 @@ Task hoàn thành khi báo cáo đã được trả trong chat và user chưa y�
 - **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Mọi thay đổi là việc của user hoặc skill-creator; sửa trong khi review tạo feedback loop và bias kết quả.
 - **Pure read-only** — không tạo file, không chạy command có side effect, không fetch external URL trong quá trình review; chỉ dùng thao tác đọc/inspect.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
+- Lỗi frontmatter/YAML làm skill có nguy cơ không load là issue ưu tiên cao; luôn đưa vào `Issues` nếu phát hiện.
 - Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
 - Issues phải **cụ thể và có fix**:
   - Bad: `"description chưa tốt"`
   - Good: `"SKILL.md:3 — description thiếu NOT-trigger → thêm 'Không dùng khi user muốn tạo skill mới (dùng skill-creator thay thế)'"`
+  - Good: `"SKILL.md:1-4 — frontmatter YAML không parse được do dấu ':' trong description → đổi sang description: > và indent nội dung"`
 - Tối đa **7 issues** — thà ít mà actionable.
