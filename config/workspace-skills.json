@@ -7,6 +7,10 @@
     {
       "name": "skill-creator",
       "path": ".claude/skills/skill-creator"
+    },
+    {
+      "name": "ai-insights-curator",
+      "path": ".claude/skills/ai-insights-curator"
     }
   ]
 }
