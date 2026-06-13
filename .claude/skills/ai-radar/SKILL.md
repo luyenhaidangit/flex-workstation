@@ -66,6 +66,12 @@ Format briefing trực tiếp trong chat:
 
 Tối đa **5 item** mỗi lần. Thà ít mà sắc hơn nhiều mà nhạt.
 
+**Good** — item cụ thể, có nguồn + lý do + hành động ngay:
+> **smolagents** (GitHub Trending) — thư viện agent nhỏ gọn của HuggingFace, chạy tool-call qua code thay vì JSON schema → loại bỏ tầng parse, giảm lỗi khi tool trả structured data phức tạp
+
+**Bad** — mơ hồ, không nguồn, không hành động cụ thể:
+> Có nhiều bài viết thú vị về AI agent gần đây, LLM đang phát triển rất nhanh
+
 Xem ví dụ output đầy đủ (good/bad) tại `references/example-output.md`.
 
 ## Nguyên tắc chất lượng
