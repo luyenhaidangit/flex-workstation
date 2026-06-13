@@ -1,6 +1,11 @@
 ---
 name: skill-reviewer
-description: Dùng khi người dùng muốn "review skill X", "audit SKILL.md", "skill này có vấn đề gì không", "check chất lượng skill Y", "skill viết đúng chưa", "cải thiện skill". Không dùng khi user muốn AI sửa hẳn (→ skill-creator) hoặc chạy eval/tạo skill mới. Output: báo cáo điểm/100 theo 5 trục + danh sách fix suggestions cụ thể.
+description: >
+  Dùng khi người dùng muốn "review skill X", "audit SKILL.md",
+  "skill này có vấn đề gì không", "check chất lượng skill Y",
+  "skill viết đúng chưa", "cải thiện skill". Không dùng khi user muốn
+  AI sửa hẳn (→ skill-creator) hoặc chạy eval/tạo skill mới.
+  Output: báo cáo điểm/100 theo 5 trục + danh sách fix suggestions cụ thể.
 ---
 
 # Skill Reviewer
