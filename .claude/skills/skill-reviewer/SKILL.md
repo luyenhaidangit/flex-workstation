@@ -3,7 +3,7 @@ name: skill-reviewer
 description: >
   Dùng khi người dùng muốn "review skill X", "audit SKILL.md",
   "skill này có vấn đề gì không", "check chất lượng skill Y",
-  "skill viết đúng chưa", "cải thiện skill". Không dùng khi user muốn
+  "skill viết đúng chưa", "muốn review để biết nên cải thiện gì". Không dùng khi user muốn
   AI sửa hẳn (→ skill-creator) hoặc chạy eval/tạo skill mới.
   Output: báo cáo điểm/100 theo 5 trục + danh sách fix suggestions cụ thể.
 ---
@@ -36,7 +36,7 @@ Nhận diện skill cần review từ yêu cầu:
 Đọc song song:
 - `SKILL.md` của skill target
 - Kiểm tra frontmatter YAML: có `---` mở/đóng, parse được, có đủ `name` + `description`, và `name` khớp tên thư mục skill
-- Kiểm tra sự tồn tại của các file/thư mục được nhắc đến trong body (references/, scripts/, assets/)
+- Nếu body target có nhắc đến file/thư mục (references/, scripts/, assets/ ...) thì kiểm tra sự tồn tại của chúng
 - Kiểm tra `flex-workstation/config/workspace-skills.json` để xem skill có được đăng ký chưa
 
 ### 3. Chấm điểm theo 5 trục
@@ -45,7 +45,7 @@ Nhận diện skill cần review từ yêu cầu:
 
 ### 4. Tổng hợp và trả kết quả
 
-Trả báo cáo theo format sau — không thêm bớt cấu trúc:
+Trả báo cáo theo format sau — không thêm bớt cấu trúc, trừ khi user yêu cầu focus/scope hẹp hơn (vd: "chỉ check Trục 1"):
 
 ```
 ## Skill Review: [skill-name]
@@ -80,7 +80,7 @@ Task hoàn thành khi báo cáo đã được trả trong chat và user chưa y�
 
 ## Nguyên tắc chấm điểm
 
-- **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Mọi thay đổi là việc của user hoặc skill-creator; sửa trong khi review tạo feedback loop và bias kết quả.
+- **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Trong lượt review này, mọi thay đổi là việc của user hoặc skill-creator; sửa trong khi review tạo feedback loop và bias kết quả. Nếu user sau đó yêu cầu sửa thì thực hiện bình thường.
 - **Pure read-only** — không tạo file, không chạy command có side effect, không fetch external URL trong quá trình review; chỉ dùng thao tác đọc/inspect.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Lỗi frontmatter/YAML làm skill có nguy cơ không load là issue ưu tiên cao; luôn đưa vào `Issues` nếu phát hiện.
