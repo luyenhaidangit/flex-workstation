@@ -1,3 +1,12 @@
 {
-  "localSkills": []
+  "localSkills": [
+    {
+      "name": "agent-instructions-architect",
+      "path": ".claude/skills/agent-instructions-architect"
+    },
+    {
+      "name": "skill-creator",
+      "path": ".claude/skills/skill-creator"
+    }
+  ]
 }

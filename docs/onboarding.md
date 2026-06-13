@@ -114,6 +114,14 @@ Hoặc double-click:
 SYNC_WORKSPACE_SKILLS.cmd
 ```
 
+Nếu Claude Code đang mở sẵn tại `C:\Workspace\Project`, sau khi sync hãy chạy trong Claude:
+
+```text
+/reload-skills
+```
+
+Hoặc đóng session và mở lại bằng `OPEN_CLAUDE.cmd`.
+
 Ghi đè khi muốn cập nhật lại từ nguồn:
 
 ```powershell

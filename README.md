@@ -79,3 +79,5 @@ Hoặc double-click:
 ```text
 SYNC_WORKSPACE_SKILLS.cmd
 ```
+
+Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync.
