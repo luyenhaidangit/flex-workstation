@@ -15,7 +15,7 @@ Tự tìm và tổng hợp nội dung AI mới/hữu ích từ các nguồn uy t
 
 ## Args tùy chọn
 
-- **Chủ đề:** `agent-design`, `claude-code`, `RAG`, `prompting`, `mcp`, `tooling`, `llm-fundamentals`
+- **Chủ đề:** `agent-design`, `claude-code`, `coding-agent`, `RAG`, `prompting`, `mcp`, `tooling`, `llm-fundamentals`
 - **Timeframe:** `hôm nay`, `tuần này`
 - Không có arg → quét tổng quát tất cả chủ đề
 
@@ -25,14 +25,16 @@ Tự tìm và tổng hợp nội dung AI mới/hữu ích từ các nguồn uy t
 
 - Đọc `references/sources.md` để lấy danh sách nguồn và mapping tag → nhóm nguồn.
 - Nếu có arg chủ đề → ưu tiên nguồn trong nhóm khớp tag.
+- Nếu arg chủ đề không khớp mapping → dùng nhóm `Tin tức & xu hướng` trong `references/sources.md`; nếu phạm vi vẫn mơ hồ thì hỏi lại 1 câu ngắn.
 - Nếu không có arg → quét toàn bộ nhóm nguồn.
 - Chỉ sử dụng nguồn trong danh sách này. Không tự thêm source ngoài `references/sources.md` trừ khi user yêu cầu rõ.
 
 ### 2. Fetch và lọc
 
 Với mỗi nguồn liên quan:
-- Fetch trang/feed.
+- Fetch theo thứ tự ưu tiên: RSS/feed chính thức nếu có → trang nguồn trực tiếp (GitHub Trending/HN/blog) → search giới hạn trong domain nguồn nếu cần.
 - Lọc lấy nội dung mới hoặc nổi bật, bỏ: nội dung cũ, quảng cáo, bài không liên quan AI/LLM/tooling.
+- Với timeframe `hôm nay`/`tuần này`: ưu tiên ngày publish/update rõ ràng; nếu nguồn không có timestamp, chỉ đưa vào khi có bằng chứng nổi bật hiện tại như GitHub Trending daily/weekly hoặc đang ở trang front page của nguồn.
 - Nếu fetch thất bại (timeout, login-wall) → bỏ qua, ghi chú "không lấy được", không bịa nội dung.
 
 ### 3. Chắt lọc

@@ -11,6 +11,8 @@ Danh sách nguồn chất lượng nhóm theo chủ đề. Skill đọc file nà
 - **Anthropic "Building effective agents"** — https://www.anthropic.com/research/building-effective-agents — pattern thiết kế agent (chaining, routing, orchestrator).
 - **LangChain blog** — https://blog.langchain.dev — pattern RAG, tool use, memory (đọc có chọn lọc).
 
+Ghi chú: nguồn evergreen như tài liệu nền tảng hoặc bài pattern chỉ dùng làm bối cảnh/đối chiếu; không tính là item "mới" trừ khi có ngày cập nhật mới hoặc thay đổi đáng chú ý được xác minh.
+
 ## Prompting & LLM fundamentals
 - **Anthropic prompt engineering docs** — https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering
 - **Prompt engineering guide** — https://www.promptingguide.ai
