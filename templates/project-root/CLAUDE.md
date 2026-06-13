@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Workspace root: `C:\Workspace\Project`.
+Workspace root: `<WORKSPACE_ROOT>`.
 
 `flex-workstation` là source-of-truth cho tài liệu, bootstrap, template, skill source và cấu hình workspace.
 
@@ -19,12 +19,6 @@ Khi người dùng yêu cầu tạo hoặc sửa skill dùng chung:
 - Chạy `flex-workstation/SYNC_WORKSPACE_SKILLS.cmd`.
 - Nếu Claude đang mở, chạy `/reload-skills` hoặc mở session mới.
 
-Runtime skills được Claude load từ:
-
-```text
-C:\Workspace\Project\.claude\skills
-```
-
 ## Đồng bộ config với template
 
 Workspace root là bản "sống"; `flex-workstation/templates/project-root/` là bản scaffold mẫu dùng khi bootstrap setup mới. Khi sửa config dùng chung ở root — `CLAUDE.md`, `.claude/settings.json`, `.claude/settings.local.json` — mirror thay đổi tương ứng sang `flex-workstation/templates/project-root/` để setup mới kế thừa.
@@ -34,5 +28,5 @@ Workspace root là bản "sống"; `flex-workstation/templates/project-root/` l�
 Tài liệu chi tiết nằm trong:
 
 ```text
-C:\Workspace\Project\flex-workstation\README.md
+flex-workstation\README.md
 ```
