@@ -115,6 +115,28 @@ Hoặc chạy bootstrap kèm mở workspace:
 .\scripts\bootstrap.ps1 -OpenWorkspace
 ```
 
+## Mở Claude full access
+
+Nếu cần mở Claude Code tại workspace root với quyền bỏ qua prompt permission, double-click:
+
+```text
+OPEN_CLAUDE_FULL_ACCESS.cmd
+```
+
+File này chạy tại:
+
+```text
+C:\Workspace\Project
+```
+
+và gọi:
+
+```powershell
+claude --dangerously-skip-permissions
+```
+
+Chỉ dùng chế độ này trong workspace tin cậy vì Claude sẽ không hỏi trước khi dùng tool hoặc sửa file.
+
 ## Ghi chú
 
 - Không nên double-click trực tiếp `scripts/bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
