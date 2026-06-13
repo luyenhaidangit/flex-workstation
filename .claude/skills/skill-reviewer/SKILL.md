@@ -1,6 +1,6 @@
 ---
 name: skill-reviewer
-description: Dùng khi người dùng muốn "review skill X", "audit SKILL.md", "skill này có vấn đề gì không", "check chất lượng skill Y", "skill viết đúng chưa", "cải thiện skill" mà KHÔNG muốn chạy eval hay tạo skill mới — skill tự đọc SKILL.md chỉ định, chấm điểm theo 5 trục, và trả báo cáo có điểm + fix suggestions cụ thể trực tiếp trong chat.
+description: Dùng khi người dùng muốn "review skill X", "audit SKILL.md", "skill này có vấn đề gì không", "check chất lượng skill Y", "skill viết đúng chưa", "cải thiện skill" (nghĩa là muốn nhận checklist để tự sửa — nếu muốn AI sửa hẳn thì dùng skill-creator) mà KHÔNG muốn chạy eval hay tạo skill mới — skill tự đọc SKILL.md chỉ định, chấm điểm theo 5 trục, và trả báo cáo có điểm + fix suggestions cụ thể trực tiếp trong chat.
 ---
 
 # Skill Reviewer
@@ -24,6 +24,9 @@ Nhận diện skill cần review từ yêu cầu:
 - Nếu không rõ → hỏi 1 câu: "Skill nào bạn muốn review?"
 
 ### 2. Thu thập thông tin
+
+**Input yêu cầu:** tên skill hoặc path đến SKILL.md.
+**Input tùy chọn:** focus area cụ thể (vd: "chỉ check Trục 1", "tập trung safety").
 
 Đọc song song:
 - `SKILL.md` của skill target
@@ -65,9 +68,14 @@ Nếu điểm < 60: khuyến nghị dùng `skill-creator` để cải tiến.
 Nếu điểm 60–79: liệt kê issues ưu tiên cao để user tự sửa.
 Nếu điểm ≥ 80: chỉ ra 1-2 điểm có thể polish thêm nếu muốn.
 
+Task hoàn thành khi báo cáo đã được trả trong chat và user chưa yêu cầu làm gì thêm.
+
 ## Nguyên tắc chấm điểm
 
+- **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Mọi thay đổi là việc của user hoặc skill-creator.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
-- Issues phải **cụ thể và có fix**: không viết "description chưa tốt" mà viết "description thiếu trigger phrase → thêm 'Dùng khi người dùng nói X hoặc Y'".
+- Issues phải **cụ thể và có fix**:
+  - Bad: `"description chưa tốt"`
+  - Good: `"SKILL.md:3 — description thiếu NOT-trigger → thêm 'Không dùng khi user muốn tạo skill mới (dùng skill-creator thay thế)'"`
 - Tối đa **7 issues** — thà ít mà actionable.

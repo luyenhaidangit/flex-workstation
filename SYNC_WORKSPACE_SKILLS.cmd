@@ -14,7 +14,7 @@ echo Target:
 echo   C:\Workspace\Project\.claude\skills
 echo.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\sync-workspace-skills.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\sync-workspace-skills.ps1" -Force
 
 if errorlevel 1 (
     echo.
