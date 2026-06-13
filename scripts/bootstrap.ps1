@@ -69,10 +69,22 @@ function Install-ClaudeCodeNative {
 function Initialize-ClaudeProjectConfig {
     $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
     $templateRoot = (Resolve-Path "$PSScriptRoot\..\templates\project-root\.claude").Path
+    $projectRootClaudeTemplate = Join-Path $PSScriptRoot "..\templates\project-root\CLAUDE.md"
+    $projectRootClaudePath = Join-Path $projectRoot "CLAUDE.md"
     $claudeRoot = Join-Path $projectRoot ".claude"
     $settingsPath = Join-Path $claudeRoot "settings.local.json"
 
     Write-Step "Preparing Claude project configuration"
+
+    if (Test-Path $projectRootClaudeTemplate) {
+        if (Test-Path $projectRootClaudePath) {
+            Write-Ok "Workspace root CLAUDE.md already exists: $projectRootClaudePath"
+        }
+        else {
+            Copy-Item -LiteralPath $projectRootClaudeTemplate -Destination $projectRootClaudePath
+            Write-Ok "Copied workspace root CLAUDE.md: $projectRootClaudePath"
+        }
+    }
 
     New-Item -ItemType Directory -Force -Path $claudeRoot | Out-Null
 

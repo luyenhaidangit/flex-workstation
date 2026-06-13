@@ -30,6 +30,7 @@ flex-workstation/
 |   +-- README.md
 |-- templates/
 |   +-- project-root/
+|       |-- CLAUDE.md
 |       +-- .claude/
 |-- .gitattributes
 |-- SETUP_WORKSPACE.cmd
@@ -59,6 +60,8 @@ Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File
 Khi chỉ cần cập nhật skill dùng chung, double-click `SYNC_WORKSPACE_SKILLS.cmd`.
 
 Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
+
+Khi mở Claude tại `C:\Workspace\Project`, root `CLAUDE.md` được bootstrap từ `templates/project-root/CLAUDE.md` để Claude hiểu `flex-workstation` là source-of-truth cho cấu hình và skill source.
 
 ## Skill dùng chung
 

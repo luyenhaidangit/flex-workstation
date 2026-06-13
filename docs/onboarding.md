@@ -48,6 +48,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 Script sẽ:
 
 - Kiểm tra `git`, VS Code CLI `code`, `winget`.
+- Copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có.
 - Copy template cấu hình Claude từ `templates/project-root/.claude` ra `C:\Workspace\Project\.claude`.
 - Sync skill local dùng chung từ `config/workspace-skills.json` vào `C:\Workspace\Project\.claude\skills`.
 - Kiểm tra Claude Code CLI `claude`.
@@ -72,6 +73,8 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 ## Cấu hình Claude được tạo sẵn
 
 Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
+
+Bootstrap cũng copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. File này giúp Claude hiểu rằng `flex-workstation` là source-of-truth khi Claude được mở tại workspace root.
 
 Chi tiết cấu trúc `.claude` và vai trò từng thư mục con: xem [docs/architecture.md](architecture.md).
 

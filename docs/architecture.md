@@ -22,6 +22,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `SYNC_WORKSPACE_SKILLS.cmd` | Entrypoint sync skill dùng chung đã khai báo trong `config/workspace-skills.json`. |
 | `skills/` | Nơi lưu skill org-share dùng chung giữa các project Flex (Claude Code hoặc AI assistant khác). |
 | `templates/project-root/.claude` | Template cấu hình Claude được bootstrap copy ra thư mục cha `C:\Workspace\Project\.claude`. |
+| `templates/project-root/CLAUDE.md` | Template memory cho workspace root, giúp Claude mở tại `C:\Workspace\Project` biết dùng `flex-workstation` làm source-of-truth. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |
 
 ## Cấu hình Claude ngoài workstation
@@ -43,6 +44,8 @@ C:\Workspace\Project\
 ```
 
 `flex-workstation` chỉ chứa template, script và tài liệu để tạo cấu trúc này. Runtime config dùng chung nằm ở `C:\Workspace\Project\.claude`; template nguồn nằm tại `templates/project-root/.claude`.
+
+Khi mở Claude tại `C:\Workspace\Project`, root memory `C:\Workspace\Project\CLAUDE.md` được copy từ `templates/project-root/CLAUDE.md` để tránh Claude tạo nhầm source file trực tiếp ở workspace root.
 
 ## Skill dùng chung cho workspace
 
