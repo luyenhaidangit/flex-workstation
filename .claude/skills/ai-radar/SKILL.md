@@ -5,8 +5,8 @@ description: >
   "tìm repo/bài về [chủ đề]", "cập nhật AI/LLM/agent/tooling", "đề xuất gì không" —
   skill tự chủ động fetch các nguồn uy tín (GitHub Trending, HN, blog kỹ thuật) và
   trả briefing trực tiếp trong chat. KHÔNG cần người dùng cung cấp link hay nội dung.
-  KHÔNG dùng khi user đã cung cấp link hoặc nội dung sẵn để tóm tắt
-  (dùng ai-insights-curator thay thế).
+  KHÔNG dùng khi user đã cung cấp link hoặc nội dung sẵn để tóm tắt —
+  trường hợp đó dùng skill tóm tắt/chắt lọc nội dung phù hợp.
 ---
 
 # AI Radar
