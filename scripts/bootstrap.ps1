@@ -180,7 +180,7 @@ Write-Step "Next steps"
 Write-Host "1. Run 'claude' in this repository and complete browser login."
 Write-Host "2. Run 'claude doctor' if login or shell integration fails."
 Write-Host "3. Open the shared workspace with:"
-Write-Host "   .\02_OPEN_PROJECT_ROOT.cmd"
+Write-Host "   .\OPEN_WORKSPACE.cmd"
 
 if ($OpenWorkspace) {
     if (Test-Command "code") {

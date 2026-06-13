@@ -4,7 +4,7 @@ setlocal
 for %%I in ("%~dp0..") do set "PROJECT_ROOT=%%~fI"
 
 echo ============================================================
-echo  flex-workstation - open project root
+echo  flex-workstation - open workspace
 echo ============================================================
 echo.
 echo This opens the parent folder that contains all Flex repositories:
@@ -24,7 +24,7 @@ code "%PROJECT_ROOT%"
 
 if errorlevel 1 (
     echo.
-    echo VS Code failed to open the project root.
+    echo VS Code failed to open the workspace.
     echo.
     pause
     exit /b 1

@@ -20,7 +20,7 @@ Trong đó:
 - `flex-workstation` là repo điều phối, chứa tài liệu, bootstrap và chỉ dẫn cho AI.
 - `flex-frontend`, `flex-backend`, `flex-api-gateway` là ví dụ các repo nghiệp vụ hoặc kỹ thuật sẽ được clone thêm.
 - Các repo project không đặt bên trong `flex-workstation`.
-- Nếu người onboard dùng đường dẫn khác, cần cập nhật lại `docs/projects.md`, `02_OPEN_PROJECT_ROOT.cmd` và các task VS Code liên quan nếu có.
+- Nếu người onboard dùng đường dẫn khác, cần cập nhật lại `docs/projects.md`, `OPEN_WORKSPACE.cmd` và các task VS Code liên quan nếu có.
 
 Câu xác nhận gợi ý:
 
@@ -33,7 +33,7 @@ Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, nga
 Trên Windows, cách đơn giản nhất là double-click file ở root repo:
 
 ```text
-01_SETUP_WORKSTATION.cmd
+SETUP_WORKSTATION.cmd
 ```
 
 File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để bạn đọc kết quả.
@@ -117,7 +117,7 @@ claude doctor
 Để mở nhanh toàn bộ thư mục cha chứa các repo Flex, double-click:
 
 ```text
-02_OPEN_PROJECT_ROOT.cmd
+OPEN_WORKSPACE.cmd
 ```
 
 File này sẽ mở:
@@ -141,7 +141,7 @@ Hoặc chạy bootstrap kèm mở workspace:
 ## Ghi chú
 
 - Không nên double-click trực tiếp `scripts/bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
-- Dùng `02_OPEN_PROJECT_ROOT.cmd` khi muốn mở VS Code tại thư mục cha `C:\Workspace\Project`.
+- Dùng `OPEN_WORKSPACE.cmd` khi muốn mở VS Code tại thư mục cha `C:\Workspace\Project`.
 - Claude Code yêu cầu tài khoản có quyền dùng Claude Code, ví dụ Pro, Max, Team, Enterprise hoặc Console.
 - Git for Windows được khuyến nghị để Claude Code có thể dùng Git Bash trên Windows.
 - Hướng dẫn cài đặt Claude Code chính thức: <https://code.claude.com/docs/en/setup>.

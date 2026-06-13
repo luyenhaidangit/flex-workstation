@@ -30,6 +30,6 @@ echo  Setup finished.
 echo ============================================================
 echo.
 echo Next step:
-echo   Double-click 02_OPEN_PROJECT_ROOT.cmd to open C:\Workspace\Project in VS Code.
+echo   Double-click OPEN_WORKSPACE.cmd to open C:\Workspace\Project in VS Code.
 echo.
 pause

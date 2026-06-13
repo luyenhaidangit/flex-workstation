@@ -14,8 +14,8 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `CLAUDE.md` | Chỉ dẫn tổng quan cho Claude Code khi làm việc trong workstation. |
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
 | `scripts/bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
-| `01_SETUP_WORKSTATION.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
-| `02_OPEN_PROJECT_ROOT.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
+| `SETUP_WORKSTATION.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
+| `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
 | `skills/` | Nơi lưu skill dùng chung cho Codex hoặc quy trình làm việc lặp lại. |
 | `templates/project-root/.claude` | Template cấu hình Claude được bootstrap copy ra thư mục cha `C:\Workspace\Project\.claude`. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |
