@@ -4,7 +4,6 @@ Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tà
 
 ## Quy tắc làm việc
 
-- Dùng tiếng Việt có dấu trong tài liệu, ghi chú và mô tả task. Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật bằng tiếng Anh.
 - Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo.
 - Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
