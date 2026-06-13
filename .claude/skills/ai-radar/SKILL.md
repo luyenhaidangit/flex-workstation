@@ -1,6 +1,12 @@
 ---
 name: ai-radar
-description: Dùng khi người dùng muốn biết "có gì mới về AI không", "AI hôm nay có gì hay", "tìm repo/bài về [chủ đề]", "cập nhật AI/LLM/agent/tooling", "đề xuất gì không" — skill tự chủ động fetch các nguồn uy tín (GitHub Trending, HN, blog kỹ thuật) và trả briefing trực tiếp trong chat. KHÔNG cần người dùng cung cấp link hay nội dung.
+description: >
+  Dùng khi người dùng muốn biết "có gì mới về AI không", "AI hôm nay có gì hay",
+  "tìm repo/bài về [chủ đề]", "cập nhật AI/LLM/agent/tooling", "đề xuất gì không" —
+  skill tự chủ động fetch các nguồn uy tín (GitHub Trending, HN, blog kỹ thuật) và
+  trả briefing trực tiếp trong chat. KHÔNG cần người dùng cung cấp link hay nội dung.
+  KHÔNG dùng khi user đã cung cấp link hoặc nội dung sẵn để tóm tắt
+  (dùng ai-insights-curator thay thế).
 ---
 
 # AI Radar
@@ -20,6 +26,7 @@ Tự tìm và tổng hợp nội dung AI mới/hữu ích từ các nguồn uy t
 - Đọc `references/sources.md` để lấy danh sách nguồn và mapping tag → nhóm nguồn.
 - Nếu có arg chủ đề → ưu tiên nguồn trong nhóm khớp tag.
 - Nếu không có arg → quét toàn bộ nhóm nguồn.
+- Chỉ sử dụng nguồn trong danh sách này. Không tự thêm source ngoài `references/sources.md` trừ khi user yêu cầu rõ.
 
 ### 2. Fetch và lọc
 
@@ -57,9 +64,13 @@ Format briefing trực tiếp trong chat:
 
 Tối đa **5 item** mỗi lần. Thà ít mà sắc hơn nhiều mà nhạt.
 
+Xem ví dụ output đầy đủ (good/bad) tại `references/example-output.md`.
+
 ## Nguyên tắc chất lượng
 
-- **Trung thực:** nếu không tìm thấy gì đáng chú ý → nói thẳng, không nhồi nội dung nhạt.
-- **Không bịa:** không tự tạo ra link hay nội dung chưa fetch được.
-- **Ưu tiên có hành động:** repo có code, bài có ví dụ cụ thể > bài lý thuyết chung chung.
-- **Không lưu file** trừ khi người dùng yêu cầu rõ.
+- **Trung thực:** nếu không tìm thấy gì đáng chú ý → nói thẳng, không nhồi nội dung nhạt. Vì bài nhạt làm mất trust nhanh hơn không có bài.
+- **Không bịa:** không tự tạo ra link hay nội dung chưa fetch được. Vì link bịa dẫn user vào 404 hoặc sai nguồn — mất trust tức thì.
+- **Ưu tiên có hành động:** repo có code, bài có ví dụ cụ thể > bài lý thuyết chung chung. Vì user muốn áp dụng được ngay, không phải đọc lý thuyết.
+- **Không lưu file** trừ khi người dùng yêu cầu rõ. Vì skill là read-and-report, không phải persist.
+
+Task hoàn thành khi briefing đã trả trong chat và user chưa yêu cầu thêm.
