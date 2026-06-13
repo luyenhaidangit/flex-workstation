@@ -24,6 +24,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint double-click cho Windows | Xem `SETUP_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở nhanh VS Code tại thư mục cha | Xem `OPEN_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Claude tại workspace | Xem `OPEN_CLAUDE.cmd`. |
+| Done | Cao | Tạo entrypoint sync workspace skills | Xem `SYNC_WORKSPACE_SKILLS.cmd`. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` nhưng không ghi đè file local đã tồn tại. |
 | Done | Cao | Tạo cơ chế sync skill dùng chung cho workspace | Xem `config/workspace-skills.json` và `scripts/sync-workspace-skills.ps1`. Phase đầu chỉ hỗ trợ local skill folder. |

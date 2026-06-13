@@ -36,7 +36,7 @@ Trên Windows, cách đơn giản nhất là double-click file ở root repo:
 SETUP_WORKSPACE.cmd
 ```
 
-File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để bạn đọc kết quả.
+File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell, bao gồm bước sync skill dùng chung, và giữ cửa sổ lại để bạn đọc kết quả.
 
 Nếu muốn chạy thủ công, mở PowerShell tại thư mục repo và chạy:
 
@@ -106,6 +106,12 @@ Sync thủ công:
 
 ```powershell
 .\scripts\sync-workspace-skills.ps1
+```
+
+Hoặc double-click:
+
+```text
+SYNC_WORKSPACE_SKILLS.cmd
 ```
 
 Ghi đè khi muốn cập nhật lại từ nguồn:

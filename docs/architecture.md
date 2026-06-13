@@ -19,6 +19,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `SETUP_WORKSPACE.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
 | `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
 | `OPEN_CLAUDE.cmd` | Entrypoint mở Claude Code tại workspace root với `--dangerously-skip-permissions`. |
+| `SYNC_WORKSPACE_SKILLS.cmd` | Entrypoint sync skill dùng chung đã khai báo trong `config/workspace-skills.json`. |
 | `skills/` | Nơi lưu skill org-share dùng chung giữa các project Flex (Claude Code hoặc AI assistant khác). |
 | `templates/project-root/.claude` | Template cấu hình Claude được bootstrap copy ra thư mục cha `C:\Workspace\Project\.claude`. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |

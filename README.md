@@ -35,6 +35,7 @@ flex-workstation/
 |-- SETUP_WORKSPACE.cmd
 |-- OPEN_WORKSPACE.cmd
 |-- OPEN_CLAUDE.cmd
+|-- SYNC_WORKSPACE_SKILLS.cmd
 |-- CLAUDE.md
 +-- README.md
 ```
@@ -55,6 +56,8 @@ Trên Windows: double-click `SETUP_WORKSPACE.cmd` để chạy bootstrap, sau đ
 
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
 
+Khi chỉ cần cập nhật skill dùng chung, double-click `SYNC_WORKSPACE_SKILLS.cmd`.
+
 Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
 
 ## Skill dùng chung
@@ -69,4 +72,10 @@ Bootstrap sẽ tự chạy sync. Nếu muốn sync thủ công:
 
 ```powershell
 .\scripts\sync-workspace-skills.ps1
+```
+
+Hoặc double-click:
+
+```text
+SYNC_WORKSPACE_SKILLS.cmd
 ```
