@@ -120,7 +120,7 @@ Hoặc chạy bootstrap kèm mở workspace:
 Nếu cần mở Claude Code tại workspace root với quyền bỏ qua prompt permission, double-click:
 
 ```text
-OPEN_CLAUDE_FULL_ACCESS.cmd
+OPEN_CLAUDE.cmd
 ```
 
 File này chạy tại:

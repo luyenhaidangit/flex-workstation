@@ -4,7 +4,7 @@ setlocal
 for %%I in ("%~dp0..") do set "PROJECT_ROOT=%%~fI"
 
 echo ============================================================
-echo  flex-workstation - open Claude full access
+echo  flex-workstation - open Claude
 echo ============================================================
 echo.
 echo Workspace:

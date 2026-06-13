@@ -31,7 +31,7 @@ flex-workstation/
 |-- .gitattributes
 |-- SETUP_WORKSPACE.cmd
 |-- OPEN_WORKSPACE.cmd
-|-- OPEN_CLAUDE_FULL_ACCESS.cmd
+|-- OPEN_CLAUDE.cmd
 |-- CLAUDE.md
 +-- README.md
 ```
@@ -49,6 +49,6 @@ flex-workstation/
 
 Trên Windows: double-click `SETUP_WORKSPACE.cmd` để chạy bootstrap, sau đó double-click `OPEN_WORKSPACE.cmd` để mở VS Code tại `C:\Workspace\Project`.
 
-Khi cần mở Claude Code tại workspace với quyền bỏ qua prompt permission, double-click `OPEN_CLAUDE_FULL_ACCESS.cmd`. Chỉ dùng file này trong workspace tin cậy.
+Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
 
 Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
