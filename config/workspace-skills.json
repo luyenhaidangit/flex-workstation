@@ -9,8 +9,8 @@
       "path": ".claude/skills/skill-creator"
     },
     {
-      "name": "ai-insights-curator",
-      "path": ".claude/skills/ai-insights-curator"
+      "name": "ai-radar",
+      "path": ".claude/skills/ai-radar"
     }
   ]
 }
