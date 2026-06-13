@@ -24,6 +24,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint double-click cho Windows | Xem `START_HERE.cmd`. |
 | Done | Cao | Tạo entrypoint mở nhanh VS Code tại thư mục cha | Xem `OPEN_PROJECT.cmd`. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
+| Done | Trung bình | Tạo skill `agent-instructions-architect` | Xem `.claude/skills/agent-instructions-architect/SKILL.md`. Skill quản lý tầng instructions Claude Code (CLAUDE.md, memory, rules, subagent, SKILL.md, slash command, output style) với 3 chế độ Generate/Review/Improve. |
 | Todo | Cao | Chuẩn hóa quy ước đặt tên project | Cần thống nhất tên thư mục, tên module và namespace. |
 | Todo | Trung bình | Bổ sung hướng dẫn chạy từng project | Mỗi project con nên có `README.md` riêng. |
 | Todo | Trung bình | Bổ sung quy trình kiểm thử | Xác định test command, coverage và quy ước CI nếu có. |
