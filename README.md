@@ -29,10 +29,10 @@ flex-workstation/
 |   +-- project-root/
 |       +-- .claude/
 |-- .gitattributes
+|-- 01_SETUP_WORKSTATION.cmd
+|-- 02_OPEN_PROJECT_ROOT.cmd
 |-- CLAUDE.md
-|-- OPEN_PROJECT.cmd
-|-- README.md
-+-- START_HERE.cmd
++-- README.md
 ```
 
 ## Tài liệu chính
@@ -62,7 +62,7 @@ Các repo như `flex-frontend`, `flex-backend`, `flex-api-gateway` nên nằm ng
 Nếu đang dùng Windows và muốn thao tác đơn giản nhất, double-click:
 
 ```text
-START_HERE.cmd
+01_SETUP_WORKSTATION.cmd
 ```
 
 File này sẽ tự gọi `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để đọc kết quả.
@@ -83,7 +83,7 @@ File đã tồn tại ở `C:\Workspace\Project\.claude` sẽ được giữ ngu
 Để mở nhanh toàn bộ thư mục cha `C:\Workspace\Project` trong VS Code, double-click:
 
 ```text
-OPEN_PROJECT.cmd
+02_OPEN_PROJECT_ROOT.cmd
 ```
 
 Mở PowerShell tại thư mục repo và chạy:
@@ -126,7 +126,7 @@ claude
 Để VS Code theo dõi toàn bộ thư mục cha chứa các repo Flex, double-click:
 
 ```text
-OPEN_PROJECT.cmd
+02_OPEN_PROJECT_ROOT.cmd
 ```
 
 Hoặc chạy trực tiếp:
@@ -140,7 +140,7 @@ Sau khi mở thư mục cha, tab Source Control của VS Code sẽ hiển thị 
 ## Quy ước triển khai
 
 - Mỗi project con nên có thư mục riêng, tài liệu mục đích riêng và hướng dẫn chạy tối thiểu.
-- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `scripts/bootstrap.ps1`, entrypoint thân thiện nên đặt tại `START_HERE.cmd` hoặc `OPEN_PROJECT.cmd`, và ghi lại tại `docs/onboarding.md`.
+- Công cụ bắt buộc hoặc khuyến nghị cho người mới nên được đưa vào `scripts/bootstrap.ps1`, entrypoint thân thiện nên đặt tại `01_SETUP_WORKSTATION.cmd` hoặc `02_OPEN_PROJECT_ROOT.cmd`, và ghi lại tại `docs/onboarding.md`.
 - Task mới nên được ghi vào `docs/tasks.md` trước khi triển khai để tránh mất ngữ cảnh.
 - Thay đổi kiến trúc hoặc cách tổ chức thư mục cần được cập nhật vào `docs/architecture.md`.
 - Skill dùng chung nên đặt trong `skills/` và có mô tả rõ: khi nào dùng, đầu vào cần có, quy trình thực hiện, và kết quả mong đợi.
