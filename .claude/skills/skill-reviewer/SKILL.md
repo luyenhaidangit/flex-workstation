@@ -66,16 +66,16 @@ Trả báo cáo theo format sau — không thêm bớt cấu trúc:
 
 Xem ví dụ end-to-end hoàn chỉnh tại `references/example-report.md`.
 
-Nếu điểm < 60: khuyến nghị dùng `skill-creator` để cải tiến.
-Nếu điểm 60–79: liệt kê issues ưu tiên cao để user tự sửa.
-Nếu điểm ≥ 80: chỉ ra 1-2 điểm có thể polish thêm nếu muốn.
+Nếu điểm < 70: khuyến nghị dùng `skill-creator` để cải tiến.
+Nếu điểm 70–84: liệt kê issues ưu tiên cao để user tự sửa.
+Nếu điểm ≥ 85: chỉ ra 1-2 điểm có thể polish thêm nếu muốn.
 
 Task hoàn thành khi báo cáo đã được trả trong chat và user chưa yêu cầu làm gì thêm.
 
 ## Nguyên tắc chấm điểm
 
 - **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Mọi thay đổi là việc của user hoặc skill-creator; sửa trong khi review tạo feedback loop và bias kết quả.
-- **Pure read-only** — không tạo file, không chạy command, không fetch external URL trong quá trình review.
+- **Pure read-only** — không tạo file, không chạy command có side effect, không fetch external URL trong quá trình review; chỉ dùng thao tác đọc/inspect.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
 - Issues phải **cụ thể và có fix**:
