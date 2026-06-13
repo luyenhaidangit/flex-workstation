@@ -48,6 +48,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 Script sẽ:
 
 - Kiểm tra `git`, VS Code CLI `code`, `winget`.
+- Copy template cấu hình Claude từ `templates/project-root/.claude` ra `C:\Workspace\Project\.claude`.
 - Kiểm tra Claude Code CLI `claude`.
 - Nếu thiếu Claude Code, tự chạy native installer chính thức. Trên Windows:
 
@@ -66,6 +67,35 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 ```powershell
 .\scripts\bootstrap.ps1 -UseWinget
 ```
+
+## Cấu hình Claude được tạo sẵn
+
+Bootstrap chuẩn bị cấu hình Claude ở ngoài `flex-workstation`, tại thư mục cha chứa toàn bộ repo. Template nguồn nằm trong workstation:
+
+```text
+templates/project-root/.claude/
+```
+
+Đích sau khi bootstrap:
+
+```text
+C:\Workspace\Project\.claude\
+|-- agents\
+|-- commands\
+|-- hooks\
+|-- skills\
++-- settings.local.json
+```
+
+Quy ước:
+
+- `settings.local.json`: cấu hình local cho Claude Code, không nên commit vào repo.
+- `skills/`: skill dùng ở cấp workspace cha.
+- `agents/`: subagent dùng chung nếu cần cô lập context.
+- `commands/`: slash command dùng chung.
+- `hooks/`: script hoặc cấu hình hỗ trợ hook nếu sau này cần tự động hóa.
+
+Nếu file hoặc thư mục ở `C:\Workspace\Project\.claude` đã tồn tại, bootstrap giữ nguyên và không ghi đè. `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
 
 ## Đăng nhập Claude Code
 

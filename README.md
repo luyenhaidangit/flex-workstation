@@ -25,6 +25,9 @@ flex-workstation/
 |   +-- bootstrap.ps1
 |-- skills/
 |   +-- README.md
+|-- templates/
+|   +-- project-root/
+|       +-- .claude/
 |-- .gitattributes
 |-- CLAUDE.md
 |-- OPEN_PROJECT.cmd
@@ -63,6 +66,19 @@ START_HERE.cmd
 ```
 
 File này sẽ tự gọi `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để đọc kết quả.
+
+Bootstrap cũng copy template cấu hình Claude từ `templates/project-root/.claude` ra thư mục cha:
+
+```text
+C:\Workspace\Project\.claude\
+|-- agents\
+|-- commands\
+|-- hooks\
+|-- skills\
++-- settings.local.json
+```
+
+File đã tồn tại ở `C:\Workspace\Project\.claude` sẽ được giữ nguyên, không ghi đè.
 
 Để mở nhanh toàn bộ thư mục cha `C:\Workspace\Project` trong VS Code, double-click:
 

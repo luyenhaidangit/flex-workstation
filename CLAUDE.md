@@ -42,6 +42,7 @@ Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, nga
 - `START_HERE.cmd`: double-click để chạy bootstrap trên Windows.
 - `OPEN_PROJECT.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
 - `scripts/bootstrap.ps1`: script kỹ thuật, không phải entrypoint double-click.
+- Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` và không ghi đè file local đã tồn tại.
 
 ## Tài liệu cần đọc theo task
 

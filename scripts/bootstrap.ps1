@@ -66,6 +66,53 @@ function Install-ClaudeCodeNative {
     bash -lc "curl -fsSL https://claude.ai/install.sh | bash"
 }
 
+function Initialize-ClaudeProjectConfig {
+    $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
+    $templateRoot = (Resolve-Path "$PSScriptRoot\..\templates\project-root\.claude").Path
+    $claudeRoot = Join-Path $projectRoot ".claude"
+    $settingsPath = Join-Path $claudeRoot "settings.local.json"
+
+    Write-Step "Preparing Claude project configuration"
+
+    New-Item -ItemType Directory -Force -Path $claudeRoot | Out-Null
+
+    Get-ChildItem -LiteralPath $templateRoot -Directory -Recurse -Force | ForEach-Object {
+        $relativePath = $_.FullName.Substring($templateRoot.Length).TrimStart("\")
+        New-Item -ItemType Directory -Force -Path (Join-Path $claudeRoot $relativePath) | Out-Null
+    }
+
+    Get-ChildItem -LiteralPath $templateRoot -File -Recurse -Force | ForEach-Object {
+        if ($_.Name -eq ".gitkeep") {
+            return
+        }
+
+        $relativePath = $_.FullName.Substring($templateRoot.Length).TrimStart("\")
+        $targetPath = Join-Path $claudeRoot $relativePath
+        $targetDirectory = Split-Path -Parent $targetPath
+
+        New-Item -ItemType Directory -Force -Path $targetDirectory | Out-Null
+
+        if (Test-Path $targetPath) {
+            Write-Ok "Claude config already exists: $targetPath"
+        }
+        else {
+            Copy-Item -LiteralPath $_.FullName -Destination $targetPath
+            Write-Ok "Copied Claude config template: $targetPath"
+        }
+    }
+
+    if (Test-Path $settingsPath) {
+        try {
+            Get-Content -Raw -Encoding UTF8 $settingsPath | ConvertFrom-Json | Out-Null
+            Write-Ok "Claude settings found: $settingsPath"
+        }
+        catch {
+            Write-Warn "Claude settings exists but is not valid JSON: $settingsPath"
+        }
+    }
+    Write-Ok "Claude config folders ready: $claudeRoot"
+}
+
 Write-Step "Checking workstation prerequisites"
 
 if (Test-Command "git") {
@@ -88,6 +135,8 @@ if (Test-Command "winget") {
 else {
     Write-Warn "WinGet is missing. This is fine because the default Claude Code install path is the native installer."
 }
+
+Initialize-ClaudeProjectConfig
 
 Write-Step "Checking Claude Code"
 
