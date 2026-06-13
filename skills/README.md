@@ -4,7 +4,7 @@ Thư mục `skills/` dùng để lưu các skill hoặc hướng dẫn thao tác
 
 ## Mục đích
 
-- Lưu các quy trình lặp lại để Codex hoặc người phát triển có thể thực hiện nhất quán.
+- Lưu các quy trình lặp lại để Claude Code (hoặc AI assistant khác) thực hiện nhất quán.
 - Chuẩn hóa cách phân tích, triển khai, kiểm thử, viết tài liệu và review.
 - Giữ skill ở cùng repository để dễ chia sẻ bối cảnh giữa các project con.
 
@@ -58,3 +58,4 @@ Mô tả tình huống kích hoạt skill.
 - Tên skill nên ngắn, viết bằng chữ thường và dùng dấu gạch ngang, ví dụ `api-review`.
 - Không đưa thông tin nhạy cảm, token, khóa API hoặc credential vào skill.
 - Skill chỉ nên chứa quy trình có khả năng tái sử dụng, không chứa ghi chú tạm thời của một task đơn lẻ.
+- Description phải cụ thể: kê rõ "skill làm gì" + "khi nào trigger" (file/keyword/tình huống). Description chung chung dẫn đến undertrigger, skill ít được dùng.

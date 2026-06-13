@@ -70,32 +70,9 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 
 ## Cấu hình Claude được tạo sẵn
 
-Bootstrap chuẩn bị cấu hình Claude ở ngoài `flex-workstation`, tại thư mục cha chứa toàn bộ repo. Template nguồn nằm trong workstation:
+Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
 
-```text
-templates/project-root/.claude/
-```
-
-Đích sau khi bootstrap:
-
-```text
-C:\Workspace\Project\.claude\
-|-- agents\
-|-- commands\
-|-- hooks\
-|-- skills\
-+-- settings.local.json
-```
-
-Quy ước:
-
-- `settings.local.json`: cấu hình local cho Claude Code, không nên commit vào repo.
-- `skills/`: skill dùng ở cấp workspace cha.
-- `agents/`: subagent dùng chung nếu cần cô lập context.
-- `commands/`: slash command dùng chung.
-- `hooks/`: script hoặc cấu hình hỗ trợ hook nếu sau này cần tự động hóa.
-
-Nếu file hoặc thư mục ở `C:\Workspace\Project\.claude` đã tồn tại, bootstrap giữ nguyên và không ghi đè. `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
+Chi tiết cấu trúc `.claude` và vai trò từng thư mục con: xem [docs/architecture.md](architecture.md).
 
 ## Đăng nhập Claude Code
 
@@ -141,7 +118,6 @@ Hoặc chạy bootstrap kèm mở workspace:
 ## Ghi chú
 
 - Không nên double-click trực tiếp `scripts/bootstrap.ps1`. Windows thường sẽ hỏi chọn app để mở file `.ps1` hoặc mở bằng editor thay vì chạy script.
-- Dùng `OPEN_WORKSPACE.cmd` khi muốn mở VS Code tại thư mục cha `C:\Workspace\Project`.
 - Claude Code yêu cầu tài khoản có quyền dùng Claude Code, ví dụ Pro, Max, Team, Enterprise hoặc Console.
 - Git for Windows được khuyến nghị để Claude Code có thể dùng Git Bash trên Windows.
 - Hướng dẫn cài đặt Claude Code chính thức: <https://code.claude.com/docs/en/setup>.

@@ -16,7 +16,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `scripts/bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
 | `SETUP_WORKSTATION.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
 | `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
-| `skills/` | Nơi lưu skill dùng chung cho Codex hoặc quy trình làm việc lặp lại. |
+| `skills/` | Nơi lưu skill org-share dùng chung giữa các project Flex (Claude Code hoặc AI assistant khác). |
 | `templates/project-root/.claude` | Template cấu hình Claude được bootstrap copy ra thư mục cha `C:\Workspace\Project\.claude`. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |
 
@@ -42,18 +42,7 @@ C:\Workspace\Project\
 
 ## Kiến trúc project con
 
-Các repository thuộc hệ thống Flex nên nằm ngang hàng trong cùng một thư mục cha. Cấu trúc local khuyến nghị:
-
-```text
-C:\Workspace\Project\
-|-- flex-workstation\
-|-- flex-frontend\
-|-- flex-backend\
-|-- flex-api-gateway\
-+-- ...
-```
-
-`flex-workstation` không chứa mã nguồn của các repo nghiệp vụ. Nó chỉ giữ vai trò điều phối, tài liệu, bootstrap và cấu hình workspace. Trước khi onboarding hoặc thêm repo mới, cần xác nhận lại đường dẫn này với người dùng.
+`flex-workstation` không chứa mã nguồn của các repo nghiệp vụ — chỉ giữ vai trò điều phối, tài liệu, bootstrap và cấu hình workspace. Các repo Flex nằm ngang hàng trong `C:\Workspace\Project\` (chi tiết và bước xác nhận: [docs/onboarding.md](onboarding.md)).
 
 Khi thêm project mới, nên dùng cấu trúc tối thiểu:
 
@@ -97,9 +86,3 @@ Danh sách chi tiết được quản lý tại [docs/projects.md](projects.md).
 | Project | Mục đích | Công nghệ | Trạng thái | Ghi chú |
 | --- | --- | --- | --- | --- |
 | `flex-api-gateway` | API Gateway cho nhóm project Flex | .NET solution, Docker, Jenkins | Dự kiến | Local path mục tiêu: `C:\Workspace\Project\flex-api-gateway`. |
-
-## Hướng phát triển tiếp theo
-
-- Bổ sung các project cần quản lý trong `docs/projects.md`.
-- Bổ sung sơ đồ luồng triển khai nếu có nhiều project phụ thuộc nhau.
-- Chuẩn hóa quy ước branch, commit, test và release nếu workspace bắt đầu có sản phẩm chạy được.
