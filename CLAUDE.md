@@ -16,7 +16,7 @@ Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tà
 
 ## Entrypoint Windows
 
-- `SETUP_WORKSTATION.cmd`: double-click để chạy bootstrap.
+- `SETUP_WORKSPACE.cmd`: double-click để chạy bootstrap.
 - `OPEN_WORKSPACE.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
 - `scripts/bootstrap.ps1`: script kỹ thuật bên trong, không phải entrypoint double-click.
 

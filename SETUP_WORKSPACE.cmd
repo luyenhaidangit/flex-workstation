@@ -4,7 +4,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================================
-echo  flex-workstation - setup workstation
+echo  flex-workstation - setup workspace
 echo ============================================================
 echo.
 echo This setup will:

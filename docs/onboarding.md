@@ -33,7 +33,7 @@ Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, nga
 Trên Windows, cách đơn giản nhất là double-click file ở root repo:
 
 ```text
-SETUP_WORKSTATION.cmd
+SETUP_WORKSPACE.cmd
 ```
 
 File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell và giữ cửa sổ lại để bạn đọc kết quả.
