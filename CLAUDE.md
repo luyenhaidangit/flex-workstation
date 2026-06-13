@@ -13,6 +13,7 @@ Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tà
   - Onboarding/bootstrap → `docs/onboarding.md`
   - Kiến trúc/quy ước kỹ thuật → `docs/architecture.md`
   - Danh sách project con → `docs/projects.md`
+  - Skill dùng chung → `config/workspace-skills.json`
 
 ## Entrypoint Windows
 

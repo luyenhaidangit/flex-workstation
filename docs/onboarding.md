@@ -49,6 +49,7 @@ Script sẽ:
 
 - Kiểm tra `git`, VS Code CLI `code`, `winget`.
 - Copy template cấu hình Claude từ `templates/project-root/.claude` ra `C:\Workspace\Project\.claude`.
+- Sync skill local dùng chung từ `config/workspace-skills.json` vào `C:\Workspace\Project\.claude\skills`.
 - Kiểm tra Claude Code CLI `claude`.
 - Nếu thiếu Claude Code, tự chạy native installer chính thức. Trên Windows:
 
@@ -73,6 +74,45 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
 
 Chi tiết cấu trúc `.claude` và vai trò từng thư mục con: xem [docs/architecture.md](architecture.md).
+
+## Skill dùng chung cho workspace
+
+Khai báo skill local dùng chung tại:
+
+```text
+config/workspace-skills.json
+```
+
+Ví dụ thêm một skill local:
+
+```json
+{
+  "localSkills": [
+    {
+      "name": "backend-dotnet",
+      "path": "C:/Workspace/Shared/skills/backend-dotnet"
+    }
+  ]
+}
+```
+
+Yêu cầu của mỗi skill folder:
+
+- Có file `SKILL.md`.
+- Nếu không khai báo `name`, script sẽ đọc `name:` trong frontmatter của `SKILL.md`.
+- Mặc định không ghi đè skill đã tồn tại ở `C:\Workspace\Project\.claude\skills`.
+
+Sync thủ công:
+
+```powershell
+.\scripts\sync-workspace-skills.ps1
+```
+
+Ghi đè khi muốn cập nhật lại từ nguồn:
+
+```powershell
+.\scripts\sync-workspace-skills.ps1 -Force
+```
 
 ## Đăng nhập Claude Code
 

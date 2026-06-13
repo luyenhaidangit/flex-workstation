@@ -16,6 +16,8 @@
 flex-workstation/
 |-- .vscode/
 |   +-- tasks.json
+|-- config/
+|   +-- workspace-skills.json
 |-- docs/
 |   |-- architecture.md
 |   |-- onboarding.md
@@ -23,6 +25,7 @@ flex-workstation/
 |   +-- tasks.md
 |-- scripts/
 |   +-- bootstrap.ps1
+|   +-- sync-workspace-skills.ps1
 |-- skills/
 |   +-- README.md
 |-- templates/
@@ -39,6 +42,7 @@ flex-workstation/
 ## Tài liệu chính
 
 - [CLAUDE.md](CLAUDE.md): quy ước cho Claude Code khi làm việc trong workstation.
+- [config/workspace-skills.json](config/workspace-skills.json): khai báo skill local dùng chung cho workspace Claude.
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới, cấu trúc local, mở workspace VS Code.
 - [docs/architecture.md](docs/architecture.md): kiến trúc tổng quan, vai trò từng project, quy ước tích hợp.
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
@@ -52,3 +56,17 @@ Trên Windows: double-click `SETUP_WORKSPACE.cmd` để chạy bootstrap, sau đ
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
 
 Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
+
+## Skill dùng chung
+
+Skill dùng chung cho workspace được khai báo trong `config/workspace-skills.json` và được sync vào:
+
+```text
+C:\Workspace\Project\.claude\skills
+```
+
+Bootstrap sẽ tự chạy sync. Nếu muốn sync thủ công:
+
+```powershell
+.\scripts\sync-workspace-skills.ps1
+```

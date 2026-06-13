@@ -138,6 +138,8 @@ else {
 
 Initialize-ClaudeProjectConfig
 
+& "$PSScriptRoot\sync-workspace-skills.ps1"
+
 Write-Step "Checking Claude Code"
 
 if (Test-Command "claude") {
