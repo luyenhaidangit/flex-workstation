@@ -35,7 +35,7 @@ Nhận diện skill cần review từ yêu cầu:
 
 ### 3. Chấm điểm theo 5 trục
 
-Đọc chi tiết tiêu chí từng trục trong `references/rubric.md` trước khi chấm. Với mỗi trục: ghi điểm, liệt kê issues cụ thể (file:line nếu có).
+Đọc chi tiết tiêu chí từng trục trong `references/rubric.md` trước khi chấm — vì rubric là source-of-truth duy nhất; chấm từ memory dễ lệch khi rubric được cập nhật. Với mỗi trục: ghi điểm, liệt kê issues cụ thể (file:line nếu có).
 
 ### 4. Tổng hợp và trả kết quả
 
@@ -64,6 +64,8 @@ Trả báo cáo theo format sau — không thêm bớt cấu trúc:
 [1-2 câu nhận xét tổng + khuyến nghị bước tiếp theo]
 ```
 
+Xem ví dụ end-to-end hoàn chỉnh tại `references/example-report.md`.
+
 Nếu điểm < 60: khuyến nghị dùng `skill-creator` để cải tiến.
 Nếu điểm 60–79: liệt kê issues ưu tiên cao để user tự sửa.
 Nếu điểm ≥ 80: chỉ ra 1-2 điểm có thể polish thêm nếu muốn.
@@ -72,7 +74,8 @@ Task hoàn thành khi báo cáo đã được trả trong chat và user chưa y�
 
 ## Nguyên tắc chấm điểm
 
-- **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Mọi thay đổi là việc của user hoặc skill-creator.
+- **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Mọi thay đổi là việc của user hoặc skill-creator; sửa trong khi review tạo feedback loop và bias kết quả.
+- **Pure read-only** — không tạo file, không chạy command, không fetch external URL trong quá trình review.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
 - Issues phải **cụ thể và có fix**:
