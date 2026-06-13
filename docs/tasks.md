@@ -27,6 +27,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint sync workspace skills | Xem `SYNC_WORKSPACE_SKILLS.cmd`. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` nhưng không ghi đè file local đã tồn tại. |
+| Done | Cao | Thêm template `.claude/settings.json` | Dùng cho cấu hình workspace chung; `settings.local.json` giữ cấu hình local theo máy/người dùng. |
 | Done | Cao | Bootstrap root memory cho Claude tại workspace root | Copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. |
 | Done | Cao | Tạo cơ chế sync skill dùng chung cho workspace | Xem `config/workspace-skills.json` và `scripts/sync-workspace-skills.ps1`. Phase đầu chỉ hỗ trợ local skill folder. |
 | Done | Trung bình | Tạo skill `agent-instructions-architect` | Skill quản lý tầng instructions Claude Code (CLAUDE.md, memory, rules, subagent, SKILL.md, slash command, output style) với 3 chế độ Generate/Review/Improve. Nếu dùng chung khi started, đặt skill vào `templates/project-root/.claude/skills/` để bootstrap copy ra `C:\Workspace\Project\.claude\skills`. |

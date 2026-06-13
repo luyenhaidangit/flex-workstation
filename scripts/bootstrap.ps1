@@ -72,6 +72,7 @@ function Initialize-ClaudeProjectConfig {
     $projectRootClaudeTemplate = Join-Path $PSScriptRoot "..\templates\project-root\CLAUDE.md"
     $projectRootClaudePath = Join-Path $projectRoot "CLAUDE.md"
     $claudeRoot = Join-Path $projectRoot ".claude"
+    $settingsSharedPath = Join-Path $claudeRoot "settings.json"
     $settingsPath = Join-Path $claudeRoot "settings.local.json"
 
     Write-Step "Preparing Claude project configuration"
@@ -113,13 +114,23 @@ function Initialize-ClaudeProjectConfig {
         }
     }
 
+    if (Test-Path $settingsSharedPath) {
+        try {
+            Get-Content -Raw -Encoding UTF8 $settingsSharedPath | ConvertFrom-Json | Out-Null
+            Write-Ok "Claude shared settings found: $settingsSharedPath"
+        }
+        catch {
+            Write-Warn "Claude shared settings exists but is not valid JSON: $settingsSharedPath"
+        }
+    }
+
     if (Test-Path $settingsPath) {
         try {
             Get-Content -Raw -Encoding UTF8 $settingsPath | ConvertFrom-Json | Out-Null
-            Write-Ok "Claude settings found: $settingsPath"
+            Write-Ok "Claude local settings found: $settingsPath"
         }
         catch {
-            Write-Warn "Claude settings exists but is not valid JSON: $settingsPath"
+            Write-Warn "Claude local settings exists but is not valid JSON: $settingsPath"
         }
     }
     Write-Ok "Claude config folders ready: $claudeRoot"

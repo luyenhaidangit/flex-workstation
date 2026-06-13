@@ -72,7 +72,12 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 
 ## Cấu hình Claude được tạo sẵn
 
-Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
+Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.json` và `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
+
+Quy ước:
+
+- `settings.json`: cấu hình dùng chung cho workspace, ví dụ model mặc định.
+- `settings.local.json`: cấu hình local theo máy/người dùng, ví dụ permissions.
 
 Bootstrap cũng copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. File này giúp Claude hiểu rằng `flex-workstation` là source-of-truth khi Claude được mở tại workspace root.
 

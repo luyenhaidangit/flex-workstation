@@ -36,6 +36,7 @@ C:\Workspace\Project\
 |   |-- commands\
 |   |-- hooks\
 |   |-- skills\
+|   |-- settings.json
 |   +-- settings.local.json
 |-- flex-workstation\
 |-- flex-frontend\
@@ -44,6 +45,11 @@ C:\Workspace\Project\
 ```
 
 `flex-workstation` chỉ chứa template, script và tài liệu để tạo cấu trúc này. Runtime config dùng chung nằm ở `C:\Workspace\Project\.claude`; template nguồn nằm tại `templates/project-root/.claude`.
+
+Quy ước settings:
+
+- `settings.json`: cấu hình dùng chung cho workspace, ví dụ model mặc định.
+- `settings.local.json`: cấu hình local theo máy/người dùng, ví dụ permissions.
 
 Khi mở Claude tại `C:\Workspace\Project`, root memory `C:\Workspace\Project\CLAUDE.md` được copy từ `templates/project-root/CLAUDE.md` để tránh Claude tạo nhầm source file trực tiếp ở workspace root.
 
