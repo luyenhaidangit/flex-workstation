@@ -1,0 +1,73 @@
+---
+name: skill-reviewer
+description: Dùng khi người dùng muốn "review skill X", "audit SKILL.md", "skill này có vấn đề gì không", "check chất lượng skill Y", "skill viết đúng chưa", "cải thiện skill" mà KHÔNG muốn chạy eval hay tạo skill mới — skill tự đọc SKILL.md chỉ định, chấm điểm theo 5 trục, và trả báo cáo có điểm + fix suggestions cụ thể trực tiếp trong chat.
+---
+
+# Skill Reviewer
+
+Audit nhanh một SKILL.md hiện có theo 5 trục tiêu chí, trả báo cáo có điểm + fix suggestions cụ thể. Không chạy eval, không tạo skill mới.
+
+## Khi nào dùng skill này (không dùng `skill-creator`)
+
+- User muốn biết skill hiện tại **có vấn đề gì** — chỉ cần chẩn đoán, chưa cần chữa
+- Muốn **điểm số nhanh** trước khi quyết định có cần đầu tư cải tiến không
+- Muốn **checklist cụ thể** để tự sửa
+
+Nếu user muốn tạo mới hoặc chạy eval → dùng `skill-creator` thay thế.
+
+## Quy trình
+
+### 1. Xác định target
+
+Nhận diện skill cần review từ yêu cầu:
+- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (runtime path) hoặc `flex-workstation/.claude/skills/<name>/SKILL.md` (source path)
+- Nếu không rõ → hỏi 1 câu: "Skill nào bạn muốn review?"
+
+### 2. Thu thập thông tin
+
+Đọc song song:
+- `SKILL.md` của skill target
+- Kiểm tra sự tồn tại của các file/thư mục được nhắc đến trong body (references/, scripts/, assets/)
+- Kiểm tra `flex-workstation/config/workspace-skills.json` để xem skill có được đăng ký chưa
+
+### 3. Chấm điểm theo 5 trục
+
+Đọc chi tiết tiêu chí từng trục trong `references/rubric.md` trước khi chấm. Với mỗi trục: ghi điểm, liệt kê issues cụ thể (file:line nếu có).
+
+### 4. Tổng hợp và trả kết quả
+
+Trả báo cáo theo format sau — không thêm bớt cấu trúc:
+
+```
+## Skill Review: [skill-name]
+**Score: XX/100**
+
+| Trục | Điểm | Tối đa |
+|---|---|---|
+| Description/Trigger | X | 25 |
+| Cấu trúc body | X | 20 |
+| Completeness | X | 20 |
+| Chất lượng instructions | X | 20 |
+| Workspace conventions | X | 15 |
+
+### Issues (theo mức độ ưu tiên)
+1. `[file:line]` — [vấn đề ngắn gọn] → [fix cụ thể]
+2. ...
+
+### Không có vấn đề tại
+- [điểm đã làm tốt, nếu có]
+
+### Tóm tắt
+[1-2 câu nhận xét tổng + khuyến nghị bước tiếp theo]
+```
+
+Nếu điểm < 60: khuyến nghị dùng `skill-creator` để cải tiến.
+Nếu điểm 60–79: liệt kê issues ưu tiên cao để user tự sửa.
+Nếu điểm ≥ 80: chỉ ra 1-2 điểm có thể polish thêm nếu muốn.
+
+## Nguyên tắc chấm điểm
+
+- Chấm theo **bằng chứng trong file**, không theo ý định.
+- Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
+- Issues phải **cụ thể và có fix**: không viết "description chưa tốt" mà viết "description thiếu trigger phrase → thêm 'Dùng khi người dùng nói X hoặc Y'".
+- Tối đa **7 issues** — thà ít mà actionable.

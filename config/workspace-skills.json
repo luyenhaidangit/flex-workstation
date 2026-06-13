@@ -11,6 +11,10 @@
     {
       "name": "ai-radar",
       "path": ".claude/skills/ai-radar"
+    },
+    {
+      "name": "skill-reviewer",
+      "path": ".claude/skills/skill-reviewer"
     }
   ]
 }
