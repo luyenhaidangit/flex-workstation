@@ -45,10 +45,10 @@ Trả báo cáo theo format sau — không thêm bớt cấu trúc:
 | Trục | Điểm | Tối đa |
 |---|---|---|
 | Description/Trigger | X | 25 |
-| Cấu trúc body | X | 20 |
-| Completeness | X | 20 |
-| Chất lượng instructions | X | 20 |
-| Workspace conventions | X | 15 |
+| Cấu trúc body | X | 15 |
+| Completeness & Operational clarity | X | 25 |
+| Chất lượng instructions | X | 25 |
+| Workspace conventions | X | 10 |
 
 ### Issues (theo mức độ ưu tiên)
 1. `[file:line]` — [vấn đề ngắn gọn] → [fix cụ thể]
