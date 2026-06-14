@@ -129,7 +129,7 @@ foreach ($source in $externalSources) {
         if ($type -eq "skills") {
             foreach ($dir in (Get-ChildItem -Path $srcPath -Directory)) {
                 if (-not (Test-Path (Join-Path $dir.FullName "SKILL.md"))) { continue }
-                if ($discovered[$type].ContainsKey($dir.Name)) {
+                if ($discovered[$type].Contains($dir.Name)) {
                     Write-Warn "Skill '$($dir.Name)' from '$($source.name)' skipped - name collision."
                     continue
                 }
@@ -137,7 +137,7 @@ foreach ($source in $externalSources) {
             }
         } else {
             foreach ($file in (Get-ChildItem -Path $srcPath -Filter "*.md" -File)) {
-                if ($discovered[$type].ContainsKey($file.BaseName)) {
+                if ($discovered[$type].Contains($file.BaseName)) {
                     Write-Warn "$type '$($file.BaseName)' from '$($source.name)' skipped - name collision."
                     continue
                 }
@@ -165,7 +165,7 @@ if ($localSkills.Count -gt 0) {
         if (-not $name) { $name = Get-SkillNameFromManifest -SkillPath $srcPath }
         if (-not $name) { $name = Split-Path -Leaf $srcPath }
 
-        $isOverride = $discovered["skills"].ContainsKey($name)
+        $isOverride = $discovered["skills"].Contains($name)
         $discovered["skills"][$name] = @{ path = $srcPath; source = "local"; isFile = $false; isOverride = $isOverride }
     }
 }
