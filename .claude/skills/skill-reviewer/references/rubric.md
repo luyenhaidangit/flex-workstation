@@ -133,6 +133,43 @@ Tiêu chí đặc thù của workspace này (flex-workstation).
 
 ---
 
+## Nhận xét nội dung (Domain Review) — không tính điểm
+
+Phần này là định tính, bổ sung sau 5 trục cấu trúc. Mục tiêu: phát hiện instruction sai domain, thiếu bước quan trọng, hoặc dùng methodology không phù hợp — điều mà chấm cấu trúc không thể phát hiện.
+
+### Cách tiếp cận
+
+**Bước 1 — Xác định domain:** Đọc toàn bộ skill body và tự hỏi "Skill này đang giúp ai làm gì trong lĩnh vực nào?" Ví dụ: BA requirements, DevOps CI/CD, UX research, data pipeline...
+
+**Bước 2 — Đánh giá methodology:** So sánh approach trong skill với kiến thức domain phổ biến:
+- Framework/quy trình được nhắc đến có tồn tại và đúng tên không?
+- Thứ tự các bước có hợp logic của domain không?
+- Có bước nào quan trọng trong domain thực tế nhưng bị bỏ qua không?
+- Có instruction nào đi ngược lại best practice thông thường không?
+
+**Bước 3 — Flag điểm đáng ngờ:** Liệt kê instruction cụ thể (file:line) trông có vẻ không chuẩn và giải thích tại sao — đây là gợi ý để user tự verify, không phải kết luận cuối.
+
+### Giới hạn quan trọng
+
+- Nhận xét chỉ dựa trên kiến thức domain **phổ biến** — không đại diện cho chuẩn nội bộ của từng tổ chức.
+- Với domain **đặc thù cao** (pháp lý, y tế, tài chính, quy định ngành) → luôn ghi chú cần subject matter expert xác nhận.
+- Nếu skill không có domain nghiệp vụ (vd: skill format output, skill sync file) → ghi "N/A" và không cố nhận xét.
+- Không downgrade score cấu trúc vì lý do content — 2 chiều hoàn toàn độc lập.
+
+### Ví dụ tốt vs không tốt
+
+**Tốt:**
+> **Domain:** Business Analysis
+> **Methodology:** Skill dùng flow "stakeholder interview → as-is process → gap analysis → to-be process" — đúng chuẩn BA cơ bản. Tuy nhiên thiếu bước sign-off với sponsor trước khi chuyển sang design, thường là yêu cầu bắt buộc trong dự án lớn.
+> **Điểm cần verify:** `SKILL.md:34` — nhắc đến "BPMN 2.0 notation" nhưng instruction thực tế chỉ mô tả flowchart thông thường, không phải BPMN 2.0 chuẩn → nên bỏ tên BPMN hoặc thêm rule cụ thể về notation.
+
+**Không tốt:**
+> Skill này có vẻ ổn về mặt nội dung, không phát hiện vấn đề gì nghiêm trọng.
+
+*(Không tốt vì quá chung chung, không chỉ ra được gì cụ thể để user verify.)*
+
+---
+
 ## Thang điểm tổng
 
 | Điểm | Nhận xét | Hành động khuyến nghị |

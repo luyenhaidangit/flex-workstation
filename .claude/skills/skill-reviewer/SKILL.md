@@ -3,14 +3,15 @@ name: skill-reviewer
 description: >
   Dùng khi người dùng muốn "review skill X", "audit SKILL.md",
   "skill này có vấn đề gì không", "check chất lượng skill Y",
-  "skill viết đúng chưa", "muốn review để biết nên cải thiện gì". Không dùng khi user muốn
-  AI sửa hẳn (→ skill-creator) hoặc chạy eval/tạo skill mới.
-  Output: báo cáo điểm/100 theo 5 trục + danh sách fix suggestions cụ thể.
+  "skill viết đúng chưa", "muốn review để biết nên cải thiện gì",
+  "nội dung skill có đúng không", "skill BA/PM/dev này thiếu gì không".
+  Không dùng khi user muốn AI sửa hẳn (→ skill-creator) hoặc chạy eval/tạo skill mới.
+  Output: báo cáo điểm/100 theo 5 trục cấu trúc + nhận xét nội dung domain + danh sách fix suggestions cụ thể.
 ---
 
 # Skill Reviewer
 
-Audit nhanh một SKILL.md hiện có theo 5 trục tiêu chí, trả báo cáo có điểm + fix suggestions cụ thể. Không chạy eval, không tạo skill mới.
+Audit một SKILL.md hiện có theo 2 chiều: (1) 5 trục cấu trúc cho điểm số, (2) nhận xét nội dung domain. Không chạy eval, không tạo skill mới.
 
 ## Khi nào dùng skill này (không dùng `skill-creator`)
 
@@ -43,6 +44,17 @@ Nhận diện skill cần review từ yêu cầu:
 
 Đọc chi tiết tiêu chí từng trục trong `references/rubric.md` trước khi chấm — vì rubric là source-of-truth duy nhất; chấm từ memory dễ lệch khi rubric được cập nhật. Với mỗi trục: ghi điểm, liệt kê issues cụ thể (file:line nếu có).
 
+### 3.5 Nhận xét nội dung domain
+
+Sau khi chấm cấu trúc, đánh giá thêm **nội dung** của skill — không cho điểm, chỉ nhận xét định tính. Đọc hướng dẫn chi tiết tại `references/rubric.md` (phần "Nhận xét nội dung").
+
+Trả lời 3 câu hỏi:
+- **Domain là gì?** Skill phục vụ lĩnh vực nào (BA, DevOps, UX, data...).
+- **Methodology có ổn không?** Approach/framework được dùng có phù hợp với domain đó không; có bước nào sai, thiếu, hoặc lỗi thời không.
+- **Điểm đáng ngờ nào cần verify?** Instruction nào trông có vẻ không chuẩn mà cần subject matter expert xác nhận.
+
+Nếu skill không có domain cụ thể (vd: skill quản lý file, format output) → ghi "N/A — skill không có domain nghiệp vụ để review".
+
 ### 4. Tổng hợp và trả kết quả
 
 Trả báo cáo theo format sau — không thêm bớt cấu trúc, trừ khi user yêu cầu focus/scope hẹp hơn (vd: "chỉ check Trục 1"):
@@ -65,6 +77,15 @@ Trả báo cáo theo format sau — không thêm bớt cấu trúc, trừ khi us
 
 ### Không có vấn đề tại
 - [điểm đã làm tốt, nếu có]
+
+### Nhận xét nội dung
+**Domain:** [tên lĩnh vực / "N/A"]
+
+**Methodology:** [approach có phù hợp không; bước quan trọng nào còn thiếu]
+
+**Điểm cần verify:** [instruction nào trông không chuẩn, cần SME xác nhận — hoặc "Không phát hiện vấn đề"]
+
+> Nhận xét dựa trên kiến thức domain chung. Với lĩnh vực đặc thù (pháp lý, y tế, tài chính...) cần subject matter expert xác nhận.
 
 ### Tóm tắt
 [1-2 câu nhận xét tổng + khuyến nghị bước tiếp theo]

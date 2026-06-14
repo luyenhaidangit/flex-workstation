@@ -41,5 +41,14 @@ Skill `run-tests` có SKILL.md 45 dòng, frontmatter YAML không parse được 
 - Cấu trúc body viết imperative, dưới 500 dòng
 - Input contract có phân biệt required/optional
 
+### Nhận xét nội dung
+**Domain:** DevOps / CI testing
+
+**Methodology:** Flow "detect test type → pick runner → report result" hợp lý cho skill chạy test đơn giản. Tuy nhiên thiếu bước xử lý khi test environment chưa sẵn sàng (vd: service dependency chưa up) — thực tế hay gặp và thường cần retry logic hoặc skip condition.
+
+**Điểm cần verify:** `SKILL.md:18` — nhắc đến "chạy integration test" nhưng không có rule nào ngăn skill ghi vào DB test chung; nếu nhiều agent chạy song song sẽ conflict → cân nhắc thêm isolation requirement.
+
+> Nhận xét dựa trên kiến thức domain chung. Với lĩnh vực đặc thù (pháp lý, y tế, tài chính...) cần subject matter expert xác nhận.
+
 ### Tóm tắt
 Skill chưa nên dùng production vì frontmatter YAML có nguy cơ làm skill không load. Khuyến nghị dùng `skill-creator` để iterate nhanh hơn — sửa YAML trước, rồi bổ sung definition of done và khai báo workspace-skills.json.
