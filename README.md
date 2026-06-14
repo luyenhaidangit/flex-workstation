@@ -25,6 +25,7 @@ flex-workstation/
 |   +-- tasks.md
 |-- scripts/
 |   +-- bootstrap.ps1
+|   +-- check-skill-path.ps1
 |   +-- sync-workspace-skills.ps1
 |-- skills/
 |   +-- README.md
@@ -50,6 +51,10 @@ flex-workstation/
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
 - [docs/tasks.md](docs/tasks.md): danh sách task, trạng thái, độ ưu tiên.
 - [skills/README.md](skills/README.md): skill org-share dùng chung trong workspace.
+
+## Hook bảo vệ skill runtime
+
+Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills`. Skill source phải được sửa trong `flex-workstation/.claude/skills` hoặc path đã khai báo trong `config/workspace-skills.json`, rồi sync lại.
 
 ## Khởi tạo nhanh
 

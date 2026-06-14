@@ -15,6 +15,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `config/workspace-skills.json` | Manifest khai báo skill local dùng chung cho workspace Claude. |
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
 | `scripts/bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
+| `scripts/check-skill-path.ps1` | Hook script dùng bởi Claude settings để chặn sửa trực tiếp vào skill runtime trong `C:\Workspace\Project\.claude\skills`. |
 | `scripts/sync-workspace-skills.ps1` | Script sync skill local dùng chung vào `C:\Workspace\Project\.claude\skills`. |
 | `SETUP_WORKSPACE.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
 | `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
@@ -50,6 +51,7 @@ Quy ước settings:
 
 - `settings.json`: cấu hình dùng chung cho workspace, ví dụ model mặc định.
 - `settings.local.json`: cấu hình local theo máy/người dùng, ví dụ permissions.
+- Hook trong `settings.json` gọi `flex-workstation\scripts\check-skill-path.ps1` từ workspace root; không đặt hook script trong `.claude\scripts`.
 
 Khi mở Claude tại `C:\Workspace\Project`, root memory `C:\Workspace\Project\CLAUDE.md` được copy từ `templates/project-root/CLAUDE.md` để tránh Claude tạo nhầm source file trực tiếp ở workspace root.
 

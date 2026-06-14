@@ -78,6 +78,7 @@ Quy ước:
 
 - `settings.json`: cấu hình dùng chung cho workspace, ví dụ model mặc định.
 - `settings.local.json`: cấu hình local theo máy/người dùng, ví dụ permissions.
+- Hook bảo vệ skill runtime trong `settings.json` gọi `flex-workstation\scripts\check-skill-path.ps1`, vì script dùng chung nằm trong workstation source chứ không nằm trong runtime `.claude\scripts`.
 
 Bootstrap cũng copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. File này giúp Claude hiểu rằng `flex-workstation` là source-of-truth khi Claude được mở tại workspace root.
 
@@ -135,6 +136,8 @@ Ghi đè khi muốn cập nhật lại từ nguồn:
 ```powershell
 .\scripts\sync-workspace-skills.ps1 -Force
 ```
+
+Không sửa trực tiếp file trong `C:\Workspace\Project\.claude\skills`; hook `scripts/check-skill-path.ps1` sẽ chặn thao tác này để tránh mất thay đổi khi sync lại.
 
 ## Đăng nhập Claude Code
 

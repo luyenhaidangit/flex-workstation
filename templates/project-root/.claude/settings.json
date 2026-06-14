@@ -13,7 +13,7 @@
           {
             "type": "command",
             "command": "powershell",
-            "args": ["-NoProfile", "-NonInteractive", "-File", ".claude\\scripts\\check-skill-path.ps1"],
+            "args": ["-NoProfile", "-NonInteractive", "-File", "flex-workstation\\scripts\\check-skill-path.ps1"],
             "statusMessage": "Kiem tra vi tri skill source..."
           }
         ]
