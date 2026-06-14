@@ -29,10 +29,10 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` nhưng không ghi đè file local đã tồn tại. |
 | Done | Cao | Thêm template `.claude/settings.json` | Dùng cho cấu hình workspace chung; `settings.local.json` giữ cấu hình local theo máy/người dùng. |
 | Done | Cao | Bootstrap root memory cho Claude tại workspace root | Copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. |
-| Done | Cao | Tạo cơ chế sync skill dùng chung cho workspace | Xem `config/workspace-assistants.json` và `scripts/sync-workspace-skills.ps1`. Phase đầu chỉ hỗ trợ local skill folder. |
+| Done | Cao | Tạo cơ chế sync skill dùng chung cho workspace | Xem `config/workspace-assistants.json` và `scripts/sync-workspace-skills.ps1`. Hỗ trợ local skill, external source clone-once và local override theo tên skill. |
 | Done | Cao | Bổ sung project-root structure cho Codex | Thêm `templates/project-root/AGENTS.md`, `.agents/skills`, và sync skill sang `C:\Workspace\Project\.agents\skills`. |
 | Done | Cao | Đưa hook script kiểm tra skill path về `scripts/` | `scripts/check-skill-path.ps1` là source dùng chung; `.claude/settings.json` chỉ gọi script này từ workspace root. |
-| Done | Trung bình | Tạo skill `agent-instructions-architect` | Skill quản lý tầng instructions Claude Code (CLAUDE.md, memory, rules, subagent, SKILL.md, slash command, output style) với 3 chế độ Generate/Review/Improve. Skill dùng chung đặt source tại `flex-workstation/.claude/skills/` và sync qua `config/workspace-assistants.json`. |
+| Done | Trung bình | Tạo skill `agent-instructions-architect` | Skill quản lý tầng instructions Claude Code (CLAUDE.md, memory, rules, subagent, SKILL.md, slash command, output style) với 3 chế độ Generate/Review/Improve. Skill dùng chung đặt source tại `flex-workstation\skills` và sync qua `config/workspace-assistants.json`. |
 | Done | Trung bình | Refactor tầng instructions workstation | Lean CLAUDE.md (~550→260 từ), bỏ trùng lặp cross-file: tree cấu trúc local chỉ ở `onboarding.md`, bootstrap chi tiết chỉ ở `onboarding.md`, quy tắc chỉ ở `CLAUDE.md`. Tổng line giảm 599→401. Đổi "Codex" thành "Claude Code". |
 | Todo | Cao | Chuẩn hóa quy ước đặt tên project | Cần thống nhất tên thư mục, tên module và namespace. |
 | Todo | Trung bình | Bổ sung hướng dẫn chạy từng project | Mỗi project con nên có `README.md` riêng. |

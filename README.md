@@ -51,11 +51,11 @@ flex-workstation/
 - [docs/architecture.md](docs/architecture.md): kiến trúc tổng quan, vai trò từng project, quy ước tích hợp.
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
 - [docs/tasks.md](docs/tasks.md): danh sách task, trạng thái, độ ưu tiên.
-- [skills/README.md](skills/README.md): skill org-share dùng chung trong workspace.
+- [skills/](skills/): skill dùng chung trong workspace, gồm skill local và bản custom từ external skill.
 
 ## Hook bảo vệ skill runtime
 
-Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. Skill source phải được sửa trong `flex-workstation/.claude/skills` hoặc path đã khai báo trong `config/workspace-assistants.json`, rồi sync lại.
+Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. Skill source phải được sửa trong `flex-workstation\skills` hoặc path đã khai báo trong `config/workspace-assistants.json`, rồi sync lại.
 
 ## Khởi tạo nhanh
 
@@ -89,5 +89,7 @@ Hoặc double-click:
 ```text
 SYNC_WORKSPACE.cmd
 ```
+
+External skill source được clone vào `skills-external/` khi sync lần đầu và không được commit. Nếu muốn custom một external skill, copy skill đó sang `skills/<skill-name>`, giữ cùng `name` trong `SKILL.md`, khai báo trong `localSkills`, rồi chạy `SYNC_WORKSPACE.cmd`. Local skill cùng tên sẽ override bản external.
 
 Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync. Nếu Codex đang mở sẵn mà skill mới chưa xuất hiện, mở session mới.

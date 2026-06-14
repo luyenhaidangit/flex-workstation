@@ -101,11 +101,15 @@ Ví dụ thêm một skill local:
   "assistants": {
     "claude": {
       "enabled": true,
-      "skillTarget": ".claude/skills"
+      "targets": {
+        "skills": ".claude/skills"
+      }
     },
     "codex": {
       "enabled": true,
-      "skillTarget": ".agents/skills"
+      "targets": {
+        "skills": ".agents/skills"
+      }
     }
   },
   "localSkills": [
@@ -119,11 +123,43 @@ Ví dụ thêm một skill local:
 
 Nếu chỉ muốn sync skill cho một assistant, đổi `enabled` của assistant còn lại thành `false`.
 
+Ví dụ thêm external source:
+
+```json
+{
+  "externalSources": [
+    {
+      "name": "agent-skills",
+      "url": "https://github.com/addyosmani/agent-skills.git",
+      "cloneTo": "skills-external/agent-skills",
+      "sync": {
+        "skills": "skills",
+        "commands": ".claude/commands",
+        "agents": "agents"
+      }
+    }
+  ]
+}
+```
+
+External source được clone vào `skills-external/` khi sync lần đầu. Thư mục này là vendor cache, không commit và không sửa tay. Sync bình thường không kéo update mới từ remote; nếu cần cập nhật vendor, chạy `.\scripts\sync-workspace-skills.ps1 -PullVendors` hoặc `.\scripts\bootstrap.ps1 -PullVendors`.
+
+## Custom external skill
+
+Khi muốn tùy biến một skill lấy từ external source:
+
+1. Copy thư mục skill từ `skills-external/<source>/skills/<skill-name>` sang `skills/<skill-name>`.
+2. Giữ cùng `name` trong `skills/<skill-name>/SKILL.md` để local skill override external skill.
+3. Thêm entry tương ứng vào `localSkills` trong `config/workspace-assistants.json`.
+4. Chạy `SYNC_WORKSPACE.cmd`.
+
+Khi sync, log sẽ hiển thị `[local override]` nếu local skill đang ghi đè skill cùng tên từ external source.
+
 Yêu cầu của mỗi skill folder:
 
 - Có file `SKILL.md`.
 - Nếu không khai báo `name`, script sẽ đọc `name:` trong frontmatter của `SKILL.md`.
-- Mặc định không ghi đè skill đã tồn tại ở `C:\Workspace\Project\.claude\skills` hoặc `C:\Workspace\Project\.agents\skills`.
+- Không sửa trực tiếp skill đã sync ở `C:\Workspace\Project\.claude\skills` hoặc `C:\Workspace\Project\.agents\skills`, vì đây là runtime artifact và sẽ bị ghi đè ở lần sync sau.
 
 Nếu chỉ cần chạy phần sync skill kỹ thuật mà không chạy toàn bộ bootstrap, dùng:
 
@@ -147,10 +183,10 @@ Hoặc đóng session và mở lại bằng `OPEN_CLAUDE.cmd`.
 
 Nếu Codex đang mở sẵn tại `C:\Workspace\Project` mà skill mới chưa xuất hiện, mở session Codex mới.
 
-Ghi đè khi muốn cập nhật lại từ nguồn:
+Kéo update mới từ external source khi cần:
 
 ```powershell
-.\scripts\sync-workspace-skills.ps1 -Force
+.\scripts\sync-workspace-skills.ps1 -PullVendors
 ```
 
 Không sửa trực tiếp file trong `C:\Workspace\Project\.claude\skills` hoặc `C:\Workspace\Project\.agents\skills`; hook `scripts/check-skill-path.ps1` sẽ chặn thao tác này khi dùng Claude để tránh mất thay đổi khi sync lại.
