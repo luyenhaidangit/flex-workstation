@@ -43,7 +43,7 @@ SPECIFY ──→ PLAN ──→ TASKS ──→ IMPLEMENT
 
 ### Phase 1: Specify
 
-**Save location:** Save the spec to `docs/specs/<feature-name>.md` in the working project (kebab-case, e.g. `auth-refresh-token.md`, `user-dashboard-redesign.md`). Create the `docs/specs/` directory if it doesn't exist. Do not save to the project root — multiple specs will accumulate and clutter it.
+**Save location:** Save the spec to `docs/specs/YYYY-MM-DD-<feature-name>.md` in the working project (kebab-case, today's date, e.g. `2026-06-14-auth-refresh-token.md`, `2026-06-14-user-dashboard-redesign.md`). Create the `docs/specs/` directory if it doesn't exist. Do not save to the project root — multiple specs will accumulate and clutter it.
 
 Start with a high-level vision. Ask the human clarifying questions until requirements are concrete.
 
@@ -97,6 +97,11 @@ For substantial changes, add optional operational sections where relevant: Risks
 
 ```markdown
 # Spec: [Project/Feature Name]
+
+**Date:** YYYY-MM-DD
+**Feature:** [feature-name-kebab-case]
+**Status:** Draft
+**Author:** [author]
 
 ## Objective
 [What we're building and why. User stories or acceptance criteria.]
@@ -240,4 +245,4 @@ Before proceeding to implementation, confirm:
 - [ ] The human has reviewed and approved the spec
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined
-- [ ] The spec is saved to `docs/specs/<feature-name>.md`
+- [ ] The spec is saved to `docs/specs/YYYY-MM-DD-<feature-name>.md`
