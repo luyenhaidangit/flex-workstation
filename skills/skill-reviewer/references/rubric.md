@@ -129,7 +129,7 @@ Tiêu chí đặc thù của workspace này (flex-workstation).
 |---|---|
 | Ghi chú, mô tả, tiêu đề viết tiếng Việt có dấu | 4 |
 | Tên file, command, package, framework, thuật ngữ kỹ thuật giữ nguyên tiếng Anh | 3 |
-| Skill được khai báo trong `flex-workstation/config/workspace-skills.json` | 3 |
+| Skill được khai báo trong `flex-workstation/config/workspace-assistants.json` | 3 |
 
 ---
 

@@ -81,7 +81,7 @@ User: "Tạo subagent `db-migrator` chuyên viết và review migration Postgres
 - Viết theo template subagent: description cụ thể đủ để main agent biết khi nào delegate (vd "khi user tạo/sửa migration Postgres, đặc biệt khi có ALTER TABLE trên bảng lớn"), system prompt có ràng buộc nghiệp vụ (luôn dùng transaction reversible, không drop column trực tiếp...)
 - Verify: description không chung chung, prompt có Why cho ràng buộc
 
-**Xong khi:** file đã được tạo, verify pass, và registry (nếu có) đã cập nhật.
+**Xong khi:** file được tạo tại target path, frontmatter hợp lệ, cấu trúc đúng template trong `references/templates.md`, verify pass, và registry (nếu có) đã cập nhật.
 
 ---
 
