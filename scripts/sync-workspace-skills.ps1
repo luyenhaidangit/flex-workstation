@@ -130,7 +130,7 @@ foreach ($source in $externalSources) {
             foreach ($dir in (Get-ChildItem -Path $srcPath -Directory)) {
                 if (-not (Test-Path (Join-Path $dir.FullName "SKILL.md"))) { continue }
                 if ($discovered[$type].ContainsKey($dir.Name)) {
-                    Write-Warn "Skill '$($dir.Name)' from '$($source.name)' skipped — name collision."
+                    Write-Warn "Skill '$($dir.Name)' from '$($source.name)' skipped - name collision."
                     continue
                 }
                 $discovered[$type][$dir.Name] = @{ path = $dir.FullName; source = $source.name; isFile = $false }
@@ -138,7 +138,7 @@ foreach ($source in $externalSources) {
         } else {
             foreach ($file in (Get-ChildItem -Path $srcPath -Filter "*.md" -File)) {
                 if ($discovered[$type].ContainsKey($file.BaseName)) {
-                    Write-Warn "$type '$($file.BaseName)' from '$($source.name)' skipped — name collision."
+                    Write-Warn "$type '$($file.BaseName)' from '$($source.name)' skipped - name collision."
                     continue
                 }
                 $discovered[$type][$file.BaseName] = @{ path = $file.FullName; source = $source.name; isFile = $true; fileName = $file.Name }
@@ -179,7 +179,7 @@ if ($discovered.Count -eq 0) {
 foreach ($type in $discovered.Keys) {
     $targets = $resourceTargets[$type]
     if (-not $targets -or $targets.Count -eq 0) {
-        Write-Warn "No target configured for '$type' — skipping."
+        Write-Warn "No target configured for '$type' - skipping."
         continue
     }
 
@@ -188,9 +188,13 @@ foreach ($type in $discovered.Keys) {
         $info = $entry.Value
         $src  = (Resolve-Path $info.path).Path
 
-        $label = if ($info.source -eq "local" -and $info.isOverride) { "[local override]" }
-                 elseif ($info.source -eq "local")                    { "[local]" }
-                 else                                                   { "[$($info.source)]" }
+        if ($info.source -eq "local" -and $info.isOverride) {
+            $label = "[local override]"
+        } elseif ($info.source -eq "local") {
+            $label = "[local]"
+        } else {
+            $label = "[$($info.source)]"
+        }
 
         foreach ($targetRoot in $targets) {
             if ($info.isFile) {
