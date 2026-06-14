@@ -1,10 +1,6 @@
 ---
 name: spec-driven-development
-description: >
-  Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet.
-  Use when requirements are unclear, ambiguous, or only exist as a vague idea.
-  Do NOT use for single-line fixes, typo corrections, or changes where requirements are fully clear and self-contained.
-  Done when spec file is saved to docs/specs/, implementation plan and task breakdown are approved or explicitly handed off.
+description: Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when requirements are unclear, ambiguous, or only exist as a vague idea.
 ---
 
 # Spec-Driven Development
@@ -25,7 +21,7 @@ Write a structured specification before writing any code. The spec is the shared
 
 ## The Gated Workflow
 
-Spec-driven development has four phases. For substantial work, seek human validation before moving to the next phase. For small changes, produce a concise spec, clearly mark assumptions, and continue when the requirements are unambiguous.
+Spec-driven development has four phases. Do not advance to the next phase until the current one is validated.
 
 ```
 SPECIFY ──→ PLAN ──→ TASKS ──→ IMPLEMENT
@@ -35,15 +31,7 @@ SPECIFY ──→ PLAN ──→ TASKS ──→ IMPLEMENT
  reviews    reviews  reviews    reviews
 ```
 
-## Input Contract
-
-**Required:** A project, feature, or change request to specify.
-
-**Optional:** Repository path, tech stack, constraints, existing requirements, target spec file, acceptance criteria, deadlines, or known risks.
-
 ### Phase 1: Specify
-
-**Save location:** Save the spec to `docs/specs/YYYY-MM-DD-<feature-name>.md` in the working project (kebab-case, today's date, e.g. `2026-06-14-auth-refresh-token.md`, `2026-06-14-user-dashboard-redesign.md`). Create the `docs/specs/` directory if it doesn't exist. Do not save to the project root — multiple specs will accumulate and clutter it.
 
 Start with a high-level vision. Ask the human clarifying questions until requirements are concrete.
 
@@ -91,17 +79,10 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
    - **Ask first:** Database schema changes, adding dependencies, changing CI config
    - **Never do:** Commit secrets, edit vendor directories, remove failing tests without approval
 
-For substantial changes, add optional operational sections where relevant: Risks, Rollout, Migration, Security, Performance, and Compatibility.
-
 **Spec template:**
 
 ```markdown
 # Spec: [Project/Feature Name]
-
-**Date:** YYYY-MM-DD
-**Feature:** [feature-name-kebab-case]
-**Status:** Draft
-**Author:** [author]
 
 ## Objective
 [What we're building and why. User stories or acceptance criteria.]
@@ -126,15 +107,6 @@ For substantial changes, add optional operational sections where relevant: Risks
 - Ask first: [...]
 - Never: [...]
 
-## Risks
-[Optional: key technical, product, delivery, or operational risks.]
-
-## Rollout / Migration
-[Optional: rollout plan, migration steps, rollback approach, compatibility notes.]
-
-## Security / Performance
-[Optional: security, privacy, performance, and reliability considerations.]
-
 ## Success Criteria
 [How we'll know this is done — specific, testable conditions]
 
@@ -158,28 +130,15 @@ This lets you loop, retry, and problem-solve toward a clear goal rather than gue
 
 ### Phase 2: Plan
 
-With the validated spec, generate a technical implementation plan. The plan should be reviewable: the human should be able to read it and say "yes, that's the right approach" or "no, change X."
+With the validated spec, generate a technical implementation plan:
 
-**Plan template:**
+1. Identify the major components and their dependencies
+2. Determine the implementation order (what must be built first)
+3. Note risks and mitigation strategies
+4. Identify what can be built in parallel vs. what must be sequential
+5. Define verification checkpoints between phases
 
-```markdown
-## Plan: [Feature Name]
-
-### Components
-- [Component 1]: [short description, e.g. "RefreshToken entity + Oracle table"]
-- [Component 2]: [short description]
-
-### Implementation Order
-1. [First step] — reason: [why this must come first, e.g. "other steps depend on this schema"]
-2. [Next step] — can run in parallel with [X] if [condition]
-
-### Risks
-- [Risk]: [Mitigation strategy]
-
-### Checkpoints
-- [ ] [What to verify at checkpoint 1]
-- [ ] [What to verify at checkpoint 2]
-```
+The plan should be reviewable: the human should be able to read it and say "yes, that's the right approach" or "no, change X."
 
 ### Phase 3: Tasks
 
@@ -189,7 +148,7 @@ Break the plan into discrete, implementable tasks:
 - Each task has explicit acceptance criteria
 - Each task includes a verification step (test, build, manual check)
 - Tasks are ordered by dependency, not by perceived importance
-- Prefer tasks that touch no more than ~5 files. If a task must touch more, split it when practical or explain why it should remain a single task.
+- No task should require changing more than ~5 files
 
 **Task template:**
 ```markdown
@@ -201,7 +160,7 @@ Break the plan into discrete, implementable tasks:
 
 ### Phase 4: Implement
 
-Execute tasks one at a time. If the workspace has skills `incremental-implementation`, `test-driven-development`, or `context-engineering` available, load them at the start — they guide incremental execution, test-first habits, and focused context loading respectively. If they're not available, proceed without them.
+Execute tasks one at a time following `skills/incremental-implementation/SKILL.md` (`incremental-implementation`) and `skills/test-driven-development/SKILL.md` (`test-driven-development`). Use `skills/context-engineering/SKILL.md` (`context-engineering`) to load the right spec sections and source files at each step rather than flooding the agent with the entire spec.
 
 ## Keeping the Spec Alive
 
@@ -230,13 +189,6 @@ The spec is a living document, not a one-time artifact:
 - Making architectural decisions without documenting them
 - Skipping the spec because "it's obvious what to build"
 
-## Boundaries
-
-- Do not overwrite an existing spec file without confirming with the human first.
-- Do not write any implementation code until the human has approved Phase 1 (Spec).
-- Do not advance to the next phase when the human hasn't responded yet — wait for an explicit signal ("ok", "looks good", "proceed", or equivalent).
-- Do not embed secrets, credentials, connection strings, or tokens in spec files.
-
 ## Verification
 
 Before proceeding to implementation, confirm:
@@ -245,4 +197,4 @@ Before proceeding to implementation, confirm:
 - [ ] The human has reviewed and approved the spec
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined
-- [ ] The spec is saved to `docs/specs/YYYY-MM-DD-<feature-name>.md`
+- [ ] The spec is saved to a file in the repository
