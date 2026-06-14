@@ -21,10 +21,10 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo task VS Code cho workstation | Xem `.vscode/tasks.json`. |
 | Done | Cao | Tạo bootstrap cho máy mới | Xem `scripts/bootstrap.ps1` và `docs/onboarding.md`. |
 | Done | Cao | Tạo chỉ dẫn Claude Code tổng quan | Xem `CLAUDE.md`. |
-| Done | Cao | Tạo entrypoint double-click cho Windows | Xem `SETUP_WORKSPACE.cmd`. |
+| Done | Cao | Tạo entrypoint double-click cho Windows | Xem `SYNC_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở nhanh VS Code tại thư mục cha | Xem `OPEN_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Claude tại workspace | Xem `OPEN_CLAUDE.cmd`. |
-| Done | Cao | Tạo entrypoint sync workspace skills | Xem `SYNC_WORKSPACE_SKILLS.cmd`. |
+| Done | Cao | Hợp nhất entrypoint sync workspace | `SYNC_WORKSPACE.cmd` chạy bootstrap, chuẩn bị cấu hình Claude/Codex và sync skill; đây là entrypoint double-click duy nhất cho sync/setup workspace. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` nhưng không ghi đè file local đã tồn tại. |
 | Done | Cao | Thêm template `.claude/settings.json` | Dùng cho cấu hình workspace chung; `settings.local.json` giữ cấu hình local theo máy/người dùng. |

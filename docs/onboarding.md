@@ -33,10 +33,10 @@ Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, nga
 Trên Windows, cách đơn giản nhất là double-click file ở root repo:
 
 ```text
-SETUP_WORKSPACE.cmd
+SYNC_WORKSPACE.cmd
 ```
 
-File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell, bao gồm bước sync skill dùng chung, và giữ cửa sổ lại để bạn đọc kết quả.
+File này sẽ tự chạy `scripts/bootstrap.ps1` bằng PowerShell, bao gồm chuẩn bị cấu hình Claude/Codex, sync skill dùng chung, kiểm tra/cài Claude Code nếu cần, và giữ cửa sổ lại để bạn đọc kết quả.
 
 Nếu muốn chạy thủ công, mở PowerShell tại thư mục repo và chạy:
 
@@ -125,16 +125,16 @@ Yêu cầu của mỗi skill folder:
 - Nếu không khai báo `name`, script sẽ đọc `name:` trong frontmatter của `SKILL.md`.
 - Mặc định không ghi đè skill đã tồn tại ở `C:\Workspace\Project\.claude\skills` hoặc `C:\Workspace\Project\.agents\skills`.
 
-Sync thủ công:
+Nếu chỉ cần chạy phần sync skill kỹ thuật mà không chạy toàn bộ bootstrap, dùng:
 
 ```powershell
 .\scripts\sync-workspace-skills.ps1
 ```
 
-Hoặc double-click:
+Entrypoint double-click chuẩn cho toàn workspace vẫn là:
 
 ```text
-SYNC_WORKSPACE_SKILLS.cmd
+SYNC_WORKSPACE.cmd
 ```
 
 Nếu Claude Code đang mở sẵn tại `C:\Workspace\Project`, sau khi sync hãy chạy trong Claude:

@@ -19,7 +19,7 @@ echo.
 where claude >nul 2>nul
 if errorlevel 1 (
     echo Claude Code CLI 'claude' was not found in PATH.
-    echo Run SETUP_WORKSPACE.cmd first, then open a new terminal and try again.
+    echo Run SYNC_WORKSPACE.cmd first, then open a new terminal and try again.
     echo.
     pause
     exit /b 1

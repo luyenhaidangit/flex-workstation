@@ -16,7 +16,7 @@ Khi người dùng yêu cầu tạo hoặc sửa skill dùng chung:
 
 - Tạo source tại `flex-workstation/.claude/skills/<skill-name>/SKILL.md` hoặc thư mục source đã khai báo trong `workspace-assistants.json`.
 - Khai báo skill trong `flex-workstation/config/workspace-assistants.json`.
-- Chạy `flex-workstation/SYNC_WORKSPACE_SKILLS.cmd`.
+- Chạy `flex-workstation/SYNC_WORKSPACE.cmd`.
 - Nếu Codex/Claude đang mở, mở session mới hoặc reload skill theo cơ chế của tool đang dùng.
 
 ## Đồng bộ config với template

@@ -36,10 +36,9 @@ flex-workstation/
 |       |-- .agents/
 |       +-- .claude/
 |-- .gitattributes
-|-- SETUP_WORKSPACE.cmd
 |-- OPEN_WORKSPACE.cmd
 |-- OPEN_CLAUDE.cmd
-|-- SYNC_WORKSPACE_SKILLS.cmd
+|-- SYNC_WORKSPACE.cmd
 |-- CLAUDE.md
 +-- README.md
 ```
@@ -60,11 +59,11 @@ Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` đ�
 
 ## Khởi tạo nhanh
 
-Trên Windows: double-click `SETUP_WORKSPACE.cmd` để chạy bootstrap, sau đó double-click `OPEN_WORKSPACE.cmd` để mở VS Code tại `C:\Workspace\Project`.
+Trên Windows: double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap/sync workspace, sau đó double-click `OPEN_WORKSPACE.cmd` để mở VS Code tại `C:\Workspace\Project`.
 
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
 
-Khi chỉ cần cập nhật skill dùng chung, double-click `SYNC_WORKSPACE_SKILLS.cmd`.
+Khi cần cập nhật cấu hình workspace hoặc skill dùng chung, double-click `SYNC_WORKSPACE.cmd`.
 
 Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
 
@@ -88,7 +87,7 @@ Bootstrap sẽ tự chạy sync. Nếu muốn sync thủ công:
 Hoặc double-click:
 
 ```text
-SYNC_WORKSPACE_SKILLS.cmd
+SYNC_WORKSPACE.cmd
 ```
 
 Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync. Nếu Codex đang mở sẵn mà skill mới chưa xuất hiện, mở session mới.
