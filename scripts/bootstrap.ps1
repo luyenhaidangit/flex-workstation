@@ -183,6 +183,11 @@ function Initialize-ClaudeProjectConfig {
     Write-Ok "Claude config folders ready: $claudeRoot"
 }
 
+Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host "  flex-workstation - sync workspace" -ForegroundColor Cyan
+Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host ""
+
 Write-Step "Checking workstation prerequisites"
 
 if (Test-Command "git") {
@@ -247,6 +252,12 @@ else {
         Write-Warn "Claude Code install finished, but 'claude' is not available in this terminal yet. Open a new terminal and run 'claude --version'."
     }
 }
+
+Write-Host ""
+Write-Host "============================================================" -ForegroundColor Green
+Write-Host "  Workspace sync finished." -ForegroundColor Green
+Write-Host "============================================================" -ForegroundColor Green
+Write-Host ""
 
 Write-Step "Next steps"
 Write-Host "1. Run 'claude' in this repository and complete browser login."
