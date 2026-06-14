@@ -14,7 +14,7 @@ Không tạo source file trực tiếp tại workspace root, trừ runtime gener
 
 Khi người dùng yêu cầu tạo hoặc sửa skill dùng chung:
 
-- Tạo source tại `flex-workstation/.claude/skills/<skill-name>/SKILL.md` hoặc thư mục source đã khai báo trong `workspace-assistants.json`.
+- Tạo source tại `flex-workstation/skills/<skill-name>/SKILL.md` hoặc thư mục source đã khai báo trong `workspace-assistants.json`.
 - Khai báo skill trong `flex-workstation/config/workspace-assistants.json`.
 - Chạy `flex-workstation/SYNC_WORKSPACE.cmd`.
 - Nếu Codex/Claude đang mở, mở session mới hoặc reload skill theo cơ chế của tool đang dùng.

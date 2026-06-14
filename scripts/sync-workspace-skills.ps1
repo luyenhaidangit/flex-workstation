@@ -1,7 +1,3 @@
-param(
-    [switch]$Force
-)
-
 $ErrorActionPreference = "Stop"
 
 function Write-Step {
@@ -114,14 +110,9 @@ foreach ($skill in $localSkills) {
         $targetPath = Join-Path $targetRoot $skillName
 
         if (Test-Path $targetPath) {
-            if ($Force) {
-                Remove-Item -LiteralPath $targetPath -Recurse -Force
-                Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
-                Write-Ok "Updated workspace skill: $skillName -> $targetRoot"
-            }
-            else {
-                Write-Ok "Workspace skill already exists: $skillName -> $targetRoot"
-            }
+            Remove-Item -LiteralPath $targetPath -Recurse -Force
+            Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
+            Write-Ok "Updated workspace skill: $skillName -> $targetRoot"
         }
         else {
             Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
