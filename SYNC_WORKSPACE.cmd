@@ -2,6 +2,10 @@
 setlocal
 cd /d "%~dp0"
 
+echo flex-workstation / Sync Workspace
+echo Sync skills, commands, agents and workspace config.
+echo.
+
 set "EXTRA_ARGS="
 set /p "dummy=Pull vendor updates: [Y,N]: " <nul
 choice /C YN /N /T 10 /D N
