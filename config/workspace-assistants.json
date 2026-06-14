@@ -17,18 +17,7 @@
       }
     }
   },
-  "externalSources": [
-    {
-      "name": "agent-skills",
-      "url": "https://github.com/addyosmani/agent-skills.git",
-      "cloneTo": "skills-external/agent-skills",
-      "sync": {
-        "skills":   "skills",
-        "commands": ".claude/commands",
-        "agents":   "agents"
-      }
-    }
-  ],
+  "externalSources": [],
   "localSkills": [
     { "name": "agent-instructions-architect", "path": "skills/agent-instructions-architect" },
     { "name": "skill-creator",                "path": "skills/skill-creator" },

@@ -171,28 +171,37 @@ if ($localSkills.Count -gt 0) {
     }
 }
 
-if ($discovered.Count -eq 0) {
-    Write-Ok "Nothing to sync."
-    return
-}
-
-# --- Clean stale files in file-based targets (commands, agents) ---
-foreach ($type in $discovered.Keys) {
+# --- Clean stale resources in targets ---
+foreach ($type in $resourceTargets.Keys) {
     $targets = $resourceTargets[$type]
     if (-not $targets -or $targets.Count -eq 0) { continue }
 
-    $sampleEntry = @($discovered[$type].GetEnumerator())[0]
-    if (-not $sampleEntry -or -not $sampleEntry.Value.isFile) { continue }
+    $known = if ($discovered.ContainsKey($type)) { $discovered[$type] } else { [ordered]@{} }
 
     foreach ($targetRoot in $targets) {
         if (-not (Test-Path $targetRoot)) { continue }
-        foreach ($existing in (Get-ChildItem -Path $targetRoot -Filter "*.md" -File)) {
-            if (-not $discovered[$type].Contains($existing.BaseName)) {
-                Remove-Item -LiteralPath $existing.FullName -Force
-                Write-Warn "Removed stale ${type}: $($existing.Name)"
+
+        if ($type -eq "skills") {
+            foreach ($existing in (Get-ChildItem -Path $targetRoot -Directory)) {
+                if (-not $known.Contains($existing.Name)) {
+                    Remove-Item -LiteralPath $existing.FullName -Recurse -Force
+                    Write-Warn "Removed stale ${type}: $($existing.Name)"
+                }
+            }
+        } else {
+            foreach ($existing in (Get-ChildItem -Path $targetRoot -Filter "*.md" -File)) {
+                if (-not $known.Contains($existing.BaseName)) {
+                    Remove-Item -LiteralPath $existing.FullName -Force
+                    Write-Warn "Removed stale ${type}: $($existing.Name)"
+                }
             }
         }
     }
+}
+
+if ($discovered.Count -eq 0) {
+    Write-Ok "Nothing to sync."
+    return
 }
 
 # --- Sync all resources to their targets ---

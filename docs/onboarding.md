@@ -123,7 +123,7 @@ Ví dụ thêm một skill local:
 
 Nếu chỉ muốn sync skill cho một assistant, đổi `enabled` của assistant còn lại thành `false`.
 
-Ví dụ thêm external source:
+External source hiện đang tắt mặc định (`externalSources: []`). Nếu cần bật lại, thêm cấu hình theo mẫu:
 
 ```json
 {
@@ -142,7 +142,7 @@ Ví dụ thêm external source:
 }
 ```
 
-External source được clone vào `skills-external/` khi sync lần đầu. Thư mục này là vendor cache, không commit và không sửa tay. Sync bình thường không kéo update mới từ remote; nếu cần cập nhật vendor, chạy `.\scripts\sync-workspace-skills.ps1 -PullVendors` hoặc `.\scripts\bootstrap.ps1 -PullVendors`.
+Khi được bật, external source được clone vào `skills-external/` lúc sync lần đầu. Thư mục này là vendor cache, không commit và không sửa tay. Sync bình thường không kéo update mới từ remote; nếu cần cập nhật vendor, chạy `.\scripts\sync-workspace-skills.ps1 -PullVendors` hoặc `.\scripts\bootstrap.ps1 -PullVendors`.
 
 ## Custom external skill
 

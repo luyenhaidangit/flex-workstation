@@ -76,7 +76,7 @@ Quy ước này tách rõ:
 - `C:\Workspace\Project\.claude\skills`: artifact runtime cho Claude được tạo khi bootstrap hoặc sync thủ công.
 - `C:\Workspace\Project\.agents\skills`: artifact runtime cho Codex được tạo khi bootstrap hoặc sync thủ công.
 - `flex-workstation\skills`: source skill local và bản custom của external skill.
-- `flex-workstation\skills-external`: vendor cache cho external source, được clone khi sync lần đầu, không commit và không sửa tay.
+- `flex-workstation\skills-external`: vendor cache cho external source nếu external source được bật; hiện `externalSources` đang để rỗng nên runtime chỉ load local skill.
 
 Local skill cùng tên sẽ override external skill. Muốn tùy biến external skill thì copy từ `skills-external/<source>/skills/<skill-name>` sang `skills/<skill-name>`, giữ cùng `name` trong `SKILL.md`, khai báo trong `localSkills`, rồi chạy `SYNC_WORKSPACE.cmd`.
 
