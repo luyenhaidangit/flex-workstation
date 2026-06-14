@@ -2,11 +2,17 @@
   "assistants": {
     "claude": {
       "enabled": true,
-      "skillTarget": ".claude/skills"
+      "targets": {
+        "skills":   ".claude/skills",
+        "commands": ".claude/commands",
+        "agents":   ".claude/agents"
+      }
     },
     "codex": {
       "enabled": true,
-      "skillTarget": ".agents/skills"
+      "targets": {
+        "skills": ".agents/skills"
+      }
     }
   },
   "externalSources": [
@@ -14,25 +20,17 @@
       "name": "agent-skills",
       "url": "https://github.com/addyosmani/agent-skills.git",
       "cloneTo": "skills-external/agent-skills",
-      "path": "skills-external/agent-skills/skills"
+      "sync": {
+        "skills":   "skills",
+        "commands": "commands",
+        "agents":   "agents"
+      }
     }
   ],
   "localSkills": [
-    {
-      "name": "agent-instructions-architect",
-      "path": "skills/agent-instructions-architect"
-    },
-    {
-      "name": "skill-creator",
-      "path": "skills/skill-creator"
-    },
-    {
-      "name": "ai-radar",
-      "path": "skills/ai-radar"
-    },
-    {
-      "name": "skill-reviewer",
-      "path": "skills/skill-reviewer"
-    }
+    { "name": "agent-instructions-architect", "path": "skills/agent-instructions-architect" },
+    { "name": "skill-creator",                "path": "skills/skill-creator" },
+    { "name": "ai-radar",                     "path": "skills/ai-radar" },
+    { "name": "skill-reviewer",               "path": "skills/skill-reviewer" }
   ]
 }

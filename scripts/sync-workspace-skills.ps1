@@ -20,192 +20,188 @@ function Write-Warn {
 
 function Get-SkillNameFromManifest {
     param([string]$SkillPath)
-
-    $skillFile = Join-Path $SkillPath "SKILL.md"
-    $lines = Get-Content -Encoding UTF8 $skillFile
-
+    $lines = Get-Content -Encoding UTF8 (Join-Path $SkillPath "SKILL.md")
     foreach ($line in $lines) {
         if ($line -match "^name:\s*(.+?)\s*$") {
             return $Matches[1].Trim().Trim('"').Trim("'")
         }
     }
-
     return $null
 }
 
-$workstationRoot = Resolve-Path "$PSScriptRoot\.."
-$projectRoot = Resolve-Path "$PSScriptRoot\..\.."
-$configPath = Join-Path $workstationRoot "config\workspace-assistants.json"
+function Resolve-ConfigPath {
+    param([string]$RawPath, [string]$Base)
+    if ([System.IO.Path]::IsPathRooted($RawPath)) { return $RawPath }
+    return Join-Path $Base $RawPath
+}
 
-Write-Step "Syncing workspace skills"
+$workstationRoot = Resolve-Path "$PSScriptRoot\.."
+$projectRoot     = Resolve-Path "$PSScriptRoot\..\.."
+$configPath      = Join-Path $workstationRoot "config\workspace-assistants.json"
+
+Write-Step "Syncing workspace"
 
 if (-not (Test-Path $configPath)) {
-    Write-Warn "Workspace assistants config not found: $configPath"
+    Write-Warn "Config not found: $configPath"
     return
 }
 
-$config = Get-Content -Raw -Encoding UTF8 $configPath | ConvertFrom-Json
-$localSkills = @($config.localSkills)
+$config         = Get-Content -Raw -Encoding UTF8 $configPath | ConvertFrom-Json
+$localSkills    = @($config.localSkills)
 $externalSources = if ($config.externalSources) { @($config.externalSources) } else { @() }
 
-$assistantConfigs = $config.assistants.PSObject.Properties | Where-Object {
-    $_.Value.enabled -and $_.Value.skillTarget
-}
-$targetRoots = @()
+# --- Build resourceTargets: type -> [absolute target paths] ---
+# Supports new "targets" map and legacy "skillTarget"
+$resourceTargets = @{}
 
-foreach ($assistantConfig in $assistantConfigs) {
-    $targetRoot = $assistantConfig.Value.skillTarget
+foreach ($prop in ($config.assistants.PSObject.Properties | Where-Object { $_.Value.enabled })) {
+    $asst = $prop.Value
 
-    if (-not [System.IO.Path]::IsPathRooted($targetRoot)) {
-        $targetRoot = Join-Path $projectRoot $targetRoot
+    $typeMap = if ($asst.targets) {
+        $asst.targets.PSObject.Properties | ForEach-Object { [pscustomobject]@{ Type = $_.Name; Path = $_.Value } }
+    } elseif ($asst.skillTarget) {
+        @([pscustomobject]@{ Type = "skills"; Path = $asst.skillTarget })
+    } else { @() }
+
+    foreach ($entry in $typeMap) {
+        $abs = Resolve-ConfigPath $entry.Path $projectRoot
+        New-Item -ItemType Directory -Force -Path $abs | Out-Null
+        if (-not $resourceTargets.ContainsKey($entry.Type)) { $resourceTargets[$entry.Type] = @() }
+        $resourceTargets[$entry.Type] += $abs
     }
-
-    New-Item -ItemType Directory -Force -Path $targetRoot | Out-Null
-    $targetRoots += $targetRoot
 }
 
-if ($targetRoots.Count -eq 0) {
-    Write-Warn "No enabled assistant skill targets declared in config\workspace-assistants.json."
+if ($resourceTargets.Count -eq 0) {
+    Write-Warn "No enabled targets declared in workspace-assistants.json."
     return
 }
 
-# Build merged skill map — externalSources truoc, localSkills override
-$mergedSkills = [ordered]@{}
+# --- Discover items from external sources ---
+# $discovered: type -> ordered{ name -> { path, source, isFile, fileName? } }
+$discovered = @{}
 
-# Buoc 1: Auto-discover tu external sources (do uu tien thap)
 foreach ($source in $externalSources) {
-    if (-not $source.path) {
-        Write-Warn "External source '$($source.name)' thieu truong 'path'."
-        continue
-    }
-
-    # Clone neu chua co, pull neu duoc yeu cau
+    # Resolve cloneTo and clone/pull as needed
+    $cloneTo = $null
     if ($source.cloneTo) {
-        $cloneTo = $source.cloneTo
-        if (-not [System.IO.Path]::IsPathRooted($cloneTo)) {
-            $cloneTo = Join-Path $workstationRoot $cloneTo
-        }
+        $cloneTo = Resolve-ConfigPath $source.cloneTo $workstationRoot
 
         if (-not (Test-Path $cloneTo)) {
             if ($source.url) {
-                Write-Step "Cloning external source: $($source.name)"
-                git clone $source.url $cloneTo
-                Write-Ok "Cloned: $($source.name) -> $cloneTo"
+                Write-Step "Cloning: $($source.name)"
+                git clone --depth 1 $source.url $cloneTo
+                Write-Ok "Cloned: $($source.name)"
             } else {
-                Write-Warn "External source '$($source.name)' chua duoc clone va khong co 'url' de tu dong clone."
+                Write-Warn "Source '$($source.name)' not cloned and no 'url' declared."
+                continue
             }
         } elseif ($PullVendors) {
-            Write-Step "Pulling updates: $($source.name)"
+            Write-Step "Pulling: $($source.name)"
             Push-Location $cloneTo
-            try {
-                git pull
-                Write-Ok "Pulled: $($source.name)"
-            } finally {
-                Pop-Location
-            }
+            try { git pull; Write-Ok "Pulled: $($source.name)" }
+            finally { Pop-Location }
         }
     }
 
-    # Discover skills tu path
-    $sourcePath = $source.path
-    if (-not [System.IO.Path]::IsPathRooted($sourcePath)) {
-        $sourcePath = Join-Path $workstationRoot $sourcePath
+    # Build sync map: type -> absolute source path
+    $syncMap = @{}
+    if ($source.sync -and $cloneTo) {
+        foreach ($sp in $source.sync.PSObject.Properties) {
+            $syncMap[$sp.Name] = Join-Path $cloneTo $sp.Value
+        }
+    } elseif ($source.path) {
+        # Legacy: path field = skills directory
+        $syncMap["skills"] = Resolve-ConfigPath $source.path $workstationRoot
     }
 
-    if (-not (Test-Path $sourcePath)) {
-        Write-Warn "External source '$($source.name)' khong tim thay: $sourcePath"
-        continue
-    }
+    foreach ($sm in $syncMap.GetEnumerator()) {
+        $type    = $sm.Key
+        $srcPath = $sm.Value
 
-    $discovered = 0
-    foreach ($dir in (Get-ChildItem -Path $sourcePath -Directory)) {
-        $skillMd = Join-Path $dir.FullName "SKILL.md"
-        if (-not (Test-Path $skillMd)) { continue }
-
-        $skillName = $dir.Name
-        if ($mergedSkills.ContainsKey($skillName)) {
-            Write-Warn "Skill '$skillName' tu '$($source.name)' bi bo qua — da duoc dang ky boi nguon truoc."
+        if (-not (Test-Path $srcPath)) {
+            Write-Warn "Not found '$($source.name)/$type': $srcPath"
             continue
         }
 
-        $mergedSkills[$skillName] = @{
-            path       = $dir.FullName
-            source     = $source.name
-            isOverride = $false
+        if (-not $discovered.ContainsKey($type)) { $discovered[$type] = [ordered]@{} }
+        $before = $discovered[$type].Count
+
+        if ($type -eq "skills") {
+            foreach ($dir in (Get-ChildItem -Path $srcPath -Directory)) {
+                if (-not (Test-Path (Join-Path $dir.FullName "SKILL.md"))) { continue }
+                if ($discovered[$type].ContainsKey($dir.Name)) {
+                    Write-Warn "Skill '$($dir.Name)' from '$($source.name)' skipped — name collision."
+                    continue
+                }
+                $discovered[$type][$dir.Name] = @{ path = $dir.FullName; source = $source.name; isFile = $false }
+            }
+        } else {
+            foreach ($file in (Get-ChildItem -Path $srcPath -Filter "*.md" -File)) {
+                if ($discovered[$type].ContainsKey($file.BaseName)) {
+                    Write-Warn "$type '$($file.BaseName)' from '$($source.name)' skipped — name collision."
+                    continue
+                }
+                $discovered[$type][$file.BaseName] = @{ path = $file.FullName; source = $source.name; isFile = $true; fileName = $file.Name }
+            }
         }
-        $discovered++
-    }
 
-    if ($discovered -gt 0) {
-        Write-Ok "Discovered $discovered skills from: $($source.name)"
+        $added = $discovered[$type].Count - $before
+        if ($added -gt 0) { Write-Ok "Discovered $added $type from: $($source.name)" }
     }
 }
 
-# Buoc 2: Local skills override (do uu tien cao)
-foreach ($skill in $localSkills) {
-    if (-not $skill.path) {
-        Write-Warn "Skipped skill entry because 'path' is missing."
-        continue
-    }
+# --- Apply localSkills (override external skills by name) ---
+if ($localSkills.Count -gt 0) {
+    if (-not $discovered.ContainsKey("skills")) { $discovered["skills"] = [ordered]@{} }
 
-    $sourcePath = $skill.path
-    if (-not [System.IO.Path]::IsPathRooted($sourcePath)) {
-        $sourcePath = Join-Path $workstationRoot $sourcePath
-    }
+    foreach ($skill in $localSkills) {
+        if (-not $skill.path) { Write-Warn "Skipped skill entry: missing 'path'."; continue }
 
-    if (-not (Test-Path $sourcePath)) {
-        Write-Warn "Skipped missing skill path: $sourcePath"
-        continue
-    }
+        $srcPath = Resolve-ConfigPath $skill.path $workstationRoot
+        if (-not (Test-Path $srcPath))                      { Write-Warn "Skipped missing skill: $srcPath"; continue }
+        if (-not (Test-Path (Join-Path $srcPath "SKILL.md"))) { Write-Warn "No SKILL.md in: $srcPath"; continue }
 
-    $skillFile = Join-Path $sourcePath "SKILL.md"
-    if (-not (Test-Path $skillFile)) {
-        Write-Warn "Skipped invalid skill folder without SKILL.md: $sourcePath"
-        continue
-    }
+        $name = $skill.name
+        if (-not $name) { $name = Get-SkillNameFromManifest -SkillPath $srcPath }
+        if (-not $name) { $name = Split-Path -Leaf $srcPath }
 
-    $skillName = $skill.name
-    if (-not $skillName) {
-        $skillName = Get-SkillNameFromManifest -SkillPath $sourcePath
-    }
-    if (-not $skillName) {
-        $skillName = Split-Path -Leaf $sourcePath
-    }
-
-    $isOverride = $mergedSkills.ContainsKey($skillName)
-    $mergedSkills[$skillName] = @{
-        path       = $sourcePath
-        source     = "local"
-        isOverride = $isOverride
+        $isOverride = $discovered["skills"].ContainsKey($name)
+        $discovered["skills"][$name] = @{ path = $srcPath; source = "local"; isFile = $false; isOverride = $isOverride }
     }
 }
 
-if ($mergedSkills.Count -eq 0) {
-    Write-Ok "No workspace skills to sync."
+if ($discovered.Count -eq 0) {
+    Write-Ok "Nothing to sync."
     return
 }
 
-# Buoc 3: Sync merged skills den tat ca targets
-foreach ($entry in $mergedSkills.GetEnumerator()) {
-    $skillName = $entry.Key
-    $info      = $entry.Value
-    $resolvedSource = (Resolve-Path $info.path).Path
-
-    $label = if ($info.source -eq "local" -and $info.isOverride) {
-        "[local override]"
-    } elseif ($info.source -eq "local") {
-        "[local]"
-    } else {
-        "[$($info.source)]"
+# --- Sync all resources to their targets ---
+foreach ($type in $discovered.Keys) {
+    $targets = $resourceTargets[$type]
+    if (-not $targets -or $targets.Count -eq 0) {
+        Write-Warn "No target configured for '$type' — skipping."
+        continue
     }
 
-    foreach ($targetRoot in $targetRoots) {
-        $targetPath = Join-Path $targetRoot $skillName
+    foreach ($entry in $discovered[$type].GetEnumerator()) {
+        $name = $entry.Key
+        $info = $entry.Value
+        $src  = (Resolve-Path $info.path).Path
 
-        if (Test-Path $targetPath) {
-            Remove-Item -LiteralPath $targetPath -Recurse -Force
+        $label = if ($info.source -eq "local" -and $info.isOverride) { "[local override]" }
+                 elseif ($info.source -eq "local")                    { "[local]" }
+                 else                                                   { "[$($info.source)]" }
+
+        foreach ($targetRoot in $targets) {
+            if ($info.isFile) {
+                $dst = Join-Path $targetRoot $info.fileName
+                Copy-Item -LiteralPath $src -Destination $dst -Force
+            } else {
+                $dst = Join-Path $targetRoot $name
+                if (Test-Path $dst) { Remove-Item -LiteralPath $dst -Recurse -Force }
+                Copy-Item -LiteralPath $src -Destination $dst -Recurse
+            }
+            Write-Ok "Synced $label [$type] $name -> $(Split-Path -Leaf $targetRoot)"
         }
-        Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
-        Write-Ok "Synced $label $skillName -> $(Split-Path -Leaf $targetRoot)"
     }
 }
