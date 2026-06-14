@@ -26,7 +26,7 @@ Nếu user muốn tạo mới hoặc chạy eval → dùng `skill-creator` thay 
 ### 1. Xác định target
 
 Nhận diện skill cần review từ yêu cầu:
-- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (runtime path) hoặc `flex-workstation/.claude/skills/<name>/SKILL.md` (source path)
+- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (runtime path) hoặc `flex-workstation/skills/<name>/SKILL.md` (source path)
 - Nếu không rõ → hỏi 1 câu: "Skill nào bạn muốn review?"
 
 ### 2. Thu thập thông tin
@@ -38,7 +38,7 @@ Nhận diện skill cần review từ yêu cầu:
 - `SKILL.md` của skill target
 - Kiểm tra frontmatter YAML: có `---` mở/đóng, parse được, có đủ `name` + `description`, và `name` khớp tên thư mục skill
 - Nếu body target có nhắc đến file/thư mục (references/, scripts/, assets/ ...) thì kiểm tra sự tồn tại của chúng
-- Kiểm tra `flex-workstation/config/workspace-skills.json` để xem skill có được đăng ký chưa
+- Kiểm tra `flex-workstation/config/workspace-assistants.json` để xem skill có được đăng ký chưa
 
 ### 3. Chấm điểm theo 5 trục
 
