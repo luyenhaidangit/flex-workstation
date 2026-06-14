@@ -9,7 +9,14 @@
       "skillTarget": ".agents/skills"
     }
   },
-  "externalSources": [],
+  "externalSources": [
+    {
+      "name": "agent-skills",
+      "url": "https://github.com/addyosmani/agent-skills.git",
+      "cloneTo": "skills-external/agent-skills",
+      "path": "skills-external/agent-skills/skills"
+    }
+  ],
   "localSkills": [
     {
       "name": "agent-instructions-architect",

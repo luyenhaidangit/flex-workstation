@@ -1,3 +1,5 @@
+param([switch]$PullVendors)
+
 $ErrorActionPreference = "Stop"
 
 function Write-Step {
@@ -77,13 +79,41 @@ foreach ($source in $externalSources) {
         continue
     }
 
+    # Clone neu chua co, pull neu duoc yeu cau
+    if ($source.cloneTo) {
+        $cloneTo = $source.cloneTo
+        if (-not [System.IO.Path]::IsPathRooted($cloneTo)) {
+            $cloneTo = Join-Path $workstationRoot $cloneTo
+        }
+
+        if (-not (Test-Path $cloneTo)) {
+            if ($source.url) {
+                Write-Step "Cloning external source: $($source.name)"
+                git clone $source.url $cloneTo
+                Write-Ok "Cloned: $($source.name) -> $cloneTo"
+            } else {
+                Write-Warn "External source '$($source.name)' chua duoc clone va khong co 'url' de tu dong clone."
+            }
+        } elseif ($PullVendors) {
+            Write-Step "Pulling updates: $($source.name)"
+            Push-Location $cloneTo
+            try {
+                git pull
+                Write-Ok "Pulled: $($source.name)"
+            } finally {
+                Pop-Location
+            }
+        }
+    }
+
+    # Discover skills tu path
     $sourcePath = $source.path
     if (-not [System.IO.Path]::IsPathRooted($sourcePath)) {
         $sourcePath = Join-Path $workstationRoot $sourcePath
     }
 
     if (-not (Test-Path $sourcePath)) {
-        Write-Warn "External source '$($source.name)' chua duoc clone: $sourcePath"
+        Write-Warn "External source '$($source.name)' khong tim thay: $sourcePath"
         continue
     }
 

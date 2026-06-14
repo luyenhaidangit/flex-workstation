@@ -1,7 +1,8 @@
 param(
     [switch]$SkipClaudeInstall,
     [switch]$UseWinget,
-    [switch]$OpenWorkspace
+    [switch]$OpenWorkspace,
+    [switch]$PullVendors
 )
 
 $ErrorActionPreference = "Stop"
@@ -213,7 +214,7 @@ else {
 
 Initialize-ClaudeProjectConfig
 
-& "$PSScriptRoot\sync-workspace-skills.ps1"
+& "$PSScriptRoot\sync-workspace-skills.ps1" -PullVendors:$PullVendors
 
 Write-Step "Checking Claude Code"
 
