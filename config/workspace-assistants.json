@@ -11,7 +11,9 @@
     "codex": {
       "enabled": true,
       "targets": {
-        "skills": ".agents/skills"
+        "skills":   ".agents/skills",
+        "commands": ".agents/commands",
+        "agents":   ".agents/agents"
       }
     }
   },

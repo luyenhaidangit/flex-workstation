@@ -176,6 +176,25 @@ if ($discovered.Count -eq 0) {
     return
 }
 
+# --- Clean stale files in file-based targets (commands, agents) ---
+foreach ($type in $discovered.Keys) {
+    $targets = $resourceTargets[$type]
+    if (-not $targets -or $targets.Count -eq 0) { continue }
+
+    $sampleEntry = @($discovered[$type].GetEnumerator())[0]
+    if (-not $sampleEntry -or -not $sampleEntry.Value.isFile) { continue }
+
+    foreach ($targetRoot in $targets) {
+        if (-not (Test-Path $targetRoot)) { continue }
+        foreach ($existing in (Get-ChildItem -Path $targetRoot -Filter "*.md" -File)) {
+            if (-not $discovered[$type].Contains($existing.BaseName)) {
+                Remove-Item -LiteralPath $existing.FullName -Force
+                Write-Warn "Removed stale ${type}: $($existing.Name)"
+            }
+        }
+    }
+}
+
 # --- Sync all resources to their targets ---
 foreach ($type in $discovered.Keys) {
     $targets = $resourceTargets[$type]
