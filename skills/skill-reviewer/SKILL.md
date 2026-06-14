@@ -26,7 +26,7 @@ Nếu user muốn tạo mới hoặc chạy eval → dùng `skill-creator` thay 
 ### 1. Xác định target
 
 Nhận diện skill cần review từ yêu cầu:
-- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (runtime path) hoặc `flex-workstation/skills/<name>/SKILL.md` (source path)
+- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (Claude runtime), `.agents/skills/<name>/SKILL.md` (Codex runtime), hoặc `flex-workstation/skills/<name>/SKILL.md` (source path)
 - Nếu không rõ → hỏi 1 câu: "Skill nào bạn muốn review?"
 
 ### 2. Thu thập thông tin

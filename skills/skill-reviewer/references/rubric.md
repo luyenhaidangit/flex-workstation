@@ -8,7 +8,7 @@ Phân bổ điểm: **Trục 1 (25) + Trục 2 (15) + Trục 3 (25) + Trục 4 (
 
 ## Trục 1 — Description/Trigger (tối đa 25đ)
 
-Frontmatter là điều kiện để skill load đúng; description là cơ chế trigger chính — Claude quyết định có invoke skill không dựa vào đây.
+Frontmatter là điều kiện để skill load đúng; description là cơ chế trigger chính — assistant quyết định có invoke skill không dựa vào đây.
 
 | Tiêu chí | Điểm |
 |---|---|
