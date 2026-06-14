@@ -5,7 +5,11 @@ description: >
   "skill này có vấn đề gì không", "check chất lượng skill Y",
   "skill viết đúng chưa", "muốn review để biết nên cải thiện gì",
   "nội dung skill có đúng không", "skill BA/PM/dev này thiếu gì không".
-  Không dùng khi user muốn AI sửa hẳn (→ skill-creator) hoặc chạy eval/tạo skill mới.
+  Nếu user chỉ yêu cầu review thì chỉ báo cáo, không sửa file.
+  Nếu user yêu cầu cập nhật/cải tiến skill thì xác định skill local hay external trước khi sửa:
+  local sửa trong `skills/`,
+  external phải copy sang local source rồi hỏi xác nhận trước khi sửa nội dung.
+  Không dùng khi user muốn chạy eval/tạo skill mới.
   Output: báo cáo điểm/100 theo 5 trục cấu trúc + nhận xét nội dung domain + danh sách fix suggestions cụ thể.
 ---
 
@@ -26,15 +30,16 @@ Nếu user muốn tạo mới hoặc chạy eval → dùng `skill-creator` thay 
 ### 1. Xác định target
 
 Nhận diện skill cần review từ yêu cầu:
-- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (Claude runtime), `.agents/skills/<name>/SKILL.md` (Codex runtime), hoặc `flex-workstation/skills/<name>/SKILL.md` (source path)
+- Tên skill → tìm trong `.claude/skills/<name>/SKILL.md` (Claude runtime), `.agents/skills/<name>/SKILL.md` (Codex runtime), hoặc `skills/<name>/SKILL.md` (source path)
 - Nếu không rõ → hỏi 1 câu: "Skill nào bạn muốn review?"
 
-Nếu user yêu cầu **cập nhật/cải tiến/sửa skill** sau khi review hoặc trong cùng request, phải xác định source trước khi sửa:
-- Runtime `.claude/skills/<name>` và `.agents/skills/<name>` chỉ là artifact sync, không sửa trực tiếp.
-- Nếu tồn tại `C:\Workspace\Project\flex-workstation\skills\<name>\SKILL.md` → đây là local source, sửa tại đây.
-- Nếu không có local source, tìm external source tại `C:\Workspace\Project\flex-workstation\skills-external\*\skills\<name>\SKILL.md`.
-- Nếu skill chỉ có ở external source → copy nguyên thư mục skill từ `skills-external\...\skills\<name>` sang `C:\Workspace\Project\flex-workstation\skills\<name>` trước, kiểm tra/thêm entry `localSkills` trong `config/workspace-assistants.json` nếu thiếu, rồi hỏi lại user xác nhận trước khi áp dụng nội dung update/cải tiến.
-- Nếu không tìm thấy cả local lẫn external source → báo rõ không tìm thấy source an toàn để sửa.
+Nếu user yêu cầu **cập nhật/cải tiến/sửa skill**, chuyển sang update mode:
+- Không sửa runtime `.claude/skills/<name>` hoặc `.agents/skills/<name>`.
+- Nếu có `skills/<name>/SKILL.md` → đây là local skill, sửa tại đó.
+- Nếu chưa có local skill, tìm external tại `skills-external/*/skills/<name>/SKILL.md`.
+- Nếu tìm thấy external → copy thư mục skill sang `skills/<name>`, kiểm tra/thêm `localSkills` trong `config/workspace-assistants.json`, rồi hỏi user xác nhận trước khi sửa nội dung.
+- Nếu không tìm thấy source an toàn → báo rõ không thể cập nhật.
+- Sau khi sửa xong, chạy `flex-workstation/SYNC_WORKSPACE.cmd` hoặc `flex-workstation/scripts/sync-workspace-skills.ps1`.
 
 ### 2. Thu thập thông tin
 
@@ -108,9 +113,8 @@ Task hoàn thành khi báo cáo đã được trả trong chat và user chưa y�
 
 ## Nguyên tắc chấm điểm
 
-- **Không chỉnh sửa SKILL.md đang được review** — chỉ đọc và báo cáo. Trong lượt review này, mọi thay đổi là việc của user hoặc skill-creator; sửa trong khi review tạo feedback loop và bias kết quả. Nếu user sau đó yêu cầu sửa thì thực hiện bình thường.
-- Khi user yêu cầu sửa/cải tiến skill, phải sửa source hợp lệ theo thứ tự: `flex-workstation/skills/<name>` trước; nếu skill là external thì copy sang local source trước và xin xác nhận trước khi sửa nội dung. Không sửa trực tiếp runtime `.claude/skills` hoặc `.agents/skills`, và không sửa trực tiếp vendor cache `skills-external`.
-- **Pure read-only** — không tạo file, không chạy command có side effect, không fetch external URL trong quá trình review; chỉ dùng thao tác đọc/inspect.
+- **Review mode** — nếu user chỉ yêu cầu review/audit/chấm điểm, chỉ đọc và báo cáo; không tạo file, không sửa file, không sync.
+- **Update mode** — chỉ khi user yêu cầu rõ sửa/cập nhật/cải tiến skill. Local skill sửa trong `skills/<name>`; external skill phải copy từ `skills-external` sang `skills/<name>` rồi hỏi user xác nhận trước khi sửa nội dung. Không sửa runtime `.claude/skills`, `.agents/skills` hoặc vendor cache `skills-external`.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Lỗi frontmatter/YAML làm skill có nguy cơ không load là issue ưu tiên cao; luôn đưa vào `Issues` nếu phát hiện.
 - Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
