@@ -9,6 +9,7 @@
       "skillTarget": ".agents/skills"
     }
   },
+  "externalSources": [],
   "localSkills": [
     {
       "name": "agent-instructions-architect",
