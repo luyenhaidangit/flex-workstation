@@ -22,7 +22,7 @@
       "cloneTo": "skills-external/agent-skills",
       "sync": {
         "skills":   "skills",
-        "commands": "commands",
+        "commands": ".claude/commands",
         "agents":   "agents"
       }
     }

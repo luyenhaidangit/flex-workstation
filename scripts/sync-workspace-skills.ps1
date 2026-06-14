@@ -137,6 +137,7 @@ foreach ($source in $externalSources) {
             }
         } else {
             foreach ($file in (Get-ChildItem -Path $srcPath -Filter "*.md" -File)) {
+                if ($file.Name -eq "README.md") { continue }
                 if ($discovered[$type].Contains($file.BaseName)) {
                     Write-Warn "$type '$($file.BaseName)' from '$($source.name)' skipped - name collision."
                     continue
