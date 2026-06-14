@@ -49,8 +49,10 @@ Script sẽ:
 
 - Kiểm tra `git`, VS Code CLI `code`, `winget`.
 - Copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có.
+- Copy `templates/project-root/AGENTS.md` ra `C:\Workspace\Project\AGENTS.md` nếu chưa có.
 - Copy template cấu hình Claude từ `templates/project-root/.claude` ra `C:\Workspace\Project\.claude`.
-- Sync skill local dùng chung từ `config/workspace-skills.json` vào `C:\Workspace\Project\.claude\skills`.
+- Copy template cấu trúc Codex từ `templates/project-root/.agents` ra `C:\Workspace\Project\.agents`.
+- Sync skill local dùng chung từ `config/workspace-skills.json` vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`.
 - Kiểm tra Claude Code CLI `claude`.
 - Nếu thiếu Claude Code, tự chạy native installer chính thức. Trên Windows:
 
@@ -70,9 +72,9 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 .\scripts\bootstrap.ps1 -UseWinget
 ```
 
-## Cấu hình Claude được tạo sẵn
+## Cấu hình Claude/Codex được tạo sẵn
 
-Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.json` và `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
+Bootstrap copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` và `templates/project-root/.agents` ra `C:\Workspace\Project\.agents` (thư mục cha chứa các repo Flex). File/thư mục đã tồn tại ở đích được giữ nguyên, không ghi đè; `settings.json` và `settings.local.json` chỉ được kiểm tra JSON hợp lệ.
 
 Quy ước:
 
@@ -80,7 +82,7 @@ Quy ước:
 - `settings.local.json`: cấu hình local theo máy/người dùng, ví dụ permissions.
 - Hook bảo vệ skill runtime trong `settings.json` gọi `flex-workstation\scripts\check-skill-path.ps1`, vì script dùng chung nằm trong workstation source chứ không nằm trong runtime `.claude\scripts`.
 
-Bootstrap cũng copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. File này giúp Claude hiểu rằng `flex-workstation` là source-of-truth khi Claude được mở tại workspace root.
+Bootstrap cũng copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` và `templates/project-root/AGENTS.md` ra `C:\Workspace\Project\AGENTS.md` nếu chưa có. Hai file này giúp Claude/Codex hiểu rằng `flex-workstation` là source-of-truth khi assistant được mở tại workspace root.
 
 Chi tiết cấu trúc `.claude` và vai trò từng thư mục con: xem [docs/architecture.md](architecture.md).
 
@@ -109,7 +111,7 @@ Yêu cầu của mỗi skill folder:
 
 - Có file `SKILL.md`.
 - Nếu không khai báo `name`, script sẽ đọc `name:` trong frontmatter của `SKILL.md`.
-- Mặc định không ghi đè skill đã tồn tại ở `C:\Workspace\Project\.claude\skills`.
+- Mặc định không ghi đè skill đã tồn tại ở `C:\Workspace\Project\.claude\skills` hoặc `C:\Workspace\Project\.agents\skills`.
 
 Sync thủ công:
 
@@ -131,13 +133,15 @@ Nếu Claude Code đang mở sẵn tại `C:\Workspace\Project`, sau khi sync h�
 
 Hoặc đóng session và mở lại bằng `OPEN_CLAUDE.cmd`.
 
+Nếu Codex đang mở sẵn tại `C:\Workspace\Project` mà skill mới chưa xuất hiện, mở session Codex mới.
+
 Ghi đè khi muốn cập nhật lại từ nguồn:
 
 ```powershell
 .\scripts\sync-workspace-skills.ps1 -Force
 ```
 
-Không sửa trực tiếp file trong `C:\Workspace\Project\.claude\skills`; hook `scripts/check-skill-path.ps1` sẽ chặn thao tác này để tránh mất thay đổi khi sync lại.
+Không sửa trực tiếp file trong `C:\Workspace\Project\.claude\skills` hoặc `C:\Workspace\Project\.agents\skills`; hook `scripts/check-skill-path.ps1` sẽ chặn thao tác này khi dùng Claude để tránh mất thay đổi khi sync lại.
 
 ## Đăng nhập Claude Code
 

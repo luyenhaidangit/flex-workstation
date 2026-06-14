@@ -12,17 +12,19 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | --- | --- |
 | `README.md` | Tài liệu định hướng chính của workspace. |
 | `CLAUDE.md` | Chỉ dẫn tổng quan cho Claude Code khi làm việc trong workstation. |
-| `config/workspace-skills.json` | Manifest khai báo skill local dùng chung cho workspace Claude. |
+| `templates/project-root/AGENTS.md` | Template project instructions cho Codex khi mở tại `C:\Workspace\Project`. |
+| `config/workspace-skills.json` | Manifest khai báo skill local dùng chung cho workspace Claude và Codex. |
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
 | `scripts/bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
-| `scripts/check-skill-path.ps1` | Hook script dùng bởi Claude settings để chặn sửa trực tiếp vào skill runtime trong `C:\Workspace\Project\.claude\skills`. |
-| `scripts/sync-workspace-skills.ps1` | Script sync skill local dùng chung vào `C:\Workspace\Project\.claude\skills`. |
+| `scripts/check-skill-path.ps1` | Hook script dùng bởi Claude settings để chặn sửa trực tiếp vào skill runtime trong `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. |
+| `scripts/sync-workspace-skills.ps1` | Script sync skill local dùng chung vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. |
 | `SETUP_WORKSPACE.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap. |
 | `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
 | `OPEN_CLAUDE.cmd` | Entrypoint mở Claude Code tại workspace root với `--dangerously-skip-permissions`. |
 | `SYNC_WORKSPACE_SKILLS.cmd` | Entrypoint sync skill dùng chung đã khai báo trong `config/workspace-skills.json`. |
 | `skills/` | Nơi lưu skill org-share dùng chung giữa các project Flex (Claude Code hoặc AI assistant khác). |
 | `templates/project-root/.claude` | Template cấu hình Claude được bootstrap copy ra thư mục cha `C:\Workspace\Project\.claude`. |
+| `templates/project-root/.agents` | Template cấu trúc Codex repo skills được bootstrap copy ra thư mục cha `C:\Workspace\Project\.agents`. |
 | `templates/project-root/CLAUDE.md` | Template memory cho workspace root, giúp Claude mở tại `C:\Workspace\Project` biết dùng `flex-workstation` làm source-of-truth. |
 | Git project được theo dõi | Các project nghiệp vụ hoặc kỹ thuật nằm cùng nhóm thư mục, được ghi nhận trong `docs/projects.md`. |
 
@@ -39,13 +41,16 @@ C:\Workspace\Project\
 |   |-- skills\
 |   |-- settings.json
 |   +-- settings.local.json
+|-- .agents\
+|   +-- skills\
+|-- AGENTS.md
 |-- flex-workstation\
 |-- flex-frontend\
 |-- flex-backend\
 +-- flex-api-gateway\
 ```
 
-`flex-workstation` chỉ chứa template, script và tài liệu để tạo cấu trúc này. Runtime config dùng chung nằm ở `C:\Workspace\Project\.claude`; template nguồn nằm tại `templates/project-root/.claude`.
+`flex-workstation` chỉ chứa template, script và tài liệu để tạo cấu trúc này. Runtime config dùng chung nằm ở `C:\Workspace\Project\.claude` và `C:\Workspace\Project\.agents`; template nguồn nằm tại `templates/project-root/.claude` và `templates/project-root/.agents`.
 
 Quy ước settings:
 
@@ -55,21 +60,25 @@ Quy ước settings:
 
 Khi mở Claude tại `C:\Workspace\Project`, root memory `C:\Workspace\Project\CLAUDE.md` được copy từ `templates/project-root/CLAUDE.md` để tránh Claude tạo nhầm source file trực tiếp ở workspace root.
 
+Khi mở Codex tại `C:\Workspace\Project`, project instructions `C:\Workspace\Project\AGENTS.md` được copy từ `templates/project-root/AGENTS.md`. Codex đọc repo skills từ `C:\Workspace\Project\.agents\skills`.
+
 ## Skill dùng chung cho workspace
 
 Skill dùng chung được khai báo trong `config/workspace-skills.json`, sau đó `scripts/sync-workspace-skills.ps1` copy các skill local vào:
 
 ```text
 C:\Workspace\Project\.claude\skills\
+C:\Workspace\Project\.agents\skills\
 ```
 
 Quy ước này tách rõ:
 
 - `config/workspace-skills.json`: source of truth được commit.
-- `C:\Workspace\Project\.claude\skills`: artifact runtime được tạo khi bootstrap hoặc sync thủ công.
-- `flex-workstation/.claude/skills`: cấu hình local riêng của repo nếu có, không dùng làm nguồn skill chung.
+- `C:\Workspace\Project\.claude\skills`: artifact runtime cho Claude được tạo khi bootstrap hoặc sync thủ công.
+- `C:\Workspace\Project\.agents\skills`: artifact runtime cho Codex được tạo khi bootstrap hoặc sync thủ công.
+- `flex-workstation/.claude/skills`: source skill dùng chung được khai báo trong `config/workspace-skills.json`.
 
-Phase hiện tại chỉ hỗ trợ local skill folder. Marketplace/plugin của Claude nên xử lý bằng cơ chế riêng vì lifecycle khác với workspace-local skills.
+Phase hiện tại chỉ hỗ trợ local skill folder. Marketplace/plugin của Claude hoặc Codex nên xử lý bằng cơ chế riêng vì lifecycle khác với workspace-local skills.
 
 ## Kiến trúc project con
 

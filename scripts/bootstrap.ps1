@@ -70,12 +70,16 @@ function Initialize-ClaudeProjectConfig {
     $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
     $templateRoot = (Resolve-Path "$PSScriptRoot\..\templates\project-root\.claude").Path
     $projectRootClaudeTemplate = Join-Path $PSScriptRoot "..\templates\project-root\CLAUDE.md"
+    $projectRootAgentsTemplate = Join-Path $PSScriptRoot "..\templates\project-root\AGENTS.md"
     $projectRootClaudePath = Join-Path $projectRoot "CLAUDE.md"
+    $projectRootAgentsPath = Join-Path $projectRoot "AGENTS.md"
     $claudeRoot = Join-Path $projectRoot ".claude"
+    $agentsTemplateRoot = Join-Path $PSScriptRoot "..\templates\project-root\.agents"
+    $agentsRoot = Join-Path $projectRoot ".agents"
     $settingsSharedPath = Join-Path $claudeRoot "settings.json"
     $settingsPath = Join-Path $claudeRoot "settings.local.json"
 
-    Write-Step "Preparing Claude project configuration"
+    Write-Step "Preparing AI assistant project configuration"
 
     if (Test-Path $projectRootClaudeTemplate) {
         if (Test-Path $projectRootClaudePath) {
@@ -84,6 +88,16 @@ function Initialize-ClaudeProjectConfig {
         else {
             Copy-Item -LiteralPath $projectRootClaudeTemplate -Destination $projectRootClaudePath
             Write-Ok "Copied workspace root CLAUDE.md: $projectRootClaudePath"
+        }
+    }
+
+    if (Test-Path $projectRootAgentsTemplate) {
+        if (Test-Path $projectRootAgentsPath) {
+            Write-Ok "Workspace root AGENTS.md already exists: $projectRootAgentsPath"
+        }
+        else {
+            Copy-Item -LiteralPath $projectRootAgentsTemplate -Destination $projectRootAgentsPath
+            Write-Ok "Copied workspace root AGENTS.md: $projectRootAgentsPath"
         }
     }
 
@@ -112,6 +126,39 @@ function Initialize-ClaudeProjectConfig {
             Copy-Item -LiteralPath $_.FullName -Destination $targetPath
             Write-Ok "Copied Claude config template: $targetPath"
         }
+    }
+
+    if (Test-Path $agentsTemplateRoot) {
+        $resolvedAgentsTemplateRoot = (Resolve-Path $agentsTemplateRoot).Path
+
+        New-Item -ItemType Directory -Force -Path $agentsRoot | Out-Null
+
+        Get-ChildItem -LiteralPath $resolvedAgentsTemplateRoot -Directory -Recurse -Force | ForEach-Object {
+            $relativePath = $_.FullName.Substring($resolvedAgentsTemplateRoot.Length).TrimStart("\")
+            New-Item -ItemType Directory -Force -Path (Join-Path $agentsRoot $relativePath) | Out-Null
+        }
+
+        Get-ChildItem -LiteralPath $resolvedAgentsTemplateRoot -File -Recurse -Force | ForEach-Object {
+            if ($_.Name -eq ".gitkeep") {
+                return
+            }
+
+            $relativePath = $_.FullName.Substring($resolvedAgentsTemplateRoot.Length).TrimStart("\")
+            $targetPath = Join-Path $agentsRoot $relativePath
+            $targetDirectory = Split-Path -Parent $targetPath
+
+            New-Item -ItemType Directory -Force -Path $targetDirectory | Out-Null
+
+            if (Test-Path $targetPath) {
+                Write-Ok "Codex config already exists: $targetPath"
+            }
+            else {
+                Copy-Item -LiteralPath $_.FullName -Destination $targetPath
+                Write-Ok "Copied Codex config template: $targetPath"
+            }
+        }
+
+        Write-Ok "Codex config folders ready: $agentsRoot"
     }
 
     if (Test-Path $settingsSharedPath) {

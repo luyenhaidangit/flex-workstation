@@ -38,9 +38,10 @@ function Get-SkillNameFromManifest {
 $workstationRoot = Resolve-Path "$PSScriptRoot\.."
 $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
 $configPath = Join-Path $workstationRoot "config\workspace-skills.json"
-$targetRoot = Join-Path $projectRoot ".claude\skills"
+$claudeTargetRoot = Join-Path $projectRoot ".claude\skills"
+$codexTargetRoot = Join-Path $projectRoot ".agents\skills"
 
-Write-Step "Syncing workspace Claude skills"
+Write-Step "Syncing workspace skills"
 
 if (-not (Test-Path $configPath)) {
     Write-Warn "Workspace skills config not found: $configPath"
@@ -50,7 +51,8 @@ if (-not (Test-Path $configPath)) {
 $config = Get-Content -Raw -Encoding UTF8 $configPath | ConvertFrom-Json
 $localSkills = @($config.localSkills)
 
-New-Item -ItemType Directory -Force -Path $targetRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $claudeTargetRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $codexTargetRoot | Out-Null
 
 if ($localSkills.Count -eq 0) {
     Write-Ok "No workspace skills declared in config\workspace-skills.json."
@@ -92,20 +94,22 @@ foreach ($skill in $localSkills) {
         $skillName = Split-Path -Leaf $resolvedSource
     }
 
-    $targetPath = Join-Path $targetRoot $skillName
+    foreach ($targetRoot in @($claudeTargetRoot, $codexTargetRoot)) {
+        $targetPath = Join-Path $targetRoot $skillName
 
-    if (Test-Path $targetPath) {
-        if ($Force) {
-            Remove-Item -LiteralPath $targetPath -Recurse -Force
-            Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
-            Write-Ok "Updated workspace skill: $skillName"
+        if (Test-Path $targetPath) {
+            if ($Force) {
+                Remove-Item -LiteralPath $targetPath -Recurse -Force
+                Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
+                Write-Ok "Updated workspace skill: $skillName -> $targetRoot"
+            }
+            else {
+                Write-Ok "Workspace skill already exists: $skillName -> $targetRoot"
+            }
         }
         else {
-            Write-Ok "Workspace skill already exists: $skillName"
+            Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
+            Write-Ok "Installed workspace skill: $skillName -> $targetRoot"
         }
-    }
-    else {
-        Copy-Item -LiteralPath $resolvedSource -Destination $targetPath -Recurse
-        Write-Ok "Installed workspace skill: $skillName"
     }
 }

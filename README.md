@@ -1,6 +1,6 @@
 # flex-workstation
 
-`flex-workstation` là workspace điều phối: quản lý các project cá nhân, tài liệu triển khai, danh sách task, kiến trúc hệ thống, và skill có thể tái sử dụng khi làm việc với Claude Code.
+`flex-workstation` là workspace điều phối: quản lý các project cá nhân, tài liệu triển khai, danh sách task, kiến trúc hệ thống, và skill có thể tái sử dụng khi làm việc với Claude Code hoặc Codex.
 
 ## Mục đích
 
@@ -31,7 +31,9 @@ flex-workstation/
 |   +-- README.md
 |-- templates/
 |   +-- project-root/
+|       |-- AGENTS.md
 |       |-- CLAUDE.md
+|       |-- .agents/
 |       +-- .claude/
 |-- .gitattributes
 |-- SETUP_WORKSPACE.cmd
@@ -45,7 +47,7 @@ flex-workstation/
 ## Tài liệu chính
 
 - [CLAUDE.md](CLAUDE.md): quy ước cho Claude Code khi làm việc trong workstation.
-- [config/workspace-skills.json](config/workspace-skills.json): khai báo skill local dùng chung cho workspace Claude.
+- [config/workspace-skills.json](config/workspace-skills.json): khai báo skill local dùng chung cho workspace Claude/Codex.
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới, cấu trúc local, mở workspace VS Code.
 - [docs/architecture.md](docs/architecture.md): kiến trúc tổng quan, vai trò từng project, quy ước tích hợp.
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
@@ -54,7 +56,7 @@ flex-workstation/
 
 ## Hook bảo vệ skill runtime
 
-Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills`. Skill source phải được sửa trong `flex-workstation/.claude/skills` hoặc path đã khai báo trong `config/workspace-skills.json`, rồi sync lại.
+Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. Skill source phải được sửa trong `flex-workstation/.claude/skills` hoặc path đã khai báo trong `config/workspace-skills.json`, rồi sync lại.
 
 ## Khởi tạo nhanh
 
@@ -66,14 +68,15 @@ Khi chỉ cần cập nhật skill dùng chung, double-click `SYNC_WORKSPACE_SKI
 
 Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
 
-Khi mở Claude tại `C:\Workspace\Project`, root `CLAUDE.md` được bootstrap từ `templates/project-root/CLAUDE.md` để Claude hiểu `flex-workstation` là source-of-truth cho cấu hình và skill source.
+Khi mở Claude tại `C:\Workspace\Project`, root `CLAUDE.md` được bootstrap từ `templates/project-root/CLAUDE.md`. Khi mở Codex tại cùng workspace, root `AGENTS.md` được bootstrap từ `templates/project-root/AGENTS.md`. Hai file này cùng giúp assistant hiểu `flex-workstation` là source-of-truth cho cấu hình và skill source.
 
 ## Skill dùng chung
 
-Skill dùng chung cho workspace được khai báo trong `config/workspace-skills.json` và được sync vào:
+Skill dùng chung cho workspace được khai báo trong `config/workspace-skills.json` và được sync vào runtime của Claude và Codex:
 
 ```text
 C:\Workspace\Project\.claude\skills
+C:\Workspace\Project\.agents\skills
 ```
 
 Bootstrap sẽ tự chạy sync. Nếu muốn sync thủ công:
@@ -88,4 +91,4 @@ Hoặc double-click:
 SYNC_WORKSPACE_SKILLS.cmd
 ```
 
-Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync.
+Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync. Nếu Codex đang mở sẵn mà skill mới chưa xuất hiện, mở session mới.

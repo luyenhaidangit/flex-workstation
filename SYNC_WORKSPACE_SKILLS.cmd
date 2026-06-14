@@ -12,6 +12,7 @@ echo   config\workspace-skills.json
 echo.
 echo Target:
 echo   C:\Workspace\Project\.claude\skills
+echo   C:\Workspace\Project\.agents\skills
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\sync-workspace-skills.ps1" -Force
