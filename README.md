@@ -1,4 +1,4 @@
-# flex-workstation
+﻿# flex-workstation
 
 `flex-workstation` là workspace điều phối: quản lý các project cá nhân, tài liệu triển khai, danh sách task, kiến trúc hệ thống, và skill có thể tái sử dụng khi làm việc với Claude Code hoặc Codex.
 
@@ -17,7 +17,7 @@ flex-workstation/
 |-- .vscode/
 |   +-- tasks.json
 |-- config/
-|   +-- workspace-skills.json
+|   +-- workspace-assistants.json
 |-- docs/
 |   |-- architecture.md
 |   |-- onboarding.md
@@ -47,7 +47,7 @@ flex-workstation/
 ## Tài liệu chính
 
 - [CLAUDE.md](CLAUDE.md): quy ước cho Claude Code khi làm việc trong workstation.
-- [config/workspace-skills.json](config/workspace-skills.json): khai báo skill local dùng chung cho workspace Claude/Codex.
+- [config/workspace-assistants.json](config/workspace-assistants.json): cấu hình assistant target cho Claude/Codex và skill local dùng chung.
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới, cấu trúc local, mở workspace VS Code.
 - [docs/architecture.md](docs/architecture.md): kiến trúc tổng quan, vai trò từng project, quy ước tích hợp.
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
@@ -56,7 +56,7 @@ flex-workstation/
 
 ## Hook bảo vệ skill runtime
 
-Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. Skill source phải được sửa trong `flex-workstation/.claude/skills` hoặc path đã khai báo trong `config/workspace-skills.json`, rồi sync lại.
+Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. Skill source phải được sửa trong `flex-workstation/.claude/skills` hoặc path đã khai báo trong `config/workspace-assistants.json`, rồi sync lại.
 
 ## Khởi tạo nhanh
 
@@ -72,7 +72,7 @@ Khi mở Claude tại `C:\Workspace\Project`, root `CLAUDE.md` được bootstra
 
 ## Skill dùng chung
 
-Skill dùng chung cho workspace được khai báo trong `config/workspace-skills.json` và được sync vào runtime của Claude và Codex:
+Skill dùng chung cho workspace được khai báo trong `config/workspace-assistants.json` và được sync vào runtime của Claude và Codex:
 
 ```text
 C:\Workspace\Project\.claude\skills

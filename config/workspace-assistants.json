@@ -1,4 +1,14 @@
 {
+  "assistants": {
+    "claude": {
+      "enabled": true,
+      "skillTarget": ".claude/skills"
+    },
+    "codex": {
+      "enabled": true,
+      "skillTarget": ".agents/skills"
+    }
+  },
   "localSkills": [
     {
       "name": "agent-instructions-architect",

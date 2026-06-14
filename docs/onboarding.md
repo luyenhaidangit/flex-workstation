@@ -1,4 +1,4 @@
-# Onboarding workstation
+﻿# Onboarding workstation
 
 Tài liệu này dành cho người mới clone `flex-workstation` trên máy Windows.
 
@@ -52,7 +52,7 @@ Script sẽ:
 - Copy `templates/project-root/AGENTS.md` ra `C:\Workspace\Project\AGENTS.md` nếu chưa có.
 - Copy template cấu hình Claude từ `templates/project-root/.claude` ra `C:\Workspace\Project\.claude`.
 - Copy template cấu trúc Codex từ `templates/project-root/.agents` ra `C:\Workspace\Project\.agents`.
-- Sync skill local dùng chung từ `config/workspace-skills.json` vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`.
+- Sync skill local dùng chung từ `config/workspace-assistants.json` vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`.
 - Kiểm tra Claude Code CLI `claude`.
 - Nếu thiếu Claude Code, tự chạy native installer chính thức. Trên Windows:
 
@@ -91,13 +91,23 @@ Chi tiết cấu trúc `.claude` và vai trò từng thư mục con: xem [docs/a
 Khai báo skill local dùng chung tại:
 
 ```text
-config/workspace-skills.json
+config/workspace-assistants.json
 ```
 
 Ví dụ thêm một skill local:
 
 ```json
 {
+  "assistants": {
+    "claude": {
+      "enabled": true,
+      "skillTarget": ".claude/skills"
+    },
+    "codex": {
+      "enabled": true,
+      "skillTarget": ".agents/skills"
+    }
+  },
   "localSkills": [
     {
       "name": "backend-dotnet",
@@ -106,6 +116,8 @@ Ví dụ thêm một skill local:
   ]
 }
 ```
+
+Nếu chỉ muốn sync skill cho một assistant, đổi `enabled` của assistant còn lại thành `false`.
 
 Yêu cầu của mỗi skill folder:
 

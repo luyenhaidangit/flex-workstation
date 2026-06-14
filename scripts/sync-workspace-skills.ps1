@@ -37,25 +37,41 @@ function Get-SkillNameFromManifest {
 
 $workstationRoot = Resolve-Path "$PSScriptRoot\.."
 $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
-$configPath = Join-Path $workstationRoot "config\workspace-skills.json"
-$claudeTargetRoot = Join-Path $projectRoot ".claude\skills"
-$codexTargetRoot = Join-Path $projectRoot ".agents\skills"
+$configPath = Join-Path $workstationRoot "config\workspace-assistants.json"
 
 Write-Step "Syncing workspace skills"
 
 if (-not (Test-Path $configPath)) {
-    Write-Warn "Workspace skills config not found: $configPath"
+    Write-Warn "Workspace assistants config not found: $configPath"
     return
 }
 
 $config = Get-Content -Raw -Encoding UTF8 $configPath | ConvertFrom-Json
 $localSkills = @($config.localSkills)
+$assistantConfigs = $config.assistants.PSObject.Properties | Where-Object {
+    $_.Value.enabled -and $_.Value.skillTarget
+}
+$targetRoots = @()
 
-New-Item -ItemType Directory -Force -Path $claudeTargetRoot | Out-Null
-New-Item -ItemType Directory -Force -Path $codexTargetRoot | Out-Null
+foreach ($assistantConfig in $assistantConfigs) {
+    $targetRoot = $assistantConfig.Value.skillTarget
+
+    if (-not [System.IO.Path]::IsPathRooted($targetRoot)) {
+        $targetRoot = Join-Path $projectRoot $targetRoot
+    }
+
+    $resolvedTargetRoot = $targetRoot
+    New-Item -ItemType Directory -Force -Path $resolvedTargetRoot | Out-Null
+    $targetRoots += $resolvedTargetRoot
+}
+
+if ($targetRoots.Count -eq 0) {
+    Write-Warn "No enabled assistant skill targets declared in config\workspace-assistants.json."
+    return
+}
 
 if ($localSkills.Count -eq 0) {
-    Write-Ok "No workspace skills declared in config\workspace-skills.json."
+    Write-Ok "No workspace skills declared in config\workspace-assistants.json."
     return
 }
 
@@ -94,7 +110,7 @@ foreach ($skill in $localSkills) {
         $skillName = Split-Path -Leaf $resolvedSource
     }
 
-    foreach ($targetRoot in @($claudeTargetRoot, $codexTargetRoot)) {
+    foreach ($targetRoot in $targetRoots) {
         $targetPath = Join-Path $targetRoot $skillName
 
         if (Test-Path $targetPath) {

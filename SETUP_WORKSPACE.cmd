@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal
 
 cd /d "%~dp0"
@@ -11,7 +11,7 @@ echo This setup will:
 echo   - Check Git, VS Code CLI, WinGet, and Claude Code
 echo   - Prepare C:\Workspace\Project\.claude from templates
 echo   - Prepare C:\Workspace\Project\.agents from templates
-echo   - Sync workspace skills from config\workspace-skills.json
+echo   - Sync workspace skills from config\workspace-assistants.json
 echo   - Install Claude Code if it is missing
 echo.
 

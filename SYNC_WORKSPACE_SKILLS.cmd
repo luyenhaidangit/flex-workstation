@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal
 
 cd /d "%~dp0"
@@ -8,7 +8,7 @@ echo  flex-workstation - sync workspace skills
 echo ============================================================
 echo.
 echo This syncs local skills declared in:
-echo   config\workspace-skills.json
+echo   config\workspace-assistants.json
 echo.
 echo Target:
 echo   C:\Workspace\Project\.claude\skills

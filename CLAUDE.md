@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, entrypoint VS Code và quy ước làm việc. Không chứa mã nguồn nghiệp vụ; các repo nghiệp vụ nằm ngang hàng với `flex-workstation`. Cấu trúc local đầy đủ và bước xác nhận onboarding: xem `docs/onboarding.md`.
 
@@ -12,14 +12,14 @@ Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tà
   - Onboarding/bootstrap → `docs/onboarding.md`
   - Kiến trúc/quy ước kỹ thuật → `docs/architecture.md`
   - Danh sách project con → `docs/projects.md`
-  - Skill dùng chung → `config/workspace-skills.json`
+  - Skill dùng chung → `config/workspace-assistants.json`
 
 ## Entrypoint Windows
 
 - `SETUP_WORKSPACE.cmd`: double-click để chạy bootstrap.
 - `OPEN_WORKSPACE.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
 - `OPEN_CLAUDE.cmd`: double-click để mở Claude Code tại `C:\Workspace\Project` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
-- `SYNC_WORKSPACE_SKILLS.cmd`: double-click để sync skill local dùng chung từ `config/workspace-skills.json`.
+- `SYNC_WORKSPACE_SKILLS.cmd`: double-click để sync skill local dùng chung từ `config/workspace-assistants.json`.
 - `scripts/bootstrap.ps1`: script kỹ thuật bên trong, không phải entrypoint double-click.
 - Sau khi sync skill trong khi Claude đang mở, chạy `/reload-skills` trong Claude hoặc mở session mới.
 
