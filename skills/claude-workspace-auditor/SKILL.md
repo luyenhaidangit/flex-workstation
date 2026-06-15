@@ -1,13 +1,13 @@
 ---
 name: claude-workspace-auditor
-description: Audits the Claude Code workspace setup across config integrity, permissions, skill sync, hooks, lifecycle coverage, and context hygiene. Use when setting up a new workspace, after changing settings.json or workspace-assistants.json, when a skill fails to trigger, when hooks seem inactive, when CLAUDE.md has grown large, or before onboarding a new developer.
+description: Audits whether a Claude Code workspace is architected well for coding: canonical project structure, config integrity, permissions, skill sync, hooks, lifecycle coverage, and context hygiene. Use when setting up a new workspace, after changing settings.json or workspace-assistants.json, when a skill fails to trigger, when hooks seem inactive, when CLAUDE.md has grown large, or before onboarding a new developer.
 ---
 
 # Claude Workspace Auditor
 
 ## Tổng quan
 
-Chạy chẩn đoán có cấu trúc qua **6 chiều** của workspace Claude Code và xuất ra báo cáo findings có ưu tiên. Skill chỉ **đọc và báo cáo** — không tự sửa. Với mỗi issue tìm được, skill chỉ rõ skill hoặc command nào nên dùng để xử lý.
+Chạy chẩn đoán có cấu trúc qua **7 chiều** của workspace Claude Code và xuất ra báo cáo findings có ưu tiên. Skill chỉ **đọc và báo cáo** — không tự sửa. Với mỗi issue tìm được, skill chỉ rõ skill hoặc command nào nên dùng để xử lý.
 
 Tư duy nền: mọi best practice của Claude Code đều xoay quanh một ràng buộc duy nhất — **cửa sổ context đầy lên rất nhanh và hiệu năng giảm khi đầy**. Workspace tốt cần làm hai việc song song: đưa kiến thức bền vững vào đúng tầng (CLAUDE.md / skills / subagents) và cho Claude cách tự kiểm chứng (test, lint, hook) thay vì bạn phải soát lỗi.
 
@@ -33,6 +33,46 @@ Tư duy nền: mọi best practice của Claude Code đều xoay quanh một rà
 
 Kiểm tra từng chiều độc lập. Gán trạng thái: ✅ tốt / ⚠️ cảnh báo (chạy được nhưng có rủi ro) / ❌ lỗi (hỏng hoặc cấu hình sai).
 
+### Chiều 0 — Canonical Workspace Structure (Kiến trúc thư mục chuẩn)
+
+Kiểm tra workspace có tách đúng các tầng Claude Code theo vai trò không. Dùng cấu trúc chuẩn này làm baseline, nhưng không yêu cầu mọi project phải có mọi file ngay từ ngày đầu:
+
+```text
+my-project/
+├── CLAUDE.md                      # Context bền vững, nạp mỗi session → giữ ngắn
+├── CLAUDE.local.md                # Ghi chú cá nhân, phải gitignore nếu tồn tại
+├── SPEC.md                        # Spec feature hiện tại, sinh ra trước khi code
+├── .claude/
+│   ├── settings.json              # Permissions + hooks deterministic gates
+│   ├── skills/                    # Kiến thức/workflow nạp theo nhu cầu
+│   ├── agents/                    # Subagent chạy trong context riêng
+│   └── commands/                  # Slash command thuần nếu dùng
+├── scripts/
+│   ├── verify.sh                  # Test + lint + typecheck bằng 1 lệnh
+│   └── block-sensitive-writes.sh  # Guard script gọi từ PreToolUse hook
+├── src/<module>/CLAUDE.md         # Context module nạp on-demand
+├── tests/                         # Verification là trung tâm của setup
+└── docs/git-instructions.md       # Import vào CLAUDE.md bằng @docs/...
+```
+
+Checklist:
+
+1. Root có `CLAUDE.md`; nếu có `CLAUDE.local.md` thì `.gitignore` phải ignore file này.
+2. Root có `SPEC.md`, `docs/SPEC.md`, hoặc `spec/` khi workspace đang theo spec-first workflow. Nếu không có spec, báo ⚠️ trừ khi project chưa có feature active.
+3. `.claude/settings.json` tồn tại và là source cho permissions/hooks; `.claude/skills/`, `.claude/agents/`, `.claude/commands/` tồn tại nếu workspace dùng các tầng tương ứng.
+4. `scripts/verify.sh`, `scripts/verify.ps1`, `Makefile` target `verify`, hoặc command tương đương tồn tại. Nếu thiếu, Stop hook không có gate đáng tin.
+5. Có guard script cho sensitive writes (`scripts/block-sensitive-writes.*`, `check-skill-path.*`, hoặc hook guard tương đương) khi workspace có generated/runtime target như `.claude/skills` hoặc `.agents/skills`.
+6. Có `tests/` hoặc test command rõ ràng trong package/tooling. Nếu không có tests, verification story yếu.
+7. Với repo nhiều module, tìm `src/*/CLAUDE.md`, package/module-level `CLAUDE.md`, hoặc rules path-scoped. Nếu root CLAUDE chứa nhiều rule module mà không có module-level context, báo ⚠️.
+8. Nếu `CLAUDE.md` trỏ tới tài liệu dài, ưu tiên import/pointer dạng `@docs/...` thay vì copy nội dung.
+
+**Tiêu chí:**
+- ✅ Các tầng chính có mặt và đúng vai trò: root context ngắn, runtime `.claude/`, verify script, guard script, tests/docs/module context phù hợp quy mô repo
+- ⚠️ Thiếu tầng hữu ích nhưng chưa phá workflow, ví dụ thiếu `SPEC.md`, thiếu module-level CLAUDE trong repo nhỏ, thiếu commands dù không dùng slash commands
+- ❌ `CLAUDE.local.md` có nguy cơ bị commit, không có root `CLAUDE.md`, hoặc không có verification path nào để Claude tự kiểm chứng
+
+---
+
 ### Chiều 1 — Config Integrity (Tính toàn vẹn cấu hình)
 
 Kiểm tra tất cả file config có cấu trúc hợp lệ:
@@ -42,6 +82,7 @@ Kiểm tra tất cả file config có cấu trúc hợp lệ:
 3. Kiểm tra tên model trong `settings.json` có nằm trong danh sách hợp lệ không (vd: `claude-sonnet-4-6`, `claude-opus-4-8`)
 4. Với mỗi hook entry trong `settings.json`: kiểm tra script path trong `args` có trỏ đến file tồn tại không
 5. So sánh `settings.json` với `flex-workstation/templates/project-root/.claude/settings.json` — báo drift nếu có field lệch
+6. Nếu workspace có template scaffold (`templates/project-root/`), kiểm tra root `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.agents/` có được mirror từ template theo policy của repo không
 
 **Tiêu chí:**
 - ✅ JSON hợp lệ, model name đúng, tất cả script path tồn tại, không có drift
@@ -59,9 +100,11 @@ Xác minh các skill đã khai báo thực sự tồn tại và được sync đ
    - Xác nhận có file `SKILL.md` trong thư mục đó
    - Xác nhận field `name:` trong frontmatter khớp với tên khai báo trong config
 2. Với mỗi `externalSources`: xác nhận path `cloneTo` tồn tại và không rỗng (không chỉ có `.gitkeep`)
-3. So sánh danh sách thư mục trong `.claude/skills/` và `.agents/skills/` — phải khớp nhau
-4. Kiểm tra skill stale trong `.claude/skills/` hoặc `.agents/skills/` không còn được khai báo trong config
-5. Với skill có side-effect (deploy, tạo PR, gửi message): kiểm tra có `disable-model-invocation: true` trong frontmatter không — skill loại này chỉ nên chạy khi người dùng gõ tay, không tự trigger
+3. Nếu có `disabledLocalSkills`, xác nhận đây là quyết định có chủ đích và không bị hiểu nhầm là vẫn đang sync local override
+4. So sánh danh sách thư mục trong `.claude/skills/` và `.agents/skills/` nếu cả Claude và Codex đều enabled — phải khớp nhau trừ khi config cố ý khác target
+5. Kiểm tra skill stale trong `.claude/skills/` hoặc `.agents/skills/` không còn được khai báo trong config
+6. Với skill có side-effect (deploy, tạo PR, gửi message): kiểm tra có `disable-model-invocation: true` trong frontmatter không — skill loại này chỉ nên chạy khi người dùng gõ tay, không tự trigger
+7. Kiểm tra skill source không bị sửa trực tiếp trong runtime generated target (`.claude/skills`, `.agents/skills`) nếu repo có source-of-truth riêng
 
 **Tiêu chí:**
 - ✅ Tất cả skill khai báo có `SKILL.md` hợp lệ, hai target khớp nhau, không có stale entry
@@ -109,6 +152,7 @@ Xác minh hooks được cấu hình đúng, script có thể reach được, **
 
 4. Nếu không có `Stop` hook: đây là gap lớn nhất. Stop hook chạy `verify.sh` (test + lint + typecheck) đảm bảo Claude không kết thúc lượt khi có lỗi — thay thế việc bạn phải soát thủ công.
 5. Kiểm tra thư mục `.claude/hooks/` — nếu tồn tại và không rỗng, xác nhận các file ở đó là có chủ đích
+6. Kiểm tra PreToolUse guard có thật sự chặn ghi vào runtime/generated hoặc sensitive paths (`.claude/skills`, `.agents/skills`, secrets, env files) khi project có các path này
 
 **Tiêu chí:**
 - ✅ Tất cả hook có matcher hợp lệ, script tồn tại, dùng relative path; có ít nhất `PreToolUse` và `Stop`
@@ -134,6 +178,17 @@ Map từng skill trong `.claude/skills/` vào phase tương ứng:
 
 Báo gap nếu có phase nào không có skill nào.
 
+Ngoài skills, kiểm tra `.claude/commands/` hoặc `.agents/commands/` có entrypoints lifecycle nếu workspace dùng slash commands:
+
+| Command | Vai trò |
+|---------|---------|
+| `spec` | tạo/cập nhật `SPEC.md` trước khi code |
+| `plan` | chia task từ spec |
+| `build` | implement incremental |
+| `test` | chạy verification |
+| `review` | quality gate |
+| `ship` | pre-launch / release checklist |
+
 **Tiêu chí:**
 - ✅ Cả 6 phase đều có ít nhất một skill
 - ⚠️ Một phase chỉ có đúng một skill (không có phương án dự phòng)
@@ -158,6 +213,8 @@ Báo gap nếu có phase nào không có skill nào.
 
 5. **Subagent definitions**: Kiểm tra `.claude/agents/` có file `.md` nào không. Subagent chạy trong context riêng — tác vụ đọc nhiều file (explore codebase, review, security scan) nên được đẩy sang subagent để giữ session chính sạch.
 
+6. **Docs import hygiene**: Kiểm tra root `CLAUDE.md` có dùng pointer/import cho tài liệu dài (`@docs/...`, `@flex-workstation/README.md`) thay vì copy nguyên nội dung docs. Nếu docs có `git-instructions.md`, architecture, onboarding, hoặc runbook dài mà nội dung bị nhét vào CLAUDE.md, báo ⚠️.
+
 **Tiêu chí:**
 - ✅ CLAUDE.md ngắn gọn (< 100 dòng), có verify script, có CLAUDE.local.md trong .gitignore, có subagent definitions
 - ⚠️ CLAUDE.md > 100 dòng hoặc chứa nội dung nên ở skill/hook; thiếu verify script; thiếu subagent
@@ -174,6 +231,7 @@ Xuất báo cáo theo cấu trúc sau:
 
 | Chiều | Trạng thái | Tóm tắt |
 |-------|------------|---------|
+| Canonical structure   | ✅/⚠️/❌ | Một dòng mô tả kết quả |
 | Config integrity       | ✅/⚠️/❌ | Một dòng mô tả kết quả |
 | Skill sync health      | ✅/⚠️/❌ | Một dòng mô tả kết quả |
 | Permissions fitness    | ✅/⚠️/❌ | Một dòng mô tả kết quả |
@@ -206,6 +264,7 @@ Xuất báo cáo theo cấu trúc sau:
 | "Tôi biết mình có những skill nào" | Phát hiện gap lifecycle cần map skill vào phase, không chỉ đếm tổng số |
 | "CLAUDE.md tôi viết cẩn thận lắm" | CLAUDE.md phình to khiến Claude phớt lờ chính những chỉ dẫn quan trọng — độ dài là kẻ thù |
 | "Không có Stop hook cũng được, tôi tự check" | Bạn là bottleneck — Stop hook tự động, không bao giờ quên, không mệt mỏi |
+| "Repo nhỏ nên không cần verify script" | Càng nhỏ càng dễ có một command verify đơn giản; thiếu verify làm Claude không có bằng chứng kết thúc |
 
 ---
 
@@ -214,6 +273,9 @@ Xuất báo cáo theo cấu trúc sau:
 - Gõ keyword của skill nhưng skill không engage — khả năng cao là vấn đề sync hoặc name mismatch
 - Hook event kích hoạt nhưng không có gì xảy ra — script path hỏng hoặc matcher quá hẹp
 - `.claude/skills/` và `.agents/skills/` có số lượng thư mục khác nhau sau khi sync
+- Có `CLAUDE.local.md` nhưng `.gitignore` không ignore
+- Không có `scripts/verify.*`, `Makefile verify`, hoặc test command thay thế
+- Root `CLAUDE.md` chứa nội dung docs dài thay vì `@docs/...`
 - `workspace-assistants.json` khai báo `localSkills` path nhưng thư mục không tồn tại
 - Danh sách `permissions.allow` rỗng hoặc chỉ có `Bash(claude --version)` sau khi workspace đã dùng thực tế
 - Claude hay "quên" chỉ dẫn trong CLAUDE.md — dấu hiệu file quá dài, context bị đầy sớm
@@ -225,7 +287,7 @@ Xuất báo cáo theo cấu trúc sau:
 
 Một lần audit được coi là xong khi:
 
-- [ ] Cả 6 chiều đã được kiểm tra và có trạng thái rõ ràng
+- [ ] Cả 7 chiều đã được kiểm tra và có trạng thái rõ ràng
 - [ ] Mỗi ❌ có hành động cụ thể đi kèm (không chỉ "cần sửa")
 - [ ] Mỗi ⚠️ đã được xác nhận là rủi ro chấp nhận được hoặc nâng lên ❌
 - [ ] Findings được sắp xếp theo độ ưu tiên (❌ trước)
