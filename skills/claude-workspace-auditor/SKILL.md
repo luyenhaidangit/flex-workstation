@@ -1,6 +1,13 @@
 ---
 name: claude-workspace-auditor
-description: Audits whether a Claude Code workspace is architected well for coding: canonical project structure, config integrity, permissions, skill sync, hooks, lifecycle coverage, and context hygiene. Use when setting up a new workspace, after changing settings.json or workspace-assistants.json, when a skill fails to trigger, when hooks seem inactive, when CLAUDE.md has grown large, or before onboarding a new developer.
+description: >
+  Audits whether a Claude Code workspace is architected well for coding:
+  canonical project structure, config integrity, permissions, skill sync,
+  hooks, lifecycle coverage, and context hygiene. Use when setting up a new
+  workspace, after changing settings.json or workspace-assistants.json, when a
+  skill fails to trigger, when hooks seem inactive, when CLAUDE.md has grown
+  large, or before onboarding a new developer. Do not use for reviewing one
+  skill file; use skill-reviewer instead.
 ---
 
 # Claude Workspace Auditor
@@ -29,42 +36,26 @@ Tư duy nền: mọi best practice của Claude Code đều xoay quanh một rà
 
 ---
 
+## Input
+
+**Bắt buộc:** workspace root hoặc path repo cần audit. Nếu user không đưa path, dùng current working directory.
+
+**Tùy chọn:**
+- Focus area: một chiều cụ thể như `hooks`, `skills`, `context hygiene`, `canonical structure`
+- Assistant target: `claude`, `codex`, hoặc `both`; mặc định là `both` nếu workspace có cả `.claude/` và `.agents/`
+- Mode: `quick` cho health check nhanh, `full` cho audit đủ 7 chiều; mặc định là `full`
+
+Nếu path không tồn tại hoặc không đọc được, dừng và hỏi lại path đúng. Nếu thiếu focus area, tự chạy full audit thay vì hỏi.
+
+---
+
 ## Quy trình Audit
 
 Kiểm tra từng chiều độc lập. Gán trạng thái: ✅ tốt / ⚠️ cảnh báo (chạy được nhưng có rủi ro) / ❌ lỗi (hỏng hoặc cấu hình sai).
 
 ### Chiều 0 — Canonical Workspace Structure (Kiến trúc thư mục chuẩn)
 
-Kiểm tra workspace có tách đúng các tầng Claude Code theo vai trò không. Dùng cấu trúc chuẩn này làm baseline, nhưng không yêu cầu mọi project phải có mọi file ngay từ ngày đầu:
-
-```text
-my-project/
-├── CLAUDE.md                      # Context bền vững, nạp mỗi session → giữ ngắn
-├── CLAUDE.local.md                # Ghi chú cá nhân, phải gitignore nếu tồn tại
-├── SPEC.md                        # Spec feature hiện tại, sinh ra trước khi code
-├── .claude/
-│   ├── settings.json              # Permissions + hooks deterministic gates
-│   ├── skills/                    # Kiến thức/workflow nạp theo nhu cầu
-│   ├── agents/                    # Subagent chạy trong context riêng
-│   └── commands/                  # Slash command thuần nếu dùng
-├── scripts/
-│   ├── verify.sh                  # Test + lint + typecheck bằng 1 lệnh
-│   └── block-sensitive-writes.sh  # Guard script gọi từ PreToolUse hook
-├── src/<module>/CLAUDE.md         # Context module nạp on-demand
-├── tests/                         # Verification là trung tâm của setup
-└── docs/git-instructions.md       # Import vào CLAUDE.md bằng @docs/...
-```
-
-Checklist:
-
-1. Root có `CLAUDE.md`; nếu có `CLAUDE.local.md` thì `.gitignore` phải ignore file này.
-2. Root có `SPEC.md`, `docs/SPEC.md`, hoặc `spec/` khi workspace đang theo spec-first workflow. Nếu không có spec, báo ⚠️ trừ khi project chưa có feature active.
-3. `.claude/settings.json` tồn tại và là source cho permissions/hooks; `.claude/skills/`, `.claude/agents/`, `.claude/commands/` tồn tại nếu workspace dùng các tầng tương ứng.
-4. `scripts/verify.sh`, `scripts/verify.ps1`, `Makefile` target `verify`, hoặc command tương đương tồn tại. Nếu thiếu, Stop hook không có gate đáng tin.
-5. Có guard script cho sensitive writes (`scripts/block-sensitive-writes.*`, `check-skill-path.*`, hoặc hook guard tương đương) khi workspace có generated/runtime target như `.claude/skills` hoặc `.agents/skills`.
-6. Có `tests/` hoặc test command rõ ràng trong package/tooling. Nếu không có tests, verification story yếu.
-7. Với repo nhiều module, tìm `src/*/CLAUDE.md`, package/module-level `CLAUDE.md`, hoặc rules path-scoped. Nếu root CLAUDE chứa nhiều rule module mà không có module-level context, báo ⚠️.
-8. Nếu `CLAUDE.md` trỏ tới tài liệu dài, ưu tiên import/pointer dạng `@docs/...` thay vì copy nội dung.
+Đọc `references/audit-checklist.md`, phần "Canonical Workspace Structure". Kiểm tra workspace có tách đúng các tầng Claude Code theo vai trò không. Dùng cấu trúc chuẩn làm baseline, nhưng phân biệt rõ `not applicable` với issue thật; repo nhỏ không bắt buộc có mọi file ngay từ ngày đầu.
 
 **Tiêu chí:**
 - ✅ Các tầng chính có mặt và đúng vai trò: root context ngắn, runtime `.claude/`, verify script, guard script, tests/docs/module context phù hợp quy mô repo
@@ -79,7 +70,7 @@ Kiểm tra tất cả file config có cấu trúc hợp lệ:
 
 1. Đọc `settings.json` và `settings.local.json` — xác nhận JSON hợp lệ (không trailing comma, ngoặc cân bằng)
 2. Đọc `workspace-assistants.json` — xác nhận JSON hợp lệ, có đủ các field bắt buộc (`assistants`, `localSkills`)
-3. Kiểm tra tên model trong `settings.json` có nằm trong danh sách hợp lệ không (vd: `claude-sonnet-4-6`, `claude-opus-4-8`)
+3. Kiểm tra tên model trong `settings.json` theo allowlist/local docs nếu repo có khai báo. Nếu không có nguồn xác thực hiện tại, flag là "cần verify" thay vì kết luận model sai.
 4. Với mỗi hook entry trong `settings.json`: kiểm tra script path trong `args` có trỏ đến file tồn tại không
 5. So sánh `settings.json` với `flex-workstation/templates/project-root/.claude/settings.json` — báo drift nếu có field lệch
 6. Nếu workspace có template scaffold (`templates/project-root/`), kiểm tra root `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.agents/` có được mirror từ template theo policy của repo không
@@ -124,7 +115,7 @@ Xác minh các skill đã khai báo thực sự tồn tại và được sync đ
 5. Ghi nhận các entry trong `settings.local.json` override hoặc mở rộng permissions
 6. Kiểm tra **CLI tools vs MCP gap**: nếu `enabledPlugins` rỗng mà không có CLI tool nào pre-approve (`gh`, `aws`, `gcloud`), đây là gap kết nối external system — không phải lỗi config nhưng hạn chế năng lực Claude trong workflow thực tế. Docs Anthropic khuyến nghị ưu tiên CLI tool trước MCP vì tiết kiệm context hơn.
 
-**Hành động nếu quá restrictive:** chạy skill `/fewer-permission-prompts` để phân tích transcript và sinh allowlist phù hợp.
+**Hành động nếu quá restrictive:** nếu workspace có command/skill `fewer-permission-prompts`, dùng nó để phân tích transcript và sinh allowlist phù hợp. Nếu không có, đề xuất phân tích transcript thủ công và thêm allowlist tối thiểu cho các lệnh đã dùng lặp lại.
 
 **Tiêu chí:**
 - ✅ Allow list phủ đủ lệnh thường dùng, không có wildcard
@@ -290,5 +281,6 @@ Một lần audit được coi là xong khi:
 - [ ] Cả 7 chiều đã được kiểm tra và có trạng thái rõ ràng
 - [ ] Mỗi ❌ có hành động cụ thể đi kèm (không chỉ "cần sửa")
 - [ ] Mỗi ⚠️ đã được xác nhận là rủi ro chấp nhận được hoặc nâng lên ❌
+- [ ] Mỗi mục không kiểm được được ghi rõ là `not checked`, và mỗi mục không áp dụng được ghi rõ là `not applicable`
 - [ ] Findings được sắp xếp theo độ ưu tiên (❌ trước)
 - [ ] Có ít nhất một follow-up action hoặc skill được gợi ý nếu tìm thấy issue
