@@ -105,12 +105,16 @@ Audit tầng instructions, ra punch list. Không sửa luôn — đợi user duy
    - `.claude/output-styles/**/*.md`
 
 2. **Đọc và check** theo các nhóm vấn đề trong `references/anti-patterns.md`:
+   - Phép thử từng dòng: bỏ dòng này đi thì Claude có còn mắc lỗi thực tế không?
    - Trùng lặp cross-tier (cùng 1 rule ở 2+ file)
    - Mâu thuẫn (rule A nói "luôn X", rule B nói "không X")
    - Sai tầng (project convention nằm trong memory; user preference nằm trong project CLAUDE.md)
+   - Sai phạm vi: thứ thỉnh thoảng mới cần nằm trong CLAUDE.md thay vì skill / command / docs import
    - Phình (CLAUDE.md root > ~500 tokens; memory file > 1 màn hình)
    - Mơ hồ (rule không kiểm chứng được)
+   - Rule bị bỏ qua trong thực tế dù đã ghi → nghi ngờ file quá dài hoặc rule bị chìm
    - Chết (nhắc file/function/flag không còn tồn tại — grep verify)
+   - Chép tài liệu dài vào instruction thay vì link/import bằng `@path`
    - Memory thiếu `**Why:**` / `**How to apply:**` (với type feedback/project)
    - Subagent/skill description mơ hồ → trigger không đúng
    - `MEMORY.md` viết nội dung memory trực tiếp thay vì link sang file con
@@ -145,6 +149,8 @@ Refactor instruction files theo punch list (từ Review hoặc user nêu trực 
    - **Split**: CLAUDE.md phình → tách phần path-specific sang `<dir>/CLAUDE.md` hoặc `.claude/rules/<topic>.md`
    - **Merge**: 2+ memory cùng chủ đề → gộp 1 file, giữ Why của bản gốc rõ nhất
    - **Move**: instruction sai tầng → chuyển đúng tầng, xóa chỗ cũ, cập nhật `MEMORY.md` nếu liên quan
+   - **Extract**: workflow/domain chỉ thỉnh thoảng dùng → chuyển sang skill / command / docs import thay vì giữ ở CLAUDE.md
+   - **Import**: tài liệu chi tiết nhưng vẫn cần pointer → giữ 1 dòng `@path/to/file.md`, không chép nội dung dài
    - **Rewrite**: mơ hồ → cụ thể, thêm ví dụ đúng/sai
    - **Delete**: chết → xóa, ghi rõ "tại sao xóa" trong commit message
 4. Sau mỗi thay đổi, **verify**:

@@ -21,10 +21,13 @@
 
 ## Tài liệu cần đọc theo task
 - Tổng quan: `README.md`
+- Chi tiết khi cần: `@docs/<topic>.md`
 - <khác>
 ```
 
 Giữ dưới ~500 tokens. Phần dài → tách.
+Mỗi dòng phải vượt phép thử: bỏ dòng này đi thì Claude có mắc lỗi thực tế không?
+Nếu nội dung chỉ thỉnh thoảng cần, ưu tiên skill / slash command / docs import thay vì nhét vào CLAUDE.md.
 
 ---
 
