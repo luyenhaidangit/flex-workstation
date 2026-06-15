@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude --version)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": ["-NoProfile", "-NonInteractive", "-File", "scripts\\block-sensitive-writes.ps1"],
+            "statusMessage": "Kiem tra sensitive/generated paths..."
+          }
+        ]
+      }
+    ]
+  }
+}
