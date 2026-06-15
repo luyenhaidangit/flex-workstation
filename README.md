@@ -90,6 +90,17 @@ Hoặc double-click:
 SYNC_WORKSPACE.cmd
 ```
 
-External skill source hiện đang tắt trong `workspace-assistants.json`. Nếu bật lại, source sẽ được clone vào `skills-external/` khi sync lần đầu và không được commit. Nếu muốn custom một external skill, copy skill đó sang `skills/<skill-name>`, giữ cùng `name` trong `SKILL.md`, khai báo trong `localSkills`, rồi chạy `SYNC_WORKSPACE.cmd`. Local skill cùng tên sẽ override bản external.
+External source `agent-skills` đang được bật trong `workspace-assistants.json` từ `skills-external/agent-skills`. Khi sync, workspace sẽ đưa skills, agent personas và markdown commands vào runtime target của Claude/Codex theo cấu hình:
+
+```text
+C:\Workspace\Project\.claude\skills
+C:\Workspace\Project\.claude\agents
+C:\Workspace\Project\.claude\commands
+C:\Workspace\Project\.agents\skills
+C:\Workspace\Project\.agents\agents
+C:\Workspace\Project\.agents\commands
+```
+
+Nếu muốn custom một external skill, copy skill đó sang `skills/<skill-name>`, giữ cùng `name` trong `SKILL.md`, khai báo trong `localSkills`, rồi chạy `SYNC_WORKSPACE.cmd`. Local skill cùng tên sẽ override bản external.
 
 Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync. Nếu Codex đang mở sẵn mà skill mới chưa xuất hiện, mở session mới.
