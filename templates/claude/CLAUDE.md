@@ -1,25 +1,28 @@
 # CLAUDE.md
 
-Project root: `<PROJECT_ROOT>`.
+Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, entrypoint VS Code và quy ước làm việc. Không chứa mã nguồn nghiệp vụ; các repo nghiệp vụ nằm ngang hàng với `flex-workstation`. Cấu trúc local đầy đủ và bước xác nhận onboarding: xem `docs/onboarding.md`.
 
-This file is loaded in every Claude Code session. Keep it short and only include rules that are always true for this project.
+## Quy tắc làm việc
 
-## Language
+- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo.
+- Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
+- Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
+- Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo — tránh ghi đè work-in-progress của thành viên khác hoặc session Claude trước.
+- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tương ứng:
+  - Onboarding/bootstrap → `docs/onboarding.md`
+  - Kiến trúc/quy ước kỹ thuật → `docs/architecture.md`
+  - Danh sách project con → `docs/projects.md`
+  - Skill dùng chung → source tại `skills/<name>/`, khai báo trong `config/workspace-assistants.json`
 
-- Trả lời và ghi chú bằng tiếng Việt có dấu. Giữ nguyên tên file, command, package, API, framework và thuật ngữ kỹ thuật bằng English.
+## Entrypoint Windows
 
-## Source Of Truth
+- `OPEN_WORKSPACE.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
+- `OPEN_CLAUDE.cmd`: double-click để mở Claude Code tại `C:\Workspace\Project` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
+- `SYNC_WORKSPACE.cmd`: double-click để chạy bootstrap, chuẩn bị cấu hình Claude/Codex và sync skill dùng chung từ `config/workspace-assistants.json`.
+- `scripts/bootstrap.ps1`: script kỹ thuật bên trong, không phải entrypoint double-click.
+- Sau khi sync skill trong khi Claude đang mở, chạy `/reload-skills` trong Claude hoặc mở session mới.
 
-- Do not edit generated runtime files under `.claude/skills`, `.claude/agents`, or `.claude/commands` directly.
-- Shared skills, agents, commands, hooks, and templates must be edited at their declared source path, then synced.
-- Personal notes belong in `CLAUDE.local.md`, which must stay ignored by git.
+## Tài liệu
 
-## Workflow
-
-- Write or update `SPEC.md` before non-trivial feature work.
-- Use one verify command before finishing a coding task: `powershell -NoProfile -File scripts/verify.ps1`.
-- Put module-specific rules in `src/<module>/CLAUDE.md` instead of growing this root file.
-
-## Task Docs
-
-- Git conventions: `@docs/git-instructions.md`
+- Index đầy đủ và mục đích từng tài liệu: `README.md`
+- Task hiện tại: `docs/tasks.md`
