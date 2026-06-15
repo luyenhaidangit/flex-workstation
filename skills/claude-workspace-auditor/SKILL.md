@@ -1,13 +1,15 @@
 ---
 name: claude-workspace-auditor
-description: Audits the Claude Code workspace setup across config integrity, permissions, skill sync, hooks, and lifecycle coverage. Use when setting up a new workspace, after changing settings.json or workspace-assistants.json, when a skill fails to trigger, when hooks seem inactive, or before onboarding a new developer.
+description: Audits the Claude Code workspace setup across config integrity, permissions, skill sync, hooks, lifecycle coverage, and context hygiene. Use when setting up a new workspace, after changing settings.json or workspace-assistants.json, when a skill fails to trigger, when hooks seem inactive, when CLAUDE.md has grown large, or before onboarding a new developer.
 ---
 
 # Claude Workspace Auditor
 
 ## Tổng quan
 
-Chạy chẩn đoán có cấu trúc qua 5 chiều của workspace Claude Code và xuất ra báo cáo findings có ưu tiên. Skill chỉ **đọc và báo cáo** — không tự sửa. Với mỗi issue tìm được, skill chỉ rõ skill hoặc command nào nên dùng để xử lý.
+Chạy chẩn đoán có cấu trúc qua **6 chiều** của workspace Claude Code và xuất ra báo cáo findings có ưu tiên. Skill chỉ **đọc và báo cáo** — không tự sửa. Với mỗi issue tìm được, skill chỉ rõ skill hoặc command nào nên dùng để xử lý.
+
+Tư duy nền: mọi best practice của Claude Code đều xoay quanh một ràng buộc duy nhất — **cửa sổ context đầy lên rất nhanh và hiệu năng giảm khi đầy**. Workspace tốt cần làm hai việc song song: đưa kiến thức bền vững vào đúng tầng (CLAUDE.md / skills / subagents) và cho Claude cách tự kiểm chứng (test, lint, hook) thay vì bạn phải soát lỗi.
 
 ## Khi nào dùng
 
@@ -16,6 +18,7 @@ Chạy chẩn đoán có cấu trúc qua 5 chiều của workspace Claude Code v
 - Sau khi chỉnh `settings.json`, `workspace-assistants.json`, hoặc bất kỳ hook script nào
 - Một skill không trigger dù gõ đúng keyword
 - Hook có vẻ không chạy (không thấy output, không có phản hồi)
+- CLAUDE.md đã phình to và nghi ngờ Claude đang bỏ qua chỉ dẫn quan trọng
 - Trước khi onboard developer mới để đảm bảo baseline sạch
 - Định kỳ health check sau refactor lớn
 
@@ -58,10 +61,11 @@ Xác minh các skill đã khai báo thực sự tồn tại và được sync đ
 2. Với mỗi `externalSources`: xác nhận path `cloneTo` tồn tại và không rỗng (không chỉ có `.gitkeep`)
 3. So sánh danh sách thư mục trong `.claude/skills/` và `.agents/skills/` — phải khớp nhau
 4. Kiểm tra skill stale trong `.claude/skills/` hoặc `.agents/skills/` không còn được khai báo trong config
+5. Với skill có side-effect (deploy, tạo PR, gửi message): kiểm tra có `disable-model-invocation: true` trong frontmatter không — skill loại này chỉ nên chạy khi người dùng gõ tay, không tự trigger
 
 **Tiêu chí:**
 - ✅ Tất cả skill khai báo có `SKILL.md` hợp lệ, hai target khớp nhau, không có stale entry
-- ⚠️ External source tồn tại nhưng có vẻ shallow/rỗng
+- ⚠️ External source tồn tại nhưng có vẻ shallow/rỗng; hoặc skill có side-effect nhưng thiếu `disable-model-invocation`
 - ❌ Thiếu `SKILL.md`, name không khớp, hoặc hai target lệch nhau
 
 ---
@@ -75,31 +79,40 @@ Xác minh các skill đã khai báo thực sự tồn tại và được sync đ
 3. Đánh dấu **quá permissive** nếu có wildcard như `Bash(*)`
 4. Kiểm tra các lệnh hay dùng mà chưa có trong allow list: `git`, `npm`, `node`, `powershell`
 5. Ghi nhận các entry trong `settings.local.json` override hoặc mở rộng permissions
+6. Kiểm tra **CLI tools vs MCP gap**: nếu `enabledPlugins` rỗng mà không có CLI tool nào pre-approve (`gh`, `aws`, `gcloud`), đây là gap kết nối external system — không phải lỗi config nhưng hạn chế năng lực Claude trong workflow thực tế. Docs Anthropic khuyến nghị ưu tiên CLI tool trước MCP vì tiết kiệm context hơn.
 
 **Hành động nếu quá restrictive:** chạy skill `/fewer-permission-prompts` để phân tích transcript và sinh allowlist phù hợp.
 
 **Tiêu chí:**
 - ✅ Allow list phủ đủ lệnh thường dùng, không có wildcard
-- ⚠️ Chỉ có entry tối thiểu — sẽ bị hỏi liên tục khi làm việc thực
+- ⚠️ Chỉ có entry tối thiểu — sẽ bị hỏi liên tục khi làm việc thực; hoặc không có CLI tool nào cho external system
 - ❌ Có wildcard permission (`Bash(*)`)
 
 ---
 
 ### Chiều 4 — Hooks Validation (Kiểm tra hooks)
 
-Xác minh hooks được cấu hình đúng và script có thể reach được:
+Xác minh hooks được cấu hình đúng, script có thể reach được, **và bộ hook tối thiểu đã có mặt**:
 
 1. Đọc phần `hooks` trong `settings.json`
-2. Với mỗi hook event (vd: `PreToolUse`, `PostToolUse`, `SessionStart`):
+2. Với mỗi hook event:
    - Xác nhận field `matcher` là regex pattern hợp lệ
    - Xác nhận script trong `command`/`args` tồn tại ở path đó
    - Ghi chú nếu dùng absolute path (dễ hỏng khi đổi máy) thay vì relative path
-3. Kiểm tra không có hook dùng path chỉ tồn tại trên một máy — nên dùng relative path từ `flex-workstation/scripts/`
-4. Kiểm tra thư mục `.claude/hooks/` — nếu tồn tại và không rỗng, xác nhận các file ở đó là có chủ đích
+3. Kiểm tra **bộ hook tối thiểu** theo khuyến nghị Anthropic:
+
+   | Hook | Mục đích | Cần thiết |
+   |------|----------|-----------|
+   | `PreToolUse` | Guard — chặn ghi vào thư mục nhạy cảm, kiểm tra trước khi sửa | Nên có |
+   | `PostToolUse` | Auto-format sau khi sửa file | Nên có với dự án có formatter |
+   | `Stop` | Chạy verify script trước khi Claude kết thúc lượt — guardrail mạnh nhất | **Quan trọng nhất** |
+
+4. Nếu không có `Stop` hook: đây là gap lớn nhất. Stop hook chạy `verify.sh` (test + lint + typecheck) đảm bảo Claude không kết thúc lượt khi có lỗi — thay thế việc bạn phải soát thủ công.
+5. Kiểm tra thư mục `.claude/hooks/` — nếu tồn tại và không rỗng, xác nhận các file ở đó là có chủ đích
 
 **Tiêu chí:**
-- ✅ Tất cả hook có matcher hợp lệ, script path tồn tại, dùng relative path
-- ⚠️ Dùng absolute path trong args hook (chạy được trên máy hiện tại, dễ hỏng ở máy khác)
+- ✅ Tất cả hook có matcher hợp lệ, script tồn tại, dùng relative path; có ít nhất `PreToolUse` và `Stop`
+- ⚠️ Dùng absolute path; hoặc thiếu `Stop` hook; hoặc có `PreToolUse` nhưng không có verify gate
 - ❌ Script path của hook không tồn tại
 
 ---
@@ -128,6 +141,30 @@ Báo gap nếu có phase nào không có skill nào.
 
 ---
 
+### Chiều 6 — Context Hygiene (Vệ sinh ngữ cảnh)
+
+Đây là chiều quan trọng nhất theo docs Anthropic nhưng thường bị bỏ qua nhất. Mục tiêu: đảm bảo context không bị lãng phí vào những thứ không cần thiết ở đầu mỗi session.
+
+1. **CLAUDE.md bloat check**: Đọc `CLAUDE.md` ở project root. Với mỗi dòng/đoạn, áp dụng bộ lọc của Anthropic:
+   - *"Bỏ dòng này đi thì Claude có mắc lỗi không?"* — nếu không, đó là ứng viên cắt bỏ
+   - Flag nếu file > 100 dòng
+   - Flag nếu có nội dung thuộc về skills (workflow đôi lúc mới dùng), hooks (rule tất định), hoặc docs riêng — những thứ này không nên ở CLAUDE.md
+
+2. **Verification script**: Kiểm tra có file `scripts/verify.sh` (hoặc `scripts/verify.ps1`, `Makefile` với target `verify`) chạy test + lint + typecheck bằng 1 lệnh không. Đây là điều kiện tiên quyết để Stop hook hoạt động có ý nghĩa.
+
+3. **CLAUDE.local.md**: Kiểm tra có file `CLAUDE.local.md` và file này có trong `.gitignore` không. Ghi chú cá nhân (path cục bộ, token tạm, reminder cho bản thân) nên ở đây, không nên commit lên repo.
+
+4. **Module-level CLAUDE.md**: Với repo có nhiều module/subdir lớn, kiểm tra các thư mục quan trọng có `CLAUDE.md` riêng không. Claude nạp on-demand khi đọc file trong thư mục đó — giúp CLAUDE.md root không phải chứa context của từng module.
+
+5. **Subagent definitions**: Kiểm tra `.claude/agents/` có file `.md` nào không. Subagent chạy trong context riêng — tác vụ đọc nhiều file (explore codebase, review, security scan) nên được đẩy sang subagent để giữ session chính sạch.
+
+**Tiêu chí:**
+- ✅ CLAUDE.md ngắn gọn (< 100 dòng), có verify script, có CLAUDE.local.md trong .gitignore, có subagent definitions
+- ⚠️ CLAUDE.md > 100 dòng hoặc chứa nội dung nên ở skill/hook; thiếu verify script; thiếu subagent
+- ❌ CLAUDE.local.md tồn tại nhưng không có trong `.gitignore` (rủi ro commit thông tin cá nhân/nhạy cảm)
+
+---
+
 ## Định dạng output
 
 Xuất báo cáo theo cấu trúc sau:
@@ -142,6 +179,7 @@ Xuất báo cáo theo cấu trúc sau:
 | Permissions fitness    | ✅/⚠️/❌ | Một dòng mô tả kết quả |
 | Hooks validation       | ✅/⚠️/❌ | Một dòng mô tả kết quả |
 | Lifecycle coverage     | ✅/⚠️/❌ | Một dòng mô tả kết quả |
+| Context hygiene        | ✅/⚠️/❌ | Một dòng mô tả kết quả |
 
 ## Findings (theo độ ưu tiên)
 
@@ -166,6 +204,8 @@ Xuất báo cáo theo cấu trúc sau:
 | "Hỏi permissions thì approve thôi" | Bị hỏi liên tục làm gián đoạn flow và dễ dẫn đến over-approve |
 | "Hook chạy tuần trước, vẫn ổn thôi" | Một thay đổi path hoặc script có thể làm hook hỏng im lặng, không có error message |
 | "Tôi biết mình có những skill nào" | Phát hiện gap lifecycle cần map skill vào phase, không chỉ đếm tổng số |
+| "CLAUDE.md tôi viết cẩn thận lắm" | CLAUDE.md phình to khiến Claude phớt lờ chính những chỉ dẫn quan trọng — độ dài là kẻ thù |
+| "Không có Stop hook cũng được, tôi tự check" | Bạn là bottleneck — Stop hook tự động, không bao giờ quên, không mệt mỏi |
 
 ---
 
@@ -176,6 +216,8 @@ Xuất báo cáo theo cấu trúc sau:
 - `.claude/skills/` và `.agents/skills/` có số lượng thư mục khác nhau sau khi sync
 - `workspace-assistants.json` khai báo `localSkills` path nhưng thư mục không tồn tại
 - Danh sách `permissions.allow` rỗng hoặc chỉ có `Bash(claude --version)` sau khi workspace đã dùng thực tế
+- Claude hay "quên" chỉ dẫn trong CLAUDE.md — dấu hiệu file quá dài, context bị đầy sớm
+- Claude kết thúc lượt mà không báo lỗi nhưng test thực ra đang fail — thiếu Stop hook
 
 ---
 
@@ -183,7 +225,7 @@ Xuất báo cáo theo cấu trúc sau:
 
 Một lần audit được coi là xong khi:
 
-- [ ] Cả 5 chiều đã được kiểm tra và có trạng thái rõ ràng
+- [ ] Cả 6 chiều đã được kiểm tra và có trạng thái rõ ràng
 - [ ] Mỗi ❌ có hành động cụ thể đi kèm (không chỉ "cần sửa")
 - [ ] Mỗi ⚠️ đã được xác nhận là rủi ro chấp nhận được hoặc nâng lên ❌
 - [ ] Findings được sắp xếp theo độ ưu tiên (❌ trước)
