@@ -14,19 +14,13 @@ Không tạo source file trực tiếp tại workspace root, trừ runtime gener
 
 Khi người dùng yêu cầu tạo hoặc sửa skill dùng chung:
 
-- Tạo source tại `flex-workstation/skills/<skill-name>/SKILL.md` hoặc thư mục source đã khai báo trong `workspace-assistants.json`.
-- Khai báo skill trong `flex-workstation/config/workspace-assistants.json`.
-- Chạy `flex-workstation/SYNC_WORKSPACE.cmd`.
-- Nếu Codex/Claude đang mở, mở session mới hoặc reload skill theo cơ chế của tool đang dùng.
+- Sửa source trong `flex-workstation/skills/<skill-name>/SKILL.md` hoặc path đã khai báo trong `workspace-assistants.json`.
+- Cập nhật `flex-workstation/config/workspace-assistants.json`, chạy `flex-workstation/SYNC_WORKSPACE.cmd`, rồi mở session mới/reload nếu tool đang mở.
 
 ## Đồng bộ config với template
 
-Workspace root là bản "sống"; `flex-workstation/templates/project-root/` là bản scaffold mẫu dùng khi bootstrap setup mới. Khi sửa config dùng chung ở root — `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`, `.claude/settings.local.json` — mirror thay đổi tương ứng sang `flex-workstation/templates/project-root/` để setup mới kế thừa.
+Workspace root là bản "sống". `flex-workstation/templates/project-root/` là scaffold cho setup mới. Khi sửa config dùng chung ở root — `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`, `.claude/settings.local.json` — mirror thay đổi sang template tương ứng.
 
 - Chỉ mirror config ổn định, dùng chung (vd `model`, quy ước ngôn ngữ, workflow). KHÔNG mirror giá trị đặc thù máy/cá nhân: path tuyệt đối, permission tạm cho từng máy.
 
-Tài liệu chi tiết nằm trong:
-
-```text
-flex-workstation\README.md
-```
+Chi tiết: `@flex-workstation/README.md`.
