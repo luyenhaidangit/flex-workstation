@@ -53,6 +53,7 @@ Script sẽ:
 - Copy template cấu hình Claude từ `templates/project-root/.claude` ra `C:\Workspace\Project\.claude`.
 - Copy template cấu trúc Codex từ `templates/project-root/.agents` ra `C:\Workspace\Project\.agents`.
 - Sync skill local dùng chung từ `config/workspace-assistants.json` vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`.
+- Kiểm tra/cài `ccusage` để theo dõi usage của Claude Code/Codex.
 - Kiểm tra Claude Code CLI `claude`.
 - Nếu thiếu Claude Code, tự chạy native installer chính thức. Trên Windows:
 
@@ -70,6 +71,12 @@ Nếu muốn dùng WinGet trên Windows thay vì native installer:
 
 ```powershell
 .\scripts\bootstrap.ps1 -UseWinget
+```
+
+Nếu chỉ muốn bỏ qua cài `ccusage` trong lần bootstrap này:
+
+```powershell
+.\scripts\bootstrap.ps1 -SkipCcusageInstall
 ```
 
 ## Cấu hình Claude/Codex được tạo sẵn
@@ -253,6 +260,20 @@ claude --dangerously-skip-permissions
 ```
 
 Chỉ dùng chế độ này trong workspace tin cậy vì Claude sẽ không hỏi trước khi dùng tool hoặc sửa file.
+
+## Mở AI usage monitor
+
+Để theo dõi nhanh usage/cost AI, double-click:
+
+```text
+OPEN_AI_USAGE_MONITOR.cmd
+```
+
+File này chạy `scripts/open-ai-usage-monitor.ps1`. Nếu thiếu `ccusage`, script sẽ thử cài global bằng `npm install -g ccusage@latest` hoặc package manager khả dụng khác, rồi mở monitor active block tự refresh:
+
+```powershell
+ccusage blocks --active
+```
 
 ## Ghi chú
 

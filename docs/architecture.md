@@ -17,9 +17,12 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `docs/` | Nơi lưu tài liệu triển khai, task, kiến trúc và quyết định kỹ thuật. |
 | `scripts/bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
 | `scripts/check-skill-path.ps1` | Hook script dùng bởi Claude settings để chặn sửa trực tiếp vào skill runtime trong `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. |
+| `scripts/ensure-ccusage.ps1` | Kiểm tra/cài `ccusage` để xem usage/cost của Claude Code/Codex. |
+| `scripts/open-ai-usage-monitor.ps1` | Mở monitor `ccusage` và tự refresh active billing block nếu CLI không hỗ trợ live mode native. |
 | `scripts/sync-workspace-skills.ps1` | Script clone external source khi cần và sync skill/command/agent dùng chung vào runtime của Claude/Codex. |
 | `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
 | `OPEN_CLAUDE.cmd` | Entrypoint mở Claude Code tại workspace root với `--dangerously-skip-permissions`. |
+| `OPEN_AI_USAGE_MONITOR.cmd` | Entrypoint mở nhanh monitor `ccusage` để theo dõi usage AI. |
 | `SYNC_WORKSPACE.cmd` | Entrypoint thân thiện cho người dùng Windows, dùng để double-click chạy bootstrap, chuẩn bị cấu hình Claude/Codex và sync skill dùng chung. |
 | `skills/` | Nơi lưu skill org-share dùng chung giữa các project Flex (Claude Code hoặc AI assistant khác). |
 | `templates/project-root/.claude` | Template cấu hình Claude được bootstrap copy ra thư mục cha `C:\Workspace\Project\.claude`. |

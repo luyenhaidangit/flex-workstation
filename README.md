@@ -26,6 +26,8 @@ flex-workstation/
 |-- scripts/
 |   +-- bootstrap.ps1
 |   +-- check-skill-path.ps1
+|   +-- ensure-ccusage.ps1
+|   +-- open-ai-usage-monitor.ps1
 |   +-- sync-workspace-skills.ps1
 |-- skills/
 |   +-- README.md
@@ -38,6 +40,7 @@ flex-workstation/
 |-- .gitattributes
 |-- OPEN_WORKSPACE.cmd
 |-- OPEN_CLAUDE.cmd
+|-- OPEN_AI_USAGE_MONITOR.cmd
 |-- SYNC_WORKSPACE.cmd
 |-- CLAUDE.md
 +-- README.md
@@ -62,6 +65,8 @@ Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` đ�
 Trên Windows: double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap/sync workspace, sau đó double-click `OPEN_WORKSPACE.cmd` để mở VS Code tại `C:\Workspace\Project`.
 
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
+
+Khi cần theo dõi nhanh token/cost AI, double-click `OPEN_AI_USAGE_MONITOR.cmd`. File này kiểm tra/cài `ccusage` nếu thiếu, rồi mở monitor active block bằng `ccusage blocks --active` và tự refresh.
 
 Khi cần cập nhật cấu hình workspace hoặc skill dùng chung, double-click `SYNC_WORKSPACE.cmd`.
 
