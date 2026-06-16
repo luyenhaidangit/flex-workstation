@@ -1,7 +1,7 @@
 param(
     [ValidateSet("daily", "weekly", "monthly", "session", "claude-blocks")]
-    [string]$View = "daily",
-    [string]$Since = (Get-Date -Format "yyyy-MM-dd"),
+    [string]$View = "monthly",
+    [string]$Since = (Get-Date -Day 1 -Format "yyyy-MM-dd"),
     [int]$RefreshSeconds = 30
 )
 
