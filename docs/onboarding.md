@@ -269,7 +269,7 @@ Chỉ dùng chế độ này trong workspace tin cậy vì Claude sẽ không h�
 OPEN_AI_USAGE_MONITOR.cmd
 ```
 
-File này chạy `scripts/open-ai-usage-monitor.ps1`. Nếu thiếu `ccusage`, script sẽ thử cài global bằng `npm install -g ccusage@latest` hoặc package manager khả dụng khác, rồi mở unified daily monitor trong 30 ngày gần nhất cho mọi coding AI CLI mà `ccusage` phát hiện:
+File này chạy `scripts/open-ai-usage-monitor.ps1`. Nếu thiếu `ccusage`, script sẽ thử cài global bằng `npm install -g ccusage@latest` hoặc package manager khả dụng khác, rồi mở unified daily monitor trong 30 ngày gần nhất cho mọi coding AI CLI mà `ccusage` phát hiện. Monitor hiển thị `TOTAL` trước, sau đó sắp xếp ngày mới nhất lên đầu:
 
 ```powershell
 ccusage daily --all --since <today-minus-30-days>
