@@ -18,7 +18,7 @@ Tài liệu này mô tả cách tổ chức các project, tài liệu và skill 
 | `scripts/bootstrap.ps1` | Script bootstrap máy mới sau khi clone workstation. |
 | `scripts/check-skill-path.ps1` | Hook script dùng bởi Claude settings để chặn sửa trực tiếp vào skill runtime trong `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. |
 | `scripts/ensure-ccusage.ps1` | Kiểm tra/cài `ccusage` để xem usage/cost của Claude Code/Codex. |
-| `scripts/open-ai-usage-monitor.ps1` | Mở monitor `ccusage` và tự refresh active billing block nếu CLI không hỗ trợ live mode native. |
+| `scripts/open-ai-usage-monitor.ps1` | Mở monitor `ccusage` cho mọi coding AI CLI được phát hiện; có mode riêng cho Claude Code billing block. |
 | `scripts/sync-workspace-skills.ps1` | Script clone external source khi cần và sync skill/command/agent dùng chung vào runtime của Claude/Codex. |
 | `OPEN_WORKSPACE.cmd` | Entrypoint mở nhanh VS Code tại thư mục cha chứa các repo Flex. |
 | `OPEN_CLAUDE.cmd` | Entrypoint mở Claude Code tại workspace root với `--dangerously-skip-permissions`. |

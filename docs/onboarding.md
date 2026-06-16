@@ -269,10 +269,16 @@ Chỉ dùng chế độ này trong workspace tin cậy vì Claude sẽ không h�
 OPEN_AI_USAGE_MONITOR.cmd
 ```
 
-File này chạy `scripts/open-ai-usage-monitor.ps1`. Nếu thiếu `ccusage`, script sẽ thử cài global bằng `npm install -g ccusage@latest` hoặc package manager khả dụng khác, rồi mở monitor active block tự refresh:
+File này chạy `scripts/open-ai-usage-monitor.ps1`. Nếu thiếu `ccusage`, script sẽ thử cài global bằng `npm install -g ccusage@latest` hoặc package manager khả dụng khác, rồi mở unified monitor cho mọi coding AI CLI mà `ccusage` phát hiện:
 
 ```powershell
-ccusage blocks --active
+ccusage daily --all --since <today>
+```
+
+Muốn xem riêng Claude Code billing block 5 giờ:
+
+```powershell
+.\scripts\open-ai-usage-monitor.ps1 -View claude-blocks
 ```
 
 ## Ghi chú
