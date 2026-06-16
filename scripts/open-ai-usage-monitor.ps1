@@ -50,30 +50,28 @@ function Show-DailyUsageReport {
     $rows = @()
 
     $rows += [pscustomobject]@{
-        Date          = "TOTAL"
-        Agents        = ""
-        Models        = ""
-        Input         = Format-UsageNumber $report.totals.inputTokens
-        Output        = Format-UsageNumber $report.totals.outputTokens
-        CacheCreate   = Format-UsageNumber $report.totals.cacheCreationTokens
-        CacheRead     = Format-UsageNumber $report.totals.cacheReadTokens
-        TotalTokens   = Format-UsageNumber $report.totals.totalTokens
-        CostUSD       = Format-UsageCost $report.totals.totalCost
+        Date     = "TOTAL"
+        Agents   = ""
+        Input    = Format-UsageNumber $report.totals.inputTokens
+        Output   = Format-UsageNumber $report.totals.outputTokens
+        CacheIn  = Format-UsageNumber $report.totals.cacheCreationTokens
+        CacheOut = Format-UsageNumber $report.totals.cacheReadTokens
+        Tokens   = Format-UsageNumber $report.totals.totalTokens
+        Cost     = Format-UsageCost $report.totals.totalCost
     }
 
     $report.daily |
         Sort-Object period -Descending |
         ForEach-Object {
             $rows += [pscustomobject]@{
-                Date          = $_.period
-                Agents        = Join-UsageList $_.metadata.agents
-                Models        = Join-UsageList $_.modelsUsed
-                Input         = Format-UsageNumber $_.inputTokens
-                Output        = Format-UsageNumber $_.outputTokens
-                CacheCreate   = Format-UsageNumber $_.cacheCreationTokens
-                CacheRead     = Format-UsageNumber $_.cacheReadTokens
-                TotalTokens   = Format-UsageNumber $_.totalTokens
-                CostUSD       = Format-UsageCost $_.totalCost
+                Date     = $_.period
+                Agents   = Join-UsageList $_.metadata.agents
+                Input    = Format-UsageNumber $_.inputTokens
+                Output   = Format-UsageNumber $_.outputTokens
+                CacheIn  = Format-UsageNumber $_.cacheCreationTokens
+                CacheOut = Format-UsageNumber $_.cacheReadTokens
+                Tokens   = Format-UsageNumber $_.totalTokens
+                Cost     = Format-UsageCost $_.totalCost
             }
         }
 
