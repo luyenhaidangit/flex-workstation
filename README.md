@@ -27,6 +27,7 @@ flex-workstation/
 |   +-- bootstrap.ps1
 |   +-- check-skill-path.ps1
 |   +-- ensure-ccusage.ps1
+|   +-- ensure-rtk.ps1
 |   +-- open-ai-usage-monitor.ps1
 |   +-- sync-workspace-skills.ps1
 |-- skills/
@@ -67,6 +68,8 @@ Trên Windows: double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap/sync wor
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
 
 Khi cần theo dõi nhanh token/cost AI, double-click `OPEN_AI_USAGE_MONITOR.cmd`. File này kiểm tra/cài `ccusage` nếu thiếu, rồi mở unified daily monitor trong 30 ngày gần nhất cho mọi coding AI CLI mà `ccusage` phát hiện. Monitor hiển thị `TOTAL` trước, sau đó sắp xếp ngày mới nhất lên đầu.
+
+`SYNC_WORKSPACE.cmd` cũng kiểm tra/cài `rtk` nếu thiếu. `rtk` là CLI proxy giúp giảm token cho output lệnh shell; bootstrap sẽ thử init hook global cho Claude Code/Copilot và Codex.
 
 Khi cần cập nhật cấu hình workspace hoặc skill dùng chung, double-click `SYNC_WORKSPACE.cmd`.
 

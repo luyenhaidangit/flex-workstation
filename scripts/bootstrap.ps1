@@ -1,6 +1,8 @@
 param(
     [switch]$SkipClaudeInstall,
     [switch]$SkipCcusageInstall,
+    [switch]$SkipRtkInstall,
+    [switch]$SkipRtkInit,
     [switch]$UseWinget,
     [switch]$OpenWorkspace,
     [switch]$PullVendors
@@ -218,6 +220,8 @@ Initialize-ClaudeProjectConfig
 & "$PSScriptRoot\sync-workspace-skills.ps1" -PullVendors:$PullVendors
 
 & "$PSScriptRoot\ensure-ccusage.ps1" -SkipInstall:$SkipCcusageInstall
+
+& "$PSScriptRoot\ensure-rtk.ps1" -SkipInstall:$SkipRtkInstall -SkipInit:$SkipRtkInit
 
 Write-Step "Checking Claude Code"
 

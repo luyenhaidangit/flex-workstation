@@ -54,6 +54,7 @@ Script sẽ:
 - Copy template cấu trúc Codex từ `templates/project-root/.agents` ra `C:\Workspace\Project\.agents`.
 - Sync skill local dùng chung từ `config/workspace-assistants.json` vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`.
 - Kiểm tra/cài `ccusage` để theo dõi usage của Claude Code/Codex.
+- Kiểm tra/cài `rtk` và init hook global cho Claude Code/Copilot, Codex nếu có thể.
 - Kiểm tra Claude Code CLI `claude`.
 - Nếu thiếu Claude Code, tự chạy native installer chính thức. Trên Windows:
 
@@ -78,6 +79,15 @@ Nếu chỉ muốn bỏ qua cài `ccusage` trong lần bootstrap này:
 ```powershell
 .\scripts\bootstrap.ps1 -SkipCcusageInstall
 ```
+
+Nếu chỉ muốn bỏ qua cài hoặc init `rtk` trong lần bootstrap này:
+
+```powershell
+.\scripts\bootstrap.ps1 -SkipRtkInstall
+.\scripts\bootstrap.ps1 -SkipRtkInit
+```
+
+Sau khi `rtk` được cài/init lần đầu, mở lại Claude Code hoặc Codex session mới để hook/global instruction được nạp.
 
 ## Cấu hình Claude/Codex được tạo sẵn
 
