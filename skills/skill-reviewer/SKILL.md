@@ -115,6 +115,7 @@ Task hoàn thành khi báo cáo đã được trả trong chat và user chưa y�
 
 - **Review mode** — nếu user chỉ yêu cầu review/audit/chấm điểm, chỉ đọc và báo cáo; không tạo file, không sửa file, không sync.
 - **Update mode** — chỉ khi user yêu cầu rõ sửa/cập nhật/cải tiến skill. Local skill sửa trong `skills/<name>`; external skill phải copy từ `skills-external` sang `skills/<name>` rồi hỏi user xác nhận trước khi sửa nội dung. Không sửa runtime `.claude/skills`, `.agents/skills` hoặc vendor cache `skills-external`.
+- Khi sửa skill, chỉ chỉnh phần tối thiểu cần thiết để đạt đúng mục đích user nêu; nếu mục đích chưa rõ, hỏi lại trước khi sửa. Không thêm rule, section, tiêu chí hoặc refactor ngoài phạm vi yêu cầu.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Lỗi frontmatter/YAML làm skill có nguy cơ không load là issue ưu tiên cao; luôn đưa vào `Issues` nếu phát hiện.
 - Nếu một tiêu chí không áp dụng được (vd skill không có references/) → ghi rõ "N/A" và không trừ điểm.
