@@ -12,6 +12,8 @@ Workspace root: `<WORKSPACE_ROOT>`.
 
 Không tạo source file trực tiếp tại workspace root, trừ runtime generated config trong `.claude` và `.agents` — vì các thư mục này là target được generate khi bootstrap/sync; source-of-truth nằm ở `flex-workstation`.
 
+Khi tạo tài liệu dùng chung — kiến trúc hệ thống, task tracking, ADR, onboarding, bản đồ hệ thống — mặc định tạo và cập nhật trong `flex-workstation/docs/`, không tạo ở workspace root hay thư mục `docs/` tại root. Tài liệu riêng của từng project con giữ trong thư mục `docs/` của repo đó.
+
 Khi người dùng yêu cầu tạo hoặc sửa skill dùng chung:
 
 - Sửa source trong `flex-workstation/skills/<skill-name>/SKILL.md` hoặc path đã khai báo trong `workspace-assistants.json`.
