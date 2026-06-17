@@ -9,7 +9,8 @@ description: >
   suggestions for a service, module, repo, or multi-repo workspace. Do not use for
   general prose editing or prompt/instruction files; use documentation-and-adrs
   for decision records only and agent-instructions-architect for CLAUDE/AGENTS/
-  SKILL instruction files.
+  SKILL instruction files. Do not use to write standalone ADR files (use
+  documentation-and-adrs); do not use to update non-architecture prose docs.
 ---
 
 # Architecture Documenter
@@ -34,7 +35,7 @@ Optional:
 - Output language: default to Vietnamese with technical terms in English unless the user requests English.
 - Desired destination path (default: `docs/architecture.md` for single-repo, `docs/architecture/overview.md` for workspace). Examples: `docs/architecture.md`, `docs/architecture/system-overview.md`.
 
-If scope or destination is ambiguous, ask at most two short questions. If the user asks to implement directly and a reasonable default exists, proceed.
+If scope or destination is ambiguous, ask at most two short questions before proceeding. Examples: "Scope là toàn workspace hay một repo cụ thể?" / "Đường dẫn output mong muốn, hay dùng default?" If the user asks to implement directly and a reasonable default exists, proceed without asking.
 
 ## Workflow
 
@@ -117,13 +118,25 @@ Prioritize recommendations as High/Medium/Low.
 
 ### 6. Finalize
 
+**Determine destination path before writing any file:**
+
+| Scope | Default destination |
+| --- | --- |
+| Workspace (multiple repos) | `<workspace-docs-dir>/architecture/overview.md` — e.g. `flex-workstation/docs/architecture/overview.md` |
+| Single repo | `docs/architecture.md` in that repo's root |
+| User specified explicitly | Use the user-specified path verbatim |
+
+Do not invent a custom filename when a default applies. If the resolved path is non-obvious, state it explicitly before writing and let the user correct it.
+
+If a file already exists at the destination, read it first to preserve useful content before overwriting.
+
 Before editing files, preserve existing useful content and avoid rewriting unrelated docs. When creating a new architecture doc, use `references/system-architecture-template.md`. When suggesting or creating ADRs, use `references/adr-template.md`.
 
 Read `references/quality-checklist.md` before finalizing non-trivial docs or reviews.
 
 Do not edit source code, tests, migrations, or CI/CD files — this skill has read-only access to all non-documentation files.
 
-Task is complete when the target doc has been written or updated at the destination path and `references/quality-checklist.md` has been reviewed.
+Task is complete when: (1) the resolved destination path has been confirmed or stated to the user, (2) the target doc has been written or updated at that path, and (3) `references/quality-checklist.md` has been reviewed.
 
 ## Output Rules
 
