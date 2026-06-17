@@ -20,7 +20,7 @@ description: >
 
 ## Mission
 
-Produce architecture documentation that is useful for engineers, tech leads, testers, DevOps, security reviewers, maintainers, and AI agents. The document must explain the system's purpose, structure, runtime behavior, data, security, deployment, observability, risks, and open questions.
+Produce architecture documentation that is useful for engineers, tech leads, testers, DevOps, security reviewers, maintainers, and AI agents. The document must explain the system's purpose, structure, runtime behavior, data, security, deployment, observability, risks, and open questions — at the appropriate level of abstraction for the requested scope.
 
 Do not invent architecture. Separate confirmed facts from inference.
 
@@ -53,6 +53,14 @@ Inspect only relevant files for the requested scope:
 - config examples: `appsettings*.json`, `.env.example`, Docker, Compose, Kubernetes, nginx/gateway, CI/CD
 - logging, metrics, tracing, health check, and security config
 
+Calibrate evidence depth by scope:
+
+| Scope | Read |
+| --- | --- |
+| Workspace / multi-repo | README, package/solution files, entrypoints, docker-compose, CI/CD — enough for container-level context |
+| Single repo | + entrypoints, API routes, middleware, background jobs, config examples |
+| Module / service detail | + domain/entity/model files, migrations/schema, security config, logging config |
+
 Prefer structural evidence from code/config over guesses. Use file references in notes and final findings when useful.
 
 ### 2. Classify architecture
@@ -72,7 +80,15 @@ State why the classification is `Confirmed`, `Inferred`, or `Unknown`.
 
 ### 3. Build architecture views
 
-Include only views relevant to the scope:
+Include only views relevant to the scope. Use the table below to decide which views to include — do not add lower-level views unless the user explicitly requests them:
+
+| Scope | Include | Skip (delegate to per-service docs) |
+| --- | --- | --- |
+| Workspace / multi-repo | system context, container/application view, deployment, risks and trade-offs | component/module view, runtime/sequence flow, data architecture, API/integration detail, observability internals |
+| Single repo | + component/module view, runtime/sequence flow, security, observability | data schema detail (unless core to the doc) |
+| Module / service detail | all views as relevant | — |
+
+Available views:
 
 - system context
 - container/application view
@@ -136,7 +152,12 @@ Do not invent a custom filename when a default applies. If the resolved path is 
 
 If a file already exists at the destination, read it first to preserve useful content before overwriting.
 
-Before editing files, preserve existing useful content and avoid rewriting unrelated docs. When creating a new architecture doc, use `references/system-architecture-template.md`. When listing ADR suggestions within the architecture doc, use `references/adr-template.md` as the format reference for each entry.
+Before editing files, preserve existing useful content and avoid rewriting unrelated docs. When creating a new architecture doc, use `references/system-architecture-template.md` — but select only the sections appropriate for the scope:
+
+- **Workspace scope:** use Executive Summary, System Context, Container/Application View, Deployment, Risks, Open Questions, Suggested ADRs. Link to per-service docs for component detail, data schema, and API listings.
+- **Single-repo scope:** use all sections; omit those that are genuinely not applicable.
+
+When listing ADR suggestions within the architecture doc, use `references/adr-template.md` as the format reference for each entry.
 
 Read `references/quality-checklist.md` before finalizing non-trivial docs or reviews.
 
