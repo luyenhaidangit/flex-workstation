@@ -1,19 +1,20 @@
 # Danh sách Git project được theo dõi
 
-Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-workstation`. Các repo này có thể nằm ngoài thư mục `flex-workstation`, nhưng vẫn được theo dõi để tiện tổng hợp task, kiến trúc và trạng thái triển khai.
+Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-workstation`. Các repo project nằm ngang hàng với `flex-workstation` trong `C:\Workspace\Project`, không đặt lồng bên trong workstation.
 
 ## Quy ước
 
 - Mỗi project được ghi bằng tên repo, đường dẫn local, vai trò, công nghệ chính và trạng thái.
-- Khi thêm project mới, cập nhật bảng bên dưới và bổ sung task liên quan trong `docs/tasks.md`.
-
-Cấu trúc local mặc định và bước xác nhận onboarding: xem [docs/onboarding.md](onboarding.md). Nếu người onboard chọn đường dẫn khác, cập nhật lại bảng project, `OPEN_WORKSPACE.cmd` và task VS Code liên quan.
+- Khi thêm project mới, cập nhật bảng bên dưới và bổ sung task liên quan trong `docs/tasks.md` nếu có việc triển khai tiếp theo.
+- Bản đồ hệ thống hiện tại nằm ở [system-map.md](system-map.md).
+- Cấu trúc local mặc định và bước xác nhận onboarding: xem [onboarding.md](onboarding.md).
 
 ## Project đang theo dõi
 
-| Project | Local path | Vai trò | Công nghệ nhận diện | Trạng thái Git | Ghi chú |
+| Project | Local path | Vai trò | Công nghệ nhận diện | Trạng thái | Ghi chú |
 | --- | --- | --- | --- | --- | --- |
-| `flex-workstation` | `C:\Workspace\Project\flex-workstation` | Workstation điều phối, tài liệu và bootstrap | Markdown, PowerShell, VS Code workspace | Đang theo dõi | Repo trung tâm, không chứa mã nguồn nghiệp vụ. |
+| `flex-workstation` | `C:\Workspace\Project\flex-workstation` | Workstation điều phối, tài liệu, bootstrap và AI tooling | Markdown, PowerShell, VS Code workspace | Đang dùng | Repo trung tâm, không chứa mã nguồn nghiệp vụ. |
+| `flex-auth-service` | `C:\Workspace\Project\flex-auth-service` | Dịch vụ xác thực/ủy quyền | .NET / ASP.NET Core theo `SPEC.md` hiện có | Đang có local | Tài liệu/spec riêng nằm trong repo này. |
 | `flex-frontend` | `C:\Workspace\Project\flex-frontend` | Frontend cho nhóm project Flex | Chưa xác định | Dự kiến | Cần xác nhận repository URL trước khi clone. |
 | `flex-backend` | `C:\Workspace\Project\flex-backend` | Backend cho nhóm project Flex | Chưa xác định | Dự kiến | Cần xác nhận repository URL trước khi clone. |
 | `flex-api-gateway` | `C:\Workspace\Project\flex-api-gateway` | API Gateway cho nhóm project Flex | `.sln`, `Dockerfile`, `Jenkinsfile` | Dự kiến | Repo riêng, không nhúng vào `flex-workstation`. |
@@ -21,7 +22,8 @@ Cấu trúc local mặc định và bước xác nhận onboarding: xem [docs/on
 ## Lệnh kiểm tra nhanh
 
 ```powershell
-git -C C:\Workspace\Project\flex-api-gateway status --short
+git -C C:\Workspace\Project\flex-workstation status --short
+git -C C:\Workspace\Project\flex-auth-service status --short
 ```
 
 Nếu lệnh không trả về dòng nào, working tree của project đang sạch.

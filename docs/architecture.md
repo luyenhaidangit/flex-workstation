@@ -2,6 +2,8 @@
 
 Tài liệu này mô tả cách tổ chức các project, tài liệu và skill trong `flex-workstation`.
 
+Nếu cần nhìn nhanh toàn bộ `C:\Workspace\Project` hiện có repo/runtime nào và luồng bootstrap/sync ra sao, xem [system-map.md](system-map.md).
+
 ## Tổng quan
 
 `flex-workstation` được tổ chức như một workspace chung, không giả định sẵn một công nghệ duy nhất. Mỗi project con có thể dùng stack riêng, nhưng vẫn cần tuân thủ quy ước tài liệu và cách ghi nhận task chung.

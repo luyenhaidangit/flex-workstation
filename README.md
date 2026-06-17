@@ -51,6 +51,7 @@ flex-workstation/
 
 - [CLAUDE.md](CLAUDE.md): quy ước cho Claude Code khi làm việc trong workstation.
 - [config/workspace-assistants.json](config/workspace-assistants.json): cấu hình assistant target cho Claude/Codex và skill local dùng chung.
+- [docs/system-map.md](docs/system-map.md): bản đồ hệ thống hiện tại ở cấp `C:\Workspace\Project`.
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới, cấu trúc local, mở workspace VS Code.
 - [docs/architecture.md](docs/architecture.md): kiến trúc tổng quan, vai trò từng project, quy ước tích hợp.
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
