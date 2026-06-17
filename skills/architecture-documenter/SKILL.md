@@ -32,7 +32,7 @@ Optional:
 - Scope: whole workspace, one repo, one service, one module, one API, one workflow, deployment, data, security, observability.
 - Audience: developer, tech lead, BA/tester, DevOps, security, manager, AI agent.
 - Output language: default to Vietnamese with technical terms in English unless the user requests English.
-- Desired destination path, for example `docs/architecture.md` or `docs/architecture/system-overview.md`.
+- Desired destination path (default: `docs/architecture.md` for single-repo, `docs/architecture/overview.md` for workspace). Examples: `docs/architecture.md`, `docs/architecture/system-overview.md`.
 
 If scope or destination is ambiguous, ask at most two short questions. If the user asks to implement directly and a reasonable default exists, proceed.
 
