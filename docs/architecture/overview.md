@@ -215,6 +215,8 @@ C:\Workspace\Project\
 └── flex-workstation\           # Workspace coordination
     ├── config\workspace-assistants.json
     ├── docs\                   # Workspace-level documentation
+    │   └── architecture\       # Thư mục kiến trúc chi tiết
+    │       └── overview.md     # File này
     ├── scripts\                # Bootstrap, sync, tooling scripts
     ├── skills\                 # Skill source files
     └── templates\              # Project root bootstrap templates
@@ -474,7 +476,7 @@ flowchart TB
 
 Khi làm việc trong workspace này, đọc theo thứ tự:
 
-1. **Workspace context**: `flex-workstation/docs/system-map.md` → file này (`system-architecture.md`)
+1. **Workspace context**: `flex-workstation/docs/system-map.md` → file này (`docs/architecture/overview.md`)
 2. **flex-auth-service**: `flex-auth-service/CLAUDE.md` (patterns, naming, config) → `flex-auth-service/SPEC.md` (missing features)
 3. **flex-api-gateway**: `flex-api-gateway/CHANGELOG.md` nếu có, sau đó `src/Flex.Apigateway/Controllers`
 4. **flex-microfrontend**: `flex-microfrontend/src/app` — Angular routing, services
