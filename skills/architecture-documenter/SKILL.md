@@ -80,13 +80,14 @@ Include only views relevant to the scope:
 - deployment
 - observability
 - risks and trade-offs
-- ADR suggestions
 
-Use Mermaid diagrams when they clarify relationships or runtime flow. Keep diagrams source-controlled as Markdown/Mermaid, not screenshots.
+Also include ADR suggestions when new decisions or reversals are detected in the evidence.
+
+Use Mermaid diagrams when they clarify relationships or runtime flow. Keep diagrams source-controlled as Markdown/Mermaid, not screenshots — Mermaid is diffable, searchable, and AI-readable; screenshots are not.
 
 ### 4. Write evidence-based documentation
 
-Use these labels consistently:
+Use these labels consistently to prevent AI agents and reviewers from treating inferred claims as ground truth:
 
 - `Confirmed`: directly supported by code/config/docs.
 - `Inferred`: likely based on structure, naming, or repeated patterns.
@@ -94,6 +95,9 @@ Use these labels consistently:
 - `Unknown`: not enough information found.
 
 Every major claim should be tied to evidence or explicitly labeled. Missing information is not a failure; hiding it is.
+
+**Good:** `"Service A calls Service B (Confirmed — see HttpClient registration in ServiceCollectionExtensions.cs:42)"`
+**Bad:** `"Service A calls Service B (Confirmed)"` — label without evidence pointer is not Confirmed, it is Inferred.
 
 ### 5. Review risks
 
@@ -116,6 +120,10 @@ Prioritize recommendations as High/Medium/Low.
 Before editing files, preserve existing useful content and avoid rewriting unrelated docs. When creating a new architecture doc, use `references/system-architecture-template.md`. When suggesting or creating ADRs, use `references/adr-template.md`.
 
 Read `references/quality-checklist.md` before finalizing non-trivial docs or reviews.
+
+Do not edit source code, tests, migrations, or CI/CD files — this skill has read-only access to all non-documentation files.
+
+Task is complete when the target doc has been written or updated at the destination path and `references/quality-checklist.md` has been reviewed.
 
 ## Output Rules
 
