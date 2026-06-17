@@ -29,6 +29,7 @@
     }
   ],
   "localSkills": [
+    { "name": "architecture-documenter", "path": "skills/architecture-documenter" },
     { "name": "claude-workspace-auditor", "path": "skills/claude-workspace-auditor" }
   ],
   "disabledLocalSkills": [

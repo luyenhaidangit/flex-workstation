@@ -35,6 +35,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Trung bình | Tạo skill `agent-instructions-architect` | Skill quản lý tầng instructions Claude Code (CLAUDE.md, memory, rules, subagent, SKILL.md, slash command, output style) với 3 chế độ Generate/Review/Improve. Skill dùng chung đặt source tại `flex-workstation\skills` và sync qua `config/workspace-assistants.json`. |
 | Done | Trung bình | Refactor tầng instructions workstation | Lean CLAUDE.md (~550→260 từ), bỏ trùng lặp cross-file: tree cấu trúc local chỉ ở `onboarding.md`, bootstrap chi tiết chỉ ở `onboarding.md`, quy tắc chỉ ở `CLAUDE.md`. Tổng line giảm 599→401. Đổi "Codex" thành "Claude Code". |
 | Done | Cao | Bổ sung bản đồ hệ thống workspace | Thêm `docs/system-map.md`, link từ `README.md` và `docs/architecture.md`, cập nhật `docs/projects.md` với `flex-auth-service`. |
+| Done | Trung bình | Tạo skill `architecture-documenter` | Skill viết/review tài liệu kiến trúc hệ thống dựa trên evidence, Mermaid, risk review và ADR suggestions. |
 | Todo | Cao | Chuẩn hóa quy ước đặt tên project | Cần thống nhất tên thư mục, tên module và namespace. |
 | Todo | Trung bình | Bổ sung hướng dẫn chạy từng project | Mỗi project con nên có `README.md` riêng. |
 | Todo | Trung bình | Bổ sung quy trình kiểm thử | Xác định test command, coverage và quy ước CI nếu có. |

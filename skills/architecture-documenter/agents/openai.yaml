@@ -1,0 +1,4 @@
+interface:
+  display_name: "Architecture Documenter"
+  short_description: "Write evidence-based architecture docs"
+  default_prompt: "Create or improve architecture documentation for this system using evidence from code, config, deployment files, and docs."
