@@ -6,8 +6,11 @@ description: >
   runtime flows, security constraints, and operations signals. Use when writing or
   updating architecture.md, system-map.md, architecture folders, technical design
   docs, onboarding architecture docs, Mermaid diagrams, risk reviews, or ADR
-  suggestions for a service, module, repo, or multi-repo workspace. Do not use for
-  general prose editing or prompt/instruction files; use documentation-and-adrs
+  suggestions for a service, module, repo, or multi-repo workspace. Also triggers
+  on requests like "tài liệu kiến trúc", "document the system", "architecture
+  overview", "vẽ diagram hệ thống", "system map", "mô tả kiến trúc hệ thống".
+  Do not use for general prose editing or prompt/instruction files; use
+  documentation-and-adrs
   for decision records only and agent-instructions-architect for CLAUDE/AGENTS/
   SKILL instruction files. Do not use to write standalone ADR files (use
   documentation-and-adrs); do not use to update non-architecture prose docs.
@@ -128,9 +131,12 @@ Prioritize recommendations as High/Medium/Low.
 
 Do not invent a custom filename when a default applies. If the resolved path is non-obvious, state it explicitly before writing and let the user correct it.
 
+**Good:** User asks "tài liệu cho flex-auth-service" → state path: `flex-auth-service/docs/architecture.md` before writing.
+**Bad:** Silently creating `architecture.md` at workspace root without stating the resolved path first.
+
 If a file already exists at the destination, read it first to preserve useful content before overwriting.
 
-Before editing files, preserve existing useful content and avoid rewriting unrelated docs. When creating a new architecture doc, use `references/system-architecture-template.md`. When suggesting or creating ADRs, use `references/adr-template.md`.
+Before editing files, preserve existing useful content and avoid rewriting unrelated docs. When creating a new architecture doc, use `references/system-architecture-template.md`. When listing ADR suggestions within the architecture doc, use `references/adr-template.md` as the format reference for each entry.
 
 Read `references/quality-checklist.md` before finalizing non-trivial docs or reviews.
 
