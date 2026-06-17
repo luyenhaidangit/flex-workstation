@@ -330,6 +330,18 @@ This is optional, requires subagents, and most users won't need it. The human re
 
 ---
 
+## Quality Review
+
+Once the user is satisfied with the skill's functional behavior (evals look good, feedback is clean), run `skill-reviewer` on the new skill and apply the structural fixes before moving on to description optimization.
+
+1. **Run the review** — invoke `/skill-reviewer <skill-name>`. If the environment doesn't support slash commands, follow the skill-reviewer workflow directly: read the SKILL.md you just created and score it against the 5-axis rubric.
+
+2. **Apply the fixes** — work through the Issues list from the report. Prioritize: frontmatter/YAML errors first (risk of skill not loading), then missing input/output contract, then safety rules, then the rest. Skip cosmetic issues if the user wants to move fast — ask if unclear.
+
+3. **Continue** — once fixes are applied, proceed to Description Optimization below.
+
+---
+
 ## Description Optimization
 
 The description field in SKILL.md frontmatter is the primary mechanism that determines whether Claude invokes a skill. After creating or improving a skill, offer to optimize the description for better triggering accuracy.
