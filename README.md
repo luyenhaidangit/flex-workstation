@@ -21,7 +21,6 @@ flex-workstation/
 |-- docs/
 |   |-- architecture/
 |   |   +-- overview.md
-|   |-- architecture.md
 |   |-- onboarding.md
 |   |-- projects.md
 |   |-- system-map.md
@@ -56,7 +55,6 @@ flex-workstation/
 - [config/workspace-assistants.json](config/workspace-assistants.json): cấu hình assistant target cho Claude/Codex và skill local dùng chung.
 - [docs/system-map.md](docs/system-map.md): bản đồ hệ thống hiện tại ở cấp `C:\Workspace\Project`.
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới, cấu trúc local, mở workspace VS Code.
-- [docs/architecture.md](docs/architecture.md): quy ước kiến trúc workspace và tuyến đọc tài liệu.
 - [docs/architecture/overview.md](docs/architecture/overview.md): thành phần hệ thống Flex, data architecture, deployment view, risks và open questions.
 - [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
 - [docs/tasks.md](docs/tasks.md): danh sách task, trạng thái, độ ưu tiên.

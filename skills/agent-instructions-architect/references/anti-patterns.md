@@ -4,7 +4,7 @@ Dùng khi Review (Chế độ 2) để đối chiếu và nhận diện vấn đ
 
 | Anti-pattern | Dấu hiệu nhận biết | Fix |
 |---|---|---|
-| **CLAUDE.md kể chuyện** | CLAUDE.md > 500 tokens, có đoạn giải thích kiến trúc dài | Chuyển sang `docs/architecture.md`, CLAUDE.md chỉ giữ rules ngắn |
+| **CLAUDE.md kể chuyện** | CLAUDE.md > 500 tokens, có đoạn giải thích kiến trúc dài | Chuyển sang `docs/architecture/overview.md` hoặc tài liệu phù hợp, CLAUDE.md chỉ giữ rules ngắn |
 | **Dòng không vượt phép thử xóa** | Bỏ dòng đó đi Claude vẫn không mắc lỗi đáng kể | Xóa hoặc chuyển sang docs; chỉ giữ rule làm đổi hành vi |
 | **Workflow thỉnh thoảng mới cần nằm trong CLAUDE.md** | CLAUDE.md chứa checklist/domain workflow dài cho task hiếm | Chuyển thành skill / slash command; CLAUDE.md chỉ giữ pointer nếu thật cần |
 | **Rule bị bỏ qua vì chìm trong nhiễu** | User nói "đã ghi rồi mà Claude vẫn làm sai" | Cắt bớt file, rewrite rule cụ thể hơn, chỉ dùng IMPORTANT cho luật thật sự quan trọng |

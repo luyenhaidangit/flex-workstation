@@ -81,10 +81,9 @@ Sau khi sync skills trong session đang mở:
 1. `README.md` — index và entrypoint.
 2. `docs/system-map.md` — bản đồ hệ thống hiện tại.
 3. `docs/architecture/overview.md` — kiến trúc kỹ thuật chi tiết toàn platform (components, flows, security, deployment, risks).
-4. `docs/architecture.md` — quy ước kiến trúc workspace.
-5. `docs/projects.md` — danh sách repo được theo dõi.
-6. `docs/onboarding.md` — bootstrap máy mới.
-7. Tài liệu riêng trong repo nghiệp vụ liên quan.
+4. `docs/projects.md` — danh sách repo được theo dõi.
+5. `docs/onboarding.md` — bootstrap máy mới.
+6. Tài liệu riêng trong repo nghiệp vụ liên quan.
 
 ## Việc còn mở
 

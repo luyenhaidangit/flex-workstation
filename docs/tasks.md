@@ -14,7 +14,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Trạng thái | Độ ưu tiên | Task | Ghi chú |
 | --- | --- | --- | --- |
 | Done | Cao | Tạo tài liệu mục đích workspace | Cập nhật trong `README.md`. |
-| Done | Cao | Tạo tài liệu kiến trúc ban đầu | Xem `docs/architecture.md`. |
+| Done | Cao | Tạo tài liệu kiến trúc ban đầu | Xem `docs/architecture/overview.md`. |
 | Done | Trung bình | Tạo thư mục skill dùng chung | Xem `skills/README.md`. |
 | Done | Cao | Xác định danh sách project con | Đã thêm `flex-api-gateway` vào `docs/projects.md`. |
 | Done | Cao | Ghi nhận Git project `flex-api-gateway` | Local path mục tiêu: `C:\Workspace\Project\flex-api-gateway`. |
@@ -34,7 +34,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Đưa hook script kiểm tra skill path về `scripts/` | `scripts/check-skill-path.ps1` là source dùng chung; `.claude/settings.json` chỉ gọi script này từ workspace root. |
 | Done | Trung bình | Tạo skill `agent-instructions-architect` | Skill quản lý tầng instructions Claude Code (CLAUDE.md, memory, rules, subagent, SKILL.md, slash command, output style) với 3 chế độ Generate/Review/Improve. Skill dùng chung đặt source tại `flex-workstation\skills` và sync qua `config/workspace-assistants.json`. |
 | Done | Trung bình | Refactor tầng instructions workstation | Lean CLAUDE.md (~550→260 từ), bỏ trùng lặp cross-file: tree cấu trúc local chỉ ở `onboarding.md`, bootstrap chi tiết chỉ ở `onboarding.md`, quy tắc chỉ ở `CLAUDE.md`. Tổng line giảm 599→401. Đổi "Codex" thành "Claude Code". |
-| Done | Cao | Bổ sung bản đồ hệ thống workspace | Thêm `docs/system-map.md`, link từ `README.md` và `docs/architecture.md`, cập nhật `docs/projects.md` với `flex-auth-service`. |
+| Done | Cao | Bổ sung bản đồ hệ thống workspace | Thêm `docs/system-map.md`, link từ `README.md`, cập nhật `docs/projects.md` với `flex-auth-service`. |
 | Done | Trung bình | Tạo skill `architecture-documenter` | Skill viết/review tài liệu kiến trúc hệ thống dựa trên evidence, Mermaid, risk review và ADR suggestions. |
 | Todo | Cao | Chuẩn hóa quy ước đặt tên project | Cần thống nhất tên thư mục, tên module và namespace. |
 | Todo | Trung bình | Bổ sung hướng dẫn chạy từng project | Mỗi project con nên có `README.md` riêng. |

@@ -10,7 +10,7 @@ Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tà
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo — tránh ghi đè work-in-progress của thành viên khác hoặc session Claude trước.
 - Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tương ứng:
   - Onboarding/bootstrap → `docs/onboarding.md`
-  - Kiến trúc/quy ước kỹ thuật → `docs/architecture.md`
+  - Kiến trúc hệ thống → `docs/architecture/overview.md`
   - Danh sách project con → `docs/projects.md`
   - Skill dùng chung → source tại `skills/<name>/`, khai báo trong `config/workspace-assistants.json`
 

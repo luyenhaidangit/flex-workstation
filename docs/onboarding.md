@@ -102,7 +102,7 @@ Quy ước:
 
 Bootstrap cũng copy `templates/project-root/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` và `templates/project-root/AGENTS.md` ra `C:\Workspace\Project\AGENTS.md` nếu chưa có. Hai file này giúp Claude/Codex hiểu rằng `flex-workstation` là source-of-truth khi assistant được mở tại workspace root.
 
-Chi tiết cấu trúc `.claude` và vai trò từng thư mục con: xem [docs/architecture.md](architecture.md).
+Chi tiết cấu trúc `.claude`, `.agents` và vai trò runtime: xem [system-map.md](system-map.md).
 
 ## Skill dùng chung cho workspace
 
