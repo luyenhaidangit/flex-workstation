@@ -9,23 +9,24 @@ Trước khi clone thêm project hoặc cập nhật workspace, cần xác nhậ
 ```text
 C:\Workspace\Project\
 |-- flex-workstation\
-|-- flex-frontend\
-|-- flex-backend\
+|-- flex-auth-service\
 |-- flex-api-gateway\
+|-- flex-microfrontend\
+|-- flex-environment\
 +-- ...
 ```
 
 Trong đó:
 
 - `flex-workstation` là repo điều phối, chứa tài liệu, bootstrap và chỉ dẫn cho AI.
-- `flex-frontend`, `flex-backend`, `flex-api-gateway` là ví dụ các repo nghiệp vụ hoặc kỹ thuật sẽ được clone thêm.
+- `flex-auth-service`, `flex-api-gateway`, `flex-microfrontend`, `flex-environment` là các repo project/infrastructure nằm cùng workspace.
 - Các repo project không đặt bên trong `flex-workstation`.
 - Nếu người onboard dùng đường dẫn khác, cần cập nhật lại `docs/projects.md`, `OPEN_WORKSPACE.cmd` và các task VS Code liên quan nếu có.
 
 Câu xác nhận gợi ý:
 
 ```text
-Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, ngang hàng với flex-workstation, ví dụ flex-frontend, flex-backend, flex-api-gateway... đúng không?
+Anh/chị xác nhận các repo Flex sẽ nằm trong C:\Workspace\Project\, ngang hàng với flex-workstation, ví dụ flex-auth-service, flex-api-gateway, flex-microfrontend, flex-environment... đúng không?
 ```
 
 ## Chạy bootstrap

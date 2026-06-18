@@ -25,6 +25,9 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 ```powershell
 git -C C:\Workspace\Project\flex-workstation status --short
 git -C C:\Workspace\Project\flex-auth-service status --short
+git -C C:\Workspace\Project\flex-api-gateway status --short
+git -C C:\Workspace\Project\flex-microfrontend status --short
+git -C C:\Workspace\Project\flex-environment status --short
 ```
 
 Nếu lệnh không trả về dòng nào, working tree của project đang sạch.

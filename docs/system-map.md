@@ -9,7 +9,10 @@ C:\Workspace\Project\
 |-- .agents\              # Runtime skills/agents/commands cho Codex
 |-- .claude\              # Runtime settings/skills/agents/commands cho Claude Code
 |-- flex-workstation\     # Source-of-truth điều phối workspace
-+-- flex-auth-service\    # Repo nghiệp vụ hiện có trong workspace
+|-- flex-auth-service\    # Service xác thực/ủy quyền
+|-- flex-api-gateway\     # API Gateway
+|-- flex-microfrontend\   # Frontend client
++-- flex-environment\     # Local/dev infrastructure stack
 ```
 
 `flex-workstation` không chứa mã nguồn nghiệp vụ. Repo này quản lý bootstrap, tài liệu, template, skill source, entrypoint Windows và cấu hình dùng chung cho assistant.
@@ -21,7 +24,10 @@ C:\Workspace\Project\
 | `.claude` | Runtime Claude Code tại workspace root | Được bootstrap/sync từ `flex-workstation`; không sửa trực tiếp nếu thay đổi thuộc source dùng chung. |
 | `.agents` | Runtime Codex tại workspace root | Được bootstrap/sync từ `flex-workstation`; chứa skills/agents/commands đã sync. |
 | `flex-workstation` | Repository điều hướng toàn workspace | Source-of-truth cho docs, bootstrap, template, skills và config assistant. |
-| `flex-auth-service` | Repo nghiệp vụ hiện có | Tài liệu/spec riêng nằm trong chính repo này. |
+| `flex-auth-service` | Service xác thực/ủy quyền | Tài liệu/spec riêng nằm trong chính repo này. |
+| `flex-api-gateway` | API Gateway cho nhóm service Flex | Repo riêng, có `.sln`, `Dockerfile`, `Jenkinsfile`. |
+| `flex-microfrontend` | Frontend client | Angular/Node.js theo README và `package.json`. |
+| `flex-environment` | Local/dev infrastructure stack | Docker Compose cho Redis, RabbitMQ, Jenkins, Portainer, MinIO, Elasticsearch, Kibana, Ollama và `flex-ai-gateway`. |
 
 ## Luồng bootstrap và sync
 
