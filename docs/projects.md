@@ -15,9 +15,10 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 | --- | --- | --- | --- | --- | --- |
 | `flex-workstation` | `C:\Workspace\Project\flex-workstation` | Workstation điều phối, tài liệu, bootstrap và AI tooling | Markdown, PowerShell, VS Code workspace | Đang dùng | Repo trung tâm, không chứa mã nguồn nghiệp vụ. |
 | `flex-auth-service` | `C:\Workspace\Project\flex-auth-service` | Dịch vụ xác thực/ủy quyền | .NET / ASP.NET Core theo `SPEC.md` hiện có | Đang có local | Tài liệu/spec riêng nằm trong repo này. |
-| `flex-frontend` | `C:\Workspace\Project\flex-frontend` | Frontend cho nhóm project Flex | Chưa xác định | Dự kiến | Cần xác nhận repository URL trước khi clone. |
+| `flex-microfrontend` | `C:\Workspace\Project\flex-microfrontend` | Frontend client cho nhóm project Flex | Angular / Node.js theo `README.md` và `package.json` | Đang có local | README hiện ghi tên `flex-client`. |
 | `flex-backend` | `C:\Workspace\Project\flex-backend` | Backend cho nhóm project Flex | Chưa xác định | Dự kiến | Cần xác nhận repository URL trước khi clone. |
-| `flex-api-gateway` | `C:\Workspace\Project\flex-api-gateway` | API Gateway cho nhóm project Flex | `.sln`, `Dockerfile`, `Jenkinsfile` | Dự kiến | Repo riêng, không nhúng vào `flex-workstation`. |
+| `flex-api-gateway` | `C:\Workspace\Project\flex-api-gateway` | API Gateway cho nhóm project Flex | `.sln`, `.csproj`, `Dockerfile`, `Jenkinsfile` | Đang có local | Repo riêng, không nhúng vào `flex-workstation`. |
+| `flex-environment` | `C:\Workspace\Project\flex-environment` | Local/dev infrastructure stack | Docker Compose: Redis, RabbitMQ, Jenkins, Portainer, MinIO, Elasticsearch, Kibana, Ollama, `flex-ai-gateway` | Đang có local | DB primary hiện dùng Oracle Cloud; Oracle local container đang comment out. |
 
 ## Lệnh kiểm tra nhanh
 
