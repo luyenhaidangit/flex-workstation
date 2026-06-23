@@ -19,5 +19,3 @@ Thumbs.db
 *.tmp
 *.temp
 
-# External vendor skill sources
-skills-external/*/

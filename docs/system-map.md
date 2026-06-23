@@ -62,7 +62,7 @@ Sau khi sync skills trong session đang mở:
 | --- | --- | --- | --- |
 | Claude Code root instruction | `templates/project-root/CLAUDE.md` | `C:\Workspace\Project\CLAUDE.md` | Chỉ dẫn bền vững cho Claude tại workspace root. |
 | Codex root instruction | `templates/project-root/AGENTS.md` | `C:\Workspace\Project\AGENTS.md` | Chỉ dẫn bền vững cho Codex tại workspace root. |
-| Skills/agents/commands | `config/workspace-assistants.json`, `skills/`, `skills-external/` | `.claude/*`, `.agents/*` | Runtime capability cho Claude/Codex. |
+| Skills/agents/commands | `config/workspace-assistants.json`, `skills/`, `C:\Workspace\Project\flex-agents` | `.claude/*`, `.agents/*` | Runtime capability cho Claude/Codex. |
 | `ccusage` | `scripts/ensure-ccusage.ps1` | User global CLI | Theo dõi token/cost usage của coding AI CLI. |
 | `rtk` | `scripts/ensure-rtk.ps1` | User global CLI + Claude/Codex global config | Giảm token từ shell output và cung cấp instruction/hook tối ưu. |
 

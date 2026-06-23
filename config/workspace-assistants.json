@@ -19,8 +19,8 @@
   },
   "externalSources": [
     {
-      "name": "agent-skills",
-      "cloneTo": "skills-external/agent-skills",
+      "name": "flex-agents",
+      "cloneTo": "../flex-agents",
       "sync": {
         "skills": "skills",
         "agents": "agents",

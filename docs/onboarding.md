@@ -141,32 +141,31 @@ Ví dụ thêm một skill local:
 
 Nếu chỉ muốn sync skill cho một assistant, đổi `enabled` của assistant còn lại thành `false`.
 
-External source hiện đang tắt mặc định (`externalSources: []`). Nếu cần bật lại, thêm cấu hình theo mẫu:
+Nếu cần sync thêm nguồn skill dùng chung từ repo local `flex-agents`, khai báo trong `externalSources` theo mẫu:
 
 ```json
 {
   "externalSources": [
     {
-      "name": "agent-skills",
-      "url": "https://github.com/addyosmani/agent-skills.git",
-      "cloneTo": "skills-external/agent-skills",
+      "name": "flex-agents",
+      "cloneTo": "../flex-agents",
       "sync": {
         "skills": "skills",
-        "commands": ".claude/commands",
-        "agents": "agents"
+        "agents": "agents",
+        "commands": ".claude/commands"
       }
     }
   ]
 }
 ```
 
-Khi được bật, external source được clone vào `skills-external/` lúc sync lần đầu. Thư mục này là vendor cache, không commit và không sửa tay. Sync bình thường không kéo update mới từ remote; nếu cần cập nhật vendor, chạy `.\scripts\sync-workspace-skills.ps1 -PullVendors` hoặc `.\scripts\bootstrap.ps1 -PullVendors`.
+Với cấu hình này, sync sẽ đọc trực tiếp từ repo ngang hàng `C:\Workspace\Project\flex-agents`. Nếu repo `flex-agents` thay đổi, chỉ cần chạy lại `.\scripts\sync-workspace-skills.ps1` hoặc `SYNC_WORKSPACE.cmd`.
 
 ## Custom external skill
 
 Khi muốn tùy biến một skill lấy từ external source:
 
-1. Copy thư mục skill từ `skills-external/<source>/skills/<skill-name>` sang `skills/<skill-name>`.
+1. Copy thư mục skill từ `<external-source>/skills/<skill-name>` sang `skills/<skill-name>`.
 2. Giữ cùng `name` trong `skills/<skill-name>/SKILL.md` để local skill override external skill.
 3. Thêm entry tương ứng vào `localSkills` trong `config/workspace-assistants.json`.
 4. Chạy `SYNC_WORKSPACE.cmd`.

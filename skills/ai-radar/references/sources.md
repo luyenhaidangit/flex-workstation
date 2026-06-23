@@ -4,7 +4,7 @@ Danh sách nguồn chất lượng nhóm theo chủ đề. Skill đọc file nà
 
 ## Coding agent & Claude Code
 - **Anthropic Engineering blog** — https://www.anthropic.com/engineering — bài sâu về agent design, context, eval.
-- **addyosmani/agent-skills** (GitHub) — https://github.com/addyosmani/agent-skills — bộ skill đóng gói kỷ luật cho coding agent.
+- **flex-agents** (local repo) — `C:\Workspace\Project\flex-agents` — nguồn skill/agent/command dùng chung hiện tại cho workspace.
 - **Awesome Claude Code** (GitHub, search `awesome-claude-code`) — tổng hợp tool & skill cộng đồng.
 
 ## Agent design & patterns

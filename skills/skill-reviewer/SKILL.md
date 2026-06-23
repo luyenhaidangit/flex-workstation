@@ -36,7 +36,7 @@ Nhận diện skill cần review từ yêu cầu:
 Nếu user yêu cầu **cập nhật/cải tiến/sửa skill**, chuyển sang update mode:
 - Không sửa runtime `.claude/skills/<name>` hoặc `.agents/skills/<name>`.
 - Nếu có `skills/<name>/SKILL.md` → đây là local skill, sửa tại đó.
-- Nếu chưa có local skill, tìm external tại `skills-external/*/skills/<name>/SKILL.md`.
+- Nếu chưa có local skill, tìm external source đã khai báo trong `config/workspace-assistants.json` rồi tra `skills/<name>/SKILL.md` bên trong nguồn đó.
 - Nếu tìm thấy external → copy thư mục skill sang `skills/<name>`, kiểm tra/thêm `localSkills` trong `config/workspace-assistants.json`, rồi hỏi user xác nhận trước khi sửa nội dung.
 - Nếu không tìm thấy source an toàn → báo rõ không thể cập nhật.
 - Sau khi sửa xong, chạy `flex-workstation/SYNC_WORKSPACE.cmd` hoặc `flex-workstation/scripts/sync-workspace-skills.ps1`.
@@ -114,7 +114,7 @@ Task hoàn thành khi báo cáo đã được trả trong chat và user chưa y�
 ## Nguyên tắc chấm điểm
 
 - **Review mode** — nếu user chỉ yêu cầu review/audit/chấm điểm, chỉ đọc và báo cáo; không tạo file, không sửa file, không sync.
-- **Update mode** — chỉ khi user yêu cầu rõ sửa/cập nhật/cải tiến skill. Local skill sửa trong `skills/<name>`; external skill phải copy từ `skills-external` sang `skills/<name>` rồi hỏi user xác nhận trước khi sửa nội dung. Không sửa runtime `.claude/skills`, `.agents/skills` hoặc vendor cache `skills-external`.
+- **Update mode** — chỉ khi user yêu cầu rõ sửa/cập nhật/cải tiến skill. Local skill sửa trong `skills/<name>`; external skill phải copy từ external source hiện hành sang `skills/<name>` rồi hỏi user xác nhận trước khi sửa nội dung. Không sửa runtime `.claude/skills`, `.agents/skills` hoặc external source repo đang được sync trực tiếp.
 - Khi sửa skill, chỉ chỉnh phần tối thiểu cần thiết để đạt đúng mục đích user nêu; nếu mục đích chưa rõ, hỏi lại trước khi sửa. Không thêm rule, section, tiêu chí hoặc refactor ngoài phạm vi yêu cầu.
 - Chấm theo **bằng chứng trong file**, không theo ý định.
 - Lỗi frontmatter/YAML làm skill có nguy cơ không load là issue ưu tiên cao; luôn đưa vào `Issues` nếu phát hiện.

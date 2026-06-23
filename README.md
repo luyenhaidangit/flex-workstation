@@ -104,7 +104,7 @@ Hoặc double-click:
 SYNC_WORKSPACE.cmd
 ```
 
-External source `agent-skills` đang được bật trong `workspace-assistants.json` từ `skills-external/agent-skills`. Khi sync, workspace sẽ đưa skills, agent personas và markdown commands vào runtime target của Claude/Codex theo cấu hình:
+External source `flex-agents` đang được bật trong `workspace-assistants.json` từ repo ngang hàng `C:\Workspace\Project\flex-agents`. Khi sync, workspace sẽ đưa skills, agent personas và markdown commands vào runtime target của Claude/Codex theo cấu hình:
 
 ```text
 C:\Workspace\Project\.claude\skills
