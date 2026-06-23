@@ -289,10 +289,10 @@ C:\Workspace\Project
 và gọi:
 
 ```powershell
-codex
+codex --sandbox danger-full-access --ask-for-approval never
 ```
 
-Entry point này giữ sandbox và permission mặc định của Codex CLI. Nếu `codex` chưa có trong `PATH`, file sẽ dừng và nhắc cài Codex trước.
+Entry point này mở Codex với full quyền filesystem/network và tắt approval prompt. Chỉ dùng trong workspace tin cậy. Nếu `codex` chưa có trong `PATH`, file sẽ dừng và nhắc cài Codex trước.
 
 ## Mở AI usage monitor
 

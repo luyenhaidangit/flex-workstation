@@ -71,7 +71,7 @@ Trên Windows: double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap/sync wor
 
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
 
-Khi cần mở Codex tại workspace, double-click `OPEN_CODEX.cmd`. File này mở Codex tại `C:\Workspace\Project` với sandbox và permission mặc định của Codex CLI.
+Khi cần mở Codex tại workspace, double-click `OPEN_CODEX.cmd`. File này mở Codex tại `C:\Workspace\Project` với full quyền filesystem/network và tắt approval prompt, chỉ dùng trong workspace tin cậy.
 
 Khi cần theo dõi nhanh token/cost AI, double-click `OPEN_AI_USAGE_MONITOR.cmd`. File này kiểm tra/cài `ccusage` nếu thiếu, rồi mở unified daily monitor trong 30 ngày gần nhất cho mọi coding AI CLI mà `ccusage` phát hiện. Monitor hiển thị `TOTAL` trước, sau đó sắp xếp ngày mới nhất lên đầu.
 

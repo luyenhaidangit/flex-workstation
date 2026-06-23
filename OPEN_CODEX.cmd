@@ -10,8 +10,10 @@ echo.
 echo Workspace:
 echo   %PROJECT_ROOT%
 echo.
-echo This starts Codex at the shared workspace root and keeps
-echo the default sandbox and permission behavior.
+echo WARNING:
+echo   This starts Codex with full filesystem/network access and
+echo   disables approval prompts.
+echo   Use this only inside a trusted workspace.
 echo.
 
 where codex >nul 2>nul
@@ -24,4 +26,4 @@ if errorlevel 1 (
 )
 
 cd /d "%PROJECT_ROOT%"
-cmd /k codex
+cmd /k codex --sandbox danger-full-access --ask-for-approval never
