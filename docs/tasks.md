@@ -24,6 +24,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint double-click cho Windows | Xem `SYNC_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở nhanh VS Code tại thư mục cha | Xem `OPEN_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Claude tại workspace | Xem `OPEN_CLAUDE.cmd`. |
+| Done | Cao | Tạo entrypoint mở Codex tại workspace | Xem `OPEN_CODEX.cmd`. |
 | Done | Cao | Hợp nhất entrypoint sync workspace | `SYNC_WORKSPACE.cmd` chạy bootstrap, chuẩn bị cấu hình Claude/Codex và sync skill; đây là entrypoint double-click duy nhất cho sync/setup workspace. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Copy template `templates/project-root/.claude` ra `C:\Workspace\Project\.claude` nhưng không ghi đè file local đã tồn tại. |

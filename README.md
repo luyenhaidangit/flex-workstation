@@ -43,6 +43,7 @@ flex-workstation/
 |-- .gitattributes
 |-- OPEN_WORKSPACE.cmd
 |-- OPEN_CLAUDE.cmd
+|-- OPEN_CODEX.cmd
 |-- OPEN_AI_USAGE_MONITOR.cmd
 |-- SYNC_WORKSPACE.cmd
 |-- CLAUDE.md
@@ -69,6 +70,8 @@ Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` đ�
 Trên Windows: double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap/sync workspace, sau đó double-click `OPEN_WORKSPACE.cmd` để mở VS Code tại `C:\Workspace\Project`.
 
 Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
+
+Khi cần mở Codex tại workspace, double-click `OPEN_CODEX.cmd`. File này mở Codex tại `C:\Workspace\Project` với sandbox và permission mặc định của Codex CLI.
 
 Khi cần theo dõi nhanh token/cost AI, double-click `OPEN_AI_USAGE_MONITOR.cmd`. File này kiểm tra/cài `ccusage` nếu thiếu, rồi mở unified daily monitor trong 30 ngày gần nhất cho mọi coding AI CLI mà `ccusage` phát hiện. Monitor hiển thị `TOTAL` trước, sau đó sắp xếp ngày mới nhất lên đầu.
 

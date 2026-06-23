@@ -199,7 +199,7 @@ Nếu Claude Code đang mở sẵn tại `C:\Workspace\Project`, sau khi sync h�
 
 Hoặc đóng session và mở lại bằng `OPEN_CLAUDE.cmd`.
 
-Nếu Codex đang mở sẵn tại `C:\Workspace\Project` mà skill mới chưa xuất hiện, mở session Codex mới.
+Nếu Codex đang mở sẵn tại `C:\Workspace\Project` mà skill mới chưa xuất hiện, đóng session hiện tại và mở lại bằng `OPEN_CODEX.cmd` hoặc tạo session Codex mới.
 
 Kéo update mới từ external source khi cần:
 
@@ -271,6 +271,28 @@ claude --dangerously-skip-permissions
 ```
 
 Chỉ dùng chế độ này trong workspace tin cậy vì Claude sẽ không hỏi trước khi dùng tool hoặc sửa file.
+
+## Mở Codex
+
+Nếu cần mở Codex tại workspace root, double-click:
+
+```text
+OPEN_CODEX.cmd
+```
+
+File này chạy tại:
+
+```text
+C:\Workspace\Project
+```
+
+và gọi:
+
+```powershell
+codex
+```
+
+Entry point này giữ sandbox và permission mặc định của Codex CLI. Nếu `codex` chưa có trong `PATH`, file sẽ dừng và nhắc cài Codex trước.
 
 ## Mở AI usage monitor
 
