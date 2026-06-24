@@ -252,7 +252,7 @@ if (Test-Command "claude") {
     Write-Ok "flex-agents marketplace synced"
 }
 else {
-    Write-Warn "Claude Code not found — skipping flex-agents sync"
+    Write-Warn "Claude Code not found - skipping flex-agents sync"
 }
 
 Write-Host ""
