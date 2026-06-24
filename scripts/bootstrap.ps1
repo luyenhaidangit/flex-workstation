@@ -4,8 +4,7 @@ param(
     [switch]$SkipRtkInstall,
     [switch]$SkipRtkInit,
     [switch]$UseWinget,
-    [switch]$OpenWorkspace,
-    [switch]$PullVendors
+    [switch]$OpenWorkspace
 )
 
 $ErrorActionPreference = "Stop"
@@ -70,16 +69,57 @@ function Install-ClaudeCodeNative {
     bash -lc "curl -fsSL https://claude.ai/install.sh | bash"
 }
 
-function Initialize-ClaudeProjectConfig {
+function Copy-TemplateDirectory {
+    param(
+        [string]$TemplatePath,
+        [string]$TargetPath,
+        [string]$Label
+    )
+
+    if (-not (Test-Path $TemplatePath)) {
+        Write-Warn "$Label template not found: $TemplatePath"
+        return
+    }
+
+    $resolvedTemplatePath = (Resolve-Path $TemplatePath).Path
+    New-Item -ItemType Directory -Force -Path $TargetPath | Out-Null
+
+    Get-ChildItem -LiteralPath $resolvedTemplatePath -Directory -Recurse -Force | ForEach-Object {
+        $relativePath = $_.FullName.Substring($resolvedTemplatePath.Length).TrimStart('\')
+        New-Item -ItemType Directory -Force -Path (Join-Path $TargetPath $relativePath) | Out-Null
+    }
+
+    Get-ChildItem -LiteralPath $resolvedTemplatePath -File -Recurse -Force | ForEach-Object {
+        if ($_.Name -eq ".gitkeep") {
+            return
+        }
+
+        $relativePath = $_.FullName.Substring($resolvedTemplatePath.Length).TrimStart('\')
+        $targetFilePath = Join-Path $TargetPath $relativePath
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $targetFilePath) | Out-Null
+
+        if (Test-Path $targetFilePath) {
+            Write-Ok "$Label config already exists: $targetFilePath"
+        }
+        else {
+            Copy-Item -LiteralPath $_.FullName -Destination $targetFilePath
+            Write-Ok "Copied $Label config template: $targetFilePath"
+        }
+    }
+
+    Write-Ok "$Label config folders ready: $TargetPath"
+}
+
+function Initialize-WorkspaceProjectConfig {
     $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
-    $templateRoot = (Resolve-Path "$PSScriptRoot\..\templates\project-root\.claude").Path
-    $projectRootClaudeTemplate = Join-Path $PSScriptRoot "..\templates\project-root\CLAUDE.md"
-    $projectRootAgentsTemplate = Join-Path $PSScriptRoot "..\templates\project-root\AGENTS.md"
+    $templatesRoot = (Resolve-Path "$PSScriptRoot\..\workspaces\templates").Path
+    $projectRootClaudeTemplate = Join-Path $templatesRoot "CLAUDE.md"
+    $projectRootAgentsTemplate = Join-Path $templatesRoot "AGENTS.md"
     $projectRootClaudePath = Join-Path $projectRoot "CLAUDE.md"
     $projectRootAgentsPath = Join-Path $projectRoot "AGENTS.md"
     $claudeRoot = Join-Path $projectRoot ".claude"
-    $agentsTemplateRoot = Join-Path $PSScriptRoot "..\templates\project-root\.agents"
     $agentsRoot = Join-Path $projectRoot ".agents"
+    $codexRoot = Join-Path $projectRoot ".codex"
     $settingsSharedPath = Join-Path $claudeRoot "settings.json"
     $settingsPath = Join-Path $claudeRoot "settings.local.json"
 
@@ -105,65 +145,9 @@ function Initialize-ClaudeProjectConfig {
         }
     }
 
-    New-Item -ItemType Directory -Force -Path $claudeRoot | Out-Null
-
-    Get-ChildItem -LiteralPath $templateRoot -Directory -Recurse -Force | ForEach-Object {
-        $relativePath = $_.FullName.Substring($templateRoot.Length).TrimStart("\")
-        New-Item -ItemType Directory -Force -Path (Join-Path $claudeRoot $relativePath) | Out-Null
-    }
-
-    Get-ChildItem -LiteralPath $templateRoot -File -Recurse -Force | ForEach-Object {
-        if ($_.Name -eq ".gitkeep") {
-            return
-        }
-
-        $relativePath = $_.FullName.Substring($templateRoot.Length).TrimStart("\")
-        $targetPath = Join-Path $claudeRoot $relativePath
-        $targetDirectory = Split-Path -Parent $targetPath
-
-        New-Item -ItemType Directory -Force -Path $targetDirectory | Out-Null
-
-        if (Test-Path $targetPath) {
-            Write-Ok "Claude config already exists: $targetPath"
-        }
-        else {
-            Copy-Item -LiteralPath $_.FullName -Destination $targetPath
-            Write-Ok "Copied Claude config template: $targetPath"
-        }
-    }
-
-    if (Test-Path $agentsTemplateRoot) {
-        $resolvedAgentsTemplateRoot = (Resolve-Path $agentsTemplateRoot).Path
-
-        New-Item -ItemType Directory -Force -Path $agentsRoot | Out-Null
-
-        Get-ChildItem -LiteralPath $resolvedAgentsTemplateRoot -Directory -Recurse -Force | ForEach-Object {
-            $relativePath = $_.FullName.Substring($resolvedAgentsTemplateRoot.Length).TrimStart("\")
-            New-Item -ItemType Directory -Force -Path (Join-Path $agentsRoot $relativePath) | Out-Null
-        }
-
-        Get-ChildItem -LiteralPath $resolvedAgentsTemplateRoot -File -Recurse -Force | ForEach-Object {
-            if ($_.Name -eq ".gitkeep") {
-                return
-            }
-
-            $relativePath = $_.FullName.Substring($resolvedAgentsTemplateRoot.Length).TrimStart("\")
-            $targetPath = Join-Path $agentsRoot $relativePath
-            $targetDirectory = Split-Path -Parent $targetPath
-
-            New-Item -ItemType Directory -Force -Path $targetDirectory | Out-Null
-
-            if (Test-Path $targetPath) {
-                Write-Ok "Codex config already exists: $targetPath"
-            }
-            else {
-                Copy-Item -LiteralPath $_.FullName -Destination $targetPath
-                Write-Ok "Copied Codex config template: $targetPath"
-            }
-        }
-
-        Write-Ok "Codex config folders ready: $agentsRoot"
-    }
+    Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".claude") -TargetPath $claudeRoot -Label "Claude"
+    Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".agents") -TargetPath $agentsRoot -Label "Codex agent"
+    Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".codex") -TargetPath $codexRoot -Label "Codex CLI"
 
     if (Test-Path $settingsSharedPath) {
         try {
@@ -188,7 +172,7 @@ function Initialize-ClaudeProjectConfig {
 }
 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "  flex-workstation - sync workspace" -ForegroundColor Cyan
+Write-Host "  flex-workstation - prepare workspace templates" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -215,9 +199,7 @@ else {
     Write-Warn "WinGet is missing. This is fine because the default Claude Code install path is the native installer."
 }
 
-Initialize-ClaudeProjectConfig
-
-& "$PSScriptRoot\sync-workspace-skills.ps1" -PullVendors:$PullVendors
+Initialize-WorkspaceProjectConfig
 
 & "$PSScriptRoot\ensure-ccusage.ps1" -SkipInstall:$SkipCcusageInstall
 
@@ -263,7 +245,7 @@ else {
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
-Write-Host "  Workspace sync finished." -ForegroundColor Green
+Write-Host "  Workspace template setup finished." -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host ""
 

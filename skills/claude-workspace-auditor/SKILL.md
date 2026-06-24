@@ -2,9 +2,9 @@
 name: claude-workspace-auditor
 description: >
   Audits whether a Claude Code workspace is architected well for coding:
-  canonical project structure, config integrity, permissions, skill sync,
+  canonical project structure, config integrity, permissions, template integrity,
   hooks, lifecycle coverage, and context hygiene. Use when setting up a new
-  workspace, after changing settings.json or workspace-assistants.json, when a
+  workspace, after changing settings.json or workspace templates, when a
   skill fails to trigger, when hooks seem inactive, when CLAUDE.md has grown
   large, or before onboarding a new developer. Do not use for reviewing one
   skill file; use skill-reviewer instead.
@@ -22,7 +22,7 @@ Tư duy nền: mọi best practice của Claude Code đều xoay quanh một rà
 
 **Dùng khi:**
 - Thiết lập workspace mới lần đầu
-- Sau khi chỉnh `settings.json`, `workspace-assistants.json`, hoặc bất kỳ hook script nào
+- Sau khi chỉnh `settings.json`, workspace template, hoặc bất kỳ hook script nào
 - Một skill không trigger dù gõ đúng keyword
 - Hook có vẻ không chạy (không thấy output, không có phản hồi)
 - CLAUDE.md đã phình to và nghi ngờ Claude đang bỏ qua chỉ dẫn quan trọng
@@ -69,11 +69,10 @@ Kiểm tra từng chiều độc lập. Gán trạng thái: ✅ tốt / ⚠️ c
 Kiểm tra tất cả file config có cấu trúc hợp lệ:
 
 1. Đọc `settings.json` và `settings.local.json` — xác nhận JSON hợp lệ (không trailing comma, ngoặc cân bằng)
-2. Đọc `workspace-assistants.json` — xác nhận JSON hợp lệ, có đủ các field bắt buộc (`assistants`, `localSkills`)
-3. Kiểm tra tên model trong `settings.json` theo allowlist/local docs nếu repo có khai báo. Nếu không có nguồn xác thực hiện tại, flag là "cần verify" thay vì kết luận model sai.
-4. Với mỗi hook entry trong `settings.json`: kiểm tra script path trong `args` có trỏ đến file tồn tại không
-5. So sánh `settings.json` với `flex-workstation/templates/project-root/.claude/settings.json` — báo drift nếu có field lệch
-6. Nếu workspace có template scaffold (`templates/project-root/`), kiểm tra root `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.agents/` có được mirror từ template theo policy của repo không
+2. Kiểm tra tên model trong `settings.json` theo allowlist/local docs nếu repo có khai báo. Nếu không có nguồn xác thực hiện tại, flag là "cần verify" thay vì kết luận model sai.
+3. Với mỗi hook entry trong `settings.json`: kiểm tra script path trong `args` có trỏ đến file tồn tại không
+4. So sánh `settings.json` với `flex-workstation/workspaces/templates/.claude/settings.json` — báo drift nếu có field lệch
+5. Nếu workspace có template scaffold (`workspaces/templates/`), kiểm tra root `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.agents/` và `.codex/config.toml` có được mirror từ template theo policy của repo không
 
 **Tiêu chí:**
 - ✅ JSON hợp lệ, model name đúng, tất cả script path tồn tại, không có drift
@@ -82,25 +81,19 @@ Kiểm tra tất cả file config có cấu trúc hợp lệ:
 
 ---
 
-### Chiều 2 — Skill Sync Health (Trạng thái đồng bộ skill)
+### Chiều 2 — Template và skill source health
 
-Xác minh các skill đã khai báo thực sự tồn tại và được sync đúng:
+Xác minh template và skill source tồn tại đúng vị trí:
 
-1. Với mỗi entry trong `localSkills` của `workspace-assistants.json`:
-   - Xác nhận thư mục `path` tồn tại dưới `flex-workstation/`
-   - Xác nhận có file `SKILL.md` trong thư mục đó
-   - Xác nhận field `name:` trong frontmatter khớp với tên khai báo trong config
-2. Với mỗi `externalSources`: xác nhận path `cloneTo` tồn tại và không rỗng (không chỉ có `.gitkeep`)
-3. Nếu có `disabledLocalSkills`, xác nhận đây là quyết định có chủ đích và không bị hiểu nhầm là vẫn đang sync local override
-4. So sánh danh sách thư mục trong `.claude/skills/` và `.agents/skills/` nếu cả Claude và Codex đều enabled — phải khớp nhau trừ khi config cố ý khác target
-5. Kiểm tra skill stale trong `.claude/skills/` hoặc `.agents/skills/` không còn được khai báo trong config
-6. Với skill có side-effect (deploy, tạo PR, gửi message): kiểm tra có `disable-model-invocation: true` trong frontmatter không — skill loại này chỉ nên chạy khi người dùng gõ tay, không tự trigger
-7. Kiểm tra skill source không bị sửa trực tiếp trong runtime generated target (`.claude/skills`, `.agents/skills`) nếu repo có source-of-truth riêng
+1. Xác nhận `workspaces/templates/` có `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/` và `.codex/`
+2. Với mỗi skill dưới `skills/`: xác nhận có `SKILL.md` và frontmatter hợp lệ
+3. Với skill có side-effect (deploy, tạo PR, gửi message): kiểm tra có `disable-model-invocation: true` trong frontmatter không — skill loại này chỉ nên chạy khi người dùng gõ tay, không tự trigger
+4. Không suy diễn `.claude/skills/` hoặc `.agents/skills/` là output được sync nếu bootstrap không có cơ chế sync
 
 **Tiêu chí:**
-- ✅ Tất cả skill khai báo có `SKILL.md` hợp lệ, hai target khớp nhau, không có stale entry
-- ⚠️ External source tồn tại nhưng có vẻ shallow/rỗng; hoặc skill có side-effect nhưng thiếu `disable-model-invocation`
-- ❌ Thiếu `SKILL.md`, name không khớp, hoặc hai target lệch nhau
+- ✅ Template đầy đủ và mọi skill source có `SKILL.md` hợp lệ
+- ⚠️ Skill có side-effect nhưng thiếu `disable-model-invocation`
+- ❌ Thiếu file template bắt buộc hoặc `SKILL.md` không hợp lệ
 
 ---
 
@@ -267,7 +260,6 @@ Xuất báo cáo theo cấu trúc sau:
 - Có `CLAUDE.local.md` nhưng `.gitignore` không ignore
 - Không có `scripts/verify.*`, `Makefile verify`, hoặc test command thay thế
 - Root `CLAUDE.md` chứa nội dung docs dài thay vì `@docs/...`
-- `workspace-assistants.json` khai báo `localSkills` path nhưng thư mục không tồn tại
 - Danh sách `permissions.allow` rỗng hoặc chỉ có `Bash(claude --version)` sau khi workspace đã dùng thực tế
 - Claude hay "quên" chỉ dẫn trong CLAUDE.md — dấu hiệu file quá dài, context bị đầy sớm
 - Claude kết thúc lượt mà không báo lỗi nhưng test thực ra đang fail — thiếu Stop hook

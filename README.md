@@ -1,120 +1,58 @@
-﻿# flex-workstation
+# flex-workstation
 
-`flex-workstation` là workspace điều phối: quản lý các project cá nhân, tài liệu triển khai, danh sách task, kiến trúc hệ thống, và skill có thể tái sử dụng khi làm việc với Claude Code hoặc Codex.
+`flex-workstation` là workspace điều phối: quản lý tài liệu, bootstrap, template và skill source dùng chung cho các project Flex.
 
 ## Mục đích
 
 - Tập trung tài liệu định hướng cho các project trong cùng workspace.
-- Theo dõi task triển khai theo từng giai đoạn.
-- Ghi lại kiến trúc, quy ước kỹ thuật, cách tổ chức thư mục và trách nhiệm của từng project.
-- Lưu skill dùng chung để tái sử dụng giữa nhiều project.
-- Giảm việc giải thích lại bối cảnh khi tiếp tục làm việc trong các phiên sau.
+- Quản lý template cấu hình cho Claude Code và Codex.
+- Cung cấp entrypoint Windows để bootstrap và mở workspace.
+- Lưu skill source dùng chung trong `skills/`.
 
-## Cấu trúc thư mục
+## Cấu trúc chính
 
 ```text
 flex-workstation/
-|-- .vscode/
-|   +-- tasks.json
-|-- config/
-|   +-- workspace-assistants.json
-|-- docs/
-|   |-- architecture/
-|   |   +-- overview.md
-|   |-- onboarding.md
-|   |-- projects.md
-|   |-- system-map.md
-|   +-- tasks.md
-|-- scripts/
-|   +-- bootstrap.ps1
-|   +-- check-skill-path.ps1
-|   +-- ensure-ccusage.ps1
-|   +-- ensure-rtk.ps1
-|   +-- open-ai-usage-monitor.ps1
-|   +-- sync-workspace-skills.ps1
-|-- skills/
-|   +-- README.md
-|-- templates/
-|   +-- project-root/
+|-- docs/                       # Tài liệu workspace
+|-- scripts/                    # Bootstrap và tooling scripts
+|-- skills/                     # Skill source dùng chung
+|-- workspaces/
+|   +-- templates/              # Template được copy ra workspace root
 |       |-- AGENTS.md
 |       |-- CLAUDE.md
 |       |-- .agents/
-|       +-- .claude/
-|-- .gitattributes
-|-- OPEN_WORKSPACE.cmd
+|       |-- .claude/
+|       +-- .codex/
 |-- OPEN_CLAUDE.cmd
 |-- OPEN_CODEX.cmd
-|-- OPEN_AI_USAGE_MONITOR.cmd
+|-- OPEN_WORKSPACE.cmd
 |-- SYNC_WORKSPACE.cmd
 |-- CLAUDE.md
 +-- README.md
 ```
 
-## Tài liệu chính
-
-- [CLAUDE.md](CLAUDE.md): quy ước cho Claude Code khi làm việc trong workstation.
-- [config/workspace-assistants.json](config/workspace-assistants.json): cấu hình assistant target cho Claude/Codex và skill local dùng chung.
-- [docs/system-map.md](docs/system-map.md): bản đồ hệ thống hiện tại ở cấp `C:\Workspace\Project`.
-- [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới, cấu trúc local, mở workspace VS Code.
-- [docs/architecture/overview.md](docs/architecture/overview.md): thành phần hệ thống Flex, data architecture, deployment view, risks và open questions.
-- [docs/projects.md](docs/projects.md): danh sách Git project được theo dõi chung.
-- [docs/tasks.md](docs/tasks.md): danh sách task, trạng thái, độ ưu tiên.
-- [skills/](skills/): skill dùng chung trong workspace, gồm skill local và bản custom từ external skill.
-
-## Hook bảo vệ skill runtime
-
-Claude settings dùng hook `PreToolUse` gọi `scripts/check-skill-path.ps1` để chặn sửa trực tiếp vào `C:\Workspace\Project\.claude\skills` và `C:\Workspace\Project\.agents\skills`. Skill source phải được sửa trong `flex-workstation\skills` hoặc path đã khai báo trong `config/workspace-assistants.json`, rồi sync lại.
-
 ## Khởi tạo nhanh
 
-Trên Windows: double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap/sync workspace, sau đó double-click `OPEN_WORKSPACE.cmd` để mở VS Code tại `C:\Workspace\Project`.
+Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script copy các file template còn thiếu từ `workspaces/templates/` ra `C:\Workspace\Project`:
 
-Khi cần mở Claude Code tại workspace, double-click `OPEN_CLAUDE.cmd`. File này chạy Claude với quyền bỏ qua prompt permission, chỉ dùng trong workspace tin cậy.
+- `CLAUDE.md` và `AGENTS.md`
+- `.claude/`, `.agents/` và `.codex/`
 
-Khi cần mở Codex tại workspace, double-click `OPEN_CODEX.cmd`. File này mở Codex tại `C:\Workspace\Project` với full quyền filesystem/network và tắt approval prompt, chỉ dùng trong workspace tin cậy.
+Bootstrap không ghi đè file đã có và không sync skill, agent persona hoặc command từ nguồn ngoài. Sau đó, dùng `OPEN_WORKSPACE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 
-Khi cần theo dõi nhanh token/cost AI, double-click `OPEN_AI_USAGE_MONITOR.cmd`. File này kiểm tra/cài `ccusage` nếu thiếu, rồi mở unified daily monitor trong 30 ngày gần nhất cho mọi coding AI CLI mà `ccusage` phát hiện. Monitor hiển thị `TOTAL` trước, sau đó sắp xếp ngày mới nhất lên đầu.
+## Cấu hình coding agent
 
-`SYNC_WORKSPACE.cmd` cũng kiểm tra/cài `rtk` nếu thiếu. `rtk` là CLI proxy giúp giảm token cho output lệnh shell; bootstrap sẽ thử init hook global cho Claude Code/Copilot và Codex.
+| Công cụ | Template | Runtime target |
+| --- | --- | --- |
+| Claude Code | `workspaces/templates/.claude/` | `C:\Workspace\Project\.claude\` |
+| Codex agent context | `workspaces/templates/.agents/` và `AGENTS.md` | `C:\Workspace\Project\.agents\` và `AGENTS.md` |
+| Codex CLI | `workspaces/templates/.codex/config.toml` | `C:\Workspace\Project\.codex/config.toml` |
 
-Khi cần cập nhật cấu hình workspace hoặc skill dùng chung, double-click `SYNC_WORKSPACE.cmd`.
+## Tài liệu
 
-Chi tiết bootstrap, manual install, troubleshooting: xem [docs/onboarding.md](docs/onboarding.md).
-
-Khi mở Claude tại `C:\Workspace\Project`, root `CLAUDE.md` được bootstrap từ `templates/project-root/CLAUDE.md`. Khi mở Codex tại cùng workspace, root `AGENTS.md` được bootstrap từ `templates/project-root/AGENTS.md`. Hai file này cùng giúp assistant hiểu `flex-workstation` là source-of-truth cho cấu hình và skill source.
-
-## Skill dùng chung
-
-Skill dùng chung cho workspace được khai báo trong `config/workspace-assistants.json` và được sync vào runtime của Claude và Codex:
-
-```text
-C:\Workspace\Project\.claude\skills
-C:\Workspace\Project\.agents\skills
-```
-
-Bootstrap sẽ tự chạy sync. Nếu muốn sync thủ công:
-
-```powershell
-.\scripts\sync-workspace-skills.ps1
-```
-
-Hoặc double-click:
-
-```text
-SYNC_WORKSPACE.cmd
-```
-
-External source `flex-agents` đang được bật trong `workspace-assistants.json` từ repo ngang hàng `C:\Workspace\Project\flex-agents`. Khi sync, workspace sẽ đưa skills, agent personas và markdown commands vào runtime target của Claude/Codex theo cấu hình:
-
-```text
-C:\Workspace\Project\.claude\skills
-C:\Workspace\Project\.claude\agents
-C:\Workspace\Project\.claude\commands
-C:\Workspace\Project\.agents\skills
-C:\Workspace\Project\.agents\agents
-C:\Workspace\Project\.agents\commands
-```
-
-Nếu muốn custom một external skill, copy skill đó sang `skills/<skill-name>`, giữ cùng `name` trong `SKILL.md`, khai báo trong `localSkills`, rồi chạy `SYNC_WORKSPACE.cmd`. Local skill cùng tên sẽ override bản external.
-
-Nếu Claude đang mở sẵn, chạy `/reload-skills` trong Claude sau khi sync. Nếu Codex đang mở sẵn mà skill mới chưa xuất hiện, mở session mới.
+- [CLAUDE.md](CLAUDE.md): quy ước khi làm việc trong `flex-workstation`.
+- [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới và cách mở workspace.
+- [docs/system-map.md](docs/system-map.md): bản đồ workspace và runtime AI tooling.
+- [docs/architecture/overview.md](docs/architecture/overview.md): kiến trúc platform ở mức tổng quan.
+- [docs/projects.md](docs/projects.md): danh sách project được theo dõi.
+- [docs/tasks.md](docs/tasks.md): task và lịch sử triển khai.

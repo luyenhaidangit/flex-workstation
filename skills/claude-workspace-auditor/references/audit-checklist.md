@@ -30,7 +30,7 @@ Checklist:
 2. Root có `SPEC.md`, `docs/SPEC.md`, hoặc `spec/` khi workspace đang theo spec-first workflow. Nếu không có spec, báo `⚠️` trừ khi project chưa có feature active.
 3. `.claude/settings.json` tồn tại và là source cho permissions/hooks; `.claude/skills/`, `.claude/agents/`, `.claude/commands/` tồn tại nếu workspace dùng các tầng tương ứng.
 4. `scripts/verify.sh`, `scripts/verify.ps1`, `Makefile` target `verify`, hoặc command tương đương tồn tại. Nếu thiếu, Stop hook không có gate đáng tin.
-5. Có guard script cho sensitive writes (`scripts/block-sensitive-writes.*`, `check-skill-path.*`, hoặc hook guard tương đương) khi workspace có generated/runtime target như `.claude/skills` hoặc `.agents/skills`.
+5. Nếu template có hook hoặc guard script, các path được tham chiếu phải tồn tại và phù hợp với runtime config hiện tại.
 6. Có `tests/` hoặc test command rõ ràng trong package/tooling. Nếu không có tests, verification story yếu.
 7. Với repo nhiều module, tìm `src/*/CLAUDE.md`, package/module-level `CLAUDE.md`, hoặc rules path-scoped. Nếu root CLAUDE chứa nhiều rule module mà không có module-level context, báo `⚠️`.
 8. Nếu `CLAUDE.md` trỏ tới tài liệu dài, ưu tiên import/pointer dạng `@docs/...` thay vì copy nội dung.

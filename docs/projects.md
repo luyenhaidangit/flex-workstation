@@ -14,7 +14,7 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 | Project | Local path | Vai trò | Công nghệ nhận diện | Trạng thái | Ghi chú |
 | --- | --- | --- | --- | --- | --- |
 | `flex-workstation` | `C:\Workspace\Project\flex-workstation` | Workstation điều phối, tài liệu, bootstrap và AI tooling | Markdown, PowerShell, VS Code workspace | Đang dùng | Repo trung tâm, không chứa mã nguồn nghiệp vụ. |
-| `flex-agents` | `C:\Workspace\Project\flex-agents` | Nguồn skill/agent/command dùng chung cho workspace | Markdown, plugin/runtime files cho coding agents | Đang có local | Nguồn external cập nhật hiện tại cho sync skill dùng chung. |
+| `flex-agents` | `C:\Workspace\Project\flex-agents` | Repository agent độc lập | Markdown, plugin/runtime files cho coding agents | Đang có local | Không được bootstrap `flex-workstation` tự động sync. |
 | `flex-auth-service` | `C:\Workspace\Project\flex-auth-service` | Dịch vụ xác thực/ủy quyền | .NET / ASP.NET Core theo `SPEC.md` hiện có | Đang có local | Tài liệu/spec riêng nằm trong repo này. |
 | `flex-microfrontend` | `C:\Workspace\Project\flex-microfrontend` | Frontend client cho nhóm project Flex | Angular / Node.js theo `README.md` và `package.json` | Đang có local | README hiện ghi tên `flex-client`. |
 | `flex-backend` | `C:\Workspace\Project\flex-backend` | Backend cho nhóm project Flex | Chưa xác định | Dự kiến | Cần xác nhận repository URL trước khi clone. |

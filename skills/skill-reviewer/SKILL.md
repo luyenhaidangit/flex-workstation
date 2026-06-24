@@ -36,10 +36,10 @@ Nhận diện skill cần review từ yêu cầu:
 Nếu user yêu cầu **cập nhật/cải tiến/sửa skill**, chuyển sang update mode:
 - Không sửa runtime `.claude/skills/<name>` hoặc `.agents/skills/<name>`.
 - Nếu có `skills/<name>/SKILL.md` → đây là local skill, sửa tại đó.
-- Nếu chưa có local skill, tìm external source đã khai báo trong `config/workspace-assistants.json` rồi tra `skills/<name>/SKILL.md` bên trong nguồn đó.
-- Nếu tìm thấy external → copy thư mục skill sang `skills/<name>`, kiểm tra/thêm `localSkills` trong `config/workspace-assistants.json`, rồi hỏi user xác nhận trước khi sửa nội dung.
+- Nếu chưa có local skill, hỏi user xác nhận source ngoài cần dùng rồi tra `skills/<name>/SKILL.md` trong source đó.
+- Nếu tìm thấy external → copy thư mục skill sang `skills/<name>`, rồi hỏi user xác nhận trước khi sửa nội dung.
 - Nếu không tìm thấy source an toàn → báo rõ không thể cập nhật.
-- Sau khi sửa xong, chạy `flex-workstation/SYNC_WORKSPACE.cmd` hoặc `flex-workstation/scripts/sync-workspace-skills.ps1`.
+- Sau khi sửa xong, không cần chạy sync skill; chỉ mở session mới nếu coding agent cần nạp lại skill source.
 
 ### 2. Thu thập thông tin
 
@@ -50,7 +50,6 @@ Nếu user yêu cầu **cập nhật/cải tiến/sửa skill**, chuyển sang u
 - `SKILL.md` của skill target
 - Kiểm tra frontmatter YAML: có `---` mở/đóng, parse được, có đủ `name` + `description`, và `name` khớp tên thư mục skill
 - Nếu body target có nhắc đến file/thư mục (references/, scripts/, assets/ ...) thì kiểm tra sự tồn tại của chúng
-- Kiểm tra `flex-workstation/config/workspace-assistants.json` để xem skill có được đăng ký chưa
 
 ### 3. Chấm điểm theo 5 trục
 

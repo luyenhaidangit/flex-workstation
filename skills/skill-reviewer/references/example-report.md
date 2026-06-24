@@ -10,7 +10,7 @@ Minh họa một review hoàn chỉnh: từ input đến output.
 /skill-reviewer run-tests
 ```
 
-Skill `run-tests` có SKILL.md 45 dòng, frontmatter YAML không parse được do `description` chứa dấu `:`, không có references/, không có ví dụ good/bad, không khai báo trong workspace-assistants.json.
+Skill `run-tests` có SKILL.md 45 dòng, frontmatter YAML không parse được do `description` chứa dấu `:`, không có references/ và không có ví dụ good/bad.
 
 ---
 
@@ -35,7 +35,6 @@ Skill `run-tests` có SKILL.md 45 dòng, frontmatter YAML không parse được 
 3. `SKILL.md:3` — definition of done không có → thêm "Task hoàn thành khi output test runner đã được in trong chat"
 4. `SKILL.md:12-18` — thiếu ví dụ good/bad cho cách gọi lệnh → thêm 1 cặp minh họa đúng vs sai
 5. `SKILL.md` (toàn file) — không có safety rule → thêm "Không chạy test có side effect (write to DB, send email) trừ khi user xác nhận"
-6. `workspace-assistants.json` — skill chưa được khai báo → thêm entry và chạy `SYNC_WORKSPACE.cmd`
 
 ### Không có vấn đề tại
 - Cấu trúc body viết imperative, dưới 500 dòng
@@ -51,4 +50,4 @@ Skill `run-tests` có SKILL.md 45 dòng, frontmatter YAML không parse được 
 > Nhận xét dựa trên kiến thức domain chung. Với lĩnh vực đặc thù (pháp lý, y tế, tài chính...) cần subject matter expert xác nhận.
 
 ### Tóm tắt
-Skill chưa nên dùng production vì frontmatter YAML có nguy cơ làm skill không load. Khuyến nghị dùng `skill-creator` để iterate nhanh hơn — sửa YAML trước, rồi bổ sung definition of done và khai báo workspace-assistants.json.
+Skill chưa nên dùng production vì frontmatter YAML có nguy cơ làm skill không load. Khuyến nghị dùng `skill-creator` để iterate nhanh hơn — sửa YAML trước, rồi bổ sung definition of done.

@@ -3,15 +3,10 @@ setlocal
 cd /d "%~dp0"
 
 echo flex-workstation / Sync Workspace
-echo Sync skills, commands, agents and workspace config.
+echo Copy workspace templates and prepare local tooling.
 echo.
 
-set "EXTRA_ARGS="
-set /p "dummy=Pull vendor updates: [Y,N]: " <nul
-choice /C YN /N /T 10 /D N
-if not errorlevel 2 set "EXTRA_ARGS=-PullVendors"
-
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\bootstrap.ps1" %EXTRA_ARGS%
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\bootstrap.ps1"
 
 @echo off
 if errorlevel 1 (

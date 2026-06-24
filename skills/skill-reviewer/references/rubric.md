@@ -128,7 +128,6 @@ Tiêu chí đặc thù của workspace này (flex-workstation).
 | Tiêu chí | Điểm |
 |---|---|
 | Tên file, command, package, framework, thuật ngữ kỹ thuật giữ nguyên tiếng Anh | 5 |
-| Skill được khai báo trong `flex-workstation/config/workspace-assistants.json` | 5 |
 
 ---
 
