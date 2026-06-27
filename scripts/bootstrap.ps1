@@ -73,7 +73,8 @@ function Copy-TemplateDirectory {
     param(
         [string]$TemplatePath,
         [string]$TargetPath,
-        [string]$Label
+        [string]$Label,
+        [string[]]$PreserveExistingRelativePaths = @()
     )
 
     if (-not (Test-Path $TemplatePath)) {
@@ -98,8 +99,12 @@ function Copy-TemplateDirectory {
         $targetFilePath = Join-Path $TargetPath $relativePath
         New-Item -ItemType Directory -Force -Path (Split-Path -Parent $targetFilePath) | Out-Null
 
-        if (Test-Path $targetFilePath) {
-            Write-Ok "$Label config already exists: $targetFilePath"
+        if ((Test-Path $targetFilePath) -and ($PreserveExistingRelativePaths -contains $relativePath)) {
+            Write-Ok "$Label local config preserved: $targetFilePath"
+        }
+        elseif (Test-Path $targetFilePath) {
+            Copy-Item -LiteralPath $_.FullName -Destination $targetFilePath -Force
+            Write-Ok "Synced $Label config template: $targetFilePath"
         }
         else {
             Copy-Item -LiteralPath $_.FullName -Destination $targetFilePath
@@ -108,6 +113,30 @@ function Copy-TemplateDirectory {
     }
 
     Write-Ok "$Label config folders ready: $TargetPath"
+}
+
+function Copy-TemplateFile {
+    param(
+        [string]$TemplatePath,
+        [string]$TargetPath,
+        [string]$Label
+    )
+
+    if (-not (Test-Path $TemplatePath)) {
+        Write-Warn "$Label template not found: $TemplatePath"
+        return
+    }
+
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $TargetPath) | Out-Null
+
+    if (Test-Path $TargetPath) {
+        Copy-Item -LiteralPath $TemplatePath -Destination $TargetPath -Force
+        Write-Ok "Synced $Label template: $TargetPath"
+    }
+    else {
+        Copy-Item -LiteralPath $TemplatePath -Destination $TargetPath
+        Write-Ok "Copied $Label template: $TargetPath"
+    }
 }
 
 function Initialize-WorkspaceProjectConfig {
@@ -125,27 +154,10 @@ function Initialize-WorkspaceProjectConfig {
 
     Write-Step "Preparing AI assistant project configuration"
 
-    if (Test-Path $projectRootClaudeTemplate) {
-        if (Test-Path $projectRootClaudePath) {
-            Write-Ok "Workspace root CLAUDE.md already exists: $projectRootClaudePath"
-        }
-        else {
-            Copy-Item -LiteralPath $projectRootClaudeTemplate -Destination $projectRootClaudePath
-            Write-Ok "Copied workspace root CLAUDE.md: $projectRootClaudePath"
-        }
-    }
+    Copy-TemplateFile -TemplatePath $projectRootClaudeTemplate -TargetPath $projectRootClaudePath -Label "workspace root CLAUDE.md"
+    Copy-TemplateFile -TemplatePath $projectRootAgentsTemplate -TargetPath $projectRootAgentsPath -Label "workspace root AGENTS.md"
 
-    if (Test-Path $projectRootAgentsTemplate) {
-        if (Test-Path $projectRootAgentsPath) {
-            Write-Ok "Workspace root AGENTS.md already exists: $projectRootAgentsPath"
-        }
-        else {
-            Copy-Item -LiteralPath $projectRootAgentsTemplate -Destination $projectRootAgentsPath
-            Write-Ok "Copied workspace root AGENTS.md: $projectRootAgentsPath"
-        }
-    }
-
-    Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".claude") -TargetPath $claudeRoot -Label "Claude"
+    Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".claude") -TargetPath $claudeRoot -Label "Claude" -PreserveExistingRelativePaths @("settings.local.json")
     Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".agents") -TargetPath $agentsRoot -Label "Codex agent"
     Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".codex") -TargetPath $codexRoot -Label "Codex CLI"
 

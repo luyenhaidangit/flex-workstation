@@ -33,12 +33,12 @@ flex-workstation/
 
 ## Khởi tạo nhanh
 
-Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script copy các file template còn thiếu từ `workspaces/templates/` ra `C:\Workspace\Project`:
+Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sync các file template từ `workspaces/templates/` ra `C:\Workspace\Project`:
 
 - `CLAUDE.md` và `AGENTS.md`
 - `.claude/`, `.agents/` và `.codex/`
 
-Bootstrap không ghi đè file đã có và không sync skill, agent persona hoặc command từ nguồn ngoài. Sau đó, dùng `OPEN_WORKSPACE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
+Bootstrap ghi đè runtime config đã có bằng template để workspace hiện tại nhận thay đổi mới khi sync. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng. Bootstrap không sync skill, agent persona hoặc command từ nguồn ngoài. Sau đó, dùng `OPEN_WORKSPACE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 
 ## Cấu hình coding agent
 

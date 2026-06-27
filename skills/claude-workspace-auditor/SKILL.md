@@ -72,7 +72,7 @@ Kiểm tra tất cả file config có cấu trúc hợp lệ:
 2. Kiểm tra tên model trong `settings.json` theo allowlist/local docs nếu repo có khai báo. Nếu không có nguồn xác thực hiện tại, flag là "cần verify" thay vì kết luận model sai.
 3. Với mỗi hook entry trong `settings.json`: kiểm tra script path trong `args` có trỏ đến file tồn tại không
 4. So sánh `settings.json` với `flex-workstation/workspaces/templates/.claude/settings.json` — báo drift nếu có field lệch
-5. Nếu workspace có template scaffold (`workspaces/templates/`), kiểm tra root `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.agents/` và `.codex/config.toml` có được mirror từ template theo policy của repo không
+5. Nếu workspace có template sync (`workspaces/templates/`), kiểm tra root `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.agents/` và `.codex/config.toml` có khớp template theo policy của repo không
 
 **Tiêu chí:**
 - ✅ JSON hợp lệ, model name đúng, tất cả script path tồn tại, không có drift

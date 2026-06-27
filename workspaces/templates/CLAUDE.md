@@ -17,12 +17,12 @@ Khi tạo tài liệu dùng chung — kiến trúc hệ thống, task tracking, 
 Khi người dùng yêu cầu tạo hoặc sửa skill dùng chung:
 
 - Sửa source trong `flex-workstation/skills/<skill-name>/SKILL.md`.
-- `SYNC_WORKSPACE.cmd` không sync skill; chỉ copy các file template còn thiếu ra workspace root.
+- `SYNC_WORKSPACE.cmd` không sync skill; chỉ sync runtime config từ template ra workspace root.
 
 ## Đồng bộ config với template
 
-Workspace root là bản "sống". `flex-workstation/workspaces/templates/` là scaffold cho setup mới. Khi sửa config dùng chung ở root — `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`, `.claude/settings.local.json`, `.codex/config.toml` — mirror thay đổi sang template tương ứng.
+`flex-workstation/workspaces/templates/` là source-of-truth cho runtime config dùng chung. Khi sửa config dùng chung — `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json`, `.codex/config.toml` — sửa trong template rồi chạy `SYNC_WORKSPACE.cmd` để cập nhật workspace root.
 
-- Chỉ mirror config ổn định, dùng chung (vd `model`, quy ước ngôn ngữ, workflow). KHÔNG mirror giá trị đặc thù máy/cá nhân: path tuyệt đối, permission tạm cho từng máy.
+- Chỉ đưa config ổn định, dùng chung vào template (vd `model`, quy ước ngôn ngữ, workflow). KHÔNG đưa giá trị đặc thù máy/cá nhân vào template: path tuyệt đối, permission tạm cho từng máy. `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại khi sync.
 
 Chi tiết: `@flex-workstation/README.md`.

@@ -21,7 +21,7 @@ C:\Workspace\Project\
 ```text
 flex-workstation\SYNC_WORKSPACE.cmd
   → scripts\bootstrap.ps1
-    → copy file template chưa tồn tại từ workspaces\templates\
+    → sync file template từ workspaces\templates\
        vào C:\Workspace\Project\
     → kiểm tra/cài ccusage và rtk
     → kiểm tra/cài Claude Code nếu thiếu
@@ -29,7 +29,7 @@ flex-workstation\SYNC_WORKSPACE.cmd
     → install/update plugin `flex-agents@flex-agents`
 ```
 
-`Confirmed`: bootstrap copy `CLAUDE.md`, `AGENTS.md`, `.claude`, `.agents` và `.codex`. File đích đã tồn tại được giữ nguyên; đây là scaffold, không phải cơ chế đồng bộ ghi đè.
+`Confirmed`: bootstrap sync `CLAUDE.md`, `AGENTS.md`, `.claude`, `.agents` và `.codex` từ template ra workspace root. File đích đã tồn tại được ghi đè bằng template, trừ `.claude/settings.local.json` nếu đã có vì đây là cấu hình local theo máy/người dùng.
 
 `Confirmed`: bootstrap không đọc `workspace-assistants.json` và không chạy `sync-workspace-skills.ps1`. Skill source trong `flex-workstation/skills/` vẫn không được copy vào runtime target. Riêng Claude plugin `flex-agents@flex-agents` được install/update qua marketplace `luyenhaidangit/flex-agents`.
 
@@ -48,5 +48,5 @@ flex-workstation\SYNC_WORKSPACE.cmd
 
 - Sửa template bootstrap tại `flex-workstation/workspaces/templates/`.
 - Sửa tài liệu workspace tại `flex-workstation/docs/`.
-- Không kỳ vọng `SYNC_WORKSPACE.cmd` cập nhật file runtime đã tồn tại; sửa trực tiếp file runtime khi thay đổi chỉ áp dụng cho workspace hiện tại, sau đó mirror phần cấu hình ổn định về template.
+- Kỳ vọng `SYNC_WORKSPACE.cmd` cập nhật runtime config đã tồn tại từ template; sửa cấu hình dùng chung tại `workspaces/templates/`, rồi chạy sync để đẩy ra workspace root.
 - Không đặt mã nguồn nghiệp vụ trong `flex-workstation`; mỗi project nghiệp vụ là một repo ngang hàng.

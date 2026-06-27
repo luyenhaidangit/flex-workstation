@@ -18,7 +18,7 @@ Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tà
 
 - `OPEN_WORKSPACE.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
 - `OPEN_CLAUDE.cmd`: double-click để mở Claude Code tại `C:\Workspace\Project` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
-- `SYNC_WORKSPACE.cmd`: double-click để copy template cấu hình Claude/Codex và chuẩn bị local tooling.
+- `SYNC_WORKSPACE.cmd`: double-click để sync template cấu hình Claude/Codex và chuẩn bị local tooling.
 - `scripts/bootstrap.ps1`: script kỹ thuật bên trong, không phải entrypoint double-click.
 
 ## Tài liệu
