@@ -25,17 +25,20 @@ flex-workstation\SYNC_WORKSPACE.cmd
        vào C:\Workspace\Project\
     → kiểm tra/cài ccusage và rtk
     → kiểm tra/cài Claude Code nếu thiếu
+    → add/update marketplace `luyenhaidangit/flex-agents`
+    → install/update plugin `flex-agents@flex-agents`
 ```
 
 `Confirmed`: bootstrap copy `CLAUDE.md`, `AGENTS.md`, `.claude`, `.agents` và `.codex`. File đích đã tồn tại được giữ nguyên; đây là scaffold, không phải cơ chế đồng bộ ghi đè.
 
-`Confirmed`: bootstrap không đọc `workspace-assistants.json`, không chạy `sync-workspace-skills.ps1` và không sync skill, agent persona hoặc command từ nguồn ngoài.
+`Confirmed`: bootstrap không đọc `workspace-assistants.json` và không chạy `sync-workspace-skills.ps1`. Skill source trong `flex-workstation/skills/` vẫn không được copy vào runtime target. Riêng Claude plugin `flex-agents@flex-agents` được install/update qua marketplace `luyenhaidangit/flex-agents`.
 
 ## Runtime AI tooling
 
 | Tooling | Source-of-truth | Runtime target | Mục đích |
 | --- | --- | --- | --- |
 | Claude Code instruction/config | `workspaces/templates/CLAUDE.md`, `.claude/` | `C:\Workspace\Project\CLAUDE.md`, `.claude/` | Context, model và permission cho Claude Code. |
+| Claude plugin marketplace | `luyenhaidangit/flex-agents` | Claude Code user plugin `flex-agents@flex-agents` | Cập nhật bộ skill/plugin dùng trong Claude Code khi chạy bootstrap. |
 | Codex instruction/config | `workspaces/templates/AGENTS.md`, `.agents/`, `.codex/` | `C:\Workspace\Project\AGENTS.md`, `.agents/`, `.codex/` | Context cho Codex và cấu hình Codex CLI. |
 | Skill source | `flex-workstation/skills/` | Không có runtime target do bootstrap quản lý | Lưu source dùng chung, không được sync bởi bootstrap. |
 | `ccusage` | `scripts/ensure-ccusage.ps1` | User global CLI | Theo dõi token/cost usage. |

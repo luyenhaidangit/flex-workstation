@@ -38,9 +38,9 @@ Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó copy các 
 - `.agents/` cho Codex agent context
 - `.codex/` cho Codex CLI
 
-File và thư mục đã tồn tại ở đích được giữ nguyên. Đây là cơ chế scaffold, không phải đồng bộ ghi đè. Bootstrap không sync skill, agent persona hoặc command từ nguồn ngoài.
+File và thư mục đã tồn tại ở đích được giữ nguyên. Đây là cơ chế scaffold, không phải đồng bộ ghi đè.
 
-Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
+Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Sau khi có Claude Code, bootstrap add/update marketplace `luyenhaidangit/flex-agents`, install plugin `flex-agents@flex-agents` nếu thiếu, rồi chạy `claude plugin update flex-agents@flex-agents` để lấy bộ skill/plugin mới nhất. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
 
 ## Cấu hình agent
 
@@ -51,7 +51,7 @@ Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Dùn
 | Codex CLI | `.codex/config.toml` | Cấu hình model, approval policy và sandbox. |
 | Codex | `AGENTS.md`, `.agents/` | Context và resource theo template. |
 
-Skill source dùng chung nằm trong `flex-workstation/skills/`. Bootstrap không đưa các skill này vào runtime target.
+Skill source dùng chung nằm trong `flex-workstation/skills/`. Bootstrap không đưa các skill local này vào runtime target; bộ skill Claude Code được cập nhật qua plugin `flex-agents@flex-agents`.
 
 ## Mở workspace và coding agent
 

@@ -249,7 +249,8 @@ if (Test-Command "claude") {
     claude plugin marketplace add luyenhaidangit/flex-agents 2>$null
     claude plugin marketplace update flex-agents 2>$null
     claude plugin install flex-agents@flex-agents 2>$null
-    Write-Ok "flex-agents marketplace synced"
+    claude plugin update flex-agents@flex-agents 2>$null
+    Write-Ok "flex-agents marketplace and plugin synced"
 }
 else {
     Write-Warn "Claude Code not found - skipping flex-agents sync"
