@@ -1,58 +1,57 @@
 # Bản đồ hệ thống workspace
 
-Tài liệu này mô tả workstation project root `C:\Workspace\Project\flex-workstation` cho developer và coding agent. Luồng bootstrap dưới đây được xác nhận từ `SYNC_WORKSPACE.cmd`, `scripts/bootstrap.ps1` và `workspaces/templates/`.
+Tài liệu này mô tả project root `C:\Workspace\Project\flex-workstation` cho developer và coding agent.
 
 ## Snapshot hiện tại
 
 ```text
-C:\Workspace\Project\
-|-- flex-workstation\     # Source-of-truth cho bootstrap, template và tài liệu
-|   |-- .agents\          # Runtime template cho Codex agent
-|   |-- .claude\          # Runtime cấu hình Claude Code
-|   |-- .codex\           # Runtime cấu hình Codex CLI
-|   |-- flex-auth-service\    # Service xác thực/ủy quyền, repo con độc lập
-|   |-- flex-api-gateway\     # API Gateway, repo con độc lập
-|   |-- flex-microfrontend\   # Frontend client, repo con độc lập
-|   +-- flex-environment\     # Local/dev infrastructure stack, repo con độc lập
+flex-workstation/
+├── .agents/              # Cấu hình Codex agent
+├── .claude/              # Cấu hình Claude Code (settings.json, hooks, commands)
+├── .codex/               # Cấu hình Codex CLI
+├── docs/                 # Tài liệu workstation
+├── scripts/              # Bootstrap và tooling scripts
+├── skills/               # Skill source dùng chung
+├── workstation.json      # Manifest repo được clone khi bootstrap
+├── flex-agents/          # Repo con độc lập
+├── flex-auth-service/    # Repo con độc lập — service xác thực/ủy quyền
+├── flex-api-gateway/     # Repo con độc lập — API Gateway
+├── flex-microfrontend/   # Repo con độc lập — Frontend client
+└── flex-environment/     # Repo con độc lập — Local/dev infrastructure stack
 ```
 
 ## Luồng bootstrap
 
 ```text
-flex-workstation\SYNC_WORKSPACE.cmd
+SYNC_WORKSPACE.cmd
   → scripts\bootstrap.ps1
-    → sync file template từ workspaces\templates\
-       vào C:\Workspace\Project\flex-workstation\
     → đọc workstation.json
-    → clone repo còn thiếu vào C:\Workspace\Project\flex-workstation\
+    → clone repo còn thiếu vào flex-workstation\
     → fetch --prune và pull --ff-only repo đã có nếu working tree sạch
     → kiểm tra/cài ccusage và rtk
     → kiểm tra/cài Claude Code nếu thiếu
-    → add/update marketplace `luyenhaidangit/flex-agents`
-    → install/update plugin `flex-agents@flex-agents`
+    → add/update marketplace luyenhaidangit/flex-agents
+    → install/update plugin flex-agents@flex-agents
 ```
 
-`Confirmed`: bootstrap sync `CLAUDE.md`, `AGENTS.md`, `.claude`, `.agents` và `.codex` từ template ra project root `C:\Workspace\Project\flex-workstation`. File đích đã tồn tại được ghi đè bằng template, trừ `.claude/settings.local.json` nếu đã có vì đây là cấu hình local theo máy/người dùng.
-
-`Confirmed`: bootstrap đọc `workstation.json` tại project root workstation, chạy `git clone` cho repo chưa tồn tại trong `C:\Workspace\Project\flex-workstation`, và pull repo đã có bằng `git fetch --prune` + `git pull --ff-only`. Script bỏ qua repo có local changes, origin khác cấu hình hoặc detached HEAD.
-
-`Confirmed`: bootstrap không đọc `workspace-assistants.json` và không chạy `sync-workspace-skills.ps1`. Skill source trong `flex-workstation/skills/` vẫn không được copy vào runtime target. Riêng Claude plugin `flex-agents@flex-agents` được install/update qua marketplace `luyenhaidangit/flex-agents`.
+Script bỏ qua repo có local changes, origin khác cấu hình hoặc detached HEAD.
 
 ## Runtime AI tooling
 
-| Tooling | Source-of-truth | Runtime target | Mục đích |
-| --- | --- | --- | --- |
-| Workstation config | `workstation.json` | `C:\Workspace\Project\flex-workstation\<repo-name>` | Cấu hình workstation; hiện dùng `repositories.items` để clone repo Flex còn thiếu khi chạy sync. |
-| Claude Code instruction/config | `workspaces/templates/CLAUDE.md`, `.claude/` | `C:\Workspace\Project\flex-workstation\CLAUDE.md`, `.claude/` | Context, model và permission cho Claude Code. |
-| Claude plugin marketplace | `luyenhaidangit/flex-agents` | Claude Code user plugin `flex-agents@flex-agents` | Cập nhật bộ skill/plugin dùng trong Claude Code khi chạy bootstrap. |
-| Codex instruction/config | `workspaces/templates/AGENTS.md`, `.agents/`, `.codex/` | `C:\Workspace\Project\flex-workstation\AGENTS.md`, `.agents/`, `.codex/` | Context cho Codex và cấu hình Codex CLI. |
-| Skill source | `flex-workstation/skills/` | Không có runtime target do bootstrap quản lý | Lưu source dùng chung, không được sync bởi bootstrap. |
-| `ccusage` | `scripts/ensure-ccusage.ps1` | User global CLI | Theo dõi token/cost usage. |
-| `rtk` | `scripts/ensure-rtk.ps1` | User global CLI + cấu hình global | Giảm token shell output. |
+| Tooling | Vị trí | Mục đích |
+| --- | --- | --- |
+| Claude Code config | `.claude/` | Settings, hooks, commands cho Claude Code |
+| Claude plugin marketplace | `luyenhaidangit/flex-agents` | Cập nhật bộ skill/plugin khi chạy bootstrap |
+| Codex agent context | `AGENTS.md`, `.agents/` | Context và cấu hình agent cho Codex |
+| Codex CLI config | `.codex/` | Cấu hình Codex CLI |
+| Skill source | `skills/` | Nguồn skill dùng chung, không được sync bởi bootstrap |
+| `ccusage` | User global CLI | Theo dõi token/cost usage Claude |
+| `rtk` | User global CLI | Giảm token shell output |
+| Workstation config | `workstation.json` | Manifest repo được clone khi bootstrap |
 
 ## Quy tắc source-of-truth
 
-- Sửa template bootstrap tại `flex-workstation/workspaces/templates/`.
-- Sửa tài liệu workspace tại `flex-workstation/docs/`.
-- Kỳ vọng `SYNC_WORKSPACE.cmd` cập nhật runtime config đã tồn tại từ template; sửa cấu hình dùng chung tại `workspaces/templates/`, rồi chạy sync để đẩy ra workstation project root.
-- Repo nghiệp vụ được clone vào `flex-workstation` theo cấu hình hiện tại, nhưng vẫn là Git repo độc lập và được ignore bởi Git của workstation.
+- Sửa tài liệu workspace tại `docs/`.
+- Sửa skill tại `skills/<skill-name>/SKILL.md`.
+- Sửa runtime config trực tiếp tại `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/`.
+- Repo nghiệp vụ được clone vào `flex-workstation/` theo `workstation.json`, là Git repo độc lập và được ignore bởi Git của workstation.
