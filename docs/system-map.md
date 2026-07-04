@@ -25,6 +25,7 @@ flex-workstation\SYNC_WORKSPACE.cmd
        vào C:\Workspace\Project\flex-workstation\
     → đọc workstation.json
     → clone repo còn thiếu vào C:\Workspace\Project\flex-workstation\
+    → fetch --prune và pull --ff-only repo đã có nếu working tree sạch
     → kiểm tra/cài ccusage và rtk
     → kiểm tra/cài Claude Code nếu thiếu
     → add/update marketplace `luyenhaidangit/flex-agents`
@@ -33,7 +34,7 @@ flex-workstation\SYNC_WORKSPACE.cmd
 
 `Confirmed`: bootstrap sync `CLAUDE.md`, `AGENTS.md`, `.claude`, `.agents` và `.codex` từ template ra project root `C:\Workspace\Project\flex-workstation`. File đích đã tồn tại được ghi đè bằng template, trừ `.claude/settings.local.json` nếu đã có vì đây là cấu hình local theo máy/người dùng.
 
-`Confirmed`: bootstrap đọc `workstation.json` tại project root workstation và chỉ chạy `git clone` cho repo chưa tồn tại trong `C:\Workspace\Project\flex-workstation`. Repo đã có local không bị `pull`, reset hoặc sửa working tree.
+`Confirmed`: bootstrap đọc `workstation.json` tại project root workstation, chạy `git clone` cho repo chưa tồn tại trong `C:\Workspace\Project\flex-workstation`, và pull repo đã có bằng `git fetch --prune` + `git pull --ff-only`. Script bỏ qua repo có local changes, origin khác cấu hình hoặc detached HEAD.
 
 `Confirmed`: bootstrap không đọc `workspace-assistants.json` và không chạy `sync-workspace-skills.ps1`. Skill source trong `flex-workstation/skills/` vẫn không được copy vào runtime target. Riêng Claude plugin `flex-agents@flex-agents` được install/update qua marketplace `luyenhaidangit/flex-agents`.
 

@@ -39,7 +39,7 @@ Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sync các file 
 - `CLAUDE.md` và `AGENTS.md`
 - `.claude/`, `.agents/` và `.codex/`
 
-Script cũng đọc `workstation.json` tại project root workstation và clone các repo còn thiếu vào chính `C:\Workspace\Project\flex-workstation`. Repo đã tồn tại sẽ được bỏ qua; bootstrap không tự `git pull` để tránh ảnh hưởng working tree của từng project. Các thư mục repo con được ignore trong Git của workstation.
+Script cũng đọc `workstation.json` tại project root workstation, clone các repo còn thiếu vào chính `C:\Workspace\Project\flex-workstation`, và cập nhật repo đã tồn tại bằng `git fetch --prune` + `git pull --ff-only`. Repo đang có local changes, origin khác cấu hình hoặc đang ở detached HEAD sẽ được cảnh báo và bỏ qua để tránh ghi đè thay đổi cục bộ. Các thư mục repo con được ignore trong Git của workstation.
 
 Bootstrap ghi đè runtime config đã có bằng template để workspace hiện tại nhận thay đổi mới khi sync. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng. Bootstrap không sync skill, agent persona hoặc command từ nguồn ngoài. Sau đó, dùng `OPEN_WORKSPACE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 

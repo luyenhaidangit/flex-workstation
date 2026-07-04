@@ -25,9 +25,10 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint mở nhanh VS Code tại thư mục cha | Xem `OPEN_WORKSPACE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Claude tại workspace | Xem `OPEN_CLAUDE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Codex tại workspace | Xem `OPEN_CODEX.cmd`. |
-| Done | Cao | Hợp nhất entrypoint sync workspace | `SYNC_WORKSPACE.cmd` chạy bootstrap, sync template Claude/Codex và chuẩn bị local tooling; đây là entrypoint double-click duy nhất cho setup workspace. |
-| Done | Cao | Thêm cấu hình clone repo khi sync workspace | `workstation.json` tại project root workstation khai báo repo Flex trong `repositories.items`; `scripts/bootstrap.ps1` clone repo còn thiếu vào `C:\Workspace\Project\flex-workstation` và không tự `git pull` repo đã tồn tại. |
+| Done | Cao | Hợp nhất entrypoint sync workspace | `SYNC_WORKSPACE.cmd` chạy bootstrap, sync template Claude/Codex, sync repo project và chuẩn bị local tooling. |
+| Done | Cao | Thêm cấu hình clone/update repo khi sync workspace | `workstation.json` tại project root workstation khai báo repo Flex trong `repositories.items`; `scripts/bootstrap.ps1` clone repo còn thiếu vào `C:\Workspace\Project\flex-workstation` và pull repo đã tồn tại nếu working tree sạch. |
 | Done | Cao | Chuyển đích clone repo vào workstation | Bootstrap mặc định clone repo con vào project root workstation; `.gitignore` bỏ qua các thư mục repo con. |
+| Done | Cao | Hợp nhất cập nhật repo project vào sync | `SYNC_WORKSPACE.cmd` gọi `scripts/sync-repositories.ps1 -PullExisting`; không cần entrypoint update repo riêng. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Cấu trúc ban đầu đặt repo Flex ngang hàng trong `C:\Workspace\Project`; hiện đã chuyển đích clone vào project root workstation. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Trước đây sync template `workspaces/templates/.claude` ra `C:\Workspace\Project\.claude`; hiện đã chuyển runtime target vào `flex-workstation`. |
 | Done | Cao | Thêm template `.claude/settings.json` | Dùng cho cấu hình workspace chung; `settings.local.json` giữ cấu hình local theo máy/người dùng. |

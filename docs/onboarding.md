@@ -38,7 +38,7 @@ Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các 
 - `.agents/` cho Codex agent context
 - `.codex/` cho Codex CLI
 
-Bootstrap cũng đọc `workstation.json` tại project root workstation và clone các repo còn thiếu vào `C:\Workspace\Project\flex-workstation`. Nếu repo đã tồn tại, bootstrap bỏ qua và không chạy `git pull`; nếu thư mục đích tồn tại nhưng không phải Git repo, bootstrap cảnh báo để người dùng xử lý thủ công.
+Bootstrap cũng đọc `workstation.json` tại project root workstation, clone các repo còn thiếu vào `C:\Workspace\Project\flex-workstation`, và cập nhật repo đã tồn tại bằng `git fetch --prune` + `git pull --ff-only`. Nếu repo có local changes, origin khác cấu hình hoặc đang ở detached HEAD, bootstrap cảnh báo và bỏ qua repo đó để tránh ghi đè thay đổi cục bộ.
 
 File runtime đã tồn tại ở đích được ghi đè bằng template khi sync để workspace hiện tại nhận thay đổi mới. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 

@@ -14,14 +14,14 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 | Project | Local path | Vai trò | Công nghệ nhận diện | Trạng thái | Ghi chú |
 | --- | --- | --- | --- | --- | --- |
 | `flex-workstation` | `C:\Workspace\Project\flex-workstation` | Workstation điều phối, tài liệu, bootstrap và AI tooling | Markdown, PowerShell, VS Code workspace | Đang dùng | Repo trung tâm, không chứa mã nguồn nghiệp vụ. |
-| `flex-agents` | `C:\Workspace\Project\flex-workstation\flex-agents` | Repository agent độc lập | Markdown, plugin/runtime files cho coding agents | Clone khi sync | Bootstrap update Claude plugin qua marketplace `luyenhaidangit/flex-agents`; không tự `git pull` local repo này. |
-| `flex-auth-service` | `C:\Workspace\Project\flex-workstation\flex-auth-service` | Dịch vụ xác thực/ủy quyền | .NET / ASP.NET Core theo `SPEC.md` hiện có | Clone khi sync | Tài liệu/spec riêng nằm trong repo này. |
-| `flex-microfrontend` | `C:\Workspace\Project\flex-workstation\flex-microfrontend` | Frontend client cho nhóm project Flex | Angular / Node.js theo `README.md` và `package.json` | Clone khi sync | README hiện ghi tên `flex-client`. |
+| `flex-agents` | `C:\Workspace\Project\flex-workstation\flex-agents` | Repository agent độc lập | Markdown, plugin/runtime files cho coding agents | Clone/update khi sync | Bootstrap update Claude plugin qua marketplace `luyenhaidangit/flex-agents`; repo local được pull khi sync nếu working tree sạch. |
+| `flex-auth-service` | `C:\Workspace\Project\flex-workstation\flex-auth-service` | Dịch vụ xác thực/ủy quyền | .NET / ASP.NET Core theo `SPEC.md` hiện có | Clone/update khi sync | Tài liệu/spec riêng nằm trong repo này. |
+| `flex-microfrontend` | `C:\Workspace\Project\flex-workstation\flex-microfrontend` | Frontend client cho nhóm project Flex | Angular / Node.js theo `README.md` và `package.json` | Clone/update khi sync | README hiện ghi tên `flex-client`. |
 | `flex-backend` | `C:\Workspace\Project\flex-workstation\flex-backend` | Backend cho nhóm project Flex | Chưa xác định | Dự kiến | Cần xác nhận repository URL trước khi clone. |
-| `flex-api-gateway` | `C:\Workspace\Project\flex-workstation\flex-api-gateway` | API Gateway cho nhóm project Flex | `.sln`, `.csproj`, `Dockerfile`, `Jenkinsfile` | Clone khi sync | Repo riêng, được ignore bởi Git của workstation. |
-| `flex-environment` | `C:\Workspace\Project\flex-workstation\flex-environment` | Local/dev infrastructure stack | Docker Compose: Redis, RabbitMQ, Jenkins, Portainer, MinIO, Elasticsearch, Kibana, Ollama, `flex-ai-gateway` | Clone khi sync | DB primary hiện dùng Oracle Cloud; Oracle local container đang comment out. |
+| `flex-api-gateway` | `C:\Workspace\Project\flex-workstation\flex-api-gateway` | API Gateway cho nhóm project Flex | `.sln`, `.csproj`, `Dockerfile`, `Jenkinsfile` | Clone/update khi sync | Repo riêng, được ignore bởi Git của workstation. |
+| `flex-environment` | `C:\Workspace\Project\flex-workstation\flex-environment` | Local/dev infrastructure stack | Docker Compose: Redis, RabbitMQ, Jenkins, Portainer, MinIO, Elasticsearch, Kibana, Ollama, `flex-ai-gateway` | Clone/update khi sync | DB primary hiện dùng Oracle Cloud; Oracle local container đang comment out. |
 
-Các repo có URL clone chính thức được khai báo trong `workstation.json`. `SYNC_WORKSPACE.cmd` dùng cấu hình này để clone repo còn thiếu vào `C:\Workspace\Project\flex-workstation`.
+Các repo có URL clone chính thức được khai báo trong `workstation.json`. `SYNC_WORKSPACE.cmd` dùng cấu hình này để clone repo còn thiếu vào `C:\Workspace\Project\flex-workstation` và pull repo đã có nếu working tree sạch.
 
 ## Lệnh kiểm tra nhanh
 
