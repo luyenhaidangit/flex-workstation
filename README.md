@@ -14,7 +14,7 @@
 ```text
 flex-workstation/
 |-- docs/                       # Tài liệu workspace
-|-- repos.json                  # Manifest repo được clone khi sync
+|-- workstation.json            # Cấu hình workstation, gồm manifest repo được clone khi sync
 |-- scripts/                    # Bootstrap và tooling scripts
 |-- skills/                     # Skill source dùng chung
 |-- workspaces/
@@ -39,7 +39,7 @@ Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sync các file 
 - `CLAUDE.md` và `AGENTS.md`
 - `.claude/`, `.agents/` và `.codex/`
 
-Script cũng đọc `repos.json` tại project root workstation và clone các repo còn thiếu về thư mục cha `C:\Workspace\Project`. Repo đã tồn tại sẽ được bỏ qua; bootstrap không tự `git pull` để tránh ảnh hưởng working tree của từng project.
+Script cũng đọc `workstation.json` tại project root workstation và clone các repo còn thiếu về thư mục cha `C:\Workspace\Project`. Repo đã tồn tại sẽ được bỏ qua; bootstrap không tự `git pull` để tránh ảnh hưởng working tree của từng project.
 
 Bootstrap ghi đè runtime config đã có bằng template để workspace hiện tại nhận thay đổi mới khi sync. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng. Bootstrap không sync skill, agent persona hoặc command từ nguồn ngoài. Sau đó, dùng `OPEN_WORKSPACE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 
@@ -51,14 +51,14 @@ Bootstrap ghi đè runtime config đã có bằng template để workspace hiệ
 | Codex agent context | `workspaces/templates/.agents/` và `AGENTS.md` | `C:\Workspace\Project\flex-workstation\.agents\` và `AGENTS.md` |
 | Codex CLI | `workspaces/templates/.codex/config.toml` | `C:\Workspace\Project\flex-workstation\.codex/config.toml` |
 
-## Manifest repo
+## Cấu hình workstation
 
-Khai báo repo cần có trong workspace tại `repos.json`:
+Khai báo repo cần có trong workspace tại `workstation.json`:
 
-- `destinationRoot`: thư mục đích, mặc định `..` tức `C:\Workspace\Project`.
-- `repositories[].name`: tên thư mục local.
-- `repositories[].url`: Git remote URL.
-- `repositories[].branch`: nhánh cần clone, tùy chọn.
+- `repositories.destinationRoot`: thư mục đích, mặc định `..` tức `C:\Workspace\Project`.
+- `repositories.items[].name`: tên thư mục local.
+- `repositories.items[].url`: Git remote URL.
+- `repositories.items[].branch`: nhánh cần clone, tùy chọn.
 
 ## Tài liệu
 

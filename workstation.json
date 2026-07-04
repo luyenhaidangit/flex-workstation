@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "repositories": {
+    "destinationRoot": "..",
+    "items": [
+      {
+        "name": "flex-agents",
+        "url": "https://github.com/luyenhaidangit/flex-agents.git"
+      },
+      {
+        "name": "flex-auth-service",
+        "url": "https://github.com/luyenhaidangit/flex-auth-service"
+      },
+      {
+        "name": "flex-api-gateway",
+        "url": "https://github.com/luyenhaidangit/flex-api-gateway.git"
+      },
+      {
+        "name": "flex-microfrontend",
+        "url": "https://github.com/luyenhaidangit/flex-microfrontend"
+      },
+      {
+        "name": "flex-environment",
+        "url": "https://github.com/luyenhaidangit/flex-environment"
+      }
+    ]
+  }
+}

@@ -198,12 +198,12 @@ function Resolve-WorkspacePath {
 
 function Sync-DeclaredRepositories {
     $projectRoot = (Resolve-Path "$PSScriptRoot\..").Path
-    $repoManifestPath = Join-Path $projectRoot "repos.json"
+    $workstationConfigPath = Join-Path $projectRoot "workstation.json"
 
     Write-Step "Syncing declared Git repositories"
 
-    if (-not (Test-Path $repoManifestPath)) {
-        Write-Warn "Repository manifest not found: $repoManifestPath"
+    if (-not (Test-Path $workstationConfigPath)) {
+        Write-Warn "Workstation config not found: $workstationConfigPath"
         return
     }
 
@@ -213,24 +213,24 @@ function Sync-DeclaredRepositories {
     }
 
     try {
-        $manifest = Get-Content -Raw -Encoding UTF8 $repoManifestPath | ConvertFrom-Json
+        $config = Get-Content -Raw -Encoding UTF8 $workstationConfigPath | ConvertFrom-Json
     }
     catch {
-        Write-Warn "Repository manifest is not valid JSON: $repoManifestPath"
+        Write-Warn "Workstation config is not valid JSON: $workstationConfigPath"
         Write-Warn $_.Exception.Message
         return
     }
 
-    if (-not $manifest.repositories) {
-        Write-Warn "Repository manifest has no repositories: $repoManifestPath"
+    if (-not $config.repositories -or -not $config.repositories.items) {
+        Write-Warn "Workstation config has no repositories.items: $workstationConfigPath"
         return
     }
 
-    $destinationRootValue = if ($manifest.destinationRoot) { [string]$manifest.destinationRoot } else { ".." }
+    $destinationRootValue = if ($config.repositories.destinationRoot) { [string]$config.repositories.destinationRoot } else { ".." }
     $destinationRoot = Resolve-WorkspacePath -BasePath $projectRoot -Path $destinationRootValue
     New-Item -ItemType Directory -Force -Path $destinationRoot | Out-Null
 
-    foreach ($repo in $manifest.repositories) {
+    foreach ($repo in $config.repositories.items) {
         $name = [string]$repo.name
         $url = [string]$repo.url
         $branch = [string]$repo.branch

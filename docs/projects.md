@@ -5,7 +5,7 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 ## Quy ước
 
 - Mỗi project được ghi bằng tên repo, đường dẫn local, vai trò, công nghệ chính và trạng thái.
-- Khi thêm project mới, cập nhật bảng bên dưới, khai báo Git URL trong `repos.json` nếu repo cần được clone khi sync, và bổ sung task liên quan trong `docs/tasks.md` nếu có việc triển khai tiếp theo.
+- Khi thêm project mới, cập nhật bảng bên dưới, khai báo Git URL trong `workstation.json` nếu repo cần được clone khi sync, và bổ sung task liên quan trong `docs/tasks.md` nếu có việc triển khai tiếp theo.
 - Bản đồ hệ thống hiện tại nằm ở [system-map.md](system-map.md).
 - Cấu trúc local mặc định và bước xác nhận onboarding: xem [onboarding.md](onboarding.md).
 
@@ -21,7 +21,7 @@ Tài liệu này ghi nhận các Git repo được quản lý chung bởi `flex-
 | `flex-api-gateway` | `C:\Workspace\Project\flex-api-gateway` | API Gateway cho nhóm project Flex | `.sln`, `.csproj`, `Dockerfile`, `Jenkinsfile` | Đang có local | Repo riêng, không nhúng vào `flex-workstation`. |
 | `flex-environment` | `C:\Workspace\Project\flex-environment` | Local/dev infrastructure stack | Docker Compose: Redis, RabbitMQ, Jenkins, Portainer, MinIO, Elasticsearch, Kibana, Ollama, `flex-ai-gateway` | Đang có local | DB primary hiện dùng Oracle Cloud; Oracle local container đang comment out. |
 
-Các repo có URL clone chính thức được khai báo trong `repos.json`. `SYNC_WORKSPACE.cmd` dùng manifest này để clone repo còn thiếu về `C:\Workspace\Project`.
+Các repo có URL clone chính thức được khai báo trong `workstation.json`. `SYNC_WORKSPACE.cmd` dùng cấu hình này để clone repo còn thiếu về `C:\Workspace\Project`.
 
 ## Lệnh kiểm tra nhanh
 

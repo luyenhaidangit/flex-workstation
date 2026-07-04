@@ -38,7 +38,7 @@ Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các 
 - `.agents/` cho Codex agent context
 - `.codex/` cho Codex CLI
 
-Bootstrap cũng đọc `repos.json` tại project root workstation và clone các repo còn thiếu về `C:\Workspace\Project`. Nếu repo đã tồn tại, bootstrap bỏ qua và không chạy `git pull`; nếu thư mục đích tồn tại nhưng không phải Git repo, bootstrap cảnh báo để người dùng xử lý thủ công.
+Bootstrap cũng đọc `workstation.json` tại project root workstation và clone các repo còn thiếu về `C:\Workspace\Project`. Nếu repo đã tồn tại, bootstrap bỏ qua và không chạy `git pull`; nếu thư mục đích tồn tại nhưng không phải Git repo, bootstrap cảnh báo để người dùng xử lý thủ công.
 
 File runtime đã tồn tại ở đích được ghi đè bằng template khi sync để workspace hiện tại nhận thay đổi mới. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
@@ -55,9 +55,9 @@ Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Sau 
 
 Skill source dùng chung nằm trong `flex-workstation/skills/`. Bootstrap không đưa các skill local này vào runtime target; bộ skill Claude Code được cập nhật qua plugin `flex-agents@flex-agents`.
 
-## Khai báo repo
+## Cấu hình workstation
 
-Danh sách repo được clone khi sync nằm ở `repos.json`. Thêm repo mới bằng cách bổ sung entry:
+Danh sách repo được clone khi sync nằm ở `workstation.json`, trong `repositories.items`. Thêm repo mới bằng cách bổ sung entry:
 
 ```json
 {
