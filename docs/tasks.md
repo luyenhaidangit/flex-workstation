@@ -26,6 +26,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint mở Claude tại workspace | Xem `OPEN_CLAUDE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Codex tại workspace | Xem `OPEN_CODEX.cmd`. |
 | Done | Cao | Hợp nhất entrypoint sync workspace | `SYNC_WORKSPACE.cmd` chạy bootstrap, sync template Claude/Codex và chuẩn bị local tooling; đây là entrypoint double-click duy nhất cho setup workspace. |
+| Done | Cao | Thêm manifest clone repo khi sync workspace | `workspaces/repos.json` khai báo repo Flex; `scripts/bootstrap.ps1` clone repo còn thiếu về `C:\Workspace\Project` và không tự `git pull` repo đã tồn tại. |
 | Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Trước đây sync template `workspaces/templates/.claude` ra `C:\Workspace\Project\.claude`; hiện đã chuyển runtime target vào `flex-workstation`. |
 | Done | Cao | Thêm template `.claude/settings.json` | Dùng cho cấu hình workspace chung; `settings.local.json` giữ cấu hình local theo máy/người dùng. |

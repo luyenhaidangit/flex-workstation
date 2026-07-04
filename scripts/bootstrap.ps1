@@ -183,6 +183,112 @@ function Initialize-WorkspaceProjectConfig {
     Write-Ok "Claude config folders ready: $claudeRoot"
 }
 
+function Resolve-WorkspacePath {
+    param(
+        [string]$BasePath,
+        [string]$Path
+    )
+
+    if ([System.IO.Path]::IsPathRooted($Path)) {
+        return [System.IO.Path]::GetFullPath($Path)
+    }
+
+    return [System.IO.Path]::GetFullPath((Join-Path $BasePath $Path))
+}
+
+function Sync-DeclaredRepositories {
+    $projectRoot = (Resolve-Path "$PSScriptRoot\..").Path
+    $repoManifestPath = Join-Path $projectRoot "workspaces\repos.json"
+
+    Write-Step "Syncing declared Git repositories"
+
+    if (-not (Test-Path $repoManifestPath)) {
+        Write-Warn "Repository manifest not found: $repoManifestPath"
+        return
+    }
+
+    if (-not (Test-Command "git")) {
+        Write-Warn "Git is missing - skipping repository clone step."
+        return
+    }
+
+    try {
+        $manifest = Get-Content -Raw -Encoding UTF8 $repoManifestPath | ConvertFrom-Json
+    }
+    catch {
+        Write-Warn "Repository manifest is not valid JSON: $repoManifestPath"
+        Write-Warn $_.Exception.Message
+        return
+    }
+
+    if (-not $manifest.repositories) {
+        Write-Warn "Repository manifest has no repositories: $repoManifestPath"
+        return
+    }
+
+    $destinationRootValue = if ($manifest.destinationRoot) { [string]$manifest.destinationRoot } else { ".." }
+    $destinationRoot = Resolve-WorkspacePath -BasePath $projectRoot -Path $destinationRootValue
+    New-Item -ItemType Directory -Force -Path $destinationRoot | Out-Null
+
+    foreach ($repo in $manifest.repositories) {
+        $name = [string]$repo.name
+        $url = [string]$repo.url
+        $branch = [string]$repo.branch
+
+        if ([string]::IsNullOrWhiteSpace($name) -or [string]::IsNullOrWhiteSpace($url)) {
+            Write-Warn "Skipping repository entry because name or url is missing."
+            continue
+        }
+
+        if ($name.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars()) -ge 0) {
+            Write-Warn "Skipping repository with invalid local folder name: $name"
+            continue
+        }
+
+        $targetPath = Join-Path $destinationRoot $name
+        $targetGitPath = Join-Path $targetPath ".git"
+
+        if (Test-Path $targetGitPath) {
+            $originUrl = $null
+            try {
+                $originUrl = (& git -C $targetPath remote get-url origin 2>$null)
+            }
+            catch {
+                $originUrl = $null
+            }
+
+            if ($originUrl -and ($originUrl -ne $url)) {
+                Write-Warn "$name already exists but origin differs. Manifest: $url; local: $originUrl"
+            }
+            else {
+                Write-Ok "$name already exists: $targetPath"
+            }
+
+            continue
+        }
+
+        if (Test-Path $targetPath) {
+            Write-Warn "$name target path exists but is not a Git repository: $targetPath"
+            continue
+        }
+
+        Write-Host "Cloning $name..."
+        $cloneArgs = @("clone", $url, $targetPath)
+        if (-not [string]::IsNullOrWhiteSpace($branch)) {
+            $cloneArgs = @("clone", "--branch", $branch, $url, $targetPath)
+        }
+
+        & git @cloneArgs
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "$name cloned: $targetPath"
+        }
+        else {
+            Write-Warn "$name clone failed with exit code $LASTEXITCODE"
+        }
+    }
+}
+
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  flex-workstation - prepare workspace templates" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
@@ -212,6 +318,8 @@ else {
 }
 
 Initialize-WorkspaceProjectConfig
+
+Sync-DeclaredRepositories
 
 & "$PSScriptRoot\ensure-ccusage.ps1" -SkipInstall:$SkipCcusageInstall
 
