@@ -1,13 +1,13 @@
 @echo off
 setlocal
 
-for %%I in ("%~dp0..") do set "PROJECT_ROOT=%%~fI"
+for %%I in ("%~dp0.") do set "PROJECT_ROOT=%%~fI"
 
 echo ============================================================
 echo  flex-workstation - open workspace
 echo ============================================================
 echo.
-echo This opens the parent folder that contains all Flex repositories:
+echo This opens the flex-workstation project root:
 echo   %PROJECT_ROOT%
 echo.
 

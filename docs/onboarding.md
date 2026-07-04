@@ -31,7 +31,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\scripts\bootstrap.ps1
 ```
 
-Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các file template từ `workspaces/templates/` ra `C:\Workspace\Project`:
+Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các file template từ `workspaces/templates/` ra project root `C:\Workspace\Project\flex-workstation`:
 
 - `CLAUDE.md` và `AGENTS.md`
 - `.claude/` cho Claude Code
@@ -55,9 +55,9 @@ Skill source dùng chung nằm trong `flex-workstation/skills/`. Bootstrap khôn
 
 ## Mở workspace và coding agent
 
-- `OPEN_WORKSPACE.cmd`: mở `C:\Workspace\Project` trong VS Code.
-- `OPEN_CLAUDE.cmd`: mở Claude Code tại workspace root với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
-- `OPEN_CODEX.cmd`: mở Codex tại workspace root; hành vi CLI lấy từ `.codex/config.toml`.
+- `OPEN_WORKSPACE.cmd`: mở `C:\Workspace\Project\flex-workstation` trong VS Code.
+- `OPEN_CLAUDE.cmd`: mở Claude Code tại project root `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
+- `OPEN_CODEX.cmd`: mở Codex tại project root `C:\Workspace\Project\flex-workstation`; hành vi CLI lấy từ `.codex/config.toml`.
 
 ## Troubleshooting
 

@@ -140,7 +140,7 @@ function Copy-TemplateFile {
 }
 
 function Initialize-WorkspaceProjectConfig {
-    $projectRoot = Resolve-Path "$PSScriptRoot\..\.."
+    $projectRoot = Resolve-Path "$PSScriptRoot\.."
     $templatesRoot = (Resolve-Path "$PSScriptRoot\..\workspaces\templates").Path
     $projectRootClaudeTemplate = Join-Path $templatesRoot "CLAUDE.md"
     $projectRootAgentsTemplate = Join-Path $templatesRoot "AGENTS.md"
@@ -154,8 +154,8 @@ function Initialize-WorkspaceProjectConfig {
 
     Write-Step "Preparing AI assistant project configuration"
 
-    Copy-TemplateFile -TemplatePath $projectRootClaudeTemplate -TargetPath $projectRootClaudePath -Label "workspace root CLAUDE.md"
-    Copy-TemplateFile -TemplatePath $projectRootAgentsTemplate -TargetPath $projectRootAgentsPath -Label "workspace root AGENTS.md"
+    Copy-TemplateFile -TemplatePath $projectRootClaudeTemplate -TargetPath $projectRootClaudePath -Label "project root CLAUDE.md"
+    Copy-TemplateFile -TemplatePath $projectRootAgentsTemplate -TargetPath $projectRootAgentsPath -Label "project root AGENTS.md"
 
     Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".claude") -TargetPath $claudeRoot -Label "Claude" -PreserveExistingRelativePaths @("settings.local.json")
     Copy-TemplateDirectory -TemplatePath (Join-Path $templatesRoot ".agents") -TargetPath $agentsRoot -Label "Codex agent"
@@ -277,12 +277,12 @@ Write-Host ""
 Write-Step "Next steps"
 Write-Host "1. Run 'claude' in this repository and complete browser login."
 Write-Host "2. Run 'claude doctor' if login or shell integration fails."
-Write-Host "3. Open the shared workspace with:"
+Write-Host "3. Open the flex-workstation project root with:"
 Write-Host "   .\OPEN_WORKSPACE.cmd"
 
 if ($OpenWorkspace) {
     if (Test-Command "code") {
-        code (Resolve-Path "$PSScriptRoot\..\..")
+        code (Resolve-Path "$PSScriptRoot\..")
     }
     else {
         Write-Warn "Cannot open workspace because the VS Code CLI is missing."

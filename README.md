@@ -33,7 +33,7 @@ flex-workstation/
 
 ## Khởi tạo nhanh
 
-Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sync các file template từ `workspaces/templates/` ra `C:\Workspace\Project`:
+Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sync các file template từ `workspaces/templates/` ra project root `C:\Workspace\Project\flex-workstation`:
 
 - `CLAUDE.md` và `AGENTS.md`
 - `.claude/`, `.agents/` và `.codex/`
@@ -44,9 +44,9 @@ Bootstrap ghi đè runtime config đã có bằng template để workspace hiệ
 
 | Công cụ | Template | Runtime target |
 | --- | --- | --- |
-| Claude Code | `workspaces/templates/.claude/` | `C:\Workspace\Project\.claude\` |
-| Codex agent context | `workspaces/templates/.agents/` và `AGENTS.md` | `C:\Workspace\Project\.agents\` và `AGENTS.md` |
-| Codex CLI | `workspaces/templates/.codex/config.toml` | `C:\Workspace\Project\.codex/config.toml` |
+| Claude Code | `workspaces/templates/.claude/` | `C:\Workspace\Project\flex-workstation\.claude\` |
+| Codex agent context | `workspaces/templates/.agents/` và `AGENTS.md` | `C:\Workspace\Project\flex-workstation\.agents\` và `AGENTS.md` |
+| Codex CLI | `workspaces/templates/.codex/config.toml` | `C:\Workspace\Project\flex-workstation\.codex/config.toml` |
 
 ## Tài liệu
 

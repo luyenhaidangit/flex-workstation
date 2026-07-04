@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-for %%I in ("%~dp0..") do set "PROJECT_ROOT=%%~fI"
+for %%I in ("%~dp0.") do set "PROJECT_ROOT=%%~fI"
 
 echo ============================================================
 echo  flex-workstation - open Codex
@@ -10,7 +10,7 @@ echo.
 echo Workspace:
 echo   %PROJECT_ROOT%
 echo.
-echo This starts Codex at the shared workspace root.
+echo This starts Codex at the flex-workstation project root.
 echo Codex behavior such as model, sandbox, and approval policy
 echo should be configured in the project's .codex/config.toml.
 echo.

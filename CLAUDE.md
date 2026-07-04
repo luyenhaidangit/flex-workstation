@@ -1,27 +1,49 @@
-﻿# CLAUDE.md
+# CLAUDE.md
 
-Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, entrypoint VS Code và quy ước làm việc. Không chứa mã nguồn nghiệp vụ; các repo nghiệp vụ nằm ngang hàng với `flex-workstation`. Cấu trúc local đầy đủ và bước xác nhận onboarding: xem `docs/onboarding.md`.
+Project root: `C:\Workspace\Project\flex-workstation`.
+
+Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, template, skill source và cấu hình AI tooling. Không chứa mã nguồn nghiệp vụ; các repo nghiệp vụ nằm ngang hàng với `flex-workstation` trong `C:\Workspace\Project`.
+
+## Ngôn ngữ
+
+- Dùng tiếng Việt có dấu trong trả lời, tài liệu và ghi chú.
+- Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật bằng English khi đó là định danh kỹ thuật.
 
 ## Quy tắc làm việc
 
 - Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo.
 - Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
-- Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo — tránh ghi đè work-in-progress của thành viên khác hoặc session Claude trước.
-- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tương ứng:
-  - Onboarding/bootstrap → `docs/onboarding.md`
-  - Kiến trúc hệ thống → `docs/architecture/overview.md`
-  - Danh sách project con → `docs/projects.md`
-  - Skill dùng chung → source tại `skills/<name>/`.
+- Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
+- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tài liệu tương ứng.
+
+## Vị trí source-of-truth
+
+- Tài liệu workstation: `docs/`.
+- Skill dùng chung: `skills/<skill-name>/SKILL.md`.
+- Template runtime config: `workspaces/templates/`.
+- Runtime config sau sync: `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/` ngay trong project root này.
+
+## Đồng bộ config
+
+Khi sửa config dùng chung — `CLAUDE.md`, `AGENTS.md`, `.claude/settings.json`, `.codex/config.toml` — sửa trong `workspaces/templates/`, rồi chạy:
+
+```powershell
+.\SYNC_WORKSPACE.cmd
+```
+
+`SYNC_WORKSPACE.cmd` không sync skill source. `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
 ## Entrypoint Windows
 
-- `OPEN_WORKSPACE.cmd`: double-click để mở `C:\Workspace\Project` trong VS Code.
-- `OPEN_CLAUDE.cmd`: double-click để mở Claude Code tại `C:\Workspace\Project` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
-- `SYNC_WORKSPACE.cmd`: double-click để sync template cấu hình Claude/Codex và chuẩn bị local tooling.
-- `scripts/bootstrap.ps1`: script kỹ thuật bên trong, không phải entrypoint double-click.
+- `OPEN_WORKSPACE.cmd`: mở `C:\Workspace\Project\flex-workstation` trong VS Code.
+- `OPEN_CLAUDE.cmd`: mở Claude Code tại `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
+- `OPEN_CODEX.cmd`: mở Codex tại `C:\Workspace\Project\flex-workstation`.
+- `SYNC_WORKSPACE.cmd`: sync template cấu hình Claude/Codex và chuẩn bị local tooling.
 
 ## Tài liệu
 
-- Index đầy đủ và mục đích từng tài liệu: `README.md`
-- Task hiện tại: `docs/tasks.md`
+- Index đầy đủ: `README.md`.
+- Onboarding/bootstrap: `docs/onboarding.md`.
+- Bản đồ hệ thống: `docs/system-map.md`.
+- Task hiện tại: `docs/tasks.md`.

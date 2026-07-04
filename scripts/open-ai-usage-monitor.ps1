@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 
 & "$PSScriptRoot\ensure-ccusage.ps1"
 
-$workspaceRoot = (Resolve-Path "$PSScriptRoot\..\..").Path
+$workspaceRoot = (Resolve-Path "$PSScriptRoot\..").Path
 Set-Location $workspaceRoot
 
 function Format-UsageNumber {
