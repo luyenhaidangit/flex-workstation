@@ -20,6 +20,17 @@ flex-workstation/
 └── flex-environment/     # Repo con độc lập — Local/dev infrastructure stack
 ```
 
+## Projects
+
+| Project | Vai trò | Công nghệ |
+| --- | --- | --- |
+| `flex-agents` | Repository skill/plugin cho coding agents | Markdown, runtime files |
+| `flex-auth-service` | Service xác thực/ủy quyền | .NET / ASP.NET Core |
+| `flex-api-gateway` | API Gateway | .NET, Dockerfile, Jenkinsfile |
+| `flex-microfrontend` | Frontend client | Angular, Node.js |
+| `flex-environment` | Local/dev infrastructure stack | Docker Compose (Redis, RabbitMQ, MinIO, Elasticsearch, Kibana, Jenkins, Ollama) |
+| `flex-backend` | Backend (dự kiến) | Chưa xác định |
+
 ## Luồng bootstrap
 
 ```text
