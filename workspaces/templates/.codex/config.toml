@@ -1,5 +1,0 @@
-model = "gpt-5.5"
-approval_policy = "never"
-sandbox_mode = "danger-full-access"
-service_tier = "fast"
-model_reasoning_effort = "medium"

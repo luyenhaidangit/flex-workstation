@@ -1,9 +1,0 @@
-{
-  "model": "claude-sonnet-4-6",
-  "permissions": {
-    "additionalDirectories": [],
-    "allow": [
-      "Bash(claude --version)"
-    ]
-  }
-}
