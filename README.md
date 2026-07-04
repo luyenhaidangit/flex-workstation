@@ -64,6 +64,7 @@ Khai báo repo cần có trong workspace tại `workstation.json`:
 ## Tài liệu
 
 - [CLAUDE.md](CLAUDE.md): quy ước khi làm việc trong `flex-workstation`.
+- [SPEC.md](SPEC.md): quy ước đặt tên thư mục, file, skill và namespace.
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới và cách mở workspace.
 - [docs/system-map.md](docs/system-map.md): bản đồ workspace và runtime AI tooling.
 - [docs/projects.md](docs/projects.md): danh sách project được theo dõi.
