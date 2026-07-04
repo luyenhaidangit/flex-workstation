@@ -30,7 +30,7 @@
 - Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
-- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tài liệu tương ứng.
+- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `TASKS.md` và file tài liệu tương ứng.
 
 ## Cấu trúc project
 
@@ -61,4 +61,4 @@ flex-workstation/
 - Index đầy đủ: `README.md`
 - Onboarding/bootstrap: `docs/onboarding.md`
 - Bản đồ hệ thống: `docs/system-map.md`
-- Task hiện tại: `docs/tasks.md`
+- Task hiện tại: `TASKS.md`
