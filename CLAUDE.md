@@ -41,6 +41,28 @@ flex-workstation/
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
 - Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tài liệu tương ứng.
 
+## Hành vi làm việc
+
+### Nghĩ trước khi thực hiện
+- Nêu rõ giả định trước khi bắt đầu. Nếu không chắc, hỏi — đừng tự suy đoán im lặng.
+- Nếu có nhiều cách hiểu, trình bày các lựa chọn; không tự chọn mà không thông báo.
+- Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
+
+### Đơn giản là ưu tiên
+- Chỉ viết code đủ giải quyết yêu cầu. Không thêm tính năng suy đoán.
+- Không tạo abstraction cho code chỉ dùng một lần.
+- Không viết error handling cho tình huống không thể xảy ra.
+
+### Thay đổi phẫu thuật
+- Chỉ sửa những gì cần. Không "cải thiện" code, comment, hay format không liên quan.
+- Giữ nguyên style hiện có dù có thể làm khác.
+- Nếu phát hiện dead code không liên quan, nhắc — không tự xóa.
+- Xóa import/biến/hàm mà **chính thay đổi của mình** làm thừa, không xóa dead code từ trước.
+
+### Thực thi hướng mục tiêu
+- Với task nhiều bước, nêu plan ngắn trước khi làm: `1. [Bước] → kiểm tra: [cách]`
+- Định nghĩa tiêu chí thành công rõ ràng trước khi bắt đầu thực hiện.
+
 ## Source-of-truth
 
 | Loại | Vị trí |
