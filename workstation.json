@@ -1,7 +1,7 @@
 {
   "version": 1,
   "repositories": {
-    "destinationRoot": "..",
+    "destinationRoot": ".",
     "items": [
       {
         "name": "flex-agents",

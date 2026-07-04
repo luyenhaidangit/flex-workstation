@@ -17,7 +17,7 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo tài liệu kiến trúc ban đầu | Xem `docs/architecture/overview.md`. |
 | Done | Trung bình | Tạo thư mục skill dùng chung | Xem `skills/README.md`. |
 | Done | Cao | Xác định danh sách project con | Đã thêm `flex-api-gateway` vào `docs/projects.md`. |
-| Done | Cao | Ghi nhận Git project `flex-api-gateway` | Local path mục tiêu: `C:\Workspace\Project\flex-api-gateway`. |
+| Done | Cao | Ghi nhận Git project `flex-api-gateway` | Local path mục tiêu ban đầu là `C:\Workspace\Project\flex-api-gateway`; hiện cấu hình sync clone vào `C:\Workspace\Project\flex-workstation\flex-api-gateway`. |
 | Done | Cao | Tạo task VS Code cho workstation | Xem `.vscode/tasks.json`. |
 | Done | Cao | Tạo bootstrap cho máy mới | Xem `scripts/bootstrap.ps1` và `docs/onboarding.md`. |
 | Done | Cao | Tạo chỉ dẫn Claude Code tổng quan | Xem `CLAUDE.md`. |
@@ -26,8 +26,9 @@ Tài liệu này dùng để theo dõi các việc cần làm trong workspace `f
 | Done | Cao | Tạo entrypoint mở Claude tại workspace | Xem `OPEN_CLAUDE.cmd`. |
 | Done | Cao | Tạo entrypoint mở Codex tại workspace | Xem `OPEN_CODEX.cmd`. |
 | Done | Cao | Hợp nhất entrypoint sync workspace | `SYNC_WORKSPACE.cmd` chạy bootstrap, sync template Claude/Codex và chuẩn bị local tooling; đây là entrypoint double-click duy nhất cho setup workspace. |
-| Done | Cao | Thêm cấu hình clone repo khi sync workspace | `workstation.json` tại project root workstation khai báo repo Flex trong `repositories.items`; `scripts/bootstrap.ps1` clone repo còn thiếu về `C:\Workspace\Project` và không tự `git pull` repo đã tồn tại. |
-| Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Repo Flex nằm ngang hàng trong `C:\Workspace\Project`. |
+| Done | Cao | Thêm cấu hình clone repo khi sync workspace | `workstation.json` tại project root workstation khai báo repo Flex trong `repositories.items`; `scripts/bootstrap.ps1` clone repo còn thiếu vào `C:\Workspace\Project\flex-workstation` và không tự `git pull` repo đã tồn tại. |
+| Done | Cao | Chuyển đích clone repo vào workstation | `repositories.destinationRoot` dùng `.` để clone repo con vào project root workstation; `.gitignore` bỏ qua các thư mục repo con. |
+| Done | Cao | Bổ sung bước xác nhận cấu trúc local khi onboarding | Cấu trúc ban đầu đặt repo Flex ngang hàng trong `C:\Workspace\Project`; hiện đã chuyển đích clone vào project root workstation. |
 | Done | Cao | Bootstrap cấu hình Claude ngoài workstation | Trước đây sync template `workspaces/templates/.claude` ra `C:\Workspace\Project\.claude`; hiện đã chuyển runtime target vào `flex-workstation`. |
 | Done | Cao | Thêm template `.claude/settings.json` | Dùng cho cấu hình workspace chung; `settings.local.json` giữ cấu hình local theo máy/người dùng. |
 | Done | Cao | Bootstrap root memory cho Claude tại workspace root | Copy `workspaces/templates/CLAUDE.md` ra `C:\Workspace\Project\CLAUDE.md` nếu chưa có. |

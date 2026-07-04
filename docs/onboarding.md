@@ -4,16 +4,16 @@ Tài liệu này hướng dẫn bootstrap `flex-workstation` trên Windows.
 
 ## Cấu trúc workspace
 
-Các repository được đặt ngang hàng trong `C:\Workspace\Project`:
+Các repository project Flex được clone vào trong `C:\Workspace\Project\flex-workstation` khi chạy sync. Đây là các Git repo độc lập và được ignore bởi Git của workstation:
 
 ```text
 C:\Workspace\Project\
 |-- flex-workstation\
-|-- flex-auth-service\
-|-- flex-api-gateway\
-|-- flex-microfrontend\
-|-- flex-environment\
-+-- ...
+|   |-- flex-auth-service\
+|   |-- flex-api-gateway\
+|   |-- flex-microfrontend\
+|   |-- flex-environment\
+|   +-- ...
 ```
 
 ## Chạy bootstrap
@@ -38,7 +38,7 @@ Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các 
 - `.agents/` cho Codex agent context
 - `.codex/` cho Codex CLI
 
-Bootstrap cũng đọc `workstation.json` tại project root workstation và clone các repo còn thiếu về `C:\Workspace\Project`. Nếu repo đã tồn tại, bootstrap bỏ qua và không chạy `git pull`; nếu thư mục đích tồn tại nhưng không phải Git repo, bootstrap cảnh báo để người dùng xử lý thủ công.
+Bootstrap cũng đọc `workstation.json` tại project root workstation và clone các repo còn thiếu vào `C:\Workspace\Project\flex-workstation`. Nếu repo đã tồn tại, bootstrap bỏ qua và không chạy `git pull`; nếu thư mục đích tồn tại nhưng không phải Git repo, bootstrap cảnh báo để người dùng xử lý thủ công.
 
 File runtime đã tồn tại ở đích được ghi đè bằng template khi sync để workspace hiện tại nhận thay đổi mới. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 

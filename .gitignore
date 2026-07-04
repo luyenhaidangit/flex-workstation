@@ -20,3 +20,10 @@ Thumbs.db
 *.tmp
 *.temp
 
+# Nested Flex repositories cloned by workstation sync
+/flex-agents/
+/flex-auth-service/
+/flex-api-gateway/
+/flex-microfrontend/
+/flex-environment/
+

@@ -2,7 +2,7 @@
 
 Project root: `C:\Workspace\Project\flex-workstation`.
 
-Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, template, skill source và cấu hình AI tooling. Không chứa mã nguồn nghiệp vụ; các repo nghiệp vụ nằm ngang hàng với `flex-workstation` trong `C:\Workspace\Project`.
+Repo `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, template, skill source và cấu hình AI tooling. Theo `workstation.json`, các repo project có thể được clone vào trong project root này dưới dạng Git repo độc lập và được ignore bởi Git của workstation.
 
 ## Ngôn ngữ
 
