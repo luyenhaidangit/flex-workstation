@@ -1,12 +1,12 @@
 # Tổng quan kiến trúc hệ thống Flex
 
-Tài liệu này mô tả các thành phần chính trong workspace `C:\Workspace\Project` ở mức platform/container. Chi tiết nội bộ từng service nên nằm trong `docs/` của repo tương ứng.
+Tài liệu này mô tả các thành phần chính trong workstation project root `C:\Workspace\Project\flex-workstation` ở mức platform/container. Chi tiết nội bộ từng service nên nằm trong `docs/` của repo tương ứng.
 
 ## 1. Scope
 
 | Hạng mục | Trạng thái |
 | --- | --- |
-| Scope | Workspace Flex tại `C:\Workspace\Project` |
+| Scope | Workstation Flex tại `C:\Workspace\Project\flex-workstation` |
 | Audience | Developer, DevOps, security reviewer, AI agent |
 | Architecture style | `Inferred`: multi-repo platform gồm frontend, gateway, backend service và environment stack |
 | Primary database | `Confirmed by user`: Oracle Cloud Database |
@@ -40,8 +40,8 @@ flowchart LR
 | `flex-api-gateway` | API Gateway cho nhóm service Flex. | `Inferred` | `flex-api-gateway/Flex.ApiGateway.sln`, `flex-api-gateway/Dockerfile`, `flex-api-gateway/Jenkinsfile` |
 | `flex-auth-service` | Service xác thực/ủy quyền. | `Inferred` | `flex-auth-service/Flex.Auth.sln`, `flex-auth-service/SPEC.md`, `flex-auth-service/Dockerfile` |
 | `flex-environment` | Stack hạ tầng local/dev: Redis, RabbitMQ, Jenkins, Portainer, MinIO, Elasticsearch, Kibana, Ollama, `flex-ai-gateway`. | `Confirmed` | `flex-environment/docker-compose.yml`, `flex-environment/docker-compose.override.yml` |
-| `.claude` | Runtime config/skills/agents/commands cho Claude Code tại workspace root. | `Confirmed` | `flex-workstation/docs/system-map.md` |
-| `.agents` | Runtime skills/agents/commands cho Codex tại workspace root. | `Confirmed` | `flex-workstation/docs/system-map.md` |
+| `.claude` | Runtime config/skills/agents/commands cho Claude Code tại workstation project root. | `Confirmed` | `flex-workstation/docs/system-map.md` |
+| `.agents` | Runtime skills/agents/commands cho Codex tại workstation project root. | `Confirmed` | `flex-workstation/docs/system-map.md` |
 
 ## 4. Data Architecture
 
@@ -58,8 +58,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph Workspace["C:\\Workspace\\Project"]
-        Workstation[flex-workstation]
+    subgraph Workstation["C:\\Workspace\\Project\\flex-workstation"]
         Frontend[flex-microfrontend]
         Gateway[flex-api-gateway]
         Auth[flex-auth-service]
@@ -99,7 +98,7 @@ flowchart TB
 | Priority | Vấn đề | Tác động | Khuyến nghị |
 | --- | --- | --- | --- |
 | High | Chi tiết kết nối Oracle Cloud chưa được tài liệu hóa ở mức architecture. | DevOps/security khó xác minh wallet, secret, network access và rotation. | Bổ sung tài liệu riêng về Oracle Cloud connectivity, không ghi secret vào repo. |
-| Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong `C:\Workspace\Project`. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật `docs/projects.md` và file này khi thay đổi repo trong workspace. |
+| Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong `C:\Workspace\Project\flex-workstation`. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật `docs/projects.md` và file này khi thay đổi repo trong workstation. |
 | Medium | Quan hệ runtime giữa `flex-api-gateway`, `flex-auth-service` và Oracle Cloud mới ở mức inferred/user-confirmed. | Dễ nhầm giữa ý định kiến trúc và cấu hình triển khai thực tế. | Bổ sung evidence từ app config, connection factory hoặc deployment config của từng service. |
 
 ## 7. Open Questions

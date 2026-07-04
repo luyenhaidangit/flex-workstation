@@ -1,6 +1,6 @@
 # Bản đồ hệ thống workspace
 
-Tài liệu này mô tả workspace `C:\Workspace\Project` cho developer và coding agent. Project root cho AI tooling là `C:\Workspace\Project\flex-workstation`. Luồng bootstrap dưới đây được xác nhận từ `SYNC_WORKSPACE.cmd`, `scripts/bootstrap.ps1` và `workspaces/templates/`.
+Tài liệu này mô tả workstation project root `C:\Workspace\Project\flex-workstation` cho developer và coding agent. Luồng bootstrap dưới đây được xác nhận từ `SYNC_WORKSPACE.cmd`, `scripts/bootstrap.ps1` và `workspaces/templates/`.
 
 ## Snapshot hiện tại
 
@@ -54,5 +54,5 @@ flex-workstation\SYNC_WORKSPACE.cmd
 
 - Sửa template bootstrap tại `flex-workstation/workspaces/templates/`.
 - Sửa tài liệu workspace tại `flex-workstation/docs/`.
-- Kỳ vọng `SYNC_WORKSPACE.cmd` cập nhật runtime config đã tồn tại từ template; sửa cấu hình dùng chung tại `workspaces/templates/`, rồi chạy sync để đẩy ra workspace root.
+- Kỳ vọng `SYNC_WORKSPACE.cmd` cập nhật runtime config đã tồn tại từ template; sửa cấu hình dùng chung tại `workspaces/templates/`, rồi chạy sync để đẩy ra workstation project root.
 - Repo nghiệp vụ được clone vào `flex-workstation` theo cấu hình hiện tại, nhưng vẫn là Git repo độc lập và được ignore bởi Git của workstation.

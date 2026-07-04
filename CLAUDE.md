@@ -36,8 +36,9 @@ Khi sửa config dùng chung — `CLAUDE.md`, `AGENTS.md`, `.claude/settings.jso
 
 ## Entrypoint Windows
 
-- `OPEN_WORKSPACE.cmd`: mở `C:\Workspace\Project\flex-workstation` trong VS Code.
-- `OPEN_CLAUDE.cmd`: mở Claude Code tại `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
+- `OPEN_WORKSTATION.cmd`: mở `C:\Workspace\Project\flex-workstation` trong VS Code.
+- `OPEN_WORKSPACE.cmd`: alias tương thích, gọi `OPEN_WORKSTATION.cmd`.
+- `OPEN_CLAUDE.cmd`: mở Claude Code tại `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workstation tin cậy.
 - `OPEN_CODEX.cmd`: mở Codex tại `C:\Workspace\Project\flex-workstation`.
 - `SYNC_WORKSPACE.cmd`: sync template cấu hình Claude/Codex và chuẩn bị local tooling.
 

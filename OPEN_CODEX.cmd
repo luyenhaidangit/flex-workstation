@@ -7,10 +7,10 @@ echo ============================================================
 echo  flex-workstation - open Codex
 echo ============================================================
 echo.
-echo Workspace:
+echo Workstation project root:
 echo   %PROJECT_ROOT%
 echo.
-echo This starts Codex at the flex-workstation project root.
+echo This starts Codex at the workstation project root.
 echo Codex behavior such as model, sandbox, and approval policy
 echo should be configured in the project's .codex/config.toml.
 echo.

@@ -7,13 +7,13 @@ echo ============================================================
 echo  flex-workstation - open Claude
 echo ============================================================
 echo.
-echo Workspace:
+echo Workstation project root:
 echo   %PROJECT_ROOT%
 echo.
 echo WARNING:
 echo   This starts Claude Code with --dangerously-skip-permissions.
 echo   Claude will not ask before running tools or editing files.
-echo   Use this only inside a trusted workspace.
+echo   Use this only inside a trusted workstation.
 echo.
 
 where claude >nul 2>nul

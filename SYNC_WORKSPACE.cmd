@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo flex-workstation / Sync Workspace
-echo Copy workspace templates and prepare local tooling.
+echo Copy workstation templates, sync repositories, and prepare local tooling.
 echo.
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\bootstrap.ps1"

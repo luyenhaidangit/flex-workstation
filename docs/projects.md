@@ -38,16 +38,16 @@ Nếu lệnh không trả về dòng nào, working tree của project đang sạ
 
 ## Cấu hình VS Code
 
-Mở nhanh toàn bộ thư mục cha chứa các repo Flex bằng cách double-click:
+Mở nhanh workstation project root chứa các repo Flex bằng cách double-click:
 
 ```text
-OPEN_WORKSPACE.cmd
+OPEN_WORKSTATION.cmd
 ```
 
 Hoặc chạy:
 
 ```powershell
-code C:\Workspace\Project
+code C:\Workspace\Project\flex-workstation
 ```
 
 Task VS Code có sẵn:

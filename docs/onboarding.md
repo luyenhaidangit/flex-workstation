@@ -40,7 +40,7 @@ Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các 
 
 Bootstrap cũng đọc `workstation.json` tại project root workstation, clone các repo còn thiếu vào `C:\Workspace\Project\flex-workstation`, và cập nhật repo đã tồn tại bằng `git fetch --prune` + `git pull --ff-only`. Nếu repo có local changes, origin khác cấu hình hoặc đang ở detached HEAD, bootstrap cảnh báo và bỏ qua repo đó để tránh ghi đè thay đổi cục bộ.
 
-File runtime đã tồn tại ở đích được ghi đè bằng template khi sync để workspace hiện tại nhận thay đổi mới. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
+File runtime đã tồn tại ở đích được ghi đè bằng template khi sync để workstation hiện tại nhận thay đổi mới. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
 Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Sau khi có Claude Code, bootstrap add/update marketplace `luyenhaidangit/flex-agents`, install plugin `flex-agents@flex-agents` nếu thiếu, rồi chạy `claude plugin update flex-agents@flex-agents` để lấy bộ skill/plugin mới nhất. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
 
@@ -69,11 +69,12 @@ Danh sách repo được clone khi sync nằm ở `workstation.json`, trong `rep
 
 Trường `branch` là tùy chọn. Không đưa token hoặc credential vào URL trong manifest.
 
-## Mở workspace và coding agent
+## Mở workstation và coding agent
 
-- `OPEN_WORKSPACE.cmd`: mở `C:\Workspace\Project\flex-workstation` trong VS Code.
-- `OPEN_CLAUDE.cmd`: mở Claude Code tại project root `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workspace tin cậy.
-- `OPEN_CODEX.cmd`: mở Codex tại project root `C:\Workspace\Project\flex-workstation`; hành vi CLI lấy từ `.codex/config.toml`.
+- `OPEN_WORKSTATION.cmd`: mở workstation project root `C:\Workspace\Project\flex-workstation` trong VS Code.
+- `OPEN_WORKSPACE.cmd`: alias tương thích, gọi `OPEN_WORKSTATION.cmd`.
+- `OPEN_CLAUDE.cmd`: mở Claude Code tại workstation project root `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workstation tin cậy.
+- `OPEN_CODEX.cmd`: mở Codex tại workstation project root `C:\Workspace\Project\flex-workstation`; hành vi CLI lấy từ `.codex/config.toml`.
 
 ## Troubleshooting
 
