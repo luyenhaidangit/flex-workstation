@@ -226,7 +226,7 @@ function Sync-DeclaredRepositories {
         return
     }
 
-    $destinationRootValue = if ($config.repositories.destinationRoot) { [string]$config.repositories.destinationRoot } else { ".." }
+    $destinationRootValue = if ($config.repositories.destinationRoot) { [string]$config.repositories.destinationRoot } else { "." }
     $destinationRoot = Resolve-WorkspacePath -BasePath $projectRoot -Path $destinationRootValue
     New-Item -ItemType Directory -Force -Path $destinationRoot | Out-Null
 

@@ -55,7 +55,7 @@ Bootstrap ghi đè runtime config đã có bằng template để workspace hiệ
 
 Khai báo repo cần có trong workspace tại `workstation.json`:
 
-- `repositories.destinationRoot`: thư mục đích, mặc định `.` tức project root `C:\Workspace\Project\flex-workstation`.
+- `repositories.destinationRoot`: thư mục đích, tùy chọn; mặc định là project root `C:\Workspace\Project\flex-workstation`.
 - `repositories.items[].name`: tên thư mục local.
 - `repositories.items[].url`: Git remote URL.
 - `repositories.items[].branch`: nhánh cần clone, tùy chọn.
