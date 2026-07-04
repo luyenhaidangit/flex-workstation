@@ -198,7 +198,7 @@ function Resolve-WorkspacePath {
 
 function Sync-DeclaredRepositories {
     $projectRoot = (Resolve-Path "$PSScriptRoot\..").Path
-    $repoManifestPath = Join-Path $projectRoot "workspaces\repos.json"
+    $repoManifestPath = Join-Path $projectRoot "repos.json"
 
     Write-Step "Syncing declared Git repositories"
 
