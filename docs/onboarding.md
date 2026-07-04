@@ -45,7 +45,7 @@ Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Sau 
 | Claude Code | `.claude/settings.json` | Cấu hình model và permissions dùng chung. |
 | Claude Code | `.claude/settings.local.json` | Thiết lập local theo máy/người dùng. |
 | Codex CLI | `.codex/config.toml` | Cấu hình model, approval policy và sandbox. |
-| Codex | `AGENTS.md`, `.agents/` | Context và resource theo template. |
+| Codex | `AGENTS.md`, `.agents/` | Context và resource runtime cho Codex. |
 
 Skill source dùng chung nằm trong `flex-workstation/skills/`. Bootstrap không đưa các skill local này vào runtime target; bộ skill Claude Code được cập nhật qua plugin `flex-agents@flex-agents`.
 

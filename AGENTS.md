@@ -7,15 +7,38 @@
 - Dùng tiếng Việt có dấu trong trả lời, tài liệu và ghi chú.
 - Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật bằng English khi đó là định danh kỹ thuật.
 
-## Tooling
+## Hành vi làm việc cho Codex
+
+### Nghĩ trước khi thực hiện
+- Nêu rõ giả định trước khi bắt đầu. Nếu không chắc, hỏi — đừng tự suy đoán im lặng.
+- Nếu có nhiều cách hiểu, trình bày các lựa chọn; không tự chọn mà không thông báo.
+- Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
+
+### Đơn giản là ưu tiên
+- Chỉ viết code đủ giải quyết yêu cầu. Không thêm tính năng suy đoán.
+- Không tạo abstraction cho code chỉ dùng một lần.
+- Không viết error handling cho tình huống không thể xảy ra.
+
+### Thay đổi phẫu thuật
+- Chỉ sửa những gì cần. Không "cải thiện" code, comment, hay format không liên quan.
+- Giữ nguyên style hiện có dù có thể làm khác.
+- Nếu phát hiện dead code không liên quan, nhắc — không tự xóa.
+- Xóa import/biến/hàm mà **chính thay đổi của mình** làm thừa, không xóa dead code từ trước.
+
+### Thực thi hướng mục tiêu
+- Với task nhiều bước, nêu plan ngắn trước khi làm: `1. [Bước] → kiểm tra: [cách]`
+- Định nghĩa tiêu chí thành công rõ ràng trước khi bắt đầu thực hiện.
+
+## Tooling Codex
 
 | Tool | Mục đích |
 | --- | --- |
-| `claude` | Claude Code — AI coding agent chính |
-| `codex` | Codex CLI — AI coding agent thay thế |
-| `rtk` | Proxy shell command để giảm token output |
-| `ccusage` | Theo dõi token/cost usage Claude |
-| `SYNC_WORKSPACE.cmd` | Bootstrap: clone repos, cài tool, sync flex-agents |
+| `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
+| `rtk` | Proxy shell command để giảm token output; dùng khi chạy shell command nếu có |
+| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos, cài tool, sync flex-agents |
+| `.codex/config.toml` | Cấu hình model, approval policy và sandbox cho Codex CLI |
+
+Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.
 
 ## Cấu trúc project
 

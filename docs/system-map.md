@@ -28,6 +28,7 @@ SYNC_WORKSPACE.cmd
     → đọc workstation.json
     → clone repo còn thiếu vào flex-workstation\
     → fetch --prune và pull --ff-only repo đã có nếu working tree sạch
+    → kiểm tra runtime config CLAUDE.md, AGENTS.md, .claude, .agents, .codex
     → kiểm tra/cài ccusage và rtk
     → kiểm tra/cài Claude Code nếu thiếu
     → add/update marketplace luyenhaidangit/flex-agents
@@ -54,4 +55,5 @@ Script bỏ qua repo có local changes, origin khác cấu hình hoặc detached
 - Sửa tài liệu workspace tại `docs/`.
 - Sửa skill tại `skills/<skill-name>/SKILL.md`.
 - Sửa runtime config trực tiếp tại `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/`.
+- Khi cập nhật hành vi chung trong `CLAUDE.md`, rà `AGENTS.md` để Codex có quy tắc tương đương nhưng dùng đúng thuật ngữ/tooling Codex.
 - Repo nghiệp vụ được clone vào `flex-workstation/` theo `workstation.json`, là Git repo độc lập và được ignore bởi Git của workstation.
