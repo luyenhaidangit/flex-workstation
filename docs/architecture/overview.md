@@ -1,12 +1,12 @@
 # Tổng quan kiến trúc hệ thống Flex
 
-Tài liệu này mô tả các thành phần chính trong workstation project root `C:\Workspace\Project\flex-workstation` ở mức platform/container. Chi tiết nội bộ từng service nên nằm trong `docs/` của repo tương ứng.
+Tài liệu này mô tả các thành phần chính của workstation ở mức platform/container. Chi tiết nội bộ từng service nên nằm trong `docs/` của repo tương ứng.
 
 ## 1. Scope
 
 | Hạng mục | Trạng thái |
 | --- | --- |
-| Scope | Workstation Flex tại `C:\Workspace\Project\flex-workstation` |
+| Scope | Workstation Flex (`flex-workstation`) |
 | Audience | Developer, DevOps, security reviewer, AI agent |
 | Architecture style | `Inferred`: multi-repo platform gồm frontend, gateway, backend service và environment stack |
 | Primary database | `Confirmed by user`: Oracle Cloud Database |
@@ -58,7 +58,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph Workstation["C:\\Workspace\\Project\\flex-workstation"]
+    subgraph Workstation["flex-workstation"]
         Frontend[flex-microfrontend]
         Gateway[flex-api-gateway]
         Auth[flex-auth-service]
@@ -98,7 +98,7 @@ flowchart TB
 | Priority | Vấn đề | Tác động | Khuyến nghị |
 | --- | --- | --- | --- |
 | High | Chi tiết kết nối Oracle Cloud chưa được tài liệu hóa ở mức architecture. | DevOps/security khó xác minh wallet, secret, network access và rotation. | Bổ sung tài liệu riêng về Oracle Cloud connectivity, không ghi secret vào repo. |
-| Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong `C:\Workspace\Project\flex-workstation`. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật `docs/projects.md` và file này khi thay đổi repo trong workstation. |
+| Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong workstation. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật `docs/projects.md` và file này khi thay đổi repo trong workstation. |
 | Medium | Quan hệ runtime giữa `flex-api-gateway`, `flex-auth-service` và Oracle Cloud mới ở mức inferred/user-confirmed. | Dễ nhầm giữa ý định kiến trúc và cấu hình triển khai thực tế. | Bổ sung evidence từ app config, connection factory hoặc deployment config của từng service. |
 
 ## 7. Open Questions

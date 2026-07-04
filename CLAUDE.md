@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-Project root: `C:\Workspace\Project\flex-workstation`.
-
 `flex-workstation` là workspace điều phối cho nhóm project Flex: tài liệu, bootstrap, skill source và cấu hình AI tooling. Các repo project được clone vào trong project root này dưới dạng Git repo độc lập (xem `workstation.json`).
 
 ## Ngôn ngữ

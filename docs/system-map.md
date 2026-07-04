@@ -1,6 +1,6 @@
 # Bản đồ hệ thống workspace
 
-Tài liệu này mô tả project root `C:\Workspace\Project\flex-workstation` cho developer và coding agent.
+Tài liệu này mô tả cấu trúc workstation root cho developer và coding agent.
 
 ## Snapshot hiện tại
 

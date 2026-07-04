@@ -4,16 +4,15 @@ Tài liệu này hướng dẫn bootstrap `flex-workstation` trên Windows.
 
 ## Cấu trúc workspace
 
-Các repository project Flex được clone vào trong `C:\Workspace\Project\flex-workstation` khi chạy sync. Đây là các Git repo độc lập và được ignore bởi Git của workstation:
+Các repository project Flex được clone vào trong workstation root khi chạy sync. Đây là các Git repo độc lập và được ignore bởi Git của workstation:
 
 ```text
-C:\Workspace\Project\
-|-- flex-workstation\
-|   |-- flex-auth-service\
-|   |-- flex-api-gateway\
-|   |-- flex-microfrontend\
-|   |-- flex-environment\
-|   +-- ...
+flex-workstation\
+|-- flex-auth-service\
+|-- flex-api-gateway\
+|-- flex-microfrontend\
+|-- flex-environment\
++-- ...
 ```
 
 ## Chạy bootstrap
@@ -31,16 +30,11 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\scripts\bootstrap.ps1
 ```
 
-Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó sync các file template từ `workspaces/templates/` ra project root `C:\Workspace\Project\flex-workstation`:
+Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó clone sub-repos và cài tool:
 
-- `CLAUDE.md` và `AGENTS.md`
-- `.claude/` cho Claude Code
-- `.agents/` cho Codex agent context
-- `.codex/` cho Codex CLI
+Bootstrap đọc `workstation.json`, clone các repo còn thiếu vào workstation root, và cập nhật repo đã tồn tại bằng `git fetch --prune` + `git pull --ff-only`. Nếu repo có local changes, origin khác cấu hình hoặc đang ở detached HEAD, bootstrap cảnh báo và bỏ qua repo đó để tránh ghi đè thay đổi cục bộ.
 
-Bootstrap cũng đọc `workstation.json` tại project root workstation, clone các repo còn thiếu vào `C:\Workspace\Project\flex-workstation`, và cập nhật repo đã tồn tại bằng `git fetch --prune` + `git pull --ff-only`. Nếu repo có local changes, origin khác cấu hình hoặc đang ở detached HEAD, bootstrap cảnh báo và bỏ qua repo đó để tránh ghi đè thay đổi cục bộ.
-
-File runtime đã tồn tại ở đích được ghi đè bằng template khi sync để workstation hiện tại nhận thay đổi mới. Riêng `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
+`.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
 Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Sau khi có Claude Code, bootstrap add/update marketplace `luyenhaidangit/flex-agents`, install plugin `flex-agents@flex-agents` nếu thiếu, rồi chạy `claude plugin update flex-agents@flex-agents` để lấy bộ skill/plugin mới nhất. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
 
@@ -71,12 +65,12 @@ Trường `branch` là tùy chọn. Không đưa token hoặc credential vào UR
 
 ## Mở workstation và coding agent
 
-- `OPEN_WORKSTATION.cmd`: mở workstation project root `C:\Workspace\Project\flex-workstation` trong VS Code.
+- `OPEN_WORKSTATION.cmd`: mở workstation root trong VS Code.
 - `OPEN_WORKSPACE.cmd`: alias tương thích, gọi `OPEN_WORKSTATION.cmd`.
-- `OPEN_CLAUDE.cmd`: mở Claude Code tại workstation project root `C:\Workspace\Project\flex-workstation` với `--dangerously-skip-permissions`; chỉ dùng trong workstation tin cậy.
-- `OPEN_CODEX.cmd`: mở Codex tại workstation project root `C:\Workspace\Project\flex-workstation`; hành vi CLI lấy từ `.codex/config.toml`.
+- `OPEN_CLAUDE.cmd`: mở Claude Code tại workstation root với `--dangerously-skip-permissions`; chỉ dùng trong workstation tin cậy.
+- `OPEN_CODEX.cmd`: mở Codex tại workstation root; hành vi CLI lấy từ `.codex/config.toml`.
 
 ## Troubleshooting
 
 - Nếu `code`, `claude` hoặc `codex` chưa có trong PATH, cài công cụ tương ứng và mở terminal mới.
-- Nếu thay đổi template, chạy lại `SYNC_WORKSPACE.cmd` để cập nhật runtime file tương ứng. Với cấu hình local theo máy/người dùng, sửa trực tiếp `.claude/settings.local.json`.
+- Với cấu hình local theo máy/người dùng, sửa trực tiếp `.claude/settings.local.json`.
