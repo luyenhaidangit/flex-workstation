@@ -1,6 +1,6 @@
 # Đặc tả tính năng: [TÊN TÍNH NĂNG]
 
-**Branch**: `[###-ten-tinh-nang]`
+**Branch**: `[NNNNNN-ten-tinh-nang]`
 
 **Ngày tạo**: [NGÀY]
 

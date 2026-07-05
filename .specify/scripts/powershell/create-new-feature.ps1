@@ -55,7 +55,7 @@ function Get-HighestNumberFromSpecs {
     [long]$highest = 0
     if (Test-Path $SpecsDir) {
         Get-ChildItem -Path $SpecsDir -Directory | ForEach-Object {
-            # Match sequential prefixes (>=3 digits), but skip timestamp dirs.
+            # Match sequential prefixes (>=3 digits for backward compatibility), but skip timestamp dirs.
             if ($_.Name -match '^(\d{3,})-' -and $_.Name -notmatch '^\d{8}-\d{6}-') {
                 [long]$num = 0
                 if ([long]::TryParse($matches[1], [ref]$num) -and $num -gt $highest) {
@@ -162,7 +162,7 @@ if ($Timestamp) {
         $Number = (Get-HighestNumberFromSpecs -SpecsDir $specsDir) + 1
     }
 
-    $featureNum = ('{0:000}' -f $Number)
+    $featureNum = ('{0:000000}' -f $Number)
     $branchName = "$featureNum-$branchSuffix"
 }
 
