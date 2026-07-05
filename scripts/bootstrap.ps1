@@ -3,6 +3,8 @@ param(
     [switch]$SkipCcusageInstall,
     [switch]$SkipRtkInstall,
     [switch]$SkipRtkInit,
+    [switch]$SkipSpecifyInstall,
+    [switch]$SkipSpecifyInit,
     [switch]$UseWinget,
     [switch]$OpenWorkspace
 )
@@ -199,6 +201,8 @@ else {
         Write-Warn "Claude Code install finished, but 'claude' is not available in this terminal yet. Open a new terminal and run 'claude --version'."
     }
 }
+
+& "$PSScriptRoot\ensure-specify.ps1" -SkipInstall:$SkipSpecifyInstall -SkipInit:$SkipSpecifyInit
 
 Write-Step "Syncing flex-agents marketplace"
 

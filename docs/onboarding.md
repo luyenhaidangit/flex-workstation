@@ -36,7 +36,7 @@ Bootstrap đọc `workstation.json`, clone các repo còn thiếu vào workstati
 
 `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
-Bootstrap cũng kiểm tra/cài `ccusage`, `rtk` và Claude Code khi cần. Sau khi có Claude Code, bootstrap add/update marketplace `luyenhaidangit/flex-agents`, install plugin `flex-agents@flex-agents` nếu thiếu, rồi chạy `claude plugin update flex-agents@flex-agents` để lấy bộ skill/plugin mới nhất. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
+Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, `uv`, `specify-cli` và Claude Code khi cần. Sau khi có Claude Code, bootstrap add/update marketplace `luyenhaidangit/flex-agents`, install plugin `flex-agents@flex-agents` nếu thiếu, rồi chạy `claude plugin update flex-agents@flex-agents` để lấy bộ skill/plugin mới nhất. Bootstrap cũng chạy `specify init . --integration claude` để khởi tạo spec-kit nếu `.specify/templates/` chưa tồn tại. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit`, `-SkipSpecifyInstall`, `-SkipSpecifyInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
 
 ## Cấu hình agent
 
