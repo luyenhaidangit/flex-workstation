@@ -154,6 +154,17 @@ if (Test-Path $specifyTemplatesPath) {
     return
 }
 
+# Backup custom .specify files before specify init overwrites them
+$customFiles = @("extensions.yml", "memory\constitution.md")
+$backups = @{}
+foreach ($file in $customFiles) {
+    $fullPath = Join-Path $projectRoot ".specify\$file"
+    if (Test-Path $fullPath) {
+        $backups[$file] = Get-Content -Raw -Encoding UTF8 $fullPath
+        Write-Host "Backed up .specify\$file"
+    }
+}
+
 try {
     Write-Host "Running: specify init . --integration claude --script-type ps --force"
     Push-Location $projectRoot
@@ -167,4 +178,13 @@ catch {
     if (Test-Path (Join-Path $projectRoot ".specify")) {
         Write-Warn ".specify directory exists but may be incomplete. Run 'specify init . --integration claude --script-type ps --force' manually."
     }
+}
+
+# Restore custom files after init
+foreach ($file in $backups.Keys) {
+    $fullPath = Join-Path $projectRoot ".specify\$file"
+    $dir = Split-Path $fullPath -Parent
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    Set-Content -Encoding UTF8 -Path $fullPath -Value $backups[$file]
+    Write-Ok "Restored .specify\$file"
 }
