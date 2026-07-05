@@ -155,15 +155,16 @@ if (Test-Path $specifyTemplatesPath) {
 }
 
 try {
-    Write-Host "Running: specify init . --integration claude"
+    Write-Host "Running: specify init . --integration claude --script-type ps --force"
     Push-Location $projectRoot
-    specify init . --integration claude
+    specify init . --integration claude --script-type ps --force
     Pop-Location
     Write-Ok "spec-kit initialized with Claude Code integration."
 }
 catch {
+    Pop-Location -ErrorAction SilentlyContinue
     Write-Warn "specify init failed: $($_.Exception.Message)"
     if (Test-Path (Join-Path $projectRoot ".specify")) {
-        Write-Warn ".specify directory exists but may be incomplete. Run 'specify init . --integration claude' manually."
+        Write-Warn ".specify directory exists but may be incomplete. Run 'specify init . --integration claude --script-type ps --force' manually."
     }
 }
