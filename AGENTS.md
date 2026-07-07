@@ -29,13 +29,37 @@
 - Với task nhiều bước, nêu plan ngắn trước khi làm: `1. [Bước] → kiểm tra: [cách]`
 - Định nghĩa tiêu chí thành công rõ ràng trước khi bắt đầu thực hiện.
 
+## Speckit Workflow (Spec-Before-Code)
+
+Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
+
+### Setup (chạy một lần cho project)
+
+Thiết lập nguyên tắc: `$speckit-constitution`
+
+### Mỗi feature (lặp lại)
+
+| Bước | Lệnh Codex | Ghi chú |
+|------|------------|---------|
+| 1 | `$speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
+| 2 | `$speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
+| 3 | `$speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
+| 4 | `$speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
+| 5 | `$speckit-tasks` | Sinh task list theo dependency order |
+| 6 | `$speckit-taskstoissues` | **Optional** — chuyển tasks.md thành GitHub Issues |
+| 7 | `$speckit-analyze` | **Optional** — cross-artifact quality gate trước implement |
+| 8 | `$speckit-implement` | Thực thi tasks; tự dừng nếu checklist còn item chưa tick |
+| 9 | `$speckit-converge` | Nếu còn gap: append task bổ sung vào tasks.md → quay lại bước 8 |
+
+Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho cả Codex và Claude Code.
+
 ## Tooling Codex
 
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
 | `rtk` | Proxy shell command để giảm token output; dùng khi chạy shell command nếu có |
-| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos, cài tool, sync flex-agents |
+| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos, cài tool, sync flex-agents, sync skill junctions |
 | `.codex/config.toml` | Cấu hình model, approval policy và sandbox cho Codex CLI |
 
 Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.

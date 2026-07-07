@@ -19,6 +19,10 @@ Thumbs.db
 *.tmp
 *.temp
 
+# .claude/skills/ contains directory junctions -> .agents/skills/ (source of truth)
+# Junctions are machine-local; bootstrap.ps1 recreates them on each machine
+.claude/skills/
+
 # Nested Flex repositories cloned by workstation sync
 /flex-agents/
 /flex-auth-service/

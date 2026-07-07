@@ -71,6 +71,35 @@ function Install-ClaudeCodeNative {
     bash -lc "curl -fsSL https://claude.ai/install.sh | bash"
 }
 
+function Sync-SkillJunctions {
+    $projectRoot = Resolve-Path "$PSScriptRoot\.."
+    $agentsSkillsDir = Join-Path $projectRoot ".agents\skills"
+    $claudeSkillsDir = Join-Path $projectRoot ".claude\skills"
+
+    if (-not (Test-Path $agentsSkillsDir)) {
+        Write-Warn "No skills found at $agentsSkillsDir — skipping junction sync"
+        return
+    }
+
+    New-Item -ItemType Directory -Force -Path $claudeSkillsDir | Out-Null
+
+    foreach ($skill in Get-ChildItem $agentsSkillsDir -Directory) {
+        $junctionPath = Join-Path $claudeSkillsDir $skill.Name
+        if (Test-Path $junctionPath) {
+            $isJunction = (Get-Item $junctionPath).Attributes -band [System.IO.FileAttributes]::ReparsePoint
+            if ($isJunction) { continue }
+            # Real directory exists — migrate its content then remove
+            [System.IO.Directory]::Delete($junctionPath, $true)
+        }
+        cmd /c "mklink /J `"$junctionPath`" `"$($skill.FullName)`"" | Out-Null
+    }
+
+    $count = (Get-ChildItem $claudeSkillsDir -Directory | Where-Object {
+        $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint
+    }).Count
+    Write-Ok "Skill junctions synced: $count skills (.agents/skills -> .claude/skills)"
+}
+
 function Initialize-WorkspaceProjectConfig {
     $projectRoot = Resolve-Path "$PSScriptRoot\.."
     $projectRootClaudePath = Join-Path $projectRoot "CLAUDE.md"
@@ -157,6 +186,9 @@ else {
 }
 
 Initialize-WorkspaceProjectConfig
+
+Write-Step "Syncing skill junctions (.agents/skills -> .claude/skills)"
+Sync-SkillJunctions
 
 & "$PSScriptRoot\sync-repositories.ps1" -PullExisting
 
