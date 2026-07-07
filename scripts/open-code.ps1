@@ -44,23 +44,33 @@ Write-Host " flex-workstation - Open Code" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""
 
-$opened = 0
+$folders = @()
 $skipped = 0
 
 foreach ($repo in $repos) {
     $repoPath = Join-Path $workspaceRoot $repo.name
     if (Test-Path $repoPath) {
-        code $repoPath
+        $folders += @{ path = "./$($repo.name)" }
         Write-Ok "$($repo.name)"
-        $opened++
     } else {
         Write-Warn "[SKIP] $($repo.name): directory not found (run SYNC_WORKSPACE.cmd to clone)"
         $skipped++
     }
 }
 
+if ($folders.Count -eq 0) {
+    Write-Warn "No cloned repositories found. Run SYNC_WORKSPACE.cmd first."
+    exit 0
+}
+
+$workspaceFile = Join-Path $workspaceRoot "flex.code-workspace"
+$workspaceConfig = @{ folders = $folders } | ConvertTo-Json -Depth 3
+Set-Content -Path $workspaceFile -Value $workspaceConfig -Encoding UTF8
+
+code $workspaceFile
+
 Write-Host ""
-Write-Host "Opened: $opened project(s)" -ForegroundColor Cyan
+Write-Host "Opened: $($folders.Count) project(s) in one VS Code window" -ForegroundColor Cyan
 if ($skipped -gt 0) {
     Write-Host "Skipped: $skipped project(s) - directories not found" -ForegroundColor Yellow
 }
