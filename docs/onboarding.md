@@ -67,6 +67,7 @@ Trường `branch` là tùy chọn. Không đưa token hoặc credential vào UR
 
 - `OPEN_WORKSTATION.cmd`: mở workstation root trong VS Code.
 - `OPEN_WORKSPACE.cmd`: alias tương thích, gọi `OPEN_WORKSTATION.cmd`.
+- `OPEN_CODE.cmd`: mở tất cả sub-repo project trong VS Code, mỗi repo một cửa sổ riêng; đọc danh sách từ `workstation.json`.
 - `OPEN_CLAUDE.cmd`: mở Claude Code tại workstation root với `--dangerously-skip-permissions`; chỉ dùng trong workstation tin cậy.
 - `OPEN_CODEX.cmd`: mở Codex tại workstation root; hành vi CLI lấy từ `.codex/config.toml`.
 
