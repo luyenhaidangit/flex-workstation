@@ -1,50 +1,50 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Constitution của [PROJECT_NAME]
+<!-- Ví dụ: Spec Constitution, TaskFlow Constitution, v.v. -->
 
-## Core Principles
+## Nguyên tắc cốt lõi
 
 ### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
+<!-- Ví dụ: I. Library-First -->
 [PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+<!-- Ví dụ: Mọi feature bắt đầu như một thư viện độc lập; thư viện phải tự chứa, test độc lập được, có tài liệu; mục đích rõ ràng là bắt buộc - không tạo thư viện chỉ để tổ chức code -->
 
 ### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
+<!-- Ví dụ: II. CLI Interface -->
 [PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+<!-- Ví dụ: Mỗi thư viện expose chức năng qua CLI; giao thức text in/out: stdin/args -> stdout, errors -> stderr; hỗ trợ JSON và format dễ đọc cho người dùng -->
 
 ### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+<!-- Ví dụ: III. Test-First (NON-NEGOTIABLE) -->
 [PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+<!-- Ví dụ: TDD là bắt buộc: viết test -> user duyệt -> test fail -> sau đó implement; tuân thủ nghiêm Red-Green-Refactor cycle -->
 
 ### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
+<!-- Ví dụ: IV. Integration Testing -->
 [PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+<!-- Ví dụ: Các phạm vi cần integration test: contract test cho thư viện mới, contract thay đổi, giao tiếp giữa service, shared schemas -->
 
 ### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+<!-- Ví dụ: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
 [PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+<!-- Ví dụ: Text I/O giúp dễ debug; structured logging là bắt buộc; hoặc: dùng format MAJOR.MINOR.BUILD; hoặc: bắt đầu đơn giản, tuân thủ YAGNI -->
 
 ## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+<!-- Ví dụ: Ràng buộc bổ sung, yêu cầu bảo mật, tiêu chuẩn hiệu năng, v.v. -->
 
 [SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+<!-- Ví dụ: yêu cầu về technology stack, compliance standards, deployment policies, v.v. -->
 
 ## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+<!-- Ví dụ: Development Workflow, Review Process, Quality Gates, v.v. -->
 
 [SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+<!-- Ví dụ: yêu cầu code review, testing gates, deployment approval process, v.v. -->
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+<!-- Ví dụ: Constitution có hiệu lực cao hơn các practice khác; amendment cần tài liệu, phê duyệt và migration plan -->
 
 [GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+<!-- Ví dụ: Mọi PR/review phải xác minh compliance; complexity phải được biện minh; dùng [GUIDANCE_FILE] làm hướng dẫn runtime development -->
 
 **Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+<!-- Ví dụ: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->

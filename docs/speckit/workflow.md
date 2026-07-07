@@ -99,6 +99,13 @@ sẽ phải làm lại toàn bộ `plan.md`, `data-model.md`, `contracts/`.
 **`/speckit-checklist` là gate cứng của `/speckit-implement`**
 Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa được tick.
 
+Artifact mới sinh bởi các lệnh Speckit dùng template canonical trong
+`.specify/templates/`. Trong `flex-workstation`, toàn bộ template Speckit được
+custom để phần người dùng đọc/review dùng tiếng Việt có dấu, còn các định danh
+kỹ thuật như command, file path, API, framework, placeholder, `[P]`, `[Story]`,
+`CHK###`, `[Gap]`, `[Spec §X]` vẫn giữ nguyên. Không sửa trực tiếp skill gốc
+trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact.
+
 **`/speckit-converge` lặp với `/speckit-implement`**
 Converge chỉ **append** task bổ sung vào `tasks.md`, không sửa gì khác.
 Sau converge → chạy lại implement → converge cho đến khi báo "✅ Converged".

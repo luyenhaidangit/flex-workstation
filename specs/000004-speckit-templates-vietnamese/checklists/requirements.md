@@ -1,4 +1,4 @@
-# Checklist chất lượng đặc tả: Sửa template checklist Speckit sang tiếng Việt
+# Checklist chất lượng đặc tả: Việt hóa toàn bộ template Speckit
 
 **Mục đích**: Xác thực độ đầy đủ và chất lượng của đặc tả trước khi chuyển sang bước lập kế hoạch
 **Ngày tạo**: 2026-07-07
@@ -31,5 +31,6 @@
 
 ## Ghi chú
 
-- Đã review spec lần 1: tất cả item đạt.
+- Đã review spec lần 1 cho scope checklist: tất cả item đạt.
+- Đã cập nhật scope sang toàn bộ template Speckit; các item chất lượng đặc tả vẫn đạt vì yêu cầu mới đã nêu rõ phạm vi, ràng buộc và validation.
 - Các thuật ngữ như `Speckit`, `Markdown`, `command`, `API`, tên file và đường dẫn được giữ nguyên vì là định danh kỹ thuật.

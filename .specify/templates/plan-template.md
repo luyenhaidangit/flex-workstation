@@ -1,71 +1,70 @@
-# Implementation Plan: [FEATURE]
+# Kế hoạch triển khai: [TÍNH NĂNG]
 
-**Branch**: `[NNNNNN-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Branch**: `[NNNNNN-ten-tinh-nang]` | **Ngày**: [NGÀY] | **Đặc tả**: [link]
 
-**Input**: Feature specification from `/specs/[NNNNNN-feature-name]/spec.md`
+**Đầu vào**: Đặc tả tính năng từ `/specs/[NNNNNN-ten-tinh-nang]/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Ghi chú**: Template này được điền bởi lệnh `/speckit-plan`. Xem `.specify/templates/plan-template.md` để biết workflow tạo kế hoạch.
 
-## Summary
+## Tóm tắt
 
-[Extract from feature spec: primary requirement + technical approach from research]
+[Trích từ spec: yêu cầu chính + hướng tiếp cận kỹ thuật từ research]
 
-## Technical Context
+## Bối cảnh kỹ thuật
 
 <!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
+  CẦN THỰC HIỆN: Thay nội dung section này bằng chi tiết kỹ thuật thật của project.
+  Cấu trúc dưới đây là gợi ý để hỗ trợ quá trình lặp và review.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Ngôn ngữ/Phiên bản**: [ví dụ: Python 3.11, Swift 5.9, Rust 1.75 hoặc CẦN LÀM RÕ]
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Phụ thuộc chính**: [ví dụ: FastAPI, UIKit, LLVM hoặc CẦN LÀM RÕ]
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Lưu trữ**: [nếu áp dụng, ví dụ: PostgreSQL, CoreData, file hoặc N/A]
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Kiểm thử**: [ví dụ: pytest, XCTest, cargo test hoặc CẦN LÀM RÕ]
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Nền tảng mục tiêu**: [ví dụ: Linux server, iOS 15+, WASM hoặc CẦN LÀM RÕ]
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Loại project**: [ví dụ: library/cli/web-service/mobile-app/compiler/desktop-app hoặc CẦN LÀM RÕ]
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Mục tiêu hiệu năng**: [theo domain, ví dụ: 1000 req/s, 10k lines/sec, 60 fps hoặc CẦN LÀM RÕ]
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
+**Ràng buộc**: [theo domain, ví dụ: <200ms p95, <100MB memory, offline-capable hoặc CẦN LÀM RÕ]
 
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Quy mô/Phạm vi**: [theo domain, ví dụ: 10k users, 1M LOC, 50 screens hoặc CẦN LÀM RÕ]
 
-## Constitution Check
+## Kiểm tra constitution
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*GATE: Phải đạt trước Phase 0 research. Kiểm tra lại sau Phase 1 design.*
 
-[Gates determined based on constitution file]
+[Các gate được xác định dựa trên constitution file]
 
-## Project Structure
+## Cấu trúc project
 
-### Documentation (this feature)
+### Tài liệu cho feature này
 
 ```text
-specs/[NNNNNN-feature]/
-├── plan.md              # This file (/speckit-plan command output)
-├── research.md          # Phase 0 output (/speckit-plan command)
-├── data-model.md        # Phase 1 output (/speckit-plan command)
-├── quickstart.md        # Phase 1 output (/speckit-plan command)
-├── contracts/           # Phase 1 output (/speckit-plan command)
-└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
+specs/[NNNNNN-ten-tinh-nang]/
+├── plan.md              # File này (output của lệnh /speckit-plan)
+├── research.md          # Output Phase 0 (lệnh /speckit-plan)
+├── data-model.md        # Output Phase 1 (lệnh /speckit-plan)
+├── quickstart.md        # Output Phase 1 (lệnh /speckit-plan)
+├── contracts/           # Output Phase 1 (lệnh /speckit-plan)
+└── tasks.md             # Output Phase 2 (lệnh /speckit-tasks - KHÔNG tạo bởi /speckit-plan)
 ```
 
-### Source Code (repository root)
+### Source code (repository root)
+
 <!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
+  CẦN THỰC HIỆN: Thay cây placeholder bên dưới bằng layout thật cho feature.
+  Xóa option không dùng và mở rộng cấu trúc đã chọn bằng path thật
+  (ví dụ: apps/admin, packages/something). Plan cuối cùng không được giữ nhãn Option.
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+# [XÓA NẾU KHÔNG DÙNG] Option 1: Single project (DEFAULT)
 src/
 ├── models/
 ├── services/
@@ -77,7 +76,7 @@ tests/
 ├── integration/
 └── unit/
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+# [XÓA NẾU KHÔNG DÙNG] Option 2: Web application (khi phát hiện "frontend" + "backend")
 backend/
 ├── src/
 │   ├── models/
@@ -92,22 +91,21 @@ frontend/
 │   └── services/
 └── tests/
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+# [XÓA NẾU KHÔNG DÙNG] Option 3: Mobile + API (khi phát hiện "iOS/Android")
 api/
-└── [same as backend above]
+└── [giống backend ở trên]
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+ios/ hoặc android/
+└── [cấu trúc theo nền tảng: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Quyết định cấu trúc**: [Ghi lại cấu trúc đã chọn và tham chiếu các thư mục thật ở trên]
 
-## Complexity Tracking
+## Theo dõi độ phức tạp
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+> **Chỉ điền nếu kiểm tra constitution có vi phạm cần biện minh**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| Vi phạm | Vì sao cần | Phương án đơn giản hơn bị loại vì |
+|---------|------------|-----------------------------------|
+| [ví dụ: project thứ 4] | [nhu cầu hiện tại] | [vì sao 3 project không đủ] |
+| [ví dụ: Repository pattern] | [vấn đề cụ thể] | [vì sao truy cập DB trực tiếp không đủ] |
