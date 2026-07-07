@@ -16,6 +16,14 @@ Hệ thống AI cần cung cấp khả năng giao tiếp thời gian thực đa 
 
 ---
 
+## Clarifications
+
+### Session 2026-07-06
+
+- Q: Khi cuộc gọi thoại AI không thể phục hồi, server giải phóng tài nguyên phiên gọi sau bao lâu? → A: Giải phóng sau 30 giây không phản hồi kể từ lần retry cuối.
+
+---
+
 ## 1. Mục tiêu
 
 - **MĐ-01**: Người dùng nhận được phản hồi của AI xuất hiện dần ngay trong khi AI đang xử lý, không phải chờ toàn bộ nội dung hoàn chỉnh mới hiển thị.
@@ -125,6 +133,7 @@ Nhân viên tổng đài đang nhìn vào màn hình hiển thị danh sách hà
 - **YCPCK-004**: Mọi kết nối thời gian thực PHẢI được bảo mật — không cho phép nghe lén hoặc chèn nội dung giả mạo từ bên ngoài.
 - **YCPCK-005**: Tính năng realtime PHẢI hoạt động trên Chrome, Edge, Firefox phiên bản mới nhất (cả desktop và mobile web).
 - **YCPCK-006**: Hệ thống PHẢI tự phục hồi kết nối trong vòng 10 giây trong ít nhất 90% trường hợp gián đoạn ngắn.
+- **YCPCK-007**: Sau khi cuộc gọi thoại AI không thể phục hồi, hệ thống PHẢI giải phóng toàn bộ tài nguyên phiên gọi phía server trong vòng 30 giây kể từ lần thử kết nối lại cuối cùng thất bại.
 
 ---
 
@@ -133,7 +142,7 @@ Nhân viên tổng đài đang nhìn vào màn hình hiển thị danh sách hà
 - **Phiên kết nối**: Đại diện cho một kết nối thời gian thực của người dùng; liên kết với danh tính người dùng, loại kênh (chat / thoại / hàng đợi), và trạng thái hiện tại (đang kết nối / mất kết nối / đang phục hồi).
 - **Tin nhắn chat**: Nội dung trao đổi giữa người dùng và AI; có trạng thái (đang stream / hoàn chỉnh), nguồn gốc (trực tiếp / kênh bên ngoài), và thời điểm gửi/nhận.
 - **Sự kiện hàng đợi**: Thông báo về một cuộc gọi mới trong hàng đợi; chứa thông tin nhân viên tổng đài được chỉ định và thời điểm phát sinh.
-- **Phiên gọi thoại**: Thông tin một cuộc gọi thoại AI; liên kết với người dùng, trạng thái kết nối, và chuỗi lượt hội thoại (khởi tạo / nhận âm thanh / phát âm thanh / kết thúc lượt).
+- **Phiên gọi thoại**: Thông tin một cuộc gọi thoại AI; liên kết với người dùng, trạng thái kết nối, và chuỗi lượt hội thoại (khởi tạo / nhận âm thanh / phát âm thanh / kết thúc lượt). Tài nguyên phiên được giải phóng sau 30 giây không phản hồi kể từ lần retry cuối.
 
 ---
 
@@ -195,5 +204,4 @@ Nhân viên tổng đài đang nhìn vào màn hình hiển thị danh sách hà
 
 ## 12. Câu hỏi mở
 
-- [CẦN LÀM RÕ: Khi cuộc gọi thoại AI bị đứt và không tự phục hồi được, tài nguyên phiên gọi phía server được giải phóng thế nào và sau bao lâu? Điều này ảnh hưởng đến giới hạn số cuộc gọi đồng thời.]
 - [CẦN LÀM RÕ: Màn hình hàng đợi gọi số có yêu cầu xác thực riêng hay dùng chung phiên đăng nhập với giao diện chính của nhân viên? Ảnh hưởng đến cách phân quyền và bảo mật kênh nhận sự kiện.]
