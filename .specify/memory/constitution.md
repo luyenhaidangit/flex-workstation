@@ -1,13 +1,16 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: (template) → 1.0.0
-Added sections: Core Principles (I–V), Sub-Repo Policy, Development Workflow, Governance
-Removed sections: N/A (initial ratification)
+Version change: 1.0.0 → 1.1.0
+Modified sections:
+  - Principle II: Spec-Before-Code — mở rộng mô tả vai trò từng command trong luồng
+  - Development Workflow — cấu trúc lại thành Setup + Per-Feature, bổ sung đầy đủ commands
+Added: phân biệt setup (once) vs per-feature flow; bổ sung converge, analyze, checklist, taskstoissues
+Removed: N/A
 Templates updated:
-  ✅ .specify/templates/plan-template.md — Constitution Check gate applicable
-  ✅ .specify/templates/spec-template.md — aligned with spec-driven principle
-  ✅ .specify/templates/tasks-template.md — aligned with task structure
+  ✅ .specify/templates/plan-template.md — Constitution Check gate còn hiệu lực, không thay đổi
+  ✅ .specify/templates/spec-template.md — không bị ảnh hưởng bởi thay đổi này
+  ✅ .specify/templates/tasks-template.md — không bị ảnh hưởng bởi thay đổi này
 Deferred TODOs: None
 -->
 
@@ -25,10 +28,16 @@ MUST NOT: Sửa source code của sub-repo khi yêu cầu chỉ thuộc phạm v
 
 ### II. Spec-Before-Code (NON-NEGOTIABLE)
 
-Mọi tính năng bắt đầu bằng `/speckit-specify`. Không có implementation nào được viết trước khi có spec đã được review. Spec là nguồn sự thật duy nhất — code theo sau spec, không phải ngược lại.
+Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào. Spec là nguồn sự thật duy nhất — code theo sau spec, không phải ngược lại.
 
-MUST: Chạy `/speckit-specify` trước bất kỳ implementation nào.
-MUST: Spec được lưu tại `specs/<feature-branch>/spec.md` và commit vào repo.
+Luồng speckit phân vai trò rõ ràng:
+- `/speckit-specify` nhận mô tả nghiệp vụ (WHAT + WHY) — không có tech stack.
+- `/speckit-plan` nhận tech stack và architecture — đây là nơi kỹ thuật được quyết định.
+- `/speckit-implement` chỉ chạy sau khi spec, plan và tasks đã đầy đủ.
+
+MUST: Chạy `/speckit-specify` với mô tả nghiệp vụ trước bất kỳ implementation nào.
+MUST: Tech stack và architecture được truyền vào `/speckit-plan`, không vào `/speckit-specify`.
+MUST: Spec được lưu tại `specs/<feature-id>/spec.md` và commit vào repo.
 MUST: Cập nhật spec khi scope thay đổi — spec là living document.
 MUST NOT: Implement feature không có trong spec hoặc task list.
 
@@ -68,13 +77,24 @@ Sub-repo là Git repo độc lập được khai báo trong `workstation.json`. 
 
 ## Development Workflow
 
+### Setup (chạy một lần cho project)
+
 1. Mở workspace: `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd`
-2. Tạo spec feature: `/speckit-specify <mô tả>`
-3. Clarify nếu cần: `/speckit-clarify`
-4. Plan kỹ thuật: `/speckit-plan`
-5. Breakdown tasks: `/speckit-tasks`
-6. Implement: `/speckit-implement`
-7. Khi thay đổi behavior/structure/onboarding: cập nhật `TASKS.md` và doc liên quan.
+2. Thiết lập nguyên tắc: `/speckit-constitution`
+
+### Mỗi feature (lặp lại)
+
+| Bước | Command | Ghi chú |
+|------|---------|---------|
+| 1 | `/speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
+| 2 | `/speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
+| 3 | `/speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api); là gate của implement |
+| 4 | `/speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
+| 5 | `/speckit-tasks` | Sinh task list theo dependency order |
+| 6 | `/speckit-taskstoissues` | **Optional** — chuyển tasks.md thành GitHub Issues |
+| 7 | `/speckit-analyze` | **Optional** — cross-artifact quality gate trước implement |
+| 8 | `/speckit-implement` | Thực thi tasks; tự dừng nếu checklist còn item chưa tick |
+| 9 | `/speckit-converge` | Nếu còn gap: append task bổ sung vào tasks.md → quay lại bước 8 |
 
 Mọi thay đổi hành vi quan trọng của workstation phải được phản ánh trong `docs/` trước khi merge.
 
@@ -84,9 +104,9 @@ Constitution này là tài liệu cao nhất của `flex-workstation`. Mọi quy
 
 Amendment procedure:
 - MAJOR bump: xóa hoặc tái định nghĩa nguyên tắc cốt lõi → yêu cầu thảo luận và PR riêng.
-- MINOR bump: thêm nguyên tắc hoặc section mới.
+- MINOR bump: thêm nguyên tắc hoặc section mới, mở rộng hướng dẫn hiện có.
 - PATCH bump: làm rõ, sửa lỗi chính tả, tinh chỉnh không thay đổi nghĩa.
 
 Sau mỗi amendment: cập nhật `LAST_AMENDED_DATE`, tăng `CONSTITUTION_VERSION`, commit với message `docs: amend constitution to vX.Y.Z`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-05 | **Last Amended**: 2026-07-05
+**Version**: 1.1.0 | **Ratified**: 2026-07-05 | **Last Amended**: 2026-07-07
