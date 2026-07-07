@@ -50,7 +50,7 @@ description: "Task list for speckit-codex-support implementation"
 - [x] T005 [P] [US1] Thêm hàm `Sync-SkillJunctions` vào `scripts/bootstrap.ps1` — idempotent, tự migrate legacy real-dirs thành junctions
 - [x] T006 [US1] Thêm lời gọi `Sync-SkillJunctions` vào luồng bootstrap chính trong `scripts/bootstrap.ps1` (sau `Initialize-WorkspaceProjectConfig`)
 - [x] T007 [P] [US1] Thêm `.claude/skills/` vào `.gitignore` với comment giải thích lý do (junctions là machine-local)
-- [ ] T008 [US1] Verify live: Mở Codex CLI trong workspace, xác nhận skill picker hiển thị 10 speckit skills (Scenario 3 trong `quickstart.md`)
+- [x] T008 [US1] Verify live: Mở Codex CLI trong workspace, xác nhận skill picker hiển thị 10 speckit skills (Scenario 3 trong `quickstart.md`)
 
 **Checkpoint**: Codex tìm thấy skills từ `.agents/skills/`. Thay đổi nội dung skill tại `.agents/` tự động có hiệu lực cho cả hai agent (Scenario 4 trong `quickstart.md`).
 
