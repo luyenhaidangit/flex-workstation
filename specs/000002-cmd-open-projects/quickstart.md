@@ -29,7 +29,8 @@ OPEN_CODE.cmd
 hoặc double-click vào `OPEN_CODE.cmd` từ File Explorer
 
 **Kết quả mong đợi**:
-- Mỗi repo được clone mở trong một cửa sổ VS Code riêng biệt
+- Một cửa sổ VS Code duy nhất mở ra với tất cả repos hiển thị trong Explorer panel (multi-root workspace)
+- File `flex.code-workspace` được tạo/cập nhật tại workspace root
 - Không có error message
 - Toàn bộ hoàn tất trong dưới 10 giây
 
@@ -82,7 +83,7 @@ OPEN_CODE.cmd
 
 **Chạy**: `OPEN_CODE.cmd`
 
-**Kết quả mong đợi**: `test-repo-temp` được mở trong VS Code mà không cần sửa `OPEN_CODE.cmd`
+**Kết quả mong đợi**: `test-repo-temp` xuất hiện trong cùng cửa sổ VS Code (multi-root workspace) mà không cần sửa `OPEN_CODE.cmd` hay `flex.code-workspace`
 
 **Cleanup**: Xóa thư mục `test-repo-temp`, hoàn tác thay đổi `workstation.json`
 

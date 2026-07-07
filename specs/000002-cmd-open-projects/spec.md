@@ -38,16 +38,16 @@ Tính năng này cung cấp một file lệnh (.cmd) có thể click đúp để
 
 ### Kịch bản 1 — Mở toàn bộ project bằng một click (Ưu tiên: P1)
 
-Developer vào buổi sáng, muốn mở ngay tất cả project để làm việc. Họ vào thư mục workspace, tìm file `OPEN_CODE.cmd`, click đúp vào đó. Tất cả các project (flex-api-gateway, flex-auth-service, flex-microfrontend, flex-agents, flex-environment) lần lượt được mở trong các cửa sổ editor riêng biệt.
+Developer vào buổi sáng, muốn mở ngay tất cả project để làm việc. Họ vào thư mục workspace, tìm file `OPEN_CODE.cmd`, click đúp vào đó. Tất cả các project (flex-api-gateway, flex-auth-service, flex-microfrontend, flex-agents, flex-environment) được mở trong một cửa sổ VS Code duy nhất dưới dạng multi-root workspace.
 
 **Lý do ưu tiên**: Đây là luồng chính — giải quyết trực tiếp nhu cầu cốt lõi của tính năng
 
-**Test độc lập**: Click đúp file trên máy có workspace đã bootstrap xong, kiểm tra số cửa sổ editor được mở
+**Test độc lập**: Click đúp file trên máy có workspace đã bootstrap xong, kiểm tra một cửa sổ VS Code mở với tất cả repos hiển thị trong Explorer panel
 
 **Acceptance Scenarios**:
 
-1. **Cho trước** workspace đã bootstrap và tất cả sub-repo đã được clone, **Khi** người dùng click đúp vào `OPEN_CODE.cmd`, **Thì** tất cả project được liệt kê trong `workstation.json` đều được mở trong editor, mỗi project trong một cửa sổ riêng
-2. **Cho trước** người dùng đã có một số editor đang mở, **Khi** chạy `OPEN_CODE.cmd`, **Thì** các project chưa mở được mở thêm mà không ảnh hưởng đến cửa sổ đang có
+1. **Cho trước** workspace đã bootstrap và tất cả sub-repo đã được clone, **Khi** người dùng click đúp vào `OPEN_CODE.cmd`, **Thì** một cửa sổ VS Code duy nhất mở ra với tất cả project hiển thị trong Explorer panel dưới dạng multi-root workspace
+2. **Cho trước** người dùng thêm repo mới vào `workstation.json` và clone repo đó, **Khi** chạy `OPEN_CODE.cmd`, **Thì** repo mới xuất hiện trong cùng cửa sổ VS Code mà không cần sửa file launcher
 
 ---
 
@@ -76,7 +76,7 @@ Developer đang trong terminal tại thư mục workspace muốn kích hoạt la
 
 - **YC-001**: Hệ thống PHẢI đọc danh sách repo từ `workstation.json` để xác định project cần mở
 - **YC-002**: Người dùng PHẢI có thể kích hoạt bằng cách click đúp vào file `.cmd` từ File Explorer
-- **YC-003**: Hệ thống PHẢI mở mỗi project trong một cửa sổ editor riêng biệt
+- **YC-003**: Hệ thống PHẢI mở tất cả project trong một cửa sổ VS Code duy nhất dưới dạng multi-root workspace
 - **YC-004**: Hệ thống PHẢI bỏ qua project có thư mục chưa tồn tại thay vì dừng toàn bộ quá trình
 - **YC-005**: Hệ thống PHẢI hiển thị thông báo khi project bị bỏ qua do thư mục không tồn tại
 - **YC-006**: File launcher KHÔNG ĐƯỢC yêu cầu cài đặt thêm phần mềm ngoài những gì đã có trong bootstrap

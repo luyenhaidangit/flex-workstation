@@ -1,0 +1,19 @@
+﻿{
+    "folders":  [
+                    {
+                        "path":  "./flex-agents"
+                    },
+                    {
+                        "path":  "./flex-auth-service"
+                    },
+                    {
+                        "path":  "./flex-api-gateway"
+                    },
+                    {
+                        "path":  "./flex-microfrontend"
+                    },
+                    {
+                        "path":  "./flex-environment"
+                    }
+                ]
+}
