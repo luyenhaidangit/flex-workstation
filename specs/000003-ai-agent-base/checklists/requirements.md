@@ -32,4 +32,4 @@
 ## Notes
 
 - Validation pass 1 completed on 2026-07-07.
-- Spec deliberately keeps three open business questions in section 12 without [NEEDS CLARIFICATION] markers so planning can continue with documented assumptions or run `$speckit-clarify` if stakeholder decisions are required.
+- Clarification session completed on 2026-07-07 with 5 accepted answers; critical MVP scope questions are now resolved for planning.
