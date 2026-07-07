@@ -10,14 +10,14 @@
 - Đã xác nhận đủ 5 template trong `.specify/templates/`.
 - Đã Việt hóa các heading hiển thị còn sót trong template:
   - `.specify/templates/tasks-template.md`: `Notes` -> `Ghi chú`
-  - `.specify/templates/constitution-template.md`: `Governance` -> `Quản trị`
+- `.specify/templates/constitution-template.md`: Việt hóa `Constitution`, `Governance`, `Version`, `Ratified`, `Last Amended` thành label tiếng Việt.
 - Đã cập nhật artifact feature để thống nhất policy giữ section tương đương, không bắt buộc giữ label English trong output.
 - Đã đánh dấu T001-T025 hoàn tất trong `tasks.md`.
 
 ## Validation
 
 - `rtk rg --files .specify/templates`: đủ 5 template trong scope.
-- `rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Requirements|Success Criteria" .specify/templates`: không còn hit.
+- `rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Constitution|Version|Ratified|Last Amended|Amendment procedure|Requirements|Success Criteria" .specify/templates`: không còn hit.
 - `rtk rg "CHK###|\\[P\\]|\\[Story\\]|\\[TÊN TÍNH NĂNG\\]|\\[TÍNH NĂNG\\]|\\[LOẠI CHECKLIST\\]|\\[PROJECT_NAME\\]|/speckit-|\\.specify/templates|spec.md|plan.md|tasks.md" .specify/templates`: marker, placeholder, command và path cần thiết vẫn còn.
 - `rtk powershell -NoProfile -Command "git diff -- .agents/skills"`: không có diff.
 - `rtk powershell -NoProfile -Command "git diff --check"`: không có lỗi whitespace; Git chỉ cảnh báo LF sẽ được đổi sang CRLF theo cấu hình.

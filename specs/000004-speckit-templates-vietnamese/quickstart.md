@@ -21,7 +21,7 @@ Expected outcome:
 Chạy:
 
 ```powershell
-rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Requirements|Success Criteria" .specify/templates
+rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Constitution|Version|Ratified|Last Amended|Amendment procedure|Requirements|Success Criteria" .specify/templates
 ```
 
 Expected outcome:
