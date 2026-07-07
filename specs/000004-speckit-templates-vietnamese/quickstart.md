@@ -33,11 +33,11 @@ Expected outcome:
 Chạy:
 
 ```powershell
-rtk rg "CHK###|\\[P\\]|\\[Story\\]|\\[FEATURE NAME\\]|\\[PROJECT_NAME\\]|/speckit-|\\.specify/templates|spec.md|plan.md|tasks.md" .specify/templates
+rtk rg "CHK###|\\[P\\]|\\[Story\\]|\\[TÊN TÍNH NĂNG\\]|\\[TÍNH NĂNG\\]|\\[LOẠI CHECKLIST\\]|\\[PROJECT_NAME\\]|/speckit-|\\.specify/templates|spec.md|plan.md|tasks.md" .specify/templates
 ```
 
 Expected outcome:
-- Các marker, command, path và placeholder kỹ thuật vẫn còn khi template cần chúng.
+- Các marker, command, path, placeholder hiển thị hợp lệ và placeholder kỹ thuật vẫn còn khi template cần chúng.
 
 ## Scenario 4: Kiểm tra skill gốc không bị sửa
 

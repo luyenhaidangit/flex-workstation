@@ -47,7 +47,7 @@ Người dùng chạy một bước Speckit sinh artifact từ template workspac
 **Kịch bản chấp nhận**:
 
 1. **Cho trước** workspace yêu cầu tài liệu tiếng Việt, **Khi** template Speckit được dùng để sinh artifact mới, **Thì** artifact có phần hướng dẫn và cấu trúc hiển thị bằng tiếng Việt có dấu.
-2. **Cho trước** một template có placeholder kỹ thuật, **Khi** template được Việt hóa, **Thì** placeholder như `[FEATURE NAME]`, `[P]`, `CHK###`, command và path vẫn không bị dịch sai.
+2. **Cho trước** một template có placeholder kỹ thuật hoặc placeholder hiển thị, **Khi** template được Việt hóa, **Thì** placeholder hiển thị có thể dùng tiếng Việt như `[TÊN TÍNH NĂNG]`, `[TÍNH NĂNG]`, `[LOẠI CHECKLIST]`, còn marker kỹ thuật như `[P]`, `[Story]`, `CHK###`, command và path vẫn không bị dịch sai.
 
 ---
 
@@ -69,6 +69,8 @@ Người vận hành dùng template tiếng Việt trong workflow Speckit mà kh
 ### Trường hợp biên
 
 - Template có command, path, placeholder, marker hoặc mã item: giữ nguyên định danh kỹ thuật, chỉ Việt hóa phần diễn giải.
+- Placeholder hiển thị cho người đọc có thể Việt hóa, ví dụ `[TÊN TÍNH NĂNG]`, `[TÍNH NĂNG]`, `[LOẠI CHECKLIST]`.
+- Marker hoặc token workflow có ý nghĩa kỹ thuật phải giữ nguyên, ví dụ `[P]`, `[Story]`, `CHK###`, `$ARGUMENTS`, command và path.
 - Template có ví dụ code block hoặc cây thư mục: giữ cấu trúc code block, chỉ Việt hóa comment/mô tả khi an toàn.
 - Template có thuật ngữ kỹ thuật phổ biến như `MVP`, `API`, `contract`, `frontend`, `backend`: được giữ nguyên nếu đó là định danh hoặc thuật ngữ workflow.
 - Skill gốc trong `.agents/skills/**` vẫn còn tiếng Anh từ upstream: không sửa trực tiếp trong feature này.
