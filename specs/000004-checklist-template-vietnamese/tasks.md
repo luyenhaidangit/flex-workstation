@@ -78,9 +78,9 @@
 **Purpose**: Validation cuối và cập nhật tài liệu theo quy tắc workstation nếu hành vi workflow thay đổi
 
 - [ ] T016 Chạy static search tổng thể bằng lệnh `rtk rg "Purpose|Created|Feature|Content Quality|Requirement Completeness|Feature Readiness|Notes|Checklist Purpose|Acceptance Criteria Quality|Scenario Coverage|Edge Case Coverage" .specify/templates .agents/skills`
-- [ ] T017 Sinh thử checklist mới bằng `$speckit-checklist requirements` và kiểm tra file mới trong `specs/000004-checklist-template-vietnamese/checklists/`
-- [ ] T018 Review checklist sinh thử để xác nhận tiêu đề, mục đích, category, item và ghi chú là tiếng Việt trong `specs/000004-checklist-template-vietnamese/checklists/`
-- [ ] T019 Cập nhật `docs/tasks.md` nếu thay đổi template checklist cần được ghi nhận như thay đổi hành vi workflow workstation
+- [ ] T017 Sinh thử checklist validation-only bằng `$speckit-checklist requirements`; nếu file sinh ra chỉ phục vụ kiểm tra thì không giữ lại như artifact chính thức, và kiểm tra nội dung trong `specs/000004-checklist-template-vietnamese/checklists/`
+- [ ] T018 Review checklist sinh thử trong `specs/000004-checklist-template-vietnamese/checklists/` để xác nhận tiêu đề, mục đích, category, item và ghi chú là tiếng Việt; ghi nhận người review quen workflow hiểu mục đích và nhóm kiểm tra chính trong dưới 2 phút
+- [ ] T019 Cập nhật `docs/tasks.md` và rà `docs/speckit/workflow.md` để phản ánh thay đổi hành vi sinh checklist tiếng Việt của workflow workstation
 - [ ] T020 Kiểm tra phạm vi thay đổi bằng lệnh `rtk git status --short`
 
 ---
