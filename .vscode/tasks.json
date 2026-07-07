@@ -6,16 +6,16 @@
       "type": "shell",
       "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\bootstrap.ps1",
       "options": {
-        "cwd": "${workspaceFolder}\\flex-workstation"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     },
     {
-      "label": "git: status all tracked projects",
+      "label": "git: status workstation and api-gateway",
       "type": "shell",
-      "command": "git status --short; git -C ../flex-api-gateway status --short",
+      "command": "git status --short; git -C flex-api-gateway status --short",
       "options": {
-        "cwd": "${workspaceFolder}\\flex-workstation"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     },
@@ -24,7 +24,7 @@
       "type": "shell",
       "command": "git status --short",
       "options": {
-        "cwd": "${workspaceFolder}\\flex-workstation"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
     },
