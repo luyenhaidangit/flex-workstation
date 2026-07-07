@@ -40,7 +40,7 @@
 [SECTION_3_CONTENT]
 <!-- Ví dụ: yêu cầu code review, testing gates, deployment approval process, v.v. -->
 
-## Governance
+## Quản trị
 <!-- Ví dụ: Constitution có hiệu lực cao hơn các practice khác; amendment cần tài liệu, phê duyệt và migration plan -->
 
 [GOVERNANCE_RULES]

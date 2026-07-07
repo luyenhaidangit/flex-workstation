@@ -241,7 +241,7 @@ Với nhiều developer:
 
 ---
 
-## Notes
+## Ghi chú
 
 - [P] tasks = khác file, không phụ thuộc nhau
 - [Story] label map task tới user story cụ thể để traceability

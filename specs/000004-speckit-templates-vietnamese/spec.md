@@ -61,7 +61,7 @@ Người vận hành dùng template tiếng Việt trong workflow Speckit mà kh
 
 **Kịch bản chấp nhận**:
 
-1. **Cho trước** `plan-template.md`, **Khi** template được Việt hóa, **Thì** vẫn còn Constitution Check, Project Structure và Complexity Tracking.
+1. **Cho trước** `plan-template.md`, **Khi** template được Việt hóa, **Thì** vẫn còn các section tương đương với Constitution Check, Project Structure và Complexity Tracking.
 2. **Cho trước** `tasks-template.md`, **Khi** template được Việt hóa, **Thì** vẫn còn format task `[ID] [P?] [Story] Description`, phase dependencies và parallel opportunities.
 
 ---

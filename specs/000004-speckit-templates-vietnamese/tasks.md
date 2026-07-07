@@ -18,12 +18,12 @@
 
 **Mục đích**: Xác định toàn bộ template trong scope và ràng buộc giữ technical identifiers
 
-- [ ] T001 Rà danh sách template bằng lệnh `rtk rg --files .specify/templates`
-- [ ] T002 [P] Đọc `.specify/templates/spec-template.md`
-- [ ] T003 [P] Đọc `.specify/templates/plan-template.md`
-- [ ] T004 [P] Đọc `.specify/templates/tasks-template.md`
-- [ ] T005 [P] Đọc `.specify/templates/checklist-template.md`
-- [ ] T006 [P] Đọc `.specify/templates/constitution-template.md`
+- [X] T001 Rà danh sách template bằng lệnh `rtk rg --files .specify/templates`
+- [X] T002 [P] Đọc `.specify/templates/spec-template.md`
+- [X] T003 [P] Đọc `.specify/templates/plan-template.md`
+- [X] T004 [P] Đọc `.specify/templates/tasks-template.md`
+- [X] T005 [P] Đọc `.specify/templates/checklist-template.md`
+- [X] T006 [P] Đọc `.specify/templates/constitution-template.md`
 
 ---
 
@@ -33,9 +33,9 @@
 
 **CRITICAL**: Không bắt đầu sửa template cho tới khi hoàn tất phase này
 
-- [ ] T007 Xác định technical identifiers phải giữ nguyên trong `specs/000004-speckit-templates-vietnamese/research.md`
-- [ ] T008 Xác định mô hình `Speckit Template` và `Template Set` trong `specs/000004-speckit-templates-vietnamese/data-model.md`
-- [ ] T009 Ghi nhận nguyên tắc không sửa `.agents/skills/**` trong `specs/000004-speckit-templates-vietnamese/plan.md`
+- [X] T007 Xác định technical identifiers phải giữ nguyên trong `specs/000004-speckit-templates-vietnamese/research.md`
+- [X] T008 Xác định mô hình `Speckit Template` và `Template Set` trong `specs/000004-speckit-templates-vietnamese/data-model.md`
+- [X] T009 Ghi nhận nguyên tắc không sửa `.agents/skills/**` trong `specs/000004-speckit-templates-vietnamese/plan.md`
 
 **Checkpoint**: Có quy tắc dịch chung, danh sách template đầy đủ và ràng buộc không sửa skill gốc.
 
@@ -49,11 +49,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Việt hóa phần người đọc trong `.specify/templates/spec-template.md`, giữ placeholder như `[TÊN TÍNH NĂNG]`, `$ARGUMENTS`, `[CẦN LÀM RÕ: ...]`
-- [ ] T011 [US1] Việt hóa phần người đọc trong `.specify/templates/plan-template.md`, giữ các section tương đương với Constitution Check, Project Structure và code block path
-- [ ] T012 [US1] Việt hóa phần người đọc trong `.specify/templates/tasks-template.md`, giữ format `[ID] [P?] [Story] Description`, marker `[P]`, `[Story]` và task IDs `T###`
-- [ ] T013 [US1] Việt hóa phần người đọc trong `.specify/templates/checklist-template.md`, giữ `CHK###`, `[Gap]`, `[Spec §X]` và Markdown checkbox
-- [ ] T014 [US1] Việt hóa phần người đọc trong `.specify/templates/constitution-template.md`, giữ placeholder `[PROJECT_NAME]`, `[PRINCIPLE_*]`, `[CONSTITUTION_VERSION]`
+- [X] T010 [US1] Việt hóa phần người đọc trong `.specify/templates/spec-template.md`, giữ placeholder như `[TÊN TÍNH NĂNG]`, `$ARGUMENTS`, `[CẦN LÀM RÕ: ...]`
+- [X] T011 [US1] Việt hóa phần người đọc trong `.specify/templates/plan-template.md`, giữ các section tương đương với Constitution Check, Project Structure và code block path
+- [X] T012 [US1] Việt hóa phần người đọc trong `.specify/templates/tasks-template.md`, giữ format `[ID] [P?] [Story] Description`, marker `[P]`, `[Story]` và task IDs `T###`
+- [X] T013 [US1] Việt hóa phần người đọc trong `.specify/templates/checklist-template.md`, giữ `CHK###`, `[Gap]`, `[Spec §X]` và Markdown checkbox
+- [X] T014 [US1] Việt hóa phần người đọc trong `.specify/templates/constitution-template.md`, giữ placeholder `[PROJECT_NAME]`, `[PRINCIPLE_*]`, `[CONSTITUTION_VERSION]`
 
 **Checkpoint**: 5/5 template có nội dung hướng tới người đọc bằng tiếng Việt.
 
@@ -67,12 +67,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Rà `.specify/templates/spec-template.md` giữ đủ section 0-12 và marker clarification
-- [ ] T016 [US2] Rà `.specify/templates/plan-template.md` giữ đủ các section tương đương với Technical Context, Constitution Check, Project Structure và Complexity Tracking
-- [ ] T017 [US2] Rà `.specify/templates/tasks-template.md` giữ dependency model, parallel opportunities, MVP strategy và notes
-- [ ] T018 [US2] Rà `.specify/templates/checklist-template.md` giữ requirement-quality policy, sample checkbox và notes
-- [ ] T019 [US2] Rà `.specify/templates/constitution-template.md` giữ Core Principles, Governance và version metadata
-- [ ] T020 [US2] Kiểm tra không có thay đổi trong skill gốc bằng lệnh `rtk powershell -NoProfile -Command "git diff -- .agents/skills"`
+- [X] T015 [US2] Rà `.specify/templates/spec-template.md` giữ đủ section 0-12 và marker clarification
+- [X] T016 [US2] Rà `.specify/templates/plan-template.md` giữ đủ các section tương đương với Technical Context, Constitution Check, Project Structure và Complexity Tracking
+- [X] T017 [US2] Rà `.specify/templates/tasks-template.md` giữ dependency model, parallel opportunities, MVP strategy và notes
+- [X] T018 [US2] Rà `.specify/templates/checklist-template.md` giữ requirement-quality policy, sample checkbox và notes
+- [X] T019 [US2] Rà `.specify/templates/constitution-template.md` giữ các section tương đương với Core Principles, Governance và version metadata
+- [X] T020 [US2] Kiểm tra không có thay đổi trong skill gốc bằng lệnh `rtk powershell -NoProfile -Command "git diff -- .agents/skills"`
 
 **Checkpoint**: Template vẫn dùng được cho workflow và skill gốc không bị sửa.
 
@@ -82,11 +82,11 @@
 
 **Mục đích**: Validation cuối và cập nhật tài liệu theo quy tắc workstation
 
-- [ ] T021 Chạy static search tiếng Anh phổ biến bằng lệnh `rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Requirements|Success Criteria" .specify/templates`; mọi hit còn lại phải là thuật ngữ kỹ thuật, ví dụ có chủ đích hoặc nội dung trong validation command
-- [ ] T022 Chạy kiểm technical identifiers và placeholder hợp lệ bằng lệnh `rtk rg "CHK###|\\[P\\]|\\[Story\\]|\\[TÊN TÍNH NĂNG\\]|\\[TÍNH NĂNG\\]|\\[LOẠI CHECKLIST\\]|\\[PROJECT_NAME\\]|/speckit-|\\.specify/templates|spec.md|plan.md|tasks.md" .specify/templates`
-- [ ] T023 Cập nhật `docs/tasks.md` và `docs/speckit/workflow.md` để phản ánh quy tắc toàn bộ Speckit templates dùng tiếng Việt
-- [ ] T024 Chạy `rtk powershell -NoProfile -Command "git diff --check"`
-- [ ] T025 Kiểm tra phạm vi thay đổi bằng lệnh `rtk powershell -NoProfile -Command "git status --short"`
+- [X] T021 Chạy static search tiếng Anh phổ biến bằng lệnh `rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Requirements|Success Criteria" .specify/templates`; mọi hit còn lại phải là thuật ngữ kỹ thuật, ví dụ có chủ đích hoặc nội dung trong validation command
+- [X] T022 Chạy kiểm technical identifiers và placeholder hợp lệ bằng lệnh `rtk rg "CHK###|\\[P\\]|\\[Story\\]|\\[TÊN TÍNH NĂNG\\]|\\[TÍNH NĂNG\\]|\\[LOẠI CHECKLIST\\]|\\[PROJECT_NAME\\]|/speckit-|\\.specify/templates|spec.md|plan.md|tasks.md" .specify/templates`
+- [X] T023 Cập nhật `docs/tasks.md` và `docs/speckit/workflow.md` để phản ánh quy tắc toàn bộ Speckit templates dùng tiếng Việt
+- [X] T024 Chạy `rtk powershell -NoProfile -Command "git diff --check"`
+- [X] T025 Kiểm tra phạm vi thay đổi bằng lệnh `rtk powershell -NoProfile -Command "git status --short"`
 
 ---
 
