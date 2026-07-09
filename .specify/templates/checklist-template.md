@@ -4,6 +4,8 @@
 
 **Mục đích**: [Mô tả ngắn gọn checklist này kiểm tra gì và hỗ trợ quyết định nào]
 
+**Checklist ID**: [CL-YYYYMMDD-001 hoặc tên định danh]
+
 **Ngày tạo**: [DATE]
 
 **Người review**: [Tên người review hoặc team]
@@ -15,6 +17,10 @@
 **Tính năng**: [Link tới spec.md hoặc tài liệu liên quan]
 
 **Loại checklist**: [Requirement Quality / Plan Readiness / Task Quality / Release Readiness / Custom]
+
+**Bước hiện tại**: [spec / plan / tasks / implementation / release]
+
+**Bước tiếp theo cần quyết định**: [/speckit-plan / /speckit-tasks / implement / release]
 
 **Artifact chính được kiểm tra**: [`spec.md` / `plan.md` / `tasks.md` / release package / artifact khác]
 
@@ -41,6 +47,17 @@
 
 ---
 
+## Artifact đã kiểm tra
+
+| Artifact | Đường dẫn/Link | Trạng thái | Ghi chú |
+|----------|----------------|------------|---------|
+| `spec.md` | [link/path] | Đã kiểm/Không có/Không áp dụng | [Ghi chú] |
+| `plan.md` | [link/path] | Đã kiểm/Không có/Không áp dụng | [Ghi chú] |
+| `tasks.md` | [link/path] | Đã kiểm/Không có/Không áp dụng | [Ghi chú] |
+| `contracts/` | [link/path] | Đã kiểm/Không có/Không áp dụng | [Ghi chú] |
+
+---
+
 ## Kết quả tổng hợp
 
 **Trạng thái**: [Chưa review / Pass / Pass có điều kiện / Fail]
@@ -60,7 +77,7 @@
 
 **Quy tắc kết luận**:
 - `Pass`: Không có item `[Blocker]` hoặc `[High]` fail.
-- `Pass có điều kiện`: Không có `[Blocker]` fail, nhưng còn `[High]`/`[Medium]` fail đã có owner và kế hoạch xử lý.
+- `Pass có điều kiện`: Không có `[Blocker]` fail; các `[High]`/`[Medium]` fail còn lại đã có owner, hạn xử lý, và không chặn trực tiếp bước tiếp theo.
 - `Fail`: Có ít nhất một `[Blocker]` fail hoặc thiếu artifact chính để kiểm tra.
 
 ---
@@ -100,10 +117,14 @@
 
 - Mỗi item chỉ kiểm một vấn đề.
 - Mỗi item PHẢI trả lời được bằng Pass/Fail/Không áp dụng.
+- Mỗi item sau review PHẢI có status: `Pass`, `Fail`, `Không áp dụng`, hoặc `Chưa kiểm`.
 - Không dùng item mơ hồ như "requirement đã tốt chưa?".
 - Không kiểm implementation nếu checklist là `Requirement Quality`.
 - Item `[Blocker]` fail thì KHÔNG ĐƯỢC chuyển bước tiếp theo nếu chưa có ngoại lệ được phê duyệt.
 - Mỗi item `[Blocker]` hoặc `[High]` NÊN có tham chiếu tới artifact nguồn, ví dụ `[Spec §4, US-001]`, `[Plan §8]`, `[Task T012]`.
+- Mã `CHK###` PHẢI là duy nhất trong một checklist.
+- Không tái sử dụng mã item đã bị xóa trong cùng lần review.
+- Khi thêm item mới sau review, tiếp tục tăng số thay vì đánh số lại toàn bộ nếu checklist đã được tham chiếu.
 
 ### Gợi ý nhóm theo loại checklist
 
@@ -138,6 +159,16 @@
 - Observability
 - Smoke test
 
+**Constitution Gate**:
+- Scope Gate
+- Traceability Gate
+- Test Gate
+- Security Gate
+- Compatibility Gate
+- Observability Gate
+- Complexity Gate
+- Release Gate
+
 ---
 
 ## Quy ước tag và mức độ
@@ -158,6 +189,8 @@
 - `[Coverage]`: Chưa bao phủ đủ luồng/trạng thái.
 - `[Traceability]`: Chưa trace được sang artifact khác.
 - `[Security]`: Rủi ro quyền hoặc dữ liệu nhạy cảm.
+- `[Data]`: Rủi ro liên quan dữ liệu, entity, dữ liệu cũ, dữ liệu bẩn hoặc mất dữ liệu.
+- `[Migration]`: Rủi ro liên quan schema migration, backfill, cleanup hoặc rollback dữ liệu.
 - `[Compatibility]`: Rủi ro API/data backward compatibility.
 - `[Observability]`: Thiếu log/trace/debug.
 - `[Release]`: Thiếu readiness cho rollout/rollback/smoke test.
@@ -170,7 +203,24 @@
 
 ---
 
-## [Nhóm kiểm tra theo loại checklist]
+## Quy tắc đánh dấu Không áp dụng
+
+Một item chỉ được đánh dấu `Không áp dụng` khi:
+
+- Artifact/luồng được kiểm không có phần tương ứng.
+- Không có tác động tới phạm vi item kiểm tra.
+- Reviewer ghi lý do ngắn nếu item có mức `[Blocker]` hoặc `[High]`.
+
+Ví dụ:
+
+- API contract không thay đổi -> item contract test có thể `Không áp dụng`.
+- Feature không có phân quyền riêng -> permission matrix có thể `Không áp dụng`, nhưng phải nêu lý do.
+
+---
+
+## [Nhóm kiểm tra theo loại checklist - VÍ DỤ, PHẢI THAY THẾ]
+
+<!-- EXAMPLE ITEMS - MUST BE REPLACED -->
 
 <!--
   Các item ví dụ dưới đây minh họa cho Requirement Quality.
@@ -178,15 +228,17 @@
   Plan Readiness / Task Quality / Release Readiness / Custom.
 -->
 
-- [ ] CHK001 `[Blocker]` Requirement P1 đã có acceptance criteria kiểm được chưa? [Completeness, Measurability, Spec §4, US-001]
-- [ ] CHK002 `[High]` Thuật ngữ dễ gây hiểu nhầm đã được định nghĩa bằng tiêu chí rõ ràng chưa? [Clarity, Ambiguity]
-- [ ] CHK003 `[High]` Requirement trong cùng phạm vi có nhất quán với nhau và với constitution không? [Consistency, Conflict, Constitution]
+- [ ] CHK001 `[Blocker]` `[Status: Chưa kiểm]` Requirement P1 đã có acceptance criteria kiểm được chưa? [Completeness, Measurability, Spec §4, US-001]
+- [ ] CHK002 `[High]` `[Status: Chưa kiểm]` Thuật ngữ dễ gây hiểu nhầm đã được định nghĩa bằng tiêu chí rõ ràng chưa? [Clarity, Ambiguity]
+- [ ] CHK003 `[High]` `[Status: Chưa kiểm]` Requirement trong cùng phạm vi có nhất quán với nhau và với constitution không? [Consistency, Conflict, Constitution]
 
-## [Nhóm kiểm tra bổ sung theo rủi ro]
+## [Nhóm kiểm tra bổ sung theo rủi ro - VÍ DỤ, PHẢI THAY THẾ]
 
-- [ ] CHK004 `[Blocker]` Các yêu cầu ảnh hưởng quyền, dữ liệu, contract hoặc migration đã được trace sang artifact liên quan chưa? [Traceability, Security, Compatibility, Readiness]
-- [ ] CHK005 `[High]` Các trường hợp biên hoặc trạng thái lỗi quan trọng đã được mô tả đủ chưa? [Coverage, Gap]
-- [ ] CHK006 `[Medium]` Giả định hoặc phụ thuộc bên ngoài đã được ghi rõ và kiểm chứng chưa? [Assumption]
+<!-- EXAMPLE ITEMS - MUST BE REPLACED -->
+
+- [ ] CHK004 `[Blocker]` `[Status: Chưa kiểm]` Các yêu cầu ảnh hưởng quyền, dữ liệu, contract hoặc migration đã được trace sang artifact liên quan chưa? [Traceability, Security, Data, Migration, Compatibility, Readiness]
+- [ ] CHK005 `[High]` `[Status: Chưa kiểm]` Các trường hợp biên hoặc trạng thái lỗi quan trọng đã được mô tả đủ chưa? [Coverage, Gap]
+- [ ] CHK006 `[Medium]` `[Status: Chưa kiểm]` Giả định hoặc phụ thuộc bên ngoài đã được ghi rõ và kiểm chứng chưa? [Assumption]
 
 ---
 
@@ -243,5 +295,6 @@ Khi một item fail hoặc cần làm rõ, ghi nhận trực tiếp bên dưới
 - Đánh dấu item đã hoàn thành bằng `[x]`.
 - Thêm nhận xét hoặc phát hiện trực tiếp bên dưới item liên quan.
 - Liên kết tới tài liệu hoặc artifact liên quan khi cần.
-- Item được đánh số tuần tự để dễ tham chiếu.
+- Item được đánh số tuần tự bằng mã `CHK###` duy nhất để dễ tham chiếu.
+- Checklist chỉ ghi nhận phát hiện và quyết định review. Nội dung sửa chính thức PHẢI được cập nhật trong artifact gốc tương ứng.
 - Checklist không thay thế việc cập nhật artifact gốc; nếu phát hiện gap, PHẢI sửa artifact tương ứng hoặc ghi ngoại lệ được phê duyệt.

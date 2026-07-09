@@ -32,6 +32,7 @@
 - Checklist template phải là quality gate có loại checklist, artifact chính được kiểm, nguồn tham chiếu, kết quả tổng hợp, severity `[Blocker]`/`[High]`/`[Medium]`/`[Low]`, tag chuẩn và kết luận chuyển bước.
 - Checklist item phải kiểm một vấn đề cụ thể, trả lời được bằng Pass/Fail/Không áp dụng, và có format ghi fail gồm `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`.
 - Checklist template cần có người review, trạng thái/lần review, số item `Không áp dụng`, rule kết luận `Pass`/`Pass có điều kiện`/`Fail`, owner/deadline cho item fail, tag `[Constitution]`/`[Readiness]`, evidence cho item quan trọng và bảng ngoại lệ được phê duyệt.
+- Checklist template cần có `Checklist ID`, bước hiện tại/tiếp theo, artifact đã kiểm, status từng item `[Status: Pass/Fail/Không áp dụng/Chưa kiểm]`, quy tắc đánh dấu `Không áp dụng`, tag `[Data]`/`[Migration]`, và quy tắc mã `CHK###` duy nhất.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.
