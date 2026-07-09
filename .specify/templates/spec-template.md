@@ -6,6 +6,10 @@
 
 **Trạng thái**: Bản nháp
 
+**Người phụ trách**: [Tên người viết/owner]
+
+**Stakeholder xác nhận**: [PO/BA/Khách hàng/Team liên quan]
+
 **Đầu vào**: Mô tả người dùng: "$ARGUMENTS"
 
 ---
@@ -168,7 +172,21 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 7. Yêu cầu phi chức năng
+## 7. Quy tắc nghiệp vụ
+
+<!--
+  Ghi các quy tắc nghiệp vụ bắt buộc, đặc biệt là quyền, trạng thái, trùng lặp,
+  điều kiện chuyển bước, điều kiện khóa/sửa/xóa, và lý do bắt buộc khi từ chối.
+  Đây là rule nghiệp vụ, không phải mô tả implementation.
+-->
+
+- **BR-001**: [Quy tắc nghiệp vụ bắt buộc 1]
+- **BR-002**: [Quy tắc nghiệp vụ bắt buộc 2]
+- **BR-003**: [Quy tắc nghiệp vụ bắt buộc 3]
+
+---
+
+## 8. Yêu cầu phi chức năng
 
 <!--
   Hiệu năng, bảo mật, khả dụng, v.v.
@@ -184,7 +202,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 8. Thực thể dữ liệu
+## 9. Thực thể dữ liệu
 
 <!--
   Bao gồm section này nếu tính năng liên quan đến dữ liệu.
@@ -197,7 +215,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 9. Tiêu chí thành công *(bắt buộc)*
+## 10. Tiêu chí thành công *(bắt buộc)*
 
 <!--
   Mỗi tiêu chí phải:
@@ -215,7 +233,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 10. Giả định & Ràng buộc
+## 11. Giả định & Ràng buộc
 
 <!--
   Liệt kê những gì đang được giả định là đúng.
@@ -235,7 +253,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 11. Ngoài phạm vi
+## 12. Ngoài phạm vi
 
 <!--
   Liệt kê rõ ràng những gì KHÔNG thuộc tính năng này.
@@ -247,7 +265,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 12. Rủi ro
+## 13. Rủi ro
 
 <!--
   Những rủi ro có thể ảnh hưởng đến việc deliver tính năng.
@@ -260,7 +278,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 13. Phụ thuộc
+## 14. Phụ thuộc
 
 <!--
   Tính năng này phụ thuộc vào gì để hoạt động?
@@ -274,7 +292,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 14. Câu hỏi mở
+## 15. Câu hỏi mở
 
 <!--
   Những điều chưa rõ cần làm rõ trước khi plan kỹ thuật.
