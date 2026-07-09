@@ -33,6 +33,12 @@
 - Checklist item phải kiểm một vấn đề cụ thể, trả lời được bằng Pass/Fail/Không áp dụng, và có format ghi fail gồm `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`.
 - Checklist template cần có người review, trạng thái/lần review, số item `Không áp dụng`, rule kết luận `Pass`/`Pass có điều kiện`/`Fail`, owner/deadline cho item fail, tag `[Constitution]`/`[Readiness]`, evidence cho item quan trọng và bảng ngoại lệ được phê duyệt.
 - Checklist template cần có `Checklist ID`, bước hiện tại/tiếp theo, artifact đã kiểm, status từng item `[Status: Pass/Fail/Không áp dụng/Chưa kiểm]`, quy tắc đánh dấu `Không áp dụng`, tag `[Data]`/`[Migration]`, và quy tắc mã `CHK###` duy nhất.
+- Tasks template phải giữ cấu trúc phase theo Spec Kit nhưng task sinh ra phải atomic, có ID tuần tự `T001`, có path/command cụ thể, có đầu ra kiểm chứng được và trace được về `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
+- `[P]` trong tasks template chỉ nghĩa là parallelizable, không liên quan tới priority `P1`/`P2`/`P3`; không đánh dấu `[P]` cho task sửa cùng file hoặc phụ thuộc task khác.
+- `/speckit-tasks` không được giữ task ví dụ, placeholder như `[Entity]`/`[endpoint]`/`[file]`, hoặc `TXXX` trong output cuối; task không có file path cụ thể là không hợp lệ trừ task validate/review có command rõ ràng.
+- Tasks template cần có coverage requirements để đảm bảo mỗi user story, acceptance criteria quan trọng, requirement P1/P2, business rule, permission rule, entity, contract và constraint trong plan có task hoặc validation tương ứng.
+- Với feature backend/enterprise, tasks template cần sinh task cho migration, permission, contract, observability, audit/logging, feature flag, rollout/rollback khi `plan.md` đánh dấu liên quan; không đẩy toàn bộ security/observability xuống Polish.
+- Mỗi user story trong tasks template phải có `Independent Test` cụ thể, kể cả manual validation; không dùng placeholder chung chung như "kiểm tra hoạt động đúng".
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.

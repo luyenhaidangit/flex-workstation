@@ -1,5 +1,4 @@
 ---
-
 description: "Template danh sách task cho triển khai feature"
 ---
 
@@ -7,38 +6,106 @@ description: "Template danh sách task cho triển khai feature"
 
 **Đầu vào**: Design documents từ `/specs/[NNNNNN-ten-tinh-nang]/`
 
-**Điều kiện tiên quyết**: plan.md (bắt buộc), spec.md (bắt buộc cho user stories), research.md, data-model.md, contracts/
+**Điều kiện tiên quyết**: `plan.md` (bắt buộc), `spec.md` (bắt buộc cho user stories), `research.md`, `data-model.md`, `contracts/`
 
-**Tests**: Các ví dụ bên dưới có task test. Test là TÙY CHỌN - chỉ thêm nếu feature specification yêu cầu rõ.
+**Tests**: Test task là TÙY CHỌN. Chỉ sinh test task khi `spec.md`, `plan.md`, constitution hoặc convention project yêu cầu. Nếu có test task, test PHẢI được viết trước implementation và fail trước khi code.
 
-**Tổ chức**: Task được nhóm theo user story để mỗi story có thể được implement và kiểm tra độc lập.
+**Tổ chức**: Task được nhóm theo user story để mỗi story có thể được implement, kiểm tra và deliver độc lập.
 
-## Format: `[ID] [P?] [Story] Description`
+## Format: `[ID] [P?] [Story?] Description with path`
 
-- **[P]**: Có thể chạy song song (khác file, không phụ thuộc nhau)
-- **[Story]**: User story mà task thuộc về (ví dụ: US1, US2, US3)
-- Description phải có file path cụ thể
+- **[ID]**: ID duy nhất, tăng tuần tự từ `T001`, `T002`, `T003`...
+- **[P]**: Parallelizable, có thể chạy song song vì sửa khác file và không phụ thuộc task khác. `[P]` KHÔNG liên quan tới priority `P1`/`P2`/`P3`.
+- **[Story]**: User story mà task thuộc về, ví dụ `[US1]`, `[US2]`, `[US3]`. Setup/Foundation task có thể không có story label.
+- **Description**: Phải nêu hành động cụ thể, đối tượng cụ thể và file path cụ thể.
+
+Ví dụ format hợp lệ:
+
+- [ ] T001 Tạo migration `AddBookingTable` trong `backend/src/Infrastructure/Persistence/Migrations/20260709_AddBookingTable.cs`
+- [ ] T012 [P] [US1] Tạo DTO `CreateBookingRequest` trong `backend/src/Application/Bookings/CreateBookingRequest.cs`
+- [ ] T014 [US1] Implement `CreateBookingHandler` trong `backend/src/Application/Bookings/CreateBookingHandler.cs`
+
+## Quy tắc sinh task cho `/speckit-tasks`
+
+Khi sinh file `tasks.md`:
+
+1. Xóa toàn bộ task ví dụ khỏi template.
+2. Đọc user stories từ `spec.md` và sắp theo priority `P1`, `P2`, `P3`.
+3. Đọc `plan.md` để xác định project structure, path thật, technical scope, impact, rollout, observability và test strategy.
+4. Đọc `data-model.md` để sinh task model/schema/repository/service phù hợp.
+5. Đọc `contracts/` để sinh task API/event/contract và contract test khi cần.
+6. Chỉ sinh test task nếu spec, plan, constitution hoặc convention project yêu cầu.
+7. Mỗi task PHẢI có file path cụ thể hoặc command validate cụ thể.
+8. Mỗi task PHẢI có đúng một trách nhiệm chính.
+9. Không dùng placeholder như `[Entity]`, `[endpoint]`, `[file]` trong output cuối.
+10. Đánh số task tuần tự từ `T001`; KHÔNG dùng `TXXX` trong output cuối.
+
+## Quy tắc chất lượng task
+
+Mỗi task PHẢI:
+
+- Có ID duy nhất, tăng tuần tự.
+- Có file path cụ thể hoặc command cụ thể.
+- Có phạm vi nhỏ, có thể hoàn thành trong một lần làm việc.
+- Có đầu ra kiểm chứng được qua diff, test, command, log, UI/manual check hoặc artifact.
+- Trace được về `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
+- Không dùng mô tả mơ hồ như "implement logic", "xử lý nghiệp vụ", "cập nhật các file liên quan".
+- Không gom nhiều lớp không liên quan vào một task.
+- Không đánh dấu `[P]` nếu task sửa cùng file với task khác hoặc phụ thuộc task khác.
+
+Task không có file path cụ thể là KHÔNG HỢP LỆ, trừ task chạy command validate/review có command rõ ràng.
+
+## Coverage Requirements
+
+Khi sinh `tasks.md`, phải đảm bảo:
+
+- Mỗi user story trong `spec.md` có ít nhất một phase riêng.
+- Mỗi acceptance criteria quan trọng có task implementation hoặc validation tương ứng.
+- Mỗi requirement P1/P2 hoặc requirement ảnh hưởng code/data/API/permission có task tương ứng.
+- Mỗi business rule quan trọng có task implementation hoặc test/validation tương ứng.
+- Mỗi security/permission rule có task implementation và test/validation tương ứng khi áp dụng.
+- Mỗi entity trong `data-model.md` có task model/schema/repository/service phù hợp.
+- Mỗi endpoint/event trong `contracts/` có task implementation hoặc contract test tương ứng khi áp dụng.
+- Mỗi constraint trong `plan.md` có task hoặc ghi chú xử lý tương ứng.
+- Rollout, rollback, migration, feature flag, observability và security review có task khi `plan.md` đánh dấu liên quan.
 
 ## Quy ước path
 
-- **Single project**: `src/`, `tests/` tại repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` hoặc `android/src/`
-- Path ví dụ bên dưới giả định single project - điều chỉnh theo cấu trúc trong plan.md
+- **Single project**: `src/`, `tests/` tại repository root.
+- **Backend service**: `backend/src/`, `backend/tests/`.
+- **Web app**: `backend/src/`, `frontend/src/`.
+- **Mobile**: `api/src/`, `ios/src/` hoặc `android/src/`.
+- **Monorepo**: dùng path thật trong `plan.md`, ví dụ `apps/admin-web/`, `services/gov-api/`, `packages/shared/`.
+- Path ví dụ bên dưới chỉ minh họa; output cuối PHẢI dùng path thật theo `plan.md`.
+
+## Invalid Task Examples
+
+Các task sau KHÔNG hợp lệ:
+
+- [ ] T001 Implement chức năng đặt lịch
+  - Lý do: quá rộng, không có file path.
+- [ ] T002 Cập nhật backend và frontend
+  - Lý do: gom nhiều phần, dễ conflict, không chỉ rõ path.
+- [ ] T003 [P] Sửa `BookingService` trong `backend/src/Application/Bookings/BookingService.cs`
+- [ ] T004 [P] Thêm validation vào `BookingService` trong `backend/src/Application/Bookings/BookingService.cs`
+  - Lý do: cùng sửa một file nên không parallel.
+- [ ] T005 [US1] Xử lý lỗi
+  - Lý do: mơ hồ, không nói lỗi nào, hành vi nào, ở file nào.
 
 <!--
   ============================================================================
   QUAN TRỌNG: Các task bên dưới chỉ là VÍ DỤ MINH HỌA.
 
   Lệnh /speckit-tasks PHẢI thay thế chúng bằng task thực tế dựa trên:
-  - User stories từ spec.md (với priority P1, P2, P3...)
-  - Yêu cầu feature từ plan.md
+  - User stories từ spec.md với priority P1/P2/P3
+  - Traceability và technical scope từ plan.md
   - Entities từ data-model.md
-  - Endpoints từ contracts/
+  - Endpoints/events từ contracts/
+  - Test strategy, rollout, observability, permission và migration trong plan.md
 
   Task PHẢI được tổ chức theo user story để mỗi story có thể:
   - Implement độc lập
-  - Test độc lập
+  - Test hoặc validate độc lập
   - Deliver như một MVP increment
 
   KHÔNG giữ các task ví dụ này trong file tasks.md được sinh ra.
@@ -47,30 +114,30 @@ description: "Template danh sách task cho triển khai feature"
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Mục đích**: Khởi tạo project và cấu trúc cơ bản
+**Mục đích**: Khởi tạo cấu trúc project và công cụ dùng chung.
 
-- [ ] T001 Tạo cấu trúc project theo implementation plan
-- [ ] T002 Khởi tạo project [language] với dependency [framework]
-- [ ] T003 [P] Cấu hình linting và formatting tools
+- [ ] T001 Tạo thư mục feature `backend/src/Features/[FeatureName]/` theo cấu trúc trong `plan.md`
+- [ ] T002 Tạo file module feature `backend/src/Features/[FeatureName]/[FeatureName]Module.cs`
+- [ ] T003 [P] Cấu hình formatter rule trong `.editorconfig`
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Mục đích**: Hạ tầng lõi PHẢI hoàn tất trước khi implement BẤT KỲ user story nào
+**Mục đích**: Hạ tầng lõi PHẢI hoàn tất trước khi implement BẤT KỲ user story nào.
 
-**CRITICAL**: Không bắt đầu user story work cho tới khi phase này hoàn tất
+**CRITICAL**: Không bắt đầu user story work cho tới khi phase này hoàn tất.
 
-Ví dụ foundational tasks (điều chỉnh theo project):
+Ví dụ foundational tasks:
 
-- [ ] T004 Thiết lập database schema và migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Thiết lập API routing và middleware structure
-- [ ] T007 Tạo base models/entities mà mọi story phụ thuộc
-- [ ] T008 Cấu hình error handling và logging infrastructure
-- [ ] T009 Thiết lập environment configuration management
+- [ ] T004 Tạo migration `[MigrationName]` trong `backend/src/Infrastructure/Persistence/Migrations/[Timestamp]_[MigrationName].cs`
+- [ ] T005 [P] Tạo shared DTO `[DtoName]` trong `backend/src/Application/[FeatureName]/Dtos/[DtoName].cs`
+- [ ] T006 [P] Cấu hình permission policy `[PolicyName]` trong `backend/src/Infrastructure/Auth/[PolicyName].cs`
+- [ ] T007 Tạo dependency injection cho `[FeatureName]` trong `backend/src/Features/[FeatureName]/DependencyInjection.cs`
+- [ ] T008 Cấu hình structured logging event `[EventName]` trong `backend/src/Features/[FeatureName]/Logging/[EventName].cs`
+- [ ] T009 Cấu hình feature flag `[FeatureFlagName]` trong `backend/src/Infrastructure/Configuration/FeatureFlags.cs`
 
-**Checkpoint**: Foundation đã sẵn sàng - user story implementation có thể bắt đầu song song
+**Checkpoint**: Foundation đã sẵn sàng, user story implementation có thể bắt đầu song song nếu không conflict file/dependency.
 
 ---
 
@@ -78,25 +145,32 @@ Ví dụ foundational tasks (điều chỉnh theo project):
 
 **Goal**: [Mô tả ngắn story này deliver gì]
 
-**Independent Test**: [Cách xác minh riêng story này hoạt động]
+**Independent Test**:
+
+1. [Gọi API/chạy command/thao tác UI cụ thể]
+2. [Kiểm tra response/kết quả nghiệp vụ cụ thể]
+3. [Kiểm tra dữ liệu/log/audit nếu liên quan]
+
+Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra hoạt động đúng".
 
 ### Tests for User Story 1 (OPTIONAL - chỉ thêm nếu có yêu cầu test)
 
-> **NOTE: Viết các test này TRƯỚC, đảm bảo chúng FAIL trước implementation**
+> **NOTE**: Nếu sinh test task, viết test TRƯỚC và đảm bảo test fail trước implementation.
 
-- [ ] T010 [P] [US1] Contract test cho [endpoint] trong tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test cho [user journey] trong tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Tạo contract test cho `POST /api/[resource]` trong `backend/tests/Contract/[FeatureName]ContractTests.cs`
+- [ ] T011 [P] [US1] Tạo integration test cho luồng `[user journey]` trong `backend/tests/Integration/[FeatureName]FlowTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Tạo model [Entity1] trong src/models/[entity1].py
-- [ ] T013 [P] [US1] Tạo model [Entity2] trong src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] trong src/services/[service].py (phụ thuộc T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] trong src/[location]/[file].py
-- [ ] T016 [US1] Thêm validation và error handling
-- [ ] T017 [US1] Thêm logging cho operation của user story 1
+- [ ] T012 [P] [US1] Tạo entity `[Entity1]` trong `backend/src/Domain/[FeatureName]/[Entity1].cs`
+- [ ] T013 [P] [US1] Tạo request validator `[RequestName]Validator` trong `backend/src/Application/[FeatureName]/[RequestName]Validator.cs`
+- [ ] T014 [US1] Implement handler `[UseCaseName]Handler` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
+- [ ] T015 [US1] Implement endpoint `POST /api/[resource]` trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T016 [US1] Thêm permission check `[PermissionName]` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
+- [ ] T017 [US1] Thêm structured logging cho operation `[operation]` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
+- [ ] T018 [US1] Thêm audit record cho action `[action]` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
 
-**Checkpoint**: User Story 1 đã hoàn chỉnh và có thể test độc lập
+**Checkpoint**: User Story 1 đã hoàn chỉnh và có thể test/validate độc lập.
 
 ---
 
@@ -104,21 +178,23 @@ Ví dụ foundational tasks (điều chỉnh theo project):
 
 **Goal**: [Mô tả ngắn story này deliver gì]
 
-**Independent Test**: [Cách xác minh riêng story này hoạt động]
+**Independent Test**:
+
+1. [Gọi API/chạy command/thao tác UI cụ thể]
+2. [Kiểm tra response/kết quả nghiệp vụ cụ thể]
+3. [Kiểm tra dữ liệu/log/audit nếu liên quan]
 
 ### Tests for User Story 2 (OPTIONAL - chỉ thêm nếu có yêu cầu test)
 
-- [ ] T018 [P] [US2] Contract test cho [endpoint] trong tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test cho [user journey] trong tests/integration/test_[name].py
+- [ ] T019 [P] [US2] Tạo integration test cho luồng `[user journey]` trong `backend/tests/Integration/[FeatureName]UpdateTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Tạo model [Entity] trong src/models/[entity].py
-- [ ] T021 [US2] Implement [Service] trong src/services/[service].py
-- [ ] T022 [US2] Implement [endpoint/feature] trong src/[location]/[file].py
-- [ ] T023 [US2] Tích hợp với component của User Story 1 (nếu cần)
+- [ ] T020 [US2] Implement handler `[UseCaseName]Handler` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
+- [ ] T021 [US2] Implement endpoint `PATCH /api/[resource]/{id}` trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T022 [US2] Thêm idempotency/concurrency check trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
 
-**Checkpoint**: User Story 1 và User Story 2 đều hoạt động độc lập
+**Checkpoint**: User Story 1 và User Story 2 đều hoạt động độc lập.
 
 ---
 
@@ -126,20 +202,23 @@ Ví dụ foundational tasks (điều chỉnh theo project):
 
 **Goal**: [Mô tả ngắn story này deliver gì]
 
-**Independent Test**: [Cách xác minh riêng story này hoạt động]
+**Independent Test**:
+
+1. [Gọi API/chạy command/thao tác UI cụ thể]
+2. [Kiểm tra response/kết quả nghiệp vụ cụ thể]
+3. [Kiểm tra dữ liệu/log/audit nếu liên quan]
 
 ### Tests for User Story 3 (OPTIONAL - chỉ thêm nếu có yêu cầu test)
 
-- [ ] T024 [P] [US3] Contract test cho [endpoint] trong tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test cho [user journey] trong tests/integration/test_[name].py
+- [ ] T023 [P] [US3] Tạo integration test cho luồng `[user journey]` trong `backend/tests/Integration/[FeatureName]QueryTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T026 [P] [US3] Tạo model [Entity] trong src/models/[entity].py
-- [ ] T027 [US3] Implement [Service] trong src/services/[service].py
-- [ ] T028 [US3] Implement [endpoint/feature] trong src/[location]/[file].py
+- [ ] T024 [US3] Implement query handler `[QueryName]Handler` trong `backend/src/Application/[FeatureName]/[QueryName]Handler.cs`
+- [ ] T025 [US3] Implement endpoint `GET /api/[resource]` trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T026 [US3] Thêm permission scope filter trong `backend/src/Application/[FeatureName]/[QueryName]Handler.cs`
 
-**Checkpoint**: Tất cả user stories đã hoạt động độc lập
+**Checkpoint**: Tất cả user stories đã hoạt động độc lập.
 
 ---
 
@@ -149,14 +228,25 @@ Ví dụ foundational tasks (điều chỉnh theo project):
 
 ## Phase N: Polish & Cross-Cutting Concerns
 
-**Mục đích**: Cải thiện ảnh hưởng tới nhiều user story
+**Mục đích**: Hoàn tất kiểm tra chéo, tài liệu, observability và validation ảnh hưởng nhiều user story.
 
-- [ ] TXXX [P] Cập nhật tài liệu trong docs/
-- [ ] TXXX Dọn code và refactoring
-- [ ] TXXX Tối ưu hiệu năng trên nhiều story
-- [ ] TXXX [P] Bổ sung unit tests (nếu được yêu cầu) trong tests/unit/
-- [ ] TXXX Gia cố bảo mật
-- [ ] TXXX Chạy validation trong quickstart.md
+- [ ] T027 [P] Cập nhật tài liệu feature trong `docs/[feature-name].md`
+- [ ] T028 Kiểm tra error response không leak internal exception trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T029 Kiểm tra log không chứa token, secret, API key hoặc dữ liệu nhạy cảm trong `backend/src/Application/[FeatureName]/`
+- [ ] T030 Kiểm tra authorization cho toàn bộ endpoint mới trong `backend/tests/Integration/[FeatureName]PermissionTests.cs`
+- [ ] T031 Chạy validation quickstart bằng command trong `specs/[NNNNNN-ten-tinh-nang]/quickstart.md`
+
+---
+
+## Validation Commands
+
+Điền command thật từ `plan.md` và `quickstart.md`.
+
+- Build backend: `[command]`
+- Run tests: `[command]`
+- Run API contract tests: `[command hoặc Không áp dụng]`
+- Run frontend checks: `[command hoặc Không áp dụng]`
+- Run migration/smoke check: `[command hoặc Không áp dụng]`
 
 ---
 
@@ -164,48 +254,49 @@ Ví dụ foundational tasks (điều chỉnh theo project):
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: Không có dependency - có thể bắt đầu ngay
-- **Foundational (Phase 2)**: Phụ thuộc Setup completion - CHẶN mọi user story
-- **User Stories (Phase 3+)**: Đều phụ thuộc Foundational phase completion
-  - User stories có thể chạy song song nếu đủ người
-  - Hoặc chạy tuần tự theo priority (P1 -> P2 -> P3)
-- **Polish (Final Phase)**: Phụ thuộc tất cả user stories mong muốn đã hoàn tất
+- **Setup (Phase 1)**: Không có dependency, có thể bắt đầu ngay.
+- **Foundational (Phase 2)**: Phụ thuộc Setup completion, CHẶN mọi user story.
+- **User Stories (Phase 3+)**: Đều phụ thuộc Foundational phase completion.
+  - User stories có thể chạy song song nếu đủ người và không conflict file/dependency.
+  - Hoặc chạy tuần tự theo priority `P1` -> `P2` -> `P3`.
+- **Polish (Final Phase)**: Phụ thuộc tất cả user stories trong scope đã hoàn tất.
 
 ### User Story Dependencies
 
-- **User Story 1 (P1)**: Có thể bắt đầu sau Foundational (Phase 2) - không phụ thuộc story khác
-- **User Story 2 (P2)**: Có thể bắt đầu sau Foundational (Phase 2) - có thể tích hợp với US1 nhưng phải test độc lập được
-- **User Story 3 (P3)**: Có thể bắt đầu sau Foundational (Phase 2) - có thể tích hợp với US1/US2 nhưng phải test độc lập được
+- **User Story 1 (P1)**: Có thể bắt đầu sau Foundational (Phase 2), không phụ thuộc story khác.
+- **User Story 2 (P2)**: Có thể bắt đầu sau Foundational (Phase 2). Nếu cần component từ US1, component đó phải được tách lên Foundational hoặc ghi rõ dependency task ID.
+- **User Story 3 (P3)**: Có thể bắt đầu sau Foundational (Phase 2). Nếu cần component từ US1/US2, component đó phải được tách lên Foundational hoặc ghi rõ dependency task ID.
 
 ### Trong từng user story
 
-- Tests (nếu có) PHẢI được viết và FAIL trước implementation
-- Models trước services
-- Services trước endpoints
-- Core implementation trước integration
-- Story hoàn tất trước khi chuyển sang priority tiếp theo
+- Tests (nếu có) PHẢI được viết và fail trước implementation.
+- Models/entities trước services/handlers.
+- Services/handlers trước endpoints/UI.
+- Core implementation trước integration.
+- Permission, validation, logging/audit liên quan story phải nằm trong story đó, không đẩy hết xuống Polish.
+- Story hoàn tất trước khi chuyển sang priority tiếp theo nếu team chọn triển khai tuần tự.
 
 ### Parallel Opportunities
 
-- Mọi Setup task có marker [P] có thể chạy song song
-- Mọi Foundational task có marker [P] có thể chạy song song trong Phase 2
-- Khi Foundational phase hoàn tất, mọi user story có thể bắt đầu song song nếu team đủ capacity
-- Mọi test trong một user story có marker [P] có thể chạy song song
-- Models trong cùng story có marker [P] có thể chạy song song
-- Các user story khác nhau có thể được thực hiện song song bởi các thành viên khác nhau
+- Mọi Setup task có marker `[P]` có thể chạy song song.
+- Mọi Foundational task có marker `[P]` có thể chạy song song trong Phase 2.
+- Khi Foundational phase hoàn tất, user stories có thể bắt đầu song song nếu không conflict file/dependency.
+- Mọi test trong một user story có marker `[P]` có thể chạy song song.
+- Models/entities trong cùng story có marker `[P]` có thể chạy song song.
+- Task sửa cùng file KHÔNG ĐƯỢC đánh dấu `[P]`.
 
 ---
 
 ## Parallel Example: User Story 1
 
 ```bash
-# Chạy mọi test cho User Story 1 cùng lúc (nếu có yêu cầu test):
-Task: "Contract test cho [endpoint] trong tests/contract/test_[name].py"
-Task: "Integration test cho [user journey] trong tests/integration/test_[name].py"
+# Chạy mọi test cho User Story 1 cùng lúc nếu có yêu cầu test:
+Task: "Tạo contract test cho POST /api/[resource] trong backend/tests/Contract/[FeatureName]ContractTests.cs"
+Task: "Tạo integration test cho luồng [user journey] trong backend/tests/Integration/[FeatureName]FlowTests.cs"
 
-# Chạy mọi model cho User Story 1 cùng lúc:
-Task: "Tạo model [Entity1] trong src/models/[entity1].py"
-Task: "Tạo model [Entity2] trong src/models/[entity2].py"
+# Chạy các task model/validator khác file cùng lúc:
+Task: "Tạo entity [Entity1] trong backend/src/Domain/[FeatureName]/[Entity1].cs"
+Task: "Tạo request validator [RequestName]Validator trong backend/src/Application/[FeatureName]/[RequestName]Validator.cs"
 ```
 
 ---
@@ -214,39 +305,50 @@ Task: "Tạo model [Entity2] trong src/models/[entity2].py"
 
 ### MVP First (chỉ User Story 1)
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - chặn mọi story)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 độc lập
-5. Deploy/demo nếu sẵn sàng
+1. Complete Phase 1: Setup.
+2. Complete Phase 2: Foundational (CRITICAL, chặn mọi story).
+3. Complete Phase 3: User Story 1.
+4. **STOP and VALIDATE**: Test hoặc validate User Story 1 độc lập.
+5. Deploy/demo nếu sẵn sàng.
 
 ### Incremental Delivery
 
-1. Complete Setup + Foundational -> Foundation ready
-2. Add User Story 1 -> Test independently -> Deploy/Demo (MVP)
-3. Add User Story 2 -> Test independently -> Deploy/Demo
-4. Add User Story 3 -> Test independently -> Deploy/Demo
-5. Mỗi story thêm giá trị mà không làm hỏng story trước
+1. Complete Setup + Foundational -> Foundation ready.
+2. Add User Story 1 -> Test/validate independently -> Deploy/Demo (MVP).
+3. Add User Story 2 -> Test/validate independently -> Deploy/Demo.
+4. Add User Story 3 -> Test/validate independently -> Deploy/Demo.
+5. Mỗi story thêm giá trị mà không làm hỏng story trước.
 
 ### Parallel Team Strategy
 
 Với nhiều developer:
 
-1. Team hoàn tất Setup + Foundational cùng nhau
+1. Team hoàn tất Setup + Foundational cùng nhau.
 2. Khi Foundational xong:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
-3. Stories hoàn tất và tích hợp độc lập
+   - Developer A: User Story 1.
+   - Developer B: User Story 2.
+   - Developer C: User Story 3.
+3. Stories hoàn tất và tích hợp độc lập.
 
 ---
 
+## Checklist chất lượng trước khi implement
+
+- [ ] Không còn task ví dụ hoặc placeholder `[Entity]`, `[endpoint]`, `[file]` trong output cuối.
+- [ ] Không còn `TXXX`; toàn bộ task được đánh số tuần tự từ `T001`.
+- [ ] Mỗi task có path cụ thể hoặc command cụ thể.
+- [ ] Mỗi user story có Independent Test cụ thể.
+- [ ] Mỗi `US`/`FR` P1/P2 và requirement ảnh hưởng code/data/API/permission có task tương ứng.
+- [ ] Migration, permission, contract, observability, rollout/rollback có task khi `plan.md` đánh dấu liên quan.
+- [ ] Task `[P]` không sửa cùng file và không phụ thuộc nhau.
+- [ ] Không có dependency chéo làm mất khả năng deliver độc lập của user story.
+
 ## Ghi chú
 
-- [P] tasks = khác file, không phụ thuộc nhau
-- [Story] label map task tới user story cụ thể để traceability
-- Mỗi user story nên có thể hoàn tất và test độc lập
-- Xác minh test fail trước khi implement
-- Commit sau từng task hoặc nhóm logic
-- Dừng ở bất kỳ checkpoint nào để validate story độc lập
-- Tránh: task mơ hồ, conflict cùng file, dependency chéo giữa story làm mất tính độc lập
+- `[P]` tasks = khác file, không phụ thuộc nhau, không liên quan tới priority `P1`/`P2`/`P3`.
+- `[Story]` label map task tới user story cụ thể để traceability.
+- Mỗi user story nên có thể hoàn tất và test/validate độc lập.
+- Nếu specification KHÔNG yêu cầu test, không sinh test task chỉ để đủ format; dùng Independent Test/manual validation cụ thể.
+- Commit sau từng task hoặc nhóm logic.
+- Dừng ở bất kỳ checkpoint nào để validate story độc lập.
+- Tránh: task mơ hồ, conflict cùng file, dependency chéo giữa story làm mất tính độc lập.
