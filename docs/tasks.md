@@ -29,6 +29,8 @@
 - Traceability trong constitution phải bao phủ `US`/`FR`/`BR`/`SEC`/`NFR` quan trọng, không chỉ `US`/`FR`.
 - Constitution template cần định nghĩa rõ câu hỏi `CẦN LÀM RÕ` chặn là câu hỏi có thể làm đổi MVP, luồng P1/P2, data/migration, API/contract, permission, rollout/rollback hoặc test strategy chính.
 - Constitution template cần có tiêu chuẩn cho `research.md`, `contracts/`, `data-model.md`, `Definition of Done`, và format ngoại lệ có trạng thái.
+- Checklist template phải là quality gate có loại checklist, artifact chính được kiểm, nguồn tham chiếu, kết quả tổng hợp, severity `[Blocker]`/`[High]`/`[Medium]`/`[Low]`, tag chuẩn và kết luận chuyển bước.
+- Checklist item phải kiểm một vấn đề cụ thể, trả lời được bằng Pass/Fail/Không áp dụng, và có format ghi fail gồm `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.

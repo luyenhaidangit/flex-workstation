@@ -1,10 +1,58 @@
 # Checklist [LOẠI CHECKLIST]: [TÊN TÍNH NĂNG]
 
-**Mục đích**: [Mô tả ngắn gọn phạm vi checklist này kiểm tra]
+## Metadata
+
+**Mục đích**: [Mô tả ngắn gọn checklist này kiểm tra gì và hỗ trợ quyết định nào]
+
 **Ngày tạo**: [DATE]
+
 **Tính năng**: [Link tới spec.md hoặc tài liệu liên quan]
 
+**Loại checklist**: [Requirement Quality / Plan Readiness / Task Quality / Release Readiness / Custom]
+
+**Artifact chính được kiểm tra**: [`spec.md` / `plan.md` / `tasks.md` / release package / artifact khác]
+
+**Nguồn tham chiếu**: [`constitution.md`, `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `tasks.md`]
+
 **Ghi chú**: Checklist này được sinh bởi lệnh `/speckit-checklist` dựa trên bối cảnh và yêu cầu của tính năng.
+
+---
+
+## Phạm vi kiểm tra
+
+<!--
+  Nêu rõ checklist này kiểm quality requirement, readiness để chuyển bước, task quality,
+  hay release readiness. Không kiểm implementation nếu loại checklist là Requirement Quality.
+-->
+
+**Trong phạm vi**:
+- [Artifact/khía cạnh sẽ kiểm tra]
+- [Gate hoặc quyết định checklist hỗ trợ]
+
+**Ngoài phạm vi**:
+- [Nội dung không kiểm tra hoặc ghi "Không áp dụng"]
+- [Implementation/runtime nếu không thuộc loại checklist này]
+
+---
+
+## Kết quả tổng hợp
+
+**Trạng thái**: [Chưa review / Pass / Pass có điều kiện / Fail]
+
+**Tổng số item**: [N]
+
+**Đã pass**: [N]
+
+**Chưa pass**: [N]
+
+**Blocker**: [N]
+
+**Ghi chú chính**:
+- [Vấn đề lớn nhất nếu có hoặc "Không áp dụng"]
+
+---
+
+## Quy tắc sinh checklist
 
 <!--
   ============================================================================
@@ -15,37 +63,120 @@
   Markdown checkbox, mã `CHK###`, marker `[Gap]`, `[Spec §X]`, `[Ambiguity]`,
   `[Conflict]`, `[Assumption]`.
 
-  Checklist kiểm tra chất lượng requirement, không kiểm thử implementation.
-  Mỗi item nên hỏi liệu requirement đã đầy đủ, rõ ràng, nhất quán, đo được
-  và bao phủ đủ tình huống hay chưa.
+  Checklist là quality gate cho artifact được chỉ định. Mỗi item phải kiểm một
+  vấn đề cụ thể và trả lời được bằng Pass/Fail/Không áp dụng.
+
+  Quy tắc theo loại checklist:
+  - Requirement Quality: kiểm `spec.md`, không kiểm implementation.
+  - Plan Readiness: kiểm `plan.md` đã đủ để sinh task chưa.
+  - Task Quality: kiểm `tasks.md` có rõ, trace được, đúng dependency không.
+  - Release Readiness: kiểm rollout, rollback, migration, observability, smoke test.
+  - Custom: ghi rõ artifact và gate được kiểm trong "Phạm vi kiểm tra".
 
   Các item bên dưới chỉ là VÍ DỤ MINH HỌA.
 
   Lệnh /speckit-checklist PHẢI thay thế chúng bằng item thực tế dựa trên:
   - Yêu cầu checklist cụ thể của người dùng
-  - Requirement trong spec.md
-  - Bối cảnh kỹ thuật trong plan.md
-  - Chi tiết triển khai trong tasks.md
+  - Artifact chính được kiểm tra
+  - Nguồn tham chiếu liên quan
+  - Constitution gate nếu áp dụng
 
   KHÔNG giữ các item ví dụ này trong checklist sinh ra.
   ============================================================================
 -->
 
+- Mỗi item chỉ kiểm một vấn đề.
+- Mỗi item PHẢI trả lời được bằng Pass/Fail/Không áp dụng.
+- Không dùng item mơ hồ như "requirement đã tốt chưa?".
+- Không kiểm implementation nếu checklist là `Requirement Quality`.
+- Item `[Blocker]` fail thì KHÔNG ĐƯỢC chuyển bước tiếp theo nếu chưa có ngoại lệ được phê duyệt.
+
+---
+
+## Quy ước tag và mức độ
+
+### Mức độ nghiêm trọng
+
+- `[Blocker]`: Không được đi tiếp nếu fail.
+- `[High]`: Rủi ro lớn, cần xử lý trước khi implement/release.
+- `[Medium]`: Nên xử lý.
+- `[Low]`: Cải thiện chất lượng.
+
+### Tag chuẩn
+
+- `[Completeness]`: Thiếu nội dung bắt buộc.
+- `[Clarity]`: Diễn đạt chưa rõ, dễ hiểu sai.
+- `[Consistency]`: Mâu thuẫn giữa các requirement/artifact.
+- `[Measurability]`: Chưa đo hoặc xác minh được.
+- `[Coverage]`: Chưa bao phủ đủ luồng/trạng thái.
+- `[Traceability]`: Chưa trace được sang artifact khác.
+- `[Security]`: Rủi ro quyền hoặc dữ liệu nhạy cảm.
+- `[Compatibility]`: Rủi ro API/data backward compatibility.
+- `[Observability]`: Thiếu log/trace/debug.
+- `[Release]`: Thiếu readiness cho rollout/rollback/smoke test.
+- `[Gap]`: Có khoảng trống cần bổ sung.
+- `[Ambiguity]`: Có điểm mơ hồ.
+- `[Conflict]`: Có mâu thuẫn.
+- `[Assumption]`: Có giả định chưa xác minh.
+
+---
+
 ## [Nhóm kiểm tra 1]
 
-- [ ] CHK001 Requirement liên quan đã được mô tả đầy đủ cho tình huống chính chưa? [Completeness, Spec §X]
-- [ ] CHK002 Thuật ngữ dễ gây hiểu nhầm đã được định nghĩa bằng tiêu chí rõ ràng chưa? [Clarity]
-- [ ] CHK003 Các requirement trong cùng phạm vi có nhất quán với nhau không? [Consistency]
+- [ ] CHK001 `[Blocker]` Requirement P1 đã có acceptance criteria kiểm được chưa? [Completeness, Measurability, Spec §4, US-001]
+- [ ] CHK002 `[High]` Thuật ngữ dễ gây hiểu nhầm đã được định nghĩa bằng tiêu chí rõ ràng chưa? [Clarity, Ambiguity]
+- [ ] CHK003 `[High]` Requirement trong cùng phạm vi có nhất quán với nhau và với constitution không? [Consistency, Conflict]
 
 ## [Nhóm kiểm tra 2]
 
-- [ ] CHK004 Tiêu chí chấp nhận có thể đo lường hoặc xác minh khách quan không? [Measurability]
-- [ ] CHK005 Các trường hợp biên quan trọng đã được nêu trong requirement chưa? [Coverage, Gap]
-- [ ] CHK006 Giả định hoặc phụ thuộc bên ngoài đã được ghi rõ và kiểm chứng chưa? [Assumption]
+- [ ] CHK004 `[Blocker]` Các yêu cầu ảnh hưởng quyền, dữ liệu, contract hoặc migration đã được trace sang artifact liên quan chưa? [Traceability, Security, Compatibility]
+- [ ] CHK005 `[High]` Các trường hợp biên hoặc trạng thái lỗi quan trọng đã được mô tả đủ chưa? [Coverage, Gap]
+- [ ] CHK006 `[Medium]` Giả định hoặc phụ thuộc bên ngoài đã được ghi rõ và kiểm chứng chưa? [Assumption]
+
+---
+
+## Format ghi nhận khi item fail
+
+Khi một item fail hoặc cần làm rõ, ghi nhận trực tiếp bên dưới item theo format:
+
+```md
+  - **Phát hiện**: [Mô tả vấn đề]
+  - **Ảnh hưởng**: [Rủi ro nếu không xử lý]
+  - **Đề xuất**: [Cách sửa spec/plan/tasks/release artifact]
+  - **Tham chiếu**: [Spec §X / Plan §Y / Task ID / Contract]
+```
+
+---
+
+## Phát hiện chính
+
+- [CHK###] [Tóm tắt phát hiện quan trọng hoặc "Không có"]
+- [CHK###] [Tóm tắt phát hiện quan trọng hoặc "Không có"]
+
+---
+
+## Kết luận và hành động tiếp theo
+
+**Kết quả checklist**: [Pass / Pass có điều kiện / Fail]
+
+**Có được chuyển bước tiếp theo không**: [Có/Không]
+
+**Bước tiếp theo được đề xuất**: [/speckit-plan / /speckit-tasks / implement / release / cần cập nhật artifact]
+
+**Điều kiện để được chuyển bước**:
+- [Điều kiện 1 hoặc "Không áp dụng"]
+- [Điều kiện 2 hoặc "Không áp dụng"]
+
+**Item cần xử lý trước**:
+- [CHK### hoặc "Không áp dụng"]
+- [CHK### hoặc "Không áp dụng"]
+
+---
 
 ## Ghi chú
 
-- Đánh dấu item đã hoàn thành bằng `[x]`
-- Thêm nhận xét hoặc phát hiện trực tiếp bên dưới item liên quan
-- Liên kết tới tài liệu hoặc artifact liên quan khi cần
-- Item được đánh số tuần tự để dễ tham chiếu
+- Đánh dấu item đã hoàn thành bằng `[x]`.
+- Thêm nhận xét hoặc phát hiện trực tiếp bên dưới item liên quan.
+- Liên kết tới tài liệu hoặc artifact liên quan khi cần.
+- Item được đánh số tuần tự để dễ tham chiếu.
+- Checklist không thay thế việc cập nhật artifact gốc; nếu phát hiện gap, PHẢI sửa artifact tương ứng hoặc ghi ngoại lệ được phê duyệt.
