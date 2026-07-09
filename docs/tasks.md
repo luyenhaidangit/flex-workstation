@@ -39,6 +39,11 @@
 - Tasks template cần có coverage requirements để đảm bảo mỗi user story, acceptance criteria quan trọng, requirement P1/P2, business rule, permission rule, entity, contract và constraint trong plan có task hoặc validation tương ứng.
 - Với feature backend/enterprise, tasks template cần sinh task cho migration, permission, contract, observability, audit/logging, feature flag, rollout/rollback khi `plan.md` đánh dấu liên quan; không đẩy toàn bộ security/observability xuống Polish.
 - Mỗi user story trong tasks template phải có `Independent Test` cụ thể, kể cả manual validation; không dùng placeholder chung chung như "kiểm tra hoạt động đúng".
+- Foundational phase trong tasks template chỉ chứa task dùng chung cho ít nhất 2 user stories, điều kiện bắt buộc cho mọi story, schema/base infrastructure, hoặc contract/security foundation toàn feature; task story-specific phải nằm trong phase của story tương ứng.
+- Tasks template cần có rule xử lý conflict file tổng hợp như endpoint/router/module: nếu nhiều stories cùng sửa một file, phải tách file theo use case hoặc ghi rõ integration/dependency task.
+- Task có phụ thuộc rõ phải ghi dependency task ID; mỗi user story cần có `Definition of Done`, và output cuối nên có `Traceability Matrix` map `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` sang task.
+- Tasks template cần có rule riêng cho data/migration safety và API/event contract: không gộp migration schema với business handler, có backward compatibility/backfill/rollback note khi cần, và contract quan trọng có implementation/test task tương ứng.
+- Không sinh test task hình thức; test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.

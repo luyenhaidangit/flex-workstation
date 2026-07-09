@@ -39,6 +39,7 @@ Khi sinh file `tasks.md`:
 8. Mỗi task PHẢI có đúng một trách nhiệm chính.
 9. Không dùng placeholder như `[Entity]`, `[endpoint]`, `[file]` trong output cuối.
 10. Đánh số task tuần tự từ `T001`; KHÔNG dùng `TXXX` trong output cuối.
+11. Không sinh test task chỉ để lấp phase. Test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
 
 ## Quy tắc chất lượng task
 
@@ -49,11 +50,75 @@ Mỗi task PHẢI:
 - Có phạm vi nhỏ, có thể hoàn thành trong một lần làm việc.
 - Có đầu ra kiểm chứng được qua diff, test, command, log, UI/manual check hoặc artifact.
 - Trace được về `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
+- Ghi rõ dependency task ID nếu phụ thuộc task khác, ví dụ `(phụ thuộc T012, T013)`.
 - Không dùng mô tả mơ hồ như "implement logic", "xử lý nghiệp vụ", "cập nhật các file liên quan".
 - Không gom nhiều lớp không liên quan vào một task.
 - Không đánh dấu `[P]` nếu task sửa cùng file với task khác hoặc phụ thuộc task khác.
 
 Task không có file path cụ thể là KHÔNG HỢP LỆ, trừ task chạy command validate/review có command rõ ràng.
+
+## Task Size Rules
+
+Một task nên tương ứng với một thay đổi nhỏ, thường là:
+
+- Một file mới.
+- Một thay đổi rõ trong một file.
+- Một command validation.
+- Một artifact cụ thể.
+
+Nếu task cần sửa nhiều hơn 3 file hoặc gồm nhiều layer như database + service + endpoint + UI, PHẢI tách nhỏ.
+
+## Foundational Scope Rules
+
+Chỉ đưa task vào Foundational nếu task đó:
+
+- Được ít nhất 2 user stories sử dụng chung.
+- Là điều kiện bắt buộc để bất kỳ story nào chạy được.
+- Là schema/migration/base infrastructure cần có trước implementation.
+- Là contract hoặc security foundation ảnh hưởng toàn bộ feature.
+
+Không đưa task story-specific vào Foundational. Nếu task chỉ phục vụ `US1`/`US2`/`US3`, đặt task trong phase của user story tương ứng.
+
+Ví dụ không tốt:
+
+- [ ] T005 Tạo DTO `CreateBookingRequest` trong `backend/src/Application/Bookings/CreateBookingRequest.cs`
+
+Ví dụ tốt hơn:
+
+- [ ] T012 [US1] Tạo DTO `CreateBookingRequest` trong `backend/src/Application/Bookings/CreateBookingRequest.cs`
+
+## File Conflict Rules
+
+Nếu nhiều user stories cùng sửa một file tổng hợp như `FeatureNameEndpoints.cs`, `routes.ts`, `index.ts`, `DependencyInjection.cs`, thì:
+
+- Không coi các story đó là parallel hoàn toàn; hoặc
+- Tách file theo story/use case; hoặc
+- Ghi rõ dependency/integration task để merge endpoint/router/module sau.
+
+Ưu tiên ví dụ path tách theo use case:
+
+- `backend/src/Features/[FeatureName]/Endpoints/Create[Resource]Endpoint.cs`
+- `backend/src/Features/[FeatureName]/Endpoints/Update[Resource]Endpoint.cs`
+- `backend/src/Features/[FeatureName]/Endpoints/List[Resource]Endpoint.cs`
+
+## Data & Migration Safety Rules
+
+Nếu feature thay đổi database/data:
+
+- Phải có task tạo migration.
+- Phải có task kiểm tra backward compatibility nếu hệ thống deploy rolling.
+- Phải có task seed/backfill nếu cần.
+- Phải có task rollback hoặc recovery note nếu migration có rủi ro.
+- Không gộp migration schema và business handler vào cùng một task.
+
+## Contract Task Rules
+
+Nếu `contracts/` có API/event contract:
+
+- Mỗi endpoint/event phải có implementation task.
+- Mỗi request/response schema thay đổi phải có DTO/validator task.
+- Nếu test strategy yêu cầu contract test, mỗi contract quan trọng phải có contract test task.
+- Nếu breaking change, phải có compatibility hoặc migration task.
 
 ## Coverage Requirements
 
@@ -112,6 +177,10 @@ Các task sau KHÔNG hợp lệ:
   ============================================================================
 -->
 
+## Example Phases Only - MUST BE REPLACED
+
+Các phase bên dưới là ví dụ structure. File `tasks.md` được sinh ra KHÔNG ĐƯỢC chứa bất kỳ placeholder nào như `[FeatureName]`, `[Entity]`, `[UseCaseName]`, `[resource]`, `[command]`.
+
 ## Phase 1: Setup (Shared Infrastructure)
 
 **Mục đích**: Khởi tạo cấu trúc project và công cụ dùng chung.
@@ -131,10 +200,10 @@ Các task sau KHÔNG hợp lệ:
 Ví dụ foundational tasks:
 
 - [ ] T004 Tạo migration `[MigrationName]` trong `backend/src/Infrastructure/Persistence/Migrations/[Timestamp]_[MigrationName].cs`
-- [ ] T005 [P] Tạo shared DTO `[DtoName]` trong `backend/src/Application/[FeatureName]/Dtos/[DtoName].cs`
-- [ ] T006 [P] Cấu hình permission policy `[PolicyName]` trong `backend/src/Infrastructure/Auth/[PolicyName].cs`
+- [ ] T005 Tạo rollback note cho migration `[MigrationName]` trong `specs/[NNNNNN-ten-tinh-nang]/rollback.md`
+- [ ] T006 [P] Cấu hình permission policy dùng chung `[PolicyName]` trong `backend/src/Infrastructure/Auth/[PolicyName].cs`
 - [ ] T007 Tạo dependency injection cho `[FeatureName]` trong `backend/src/Features/[FeatureName]/DependencyInjection.cs`
-- [ ] T008 Cấu hình structured logging event `[EventName]` trong `backend/src/Features/[FeatureName]/Logging/[EventName].cs`
+- [ ] T008 Cấu hình structured logging event dùng chung `[EventName]` trong `backend/src/Features/[FeatureName]/Logging/[EventName].cs`
 - [ ] T009 Cấu hình feature flag `[FeatureFlagName]` trong `backend/src/Infrastructure/Configuration/FeatureFlags.cs`
 
 **Checkpoint**: Foundation đã sẵn sàng, user story implementation có thể bắt đầu song song nếu không conflict file/dependency.
@@ -164,11 +233,19 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 
 - [ ] T012 [P] [US1] Tạo entity `[Entity1]` trong `backend/src/Domain/[FeatureName]/[Entity1].cs`
 - [ ] T013 [P] [US1] Tạo request validator `[RequestName]Validator` trong `backend/src/Application/[FeatureName]/[RequestName]Validator.cs`
-- [ ] T014 [US1] Implement handler `[UseCaseName]Handler` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
-- [ ] T015 [US1] Implement endpoint `POST /api/[resource]` trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T014 [US1] Implement handler `[UseCaseName]Handler` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs` (phụ thuộc T012, T013)
+- [ ] T015 [US1] Implement endpoint `POST /api/[resource]` theo contract `contracts/[contract-name].openapi.yaml` trong `backend/src/Features/[FeatureName]/Endpoints/Create[Resource]Endpoint.cs` (phụ thuộc T014)
 - [ ] T016 [US1] Thêm permission check `[PermissionName]` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
 - [ ] T017 [US1] Thêm structured logging cho operation `[operation]` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
 - [ ] T018 [US1] Thêm audit record cho action `[action]` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
+
+**Definition of Done**:
+
+- Implementation tasks của story đã hoàn tất.
+- Independent Test chạy pass.
+- Permission/validation/error handling liên quan story đã được xử lý.
+- Log/audit liên quan story đã được kiểm tra nếu áp dụng.
+- Không làm hỏng các story đã hoàn tất trước đó.
 
 **Checkpoint**: User Story 1 đã hoàn chỉnh và có thể test/validate độc lập.
 
@@ -191,8 +268,16 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 ### Implementation for User Story 2
 
 - [ ] T020 [US2] Implement handler `[UseCaseName]Handler` trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
-- [ ] T021 [US2] Implement endpoint `PATCH /api/[resource]/{id}` trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T021 [US2] Implement endpoint `PATCH /api/[resource]/{id}` trong `backend/src/Features/[FeatureName]/Endpoints/Update[Resource]Endpoint.cs` (phụ thuộc T020)
 - [ ] T022 [US2] Thêm idempotency/concurrency check trong `backend/src/Application/[FeatureName]/[UseCaseName]Handler.cs`
+
+**Definition of Done**:
+
+- Implementation tasks của story đã hoàn tất.
+- Independent Test chạy pass.
+- Permission/validation/error handling liên quan story đã được xử lý.
+- Log/audit liên quan story đã được kiểm tra nếu áp dụng.
+- Không làm hỏng các story đã hoàn tất trước đó.
 
 **Checkpoint**: User Story 1 và User Story 2 đều hoạt động độc lập.
 
@@ -215,8 +300,16 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 ### Implementation for User Story 3
 
 - [ ] T024 [US3] Implement query handler `[QueryName]Handler` trong `backend/src/Application/[FeatureName]/[QueryName]Handler.cs`
-- [ ] T025 [US3] Implement endpoint `GET /api/[resource]` trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T025 [US3] Implement endpoint `GET /api/[resource]` trong `backend/src/Features/[FeatureName]/Endpoints/List[Resource]Endpoint.cs` (phụ thuộc T024)
 - [ ] T026 [US3] Thêm permission scope filter trong `backend/src/Application/[FeatureName]/[QueryName]Handler.cs`
+
+**Definition of Done**:
+
+- Implementation tasks của story đã hoàn tất.
+- Independent Test chạy pass.
+- Permission/validation/error handling liên quan story đã được xử lý.
+- Log/audit liên quan story đã được kiểm tra nếu áp dụng.
+- Không làm hỏng các story đã hoàn tất trước đó.
 
 **Checkpoint**: Tất cả user stories đã hoạt động độc lập.
 
@@ -231,7 +324,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 **Mục đích**: Hoàn tất kiểm tra chéo, tài liệu, observability và validation ảnh hưởng nhiều user story.
 
 - [ ] T027 [P] Cập nhật tài liệu feature trong `docs/[feature-name].md`
-- [ ] T028 Kiểm tra error response không leak internal exception trong `backend/src/Features/[FeatureName]/[FeatureName]Endpoints.cs`
+- [ ] T028 Kiểm tra error response không leak internal exception trong `backend/src/Features/[FeatureName]/Endpoints/`
 - [ ] T029 Kiểm tra log không chứa token, secret, API key hoặc dữ liệu nhạy cảm trong `backend/src/Application/[FeatureName]/`
 - [ ] T030 Kiểm tra authorization cho toàn bộ endpoint mới trong `backend/tests/Integration/[FeatureName]PermissionTests.cs`
 - [ ] T031 Chạy validation quickstart bằng command trong `specs/[NNNNNN-ten-tinh-nang]/quickstart.md`
@@ -250,6 +343,21 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 
 ---
 
+## Traceability Matrix
+
+Điền bảng này trong output cuối để reviewer thấy requirement đã được phủ bởi task nào.
+
+| Source | Covered by tasks |
+|--------|------------------|
+| US1 | T010-T018 |
+| FR-001 | T014, T015 |
+| AC-001 | T011, Independent Test US1 |
+| BR-001 | T014 |
+| SEC-001 | T016, T030 |
+| NFR-001 | T017, T029 |
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
@@ -258,6 +366,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 - **Foundational (Phase 2)**: Phụ thuộc Setup completion, CHẶN mọi user story.
 - **User Stories (Phase 3+)**: Đều phụ thuộc Foundational phase completion.
   - User stories có thể chạy song song nếu đủ người và không conflict file/dependency.
+  - Nếu nhiều stories cùng sửa file tổng hợp, phải tách file theo use case hoặc ghi rõ integration/dependency task.
   - Hoặc chạy tuần tự theo priority `P1` -> `P2` -> `P3`.
 - **Polish (Final Phase)**: Phụ thuộc tất cả user stories trong scope đã hoàn tất.
 
@@ -284,6 +393,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 - Mọi test trong một user story có marker `[P]` có thể chạy song song.
 - Models/entities trong cùng story có marker `[P]` có thể chạy song song.
 - Task sửa cùng file KHÔNG ĐƯỢC đánh dấu `[P]`.
+- Story chạy song song nhưng cùng sửa file tổng hợp KHÔNG được coi là song song hoàn toàn.
 
 ---
 
@@ -328,7 +438,8 @@ Với nhiều developer:
    - Developer A: User Story 1.
    - Developer B: User Story 2.
    - Developer C: User Story 3.
-3. Stories hoàn tất và tích hợp độc lập.
+3. Nếu các stories cùng cần sửa file tổng hợp, phân một integration task riêng hoặc tách file theo use case trước khi chia song song.
+4. Stories hoàn tất và tích hợp độc lập.
 
 ---
 
@@ -337,11 +448,15 @@ Với nhiều developer:
 - [ ] Không còn task ví dụ hoặc placeholder `[Entity]`, `[endpoint]`, `[file]` trong output cuối.
 - [ ] Không còn `TXXX`; toàn bộ task được đánh số tuần tự từ `T001`.
 - [ ] Mỗi task có path cụ thể hoặc command cụ thể.
+- [ ] Task phụ thuộc task khác đã ghi rõ dependency task ID.
 - [ ] Mỗi user story có Independent Test cụ thể.
+- [ ] Mỗi user story có Definition of Done cụ thể.
 - [ ] Mỗi `US`/`FR` P1/P2 và requirement ảnh hưởng code/data/API/permission có task tương ứng.
+- [ ] Traceability Matrix đã map source quan trọng sang task.
 - [ ] Migration, permission, contract, observability, rollout/rollback có task khi `plan.md` đánh dấu liên quan.
 - [ ] Task `[P]` không sửa cùng file và không phụ thuộc nhau.
 - [ ] Không có dependency chéo làm mất khả năng deliver độc lập của user story.
+- [ ] Không có story song song cùng sửa file tổng hợp mà chưa có cách xử lý conflict.
 
 ## Ghi chú
 
@@ -349,6 +464,7 @@ Với nhiều developer:
 - `[Story]` label map task tới user story cụ thể để traceability.
 - Mỗi user story nên có thể hoàn tất và test/validate độc lập.
 - Nếu specification KHÔNG yêu cầu test, không sinh test task chỉ để đủ format; dùng Independent Test/manual validation cụ thể.
+- Test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
 - Commit sau từng task hoặc nhóm logic.
 - Dừng ở bất kỳ checkpoint nào để validate story độc lập.
 - Tránh: task mơ hồ, conflict cùng file, dependency chéo giữa story làm mất tính độc lập.
