@@ -59,7 +59,23 @@
 
 ---
 
-## 2. Người dùng & Bối cảnh
+## 2. Phạm vi MVP
+
+<!--
+  Xác định phiên bản đầu tiên cần tối thiểu những gì để tạo giá trị.
+  Chỉ liệt kê phần PHẢI có trong v1/MVP; phần chưa cần đưa sang "Ngoài phạm vi".
+  Mục này giúp tránh spec phình to và giúp task generation tập trung.
+-->
+
+Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
+
+- **MVP-001**: [Khả năng tối thiểu 1 cần có để người dùng nhận được giá trị]
+- **MVP-002**: [Khả năng tối thiểu 2 cần có để luồng chính hoàn chỉnh]
+- **MVP-003**: [Giới hạn rõ ràng của MVP, ví dụ: chỉ áp dụng cho nhóm người dùng/phạm vi nghiệp vụ X]
+
+---
+
+## 3. Người dùng & Bối cảnh
 
 <!--
   Ai sẽ dùng tính năng này? Trong hoàn cảnh nào?
@@ -74,12 +90,13 @@
 
 ---
 
-## 3. Kịch bản người dùng *(bắt buộc)*
+## 4. Kịch bản người dùng *(bắt buộc)*
 
 <!--
   Ưu tiên theo thứ tự quan trọng. Mỗi kịch bản phải:
   - Có thể test độc lập
   - Mang lại giá trị độc lập nếu chỉ implement mình nó (MVP)
+  - Liên kết rõ với các yêu cầu chức năng để dễ trace khi test và sinh task
 -->
 
 ### US-001 — [Tiêu đề ngắn] (Ưu tiên: P1)
@@ -87,6 +104,8 @@
 [Mô tả hành trình người dùng bằng ngôn ngữ đời thường]
 
 **Lý do ưu tiên**: [Giải thích giá trị và lý do có mức ưu tiên này]
+
+**Liên quan yêu cầu**: FR-001, FR-002
 
 **Test độc lập**: [Mô tả cách test kịch bản này mà không cần kịch bản khác]
 
@@ -103,6 +122,8 @@
 
 **Lý do ưu tiên**: [Giải thích giá trị]
 
+**Liên quan yêu cầu**: FR-003
+
 **Test độc lập**: [Mô tả cách test độc lập]
 
 **Acceptance Criteria**:
@@ -111,14 +132,26 @@
 
 ---
 
-### Trường hợp biên
+## 5. Trạng thái dữ liệu, lỗi & thao tác lặp
 
-- Điều gì xảy ra khi [điều kiện biên]?
-- Hệ thống xử lý thế nào khi [tình huống lỗi]?
+<!--
+  Mô tả phản ứng mong đợi của hệ thống ở các trạng thái phổ biến.
+  Tập trung vào kết quả người dùng/nghiệp vụ nhìn thấy, không mô tả implementation.
+  Bỏ dòng không liên quan, nhưng không bỏ qua trạng thái có thể xảy ra trong luồng chính.
+-->
+
+- **Không có dữ liệu**: [Người dùng thấy gì hoặc có thể làm gì khi chưa có dữ liệu phù hợp]
+- **Dữ liệu không hợp lệ**: [Hệ thống báo gì, chặn gì, và người dùng sửa thế nào]
+- **Không có quyền**: [Hệ thống phản hồi thế nào khi người dùng không đủ quyền]
+- **Lỗi hệ thống**: [Thông báo/kết quả mong đợi khi hệ thống không xử lý được yêu cầu]
+- **Timeout**: [Hệ thống phản hồi thế nào khi xử lý quá thời gian cho phép]
+- **Dữ liệu bị thay đổi bởi người khác**: [Hệ thống xử lý thế nào khi dữ liệu không còn như lúc người dùng bắt đầu thao tác]
+- **Người dùng thao tác lặp lại**: [Hệ thống xử lý thế nào khi người dùng gửi lại cùng một thao tác]
+- **Trường hợp biên khác**: [Điều kiện biên quan trọng riêng của tính năng]
 
 ---
 
-## 4. Yêu cầu chức năng *(bắt buộc)*
+## 6. Yêu cầu chức năng *(bắt buộc)*
 
 <!--
   Mỗi yêu cầu phải:
@@ -135,7 +168,7 @@
 
 ---
 
-## 5. Yêu cầu phi chức năng
+## 7. Yêu cầu phi chức năng
 
 <!--
   Hiệu năng, bảo mật, khả dụng, v.v.
@@ -151,7 +184,7 @@
 
 ---
 
-## 6. Thực thể dữ liệu
+## 8. Thực thể dữ liệu
 
 <!--
   Bao gồm section này nếu tính năng liên quan đến dữ liệu.
@@ -164,7 +197,7 @@
 
 ---
 
-## 7. Tiêu chí thành công *(bắt buộc)*
+## 9. Tiêu chí thành công *(bắt buộc)*
 
 <!--
   Mỗi tiêu chí phải:
@@ -182,7 +215,7 @@
 
 ---
 
-## 8. Giả định & Ràng buộc
+## 10. Giả định & Ràng buộc
 
 <!--
   Liệt kê những gì đang được giả định là đúng.
@@ -202,7 +235,7 @@
 
 ---
 
-## 9. Ngoài phạm vi
+## 11. Ngoài phạm vi
 
 <!--
   Liệt kê rõ ràng những gì KHÔNG thuộc tính năng này.
@@ -214,7 +247,7 @@
 
 ---
 
-## 10. Rủi ro
+## 12. Rủi ro
 
 <!--
   Những rủi ro có thể ảnh hưởng đến việc deliver tính năng.
@@ -227,7 +260,7 @@
 
 ---
 
-## 11. Phụ thuộc
+## 13. Phụ thuộc
 
 <!--
   Tính năng này phụ thuộc vào gì để hoạt động?
@@ -241,7 +274,7 @@
 
 ---
 
-## 12. Câu hỏi mở
+## 14. Câu hỏi mở
 
 <!--
   Những điều chưa rõ cần làm rõ trước khi plan kỹ thuật.
