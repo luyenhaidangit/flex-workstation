@@ -6,6 +6,12 @@
 
 **Ngày tạo**: [DATE]
 
+**Người review**: [Tên người review hoặc team]
+
+**Trạng thái review**: [Chưa bắt đầu / Đang review / Hoàn tất]
+
+**Lần review**: [Lần 1 / Lần 2 / Final]
+
 **Tính năng**: [Link tới spec.md hoặc tài liệu liên quan]
 
 **Loại checklist**: [Requirement Quality / Plan Readiness / Task Quality / Release Readiness / Custom]
@@ -41,14 +47,21 @@
 
 **Tổng số item**: [N]
 
-**Đã pass**: [N]
+**Pass**: [N]
 
-**Chưa pass**: [N]
+**Fail**: [N]
 
-**Blocker**: [N]
+**Không áp dụng**: [N]
+
+**Blocker fail**: [N]
 
 **Ghi chú chính**:
 - [Vấn đề lớn nhất nếu có hoặc "Không áp dụng"]
+
+**Quy tắc kết luận**:
+- `Pass`: Không có item `[Blocker]` hoặc `[High]` fail.
+- `Pass có điều kiện`: Không có `[Blocker]` fail, nhưng còn `[High]`/`[Medium]` fail đã có owner và kế hoạch xử lý.
+- `Fail`: Có ít nhất một `[Blocker]` fail hoặc thiếu artifact chính để kiểm tra.
 
 ---
 
@@ -90,6 +103,40 @@
 - Không dùng item mơ hồ như "requirement đã tốt chưa?".
 - Không kiểm implementation nếu checklist là `Requirement Quality`.
 - Item `[Blocker]` fail thì KHÔNG ĐƯỢC chuyển bước tiếp theo nếu chưa có ngoại lệ được phê duyệt.
+- Mỗi item `[Blocker]` hoặc `[High]` NÊN có tham chiếu tới artifact nguồn, ví dụ `[Spec §4, US-001]`, `[Plan §8]`, `[Task T012]`.
+
+### Gợi ý nhóm theo loại checklist
+
+**Requirement Quality**:
+- Completeness
+- Clarity
+- Consistency
+- Measurability
+- Coverage
+- Assumption
+
+**Plan Readiness**:
+- Technical scope
+- Traceability
+- Impact analysis
+- Migration/contract/permission
+- Test strategy
+- Rollout/observability
+
+**Task Quality**:
+- Dependency order
+- Independent task
+- Test task coverage
+- Path/module clarity
+- No vague task
+
+**Release Readiness**:
+- Rollout
+- Rollback
+- Migration/backfill
+- Feature flag/config
+- Observability
+- Smoke test
 
 ---
 
@@ -114,6 +161,8 @@
 - `[Compatibility]`: Rủi ro API/data backward compatibility.
 - `[Observability]`: Thiếu log/trace/debug.
 - `[Release]`: Thiếu readiness cho rollout/rollback/smoke test.
+- `[Constitution]`: Vi phạm nguyên tắc hoặc gate trong `constitution.md`.
+- `[Readiness]`: Chưa đủ điều kiện để chuyển sang bước tiếp theo.
 - `[Gap]`: Có khoảng trống cần bổ sung.
 - `[Ambiguity]`: Có điểm mơ hồ.
 - `[Conflict]`: Có mâu thuẫn.
@@ -121,15 +170,21 @@
 
 ---
 
-## [Nhóm kiểm tra 1]
+## [Nhóm kiểm tra theo loại checklist]
+
+<!--
+  Các item ví dụ dưới đây minh họa cho Requirement Quality.
+  Khi sinh checklist loại khác, PHẢI thay bằng item phù hợp với
+  Plan Readiness / Task Quality / Release Readiness / Custom.
+-->
 
 - [ ] CHK001 `[Blocker]` Requirement P1 đã có acceptance criteria kiểm được chưa? [Completeness, Measurability, Spec §4, US-001]
 - [ ] CHK002 `[High]` Thuật ngữ dễ gây hiểu nhầm đã được định nghĩa bằng tiêu chí rõ ràng chưa? [Clarity, Ambiguity]
-- [ ] CHK003 `[High]` Requirement trong cùng phạm vi có nhất quán với nhau và với constitution không? [Consistency, Conflict]
+- [ ] CHK003 `[High]` Requirement trong cùng phạm vi có nhất quán với nhau và với constitution không? [Consistency, Conflict, Constitution]
 
-## [Nhóm kiểm tra 2]
+## [Nhóm kiểm tra bổ sung theo rủi ro]
 
-- [ ] CHK004 `[Blocker]` Các yêu cầu ảnh hưởng quyền, dữ liệu, contract hoặc migration đã được trace sang artifact liên quan chưa? [Traceability, Security, Compatibility]
+- [ ] CHK004 `[Blocker]` Các yêu cầu ảnh hưởng quyền, dữ liệu, contract hoặc migration đã được trace sang artifact liên quan chưa? [Traceability, Security, Compatibility, Readiness]
 - [ ] CHK005 `[High]` Các trường hợp biên hoặc trạng thái lỗi quan trọng đã được mô tả đủ chưa? [Coverage, Gap]
 - [ ] CHK006 `[Medium]` Giả định hoặc phụ thuộc bên ngoài đã được ghi rõ và kiểm chứng chưa? [Assumption]
 
@@ -144,6 +199,8 @@ Khi một item fail hoặc cần làm rõ, ghi nhận trực tiếp bên dưới
   - **Ảnh hưởng**: [Rủi ro nếu không xử lý]
   - **Đề xuất**: [Cách sửa spec/plan/tasks/release artifact]
   - **Tham chiếu**: [Spec §X / Plan §Y / Task ID / Contract]
+  - **Owner**: [Người/team xử lý]
+  - **Hạn xử lý**: [Ngày hoặc mốc trước khi chuyển bước]
 ```
 
 ---
@@ -152,6 +209,14 @@ Khi một item fail hoặc cần làm rõ, ghi nhận trực tiếp bên dưới
 
 - [CHK###] [Tóm tắt phát hiện quan trọng hoặc "Không có"]
 - [CHK###] [Tóm tắt phát hiện quan trọng hoặc "Không có"]
+
+---
+
+## Ngoại lệ được phê duyệt
+
+| Item | Lý do ngoại lệ | Rủi ro chấp nhận | Người phê duyệt | Hạn xem lại |
+|------|----------------|------------------|------------------|-------------|
+| [CHK### hoặc "Không áp dụng"] | [Lý do] | [Rủi ro] | [Tên] | [Ngày] |
 
 ---
 

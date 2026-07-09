@@ -31,6 +31,7 @@
 - Constitution template cần có tiêu chuẩn cho `research.md`, `contracts/`, `data-model.md`, `Definition of Done`, và format ngoại lệ có trạng thái.
 - Checklist template phải là quality gate có loại checklist, artifact chính được kiểm, nguồn tham chiếu, kết quả tổng hợp, severity `[Blocker]`/`[High]`/`[Medium]`/`[Low]`, tag chuẩn và kết luận chuyển bước.
 - Checklist item phải kiểm một vấn đề cụ thể, trả lời được bằng Pass/Fail/Không áp dụng, và có format ghi fail gồm `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`.
+- Checklist template cần có người review, trạng thái/lần review, số item `Không áp dụng`, rule kết luận `Pass`/`Pass có điều kiện`/`Fail`, owner/deadline cho item fail, tag `[Constitution]`/`[Readiness]`, evidence cho item quan trọng và bảng ngoại lệ được phê duyệt.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.
