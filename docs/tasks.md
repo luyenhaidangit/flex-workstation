@@ -19,6 +19,9 @@
 - Plan template cần tách chi tiết `API/Contract Detail`, `Permission Matrix`, và đánh giá idempotency/concurrency/retry khi feature có API, quyền, hoặc xử lý lặp.
 - `Dữ liệu & Migration` mô tả dữ liệu cần xử lý; `Rollout & Rollback` chỉ mô tả cách thực thi migration/backfill khi release để tránh ghi trùng.
 - `Chiến lược kiểm thử` đứng trước `Cấu trúc project` để source/test path thật được quyết định sau khi đã rõ lớp test cần có.
+- Constitution template phải là bộ luật kiểm được, không chỉ là tuyên ngôn: mỗi principle cần có `Quy định`, `Lý do`, `Áp dụng cho`, `Cách kiểm tra`, `Ngoại lệ`.
+- Constitution template cần định nghĩa phạm vi áp dụng, keyword `PHẢI`/`KHÔNG ĐƯỢC`/`NÊN`/`CÓ THỂ`, cổng chất lượng, ngoại lệ/biện minh độ phức tạp, quản trị và lịch sử thay đổi.
+- Cổng chất lượng trong constitution phải map được sang `spec.md`, `plan.md`, `tasks.md`, review và release: scope, traceability, test, security, compatibility, observability và complexity.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.
