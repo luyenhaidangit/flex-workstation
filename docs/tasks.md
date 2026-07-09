@@ -12,6 +12,9 @@
 - `FR` cần có priority `[P1]`/`[P2]`/`[P3]` và trace ngược về `US`/`AC`; `Thực thể dữ liệu` đứng trước phân quyền/audit để làm rõ đối tượng nghiệp vụ trước khi xác định quyền.
 - Plan template phải nối spec với thiết kế kỹ thuật bằng traceability từ `US`/`FR` sang module/path, API/contract, data/entity và kiểm thử tương ứng.
 - Plan template cần có phạm vi kỹ thuật, phân tích tác động, quyết định kỹ thuật, rollout/rollback, observability/debug và checklist sẵn sàng trước khi chạy `/speckit-tasks`.
+- Plan template cần có tóm tắt đúng lifecycle, câu hỏi kỹ thuật cần research, thiết kế tổng quan, chiến lược kiểm thử, và dữ liệu/migration riêng cho feature có DB/data.
+- Bối cảnh kỹ thuật trong plan template ưu tiên ví dụ gần hệ thống backend/enterprise: service/app liên quan, đơn vị deploy, nền tảng chạy, framework/package/internal SDK, storage và test stack thực tế.
+- Rollback trong plan template cần tách rollback code/config với rollback dữ liệu/migration; observability phải ghi rõ dữ liệu không được log như token, secret, API key hoặc dữ liệu nhạy cảm.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.
