@@ -26,6 +26,9 @@
 - Không sinh `tasks.md` khi còn câu hỏi `CẦN LÀM RÕ` chặn phạm vi, thiết kế, dữ liệu, permission, contract hoặc rollout; nếu đi tiếp phải ghi rủi ro và người phê duyệt trong `plan.md`.
 - Task trong `tasks.md` phải có đầu ra kiểm tra được, tránh task mơ hồ như "cập nhật logic" hoặc "tối ưu code" nếu không nêu module, hành vi và tiêu chí hoàn thành.
 - Constitution template cần có checklist review tối thiểu và Release Gate để kiểm rollout, rollback, migration/backfill, observability và smoke test trước release.
+- Traceability trong constitution phải bao phủ `US`/`FR`/`BR`/`SEC`/`NFR` quan trọng, không chỉ `US`/`FR`.
+- Constitution template cần định nghĩa rõ câu hỏi `CẦN LÀM RÕ` chặn là câu hỏi có thể làm đổi MVP, luồng P1/P2, data/migration, API/contract, permission, rollout/rollback hoặc test strategy chính.
+- Constitution template cần có tiêu chuẩn cho `research.md`, `contracts/`, `data-model.md`, `Definition of Done`, và format ngoại lệ có trạng thái.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.

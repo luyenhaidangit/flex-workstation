@@ -75,7 +75,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 
 ### I. Traceability bắt buộc
 
-**Quy định**: Mỗi yêu cầu P1/P2 trong spec PHẢI được mapping sang hướng xử lý kỹ thuật trong plan và task kiểm thử tương ứng trong tasks.
+**Quy định**: Mỗi yêu cầu P1/P2 hoặc yêu cầu ảnh hưởng nghiệp vụ, dữ liệu, quyền, contract, migration, observability PHẢI được trace từ spec sang plan, tasks và test.
 
 **Lý do**: Traceability giúp đảm bảo implementation bám đúng WHY/WHAT trong spec và không sinh task ngoài phạm vi.
 
@@ -83,11 +83,21 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 
 **Cách kiểm tra**:
 - `spec.md` có ID rõ cho `US`, `AC`, `FR`, `BR`, `SEC`, `NFR`, `SC` khi áp dụng.
-- `plan.md` có bảng traceability từ `US`/`FR` sang module/path/API/data/test.
-- `tasks.md` có task tham chiếu `US`/`FR`/`AC` liên quan.
+- `plan.md` có bảng traceability từ `US`/`FR`/`BR`/`SEC`/`NFR` quan trọng sang module/path/API/data/test.
+- `tasks.md` có task tham chiếu `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` liên quan khi áp dụng.
 - `tasks.md` KHÔNG ĐƯỢC sinh ra nếu còn câu hỏi `CẦN LÀM RÕ` chặn phạm vi, thiết kế, dữ liệu, permission, contract hoặc rollout.
 - Nếu vẫn đi tiếp khi còn câu hỏi mở, PHẢI ghi rõ rủi ro được chấp nhận và người phê duyệt trong `plan.md`.
 - KHÔNG ĐƯỢC sinh task không liên quan đến spec hoặc plan.
+
+Một câu hỏi được xem là chặn nếu câu trả lời có thể làm thay đổi một trong các điểm sau:
+
+- Phạm vi MVP hoặc ngoài phạm vi
+- Luồng P1/P2
+- Data/entity/migration
+- API/contract/event
+- Permission/security
+- Rollout/rollback
+- Test strategy chính
 
 **Ngoại lệ**:
 - [Khi nào được phép thiếu mapping, ai phê duyệt, và rủi ro được chấp nhận]
@@ -159,6 +169,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 **Cách kiểm tra**:
 - `spec.md` có phân quyền/bảo mật ở mức nghiệp vụ.
 - `plan.md` có `Permission Matrix` nếu feature liên quan quyền.
+- `plan.md` có `Permission Matrix` nêu rõ vai trò, hành động và phạm vi dữ liệu: tenant, department, child department, owner, member hoặc custom scope khi áp dụng.
 - `tasks.md` có kiểm thử quyền hợp lệ và không hợp lệ.
 - KHÔNG ĐƯỢC log token, secret, API key, password, private key, cookie, authorization header hoặc dữ liệu nhạy cảm.
 - Nếu cần log request/response để debug, PHẢI mask/redact dữ liệu nhạy cảm.
@@ -178,6 +189,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 **Cách kiểm tra**:
 - `plan.md` có log field chính như `traceId`/`requestId`, `tenantId`, `userId`, `entityId`, `action`, `result` khi phù hợp.
 - `plan.md` nêu dữ liệu không được log.
+- Log/trace/metric PHẢI tuân thủ nguyên tắc bảo mật dữ liệu và không được làm lộ dữ liệu nhạy cảm.
 - Có cách kiểm tra sau release: log query, dashboard, health check hoặc smoke test.
 
 **Ngoại lệ**:
@@ -201,7 +213,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 
 ---
 
-## 6. Tiêu chuẩn cho tài liệu spec/plan/tasks
+## 6. Tiêu chuẩn cho artifact Speckit
 
 ### Cấu trúc artifact
 
@@ -219,9 +231,27 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 ### `plan.md`
 
 - PHẢI mô tả HOW ở mức kỹ thuật đủ để sinh task độc lập.
-- PHẢI có traceability từ `US`/`FR` sang module/path/API/data/test cho P1/P2 hoặc yêu cầu ảnh hưởng code/data/API/permission.
+- PHẢI có traceability từ `US`/`FR`/`BR`/`SEC`/`NFR` sang module/path/API/data/test cho P1/P2 hoặc yêu cầu ảnh hưởng code/data/API/permission.
 - PHẢI có phân tích tác động, quyết định kỹ thuật, chiến lược kiểm thử, rollout/rollback và observability/debug khi áp dụng.
 - PHẢI ghi rõ ngoại lệ hoặc rủi ro nếu constitution gate chưa pass.
+
+### `research.md`
+
+- PHẢI trả lời các câu hỏi kỹ thuật được ghi trong `plan.md`.
+- PHẢI ghi rõ quyết định, lý do chọn, phương án đã loại và rủi ro còn lại.
+- KHÔNG ĐƯỢC đưa ra quyết định kỹ thuật không liên quan đến spec/plan.
+- Các quyết định quan trọng PHẢI được tóm tắt lại trong `plan.md`.
+
+### `contracts/`
+
+- PHẢI phản ánh đúng API/event/public contract được mô tả trong `plan.md`.
+- PHẢI nêu rõ breaking change nếu có.
+- PHẢI hỗ trợ contract test hoặc consumer check khi contract thay đổi.
+
+### `data-model.md`
+
+- PHẢI mô tả entity, quan hệ, migration/backfill nếu có.
+- KHÔNG ĐƯỢC thay đổi dữ liệu/schema ngoài phạm vi đã nêu trong `plan.md`.
 
 ### `tasks.md`
 
@@ -252,7 +282,21 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 
 ---
 
-## 8. Checklist review tối thiểu
+## 8. Definition of Done
+
+Một feature chỉ được xem là hoàn thành khi:
+
+- Scope khớp `spec.md`.
+- Plan/tasks/code trace được tới yêu cầu liên quan.
+- Test phù hợp rủi ro đã được thực hiện hoặc có biện minh được duyệt.
+- Permission/security impact đã được xử lý.
+- Contract/migration/rollback đã rõ nếu có.
+- Observability và smoke check sau release đã sẵn sàng.
+- Không còn ngoại lệ blocker chưa được phê duyệt.
+
+---
+
+## 9. Checklist review tối thiểu
 
 Reviewer PHẢI kiểm tra:
 
@@ -268,7 +312,7 @@ Reviewer PHẢI kiểm tra:
 
 ---
 
-## 9. Ngoại lệ và biện minh độ phức tạp
+## 10. Ngoại lệ và biện minh độ phức tạp
 
 Mọi ngoại lệ với constitution PHẢI ghi rõ:
 
@@ -279,11 +323,25 @@ Mọi ngoại lệ với constitution PHẢI ghi rõ:
 - Người phê duyệt
 - Kế hoạch xử lý sau nếu có
 
+Mỗi ngoại lệ PHẢI có trạng thái:
+
+- `Proposed`: Đang đề xuất
+- `Approved`: Đã được phê duyệt
+- `Rejected`: Bị từ chối
+- `Expired`: Hết hiệu lực
+- `Resolved`: Đã xử lý xong
+
+Format ngoại lệ chuẩn:
+
+| ID | Nguyên tắc vi phạm | Lý do | Rủi ro | Người phê duyệt | Trạng thái | Hạn xử lý |
+|----|--------------------|-------|--------|------------------|------------|-----------|
+| EX-001 | [Principle] | [Lý do] | [Rủi ro] | [Tên] | Approved | [Ngày] |
+
 Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản ánh trong `plan.md` và review/release note tương ứng.
 
 ---
 
-## 10. Quản trị
+## 11. Quản trị
 
 - Constitution có hiệu lực cao hơn template, practice cá nhân và đề xuất tự động từ AI.
 - Mọi thay đổi constitution PHẢI có lý do, người phê duyệt và lịch sử thay đổi.
@@ -297,7 +355,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 
 ---
 
-## 11. Lịch sử thay đổi
+## 12. Lịch sử thay đổi
 
 | Phiên bản | Ngày | Người thay đổi | Thay đổi | Lý do |
 |-----------|------|----------------|----------|-------|
