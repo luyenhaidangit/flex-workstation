@@ -17,16 +17,11 @@
 ## Nguyên tắc phạm vi
 
 <!--
-  Spec này chỉ mô tả WHY và WHAT:
-  - WHY: vấn đề cần giải quyết, lý do cần làm, giá trị mong đợi.
-  - WHAT: hành vi, kết quả, phạm vi, điều kiện chấp nhận ở góc nhìn người dùng/nghiệp vụ.
-  - HOW thuộc về plan kỹ thuật: kiến trúc, framework, database, API, schema, implementation.
-
-  Chỉ đưa ràng buộc kỹ thuật vào spec nếu đó là điều kiện bắt buộc từ nghiệp vụ
-  hoặc từ hệ thống hiện có và ảnh hưởng trực tiếp đến phạm vi/chấp nhận tính năng.
+  Spec này chỉ mô tả WHY và WHAT.
+  HOW thuộc về plan kỹ thuật.
 -->
 
-[Xác nhận ngắn: đặc tả này tập trung vào WHY/WHAT; mọi HOW sẽ được xử lý trong plan kỹ thuật.]
+Spec này chỉ mô tả WHY và WHAT. Các chi tiết HOW sẽ được xử lý trong plan kỹ thuật.
 
 ---
 
@@ -90,7 +85,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 **Bối cảnh sử dụng**: [Khi nào, ở đâu, điều kiện gì người dùng cần tính năng này]
 
-**Trình độ kỹ thuật**: [Mức độ am hiểu công nghệ của người dùng]
+**Mức độ am hiểu hệ thống/nghiệp vụ**: [Không chuyên / Người dùng nghiệp vụ / Quản trị viên / Kỹ thuật]
 
 ---
 
@@ -165,11 +160,16 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
   - Dùng PHẢI/KHÔNG ĐƯỢC thay vì "nên"
 -->
 
-- **FR-001**: Hệ thống PHẢI [khả năng cụ thể]
-- **FR-002**: Hệ thống PHẢI [khả năng cụ thể]
-- **FR-003**: Người dùng PHẢI có thể [tương tác chính]
-- **FR-004**: Hệ thống KHÔNG ĐƯỢC [ràng buộc quan trọng]
-- **FR-005**: Hệ thống PHẢI [yêu cầu dữ liệu hoặc hành vi]
+- **FR-001** `[P1]`: Hệ thống PHẢI [khả năng cụ thể].  
+  **Liên quan**: US-001, AC-001
+- **FR-002** `[P1]`: Hệ thống PHẢI [khả năng cụ thể].  
+  **Liên quan**: US-001, AC-002
+- **FR-003** `[P2]`: Người dùng PHẢI có thể [tương tác chính].  
+  **Liên quan**: US-002, AC-003
+- **FR-004** `[P1]`: Hệ thống KHÔNG ĐƯỢC [ràng buộc quan trọng].  
+  **Liên quan**: US-001, AC-001
+- **FR-005** `[P3]`: Hệ thống PHẢI [yêu cầu dữ liệu hoặc hành vi].  
+  **Liên quan**: [US-###, AC-### hoặc "Không áp dụng"]
 
 ---
 
@@ -185,9 +185,28 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - **BR-002**: [Quy tắc nghiệp vụ bắt buộc 2]
 - **BR-003**: [Quy tắc nghiệp vụ bắt buộc 3]
 
+**Luồng trạng thái nếu có**:
+
+| Trạng thái hiện tại | Hành động | Trạng thái tiếp theo | Điều kiện |
+|---|---|---|---|
+| [A hoặc "Không áp dụng"] | [Hành động] | [B] | [Điều kiện] |
+
 ---
 
-## 8. Phân quyền & Bảo mật
+## 8. Thực thể dữ liệu
+
+<!--
+  Mô tả thực thể nghiệp vụ và quan hệ nếu tính năng liên quan đến dữ liệu.
+  Không ghi schema, table, field type, index, hoặc API payload.
+  Ghi "Không áp dụng" nếu tính năng không có thực thể dữ liệu riêng.
+-->
+
+- **[Thực thể 1]**: [Nó đại diện cho gì, thuộc tính quan trọng không có chi tiết kỹ thuật, hoặc "Không áp dụng"]
+- **[Thực thể 2]**: [Nó đại diện cho gì, quan hệ với thực thể khác, hoặc "Không áp dụng"]
+
+---
+
+## 9. Phân quyền & Bảo mật
 
 <!--
   Mô tả quyền truy cập và bảo mật ở mức nghiệp vụ.
@@ -211,15 +230,14 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 9. Audit & Lịch sử thay đổi
+## 10. Audit & Lịch sử thay đổi
 
 <!--
-  Bỏ section này nếu tính năng không cần ghi nhận lịch sử thao tác.
   Với nghiệp vụ duyệt, phân quyền, cấu hình, publish, hoặc cập nhật trạng thái,
   cần xác định rõ có audit hay không trước khi lập plan kỹ thuật.
 -->
 
-Tính năng này có cần ghi nhận lịch sử thao tác không? [Có/Không]
+**Có cần audit không**: [Có/Không áp dụng]
 
 Nếu có, hệ thống PHẢI ghi nhận:
 
@@ -231,32 +249,19 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 10. Yêu cầu phi chức năng
+## 11. Yêu cầu phi chức năng
 
 <!--
-  Hiệu năng, bảo mật, khả dụng, v.v.
+  Hiệu năng, khả dụng, tương thích, khả năng vận hành, v.v.
   Phải có thể đo lường — không dùng từ mơ hồ như "nhanh", "ổn định".
   Chỉ ghi yêu cầu phi chức năng vào spec khi đó là điều kiện chấp nhận từ nghiệp vụ
   hoặc ràng buộc bắt buộc của hệ thống hiện có. Chi tiết triển khai thuộc plan kỹ thuật.
-  Bỏ section này nếu không có yêu cầu phi chức năng rõ ràng.
+  Ghi "Không áp dụng" nếu không có yêu cầu phi chức năng riêng.
 -->
 
 - **NFR-001**: [Yêu cầu hiệu năng, ví dụ: "Người dùng nhận được phản hồi cho thao tác chính trong vòng 3 giây trong điều kiện tải thông thường"]
-- **NFR-002**: [Yêu cầu bảo mật/nghiệp vụ, ví dụ: "Người dùng không có quyền KHÔNG ĐƯỢC xem dữ liệu nhạy cảm"]
+- **NFR-002**: [Yêu cầu tương thích nghiệp vụ, ví dụ: "Tính năng không làm gián đoạn các luồng nghiệp vụ hiện có"]
 - **NFR-003**: [Yêu cầu khả dụng, ví dụ: "Tính năng hoạt động trên các trình duyệt đang được tổ chức hỗ trợ"]
-
----
-
-## 11. Thực thể dữ liệu
-
-<!--
-  Bao gồm section này nếu tính năng liên quan đến dữ liệu.
-  Mô tả thực thể nghiệp vụ và quan hệ — không phải schema, table, field type, index, hoặc API payload.
-  Bỏ section này nếu không liên quan.
--->
-
-- **[Thực thể 1]**: [Nó đại diện cho gì, thuộc tính quan trọng không có chi tiết kỹ thuật]
-- **[Thực thể 2]**: [Nó đại diện cho gì, quan hệ với thực thể khác]
 
 ---
 
@@ -314,7 +319,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 <!--
   Những rủi ro có thể ảnh hưởng đến việc deliver tính năng.
-  Bỏ section này nếu không có rủi ro đáng kể.
+  Ghi "Không áp dụng" nếu không có rủi ro đáng kể.
 -->
 
 | Rủi ro | Khả năng | Tác động | Biện pháp |
@@ -329,7 +334,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
   Tính năng này phụ thuộc vào gì để hoạt động?
   Chỉ ghi service/API/team nếu đó là phụ thuộc bắt buộc từ nghiệp vụ hoặc hệ thống hiện có.
   Không dùng section này để thiết kế tích hợp kỹ thuật; phần đó thuộc plan kỹ thuật.
-  Bỏ section này nếu không có phụ thuộc rõ ràng.
+  Ghi "Không áp dụng" nếu không có phụ thuộc rõ ràng.
 -->
 
 - [Phụ thuộc vào hệ thống hiện có hoặc quyết định nghiệp vụ X để có Y]
