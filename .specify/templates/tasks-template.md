@@ -41,6 +41,19 @@ Khi sinh file `tasks.md`:
 10. Đánh số task tuần tự từ `T001`; KHÔNG dùng `TXXX` trong output cuối.
 11. Không sinh test task chỉ để lấp phase. Test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
 
+## Generated Output Rules
+
+File `tasks.md` được sinh ra PHẢI:
+
+- Chỉ chứa task thật của feature hiện tại.
+- Chỉ sinh phase cho user story thật có trong `spec.md`.
+- Không tự tạo đủ `US1`/`US2`/`US3` nếu spec không có các story đó.
+- Không giữ phase ví dụ, placeholder, `[FeatureName]`, `[Entity]`, `[UseCaseName]`, `[resource]`, `[command]`, `TXXX` hoặc `Phase N`.
+- Nếu một section không áp dụng, ghi `Không áp dụng` kèm lý do ngắn hoặc bỏ section đó nếu không cần cho reviewer.
+- Giữ lại các section cần cho review: Phase, Dependencies, Parallel Opportunities, Validation Commands, Traceability Matrix và Checklist chất lượng.
+- Nếu không có automated test task cho một user story, phải có manual validation task hoặc command validation task cho story đó.
+- Traceability Matrix phải dùng task ID thực tế; không dùng range nếu range chứa task không liên quan hoặc task optional đã bị bỏ.
+
 ## Quy tắc chất lượng task
 
 Mỗi task PHẢI:
@@ -51,6 +64,7 @@ Mỗi task PHẢI:
 - Có đầu ra kiểm chứng được qua diff, test, command, log, UI/manual check hoặc artifact.
 - Trace được về `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
 - Ghi rõ dependency task ID nếu phụ thuộc task khác, ví dụ `(phụ thuộc T012, T013)`.
+- Nếu task sửa file có sẵn, description phải nêu rõ class, method, section, endpoint group hoặc config key cần sửa.
 - Không dùng mô tả mơ hồ như "implement logic", "xử lý nghiệp vụ", "cập nhật các file liên quan".
 - Không gom nhiều lớp không liên quan vào một task.
 - Không đánh dấu `[P]` nếu task sửa cùng file với task khác hoặc phụ thuộc task khác.
@@ -156,6 +170,8 @@ Các task sau KHÔNG hợp lệ:
   - Lý do: cùng sửa một file nên không parallel.
 - [ ] T005 [US1] Xử lý lỗi
   - Lý do: mơ hồ, không nói lỗi nào, hành vi nào, ở file nào.
+- [ ] T006 [US2] Cập nhật `BookingService.cs`
+  - Lý do: sửa file có sẵn nhưng không nói rõ class, method, section hoặc hành vi cần sửa.
 
 <!--
   ============================================================================
@@ -315,11 +331,11 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 
 ---
 
-[Thêm các phase user story khác nếu cần, theo cùng pattern]
+[Thêm các phase user story thật nếu có trong `spec.md`, theo cùng pattern]
 
 ---
 
-## Phase N: Polish & Cross-Cutting Concerns
+## Final Phase: Polish & Cross-Cutting Concerns
 
 **Mục đích**: Hoàn tất kiểm tra chéo, tài liệu, observability và validation ảnh hưởng nhiều user story.
 
@@ -349,12 +365,14 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 
 | Source | Covered by tasks |
 |--------|------------------|
-| US1 | T010-T018 |
+| US1 | T012, T013, T014, T015, T016, T017, T018 |
 | FR-001 | T014, T015 |
 | AC-001 | T011, Independent Test US1 |
 | BR-001 | T014 |
 | SEC-001 | T016, T030 |
 | NFR-001 | T017, T029 |
+
+Traceability Matrix phải dùng task ID thực tế sau khi sinh. Không dùng range như `T010-T018` nếu trong range có task không liên quan hoặc task optional đã bị bỏ.
 
 ---
 
@@ -446,10 +464,13 @@ Với nhiều developer:
 ## Checklist chất lượng trước khi implement
 
 - [ ] Không còn task ví dụ hoặc placeholder `[Entity]`, `[endpoint]`, `[file]` trong output cuối.
-- [ ] Không còn `TXXX`; toàn bộ task được đánh số tuần tự từ `T001`.
+- [ ] Không còn `TXXX`, `Phase N` hoặc phase user story không tồn tại trong `spec.md`.
+- [ ] Toàn bộ task được đánh số tuần tự từ `T001`.
 - [ ] Mỗi task có path cụ thể hoặc command cụ thể.
+- [ ] Task sửa file có sẵn đã nêu rõ class, method, section, endpoint group hoặc config key cần sửa.
 - [ ] Task phụ thuộc task khác đã ghi rõ dependency task ID.
 - [ ] Mỗi user story có Independent Test cụ thể.
+- [ ] User story không có automated test task đã có manual validation task hoặc command validation task.
 - [ ] Mỗi user story có Definition of Done cụ thể.
 - [ ] Mỗi `US`/`FR` P1/P2 và requirement ảnh hưởng code/data/API/permission có task tương ứng.
 - [ ] Traceability Matrix đã map source quan trọng sang task.

@@ -44,6 +44,10 @@
 - Task có phụ thuộc rõ phải ghi dependency task ID; mỗi user story cần có `Definition of Done`, và output cuối nên có `Traceability Matrix` map `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` sang task.
 - Tasks template cần có rule riêng cho data/migration safety và API/event contract: không gộp migration schema với business handler, có backward compatibility/backfill/rollback note khi cần, và contract quan trọng có implementation/test task tương ứng.
 - Không sinh test task hình thức; test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
+- Output cuối của `/speckit-tasks` chỉ sinh phase cho user story thật trong `spec.md`, không giữ placeholder, `TXXX`, `Phase N`, phase ví dụ hoặc tự tạo đủ `US1`/`US2`/`US3` khi spec không có.
+- Nếu một user story không có automated test task, tasks output phải có manual validation task hoặc command validation task để dev có task verify cụ thể.
+- `Traceability Matrix` trong tasks output phải dùng task ID thực tế, không dùng range nếu range chứa task không liên quan hoặc task optional đã bị bỏ.
+- Task sửa file có sẵn phải nêu rõ class, method, section, endpoint group hoặc config key cần sửa; không viết chung chung kiểu "cập nhật file X".
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.
