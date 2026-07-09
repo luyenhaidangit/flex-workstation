@@ -141,17 +141,18 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 <!--
   Mô tả phản ứng mong đợi của hệ thống ở các trạng thái phổ biến.
   Tập trung vào kết quả người dùng/nghiệp vụ nhìn thấy, không mô tả implementation.
-  Bỏ dòng không liên quan, nhưng không bỏ qua trạng thái có thể xảy ra trong luồng chính.
+  Ghi "Không áp dụng" nếu trạng thái không liên quan.
+  Không được xóa trạng thái có thể xảy ra trong luồng chính.
 -->
 
-- **Không có dữ liệu**: [Người dùng thấy gì hoặc có thể làm gì khi chưa có dữ liệu phù hợp]
-- **Dữ liệu không hợp lệ**: [Hệ thống báo gì, chặn gì, và người dùng sửa thế nào]
-- **Không có quyền**: [Hệ thống phản hồi thế nào khi người dùng không đủ quyền]
-- **Lỗi hệ thống**: [Thông báo/kết quả mong đợi khi hệ thống không xử lý được yêu cầu]
-- **Timeout**: [Hệ thống phản hồi thế nào khi xử lý quá thời gian cho phép]
-- **Dữ liệu bị thay đổi bởi người khác**: [Hệ thống xử lý thế nào khi dữ liệu không còn như lúc người dùng bắt đầu thao tác]
-- **Người dùng thao tác lặp lại**: [Hệ thống xử lý thế nào khi người dùng gửi lại cùng một thao tác]
-- **Trường hợp biên khác**: [Điều kiện biên quan trọng riêng của tính năng]
+- **Không có dữ liệu**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Dữ liệu không hợp lệ**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Không có quyền**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Lỗi hệ thống**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Timeout**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Dữ liệu bị thay đổi bởi người khác**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Người dùng thao tác lặp lại**: [Mô tả hoặc ghi "Không áp dụng"]
+- **Trường hợp biên khác**: [Mô tả hoặc ghi "Không áp dụng"]
 
 ---
 
@@ -186,7 +187,51 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 8. Yêu cầu phi chức năng
+## 8. Phân quyền & Bảo mật
+
+<!--
+  Mô tả quyền truy cập và bảo mật ở mức nghiệp vụ.
+  Chỉ ghi dữ liệu nhạy cảm theo nghĩa nghiệp vụ; chi tiết kỹ thuật bảo vệ thuộc plan kỹ thuật.
+-->
+
+**Ai được xem**:
+- [Vai trò/nhóm người dùng được xem]
+
+**Ai được thao tác**:
+- [Vai trò/nhóm người dùng được tạo/sửa/xóa/xử lý/duyệt]
+
+**Ai không được phép**:
+- [Vai trò/trường hợp bị chặn]
+
+**Dữ liệu nhạy cảm**:
+- [Có/Không. Nếu có, mô tả ở mức nghiệp vụ]
+
+- **SEC-001**: Hệ thống PHẢI kiểm tra quyền trước khi cho phép thao tác.
+- **SEC-002**: Hệ thống KHÔNG ĐƯỢC cho người dùng truy cập dữ liệu ngoài phạm vi được cấp quyền.
+
+---
+
+## 9. Audit & Lịch sử thay đổi
+
+<!--
+  Bỏ section này nếu tính năng không cần ghi nhận lịch sử thao tác.
+  Với nghiệp vụ duyệt, phân quyền, cấu hình, publish, hoặc cập nhật trạng thái,
+  cần xác định rõ có audit hay không trước khi lập plan kỹ thuật.
+-->
+
+Tính năng này có cần ghi nhận lịch sử thao tác không? [Có/Không]
+
+Nếu có, hệ thống PHẢI ghi nhận:
+
+- Ai thực hiện
+- Thao tác gì
+- Thời điểm thực hiện
+- Dữ liệu trước/sau nếu cần
+- Lý do thay đổi nếu nghiệp vụ yêu cầu
+
+---
+
+## 10. Yêu cầu phi chức năng
 
 <!--
   Hiệu năng, bảo mật, khả dụng, v.v.
@@ -196,13 +241,13 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
   Bỏ section này nếu không có yêu cầu phi chức năng rõ ràng.
 -->
 
-- **NFR-001**: [Yêu cầu hiệu năng, ví dụ: "Người dùng thấy kết quả trong vòng 2 giây với kết nối 4G"]
+- **NFR-001**: [Yêu cầu hiệu năng, ví dụ: "Người dùng nhận được phản hồi cho thao tác chính trong vòng 3 giây trong điều kiện tải thông thường"]
 - **NFR-002**: [Yêu cầu bảo mật/nghiệp vụ, ví dụ: "Người dùng không có quyền KHÔNG ĐƯỢC xem dữ liệu nhạy cảm"]
 - **NFR-003**: [Yêu cầu khả dụng, ví dụ: "Tính năng hoạt động trên các trình duyệt đang được tổ chức hỗ trợ"]
 
 ---
 
-## 9. Thực thể dữ liệu
+## 11. Thực thể dữ liệu
 
 <!--
   Bao gồm section này nếu tính năng liên quan đến dữ liệu.
@@ -215,7 +260,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 10. Tiêu chí thành công *(bắt buộc)*
+## 12. Tiêu chí thành công *(bắt buộc)*
 
 <!--
   Mỗi tiêu chí phải:
@@ -233,7 +278,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 11. Giả định & Ràng buộc
+## 13. Giả định & Ràng buộc
 
 <!--
   Liệt kê những gì đang được giả định là đúng.
@@ -253,7 +298,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 12. Ngoài phạm vi
+## 14. Ngoài phạm vi
 
 <!--
   Liệt kê rõ ràng những gì KHÔNG thuộc tính năng này.
@@ -265,7 +310,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 13. Rủi ro
+## 15. Rủi ro
 
 <!--
   Những rủi ro có thể ảnh hưởng đến việc deliver tính năng.
@@ -278,7 +323,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 14. Phụ thuộc
+## 16. Phụ thuộc
 
 <!--
   Tính năng này phụ thuộc vào gì để hoạt động?
@@ -292,7 +337,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 15. Câu hỏi mở
+## 17. Câu hỏi mở
 
 <!--
   Những điều chưa rõ cần làm rõ trước khi plan kỹ thuật.
@@ -302,3 +347,21 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 - [CẦN LÀM RÕ: Câu hỏi 1 — tác động đến phạm vi hoặc UX]
 - [CẦN LÀM RÕ: Câu hỏi 2 — tác động đến bảo mật hoặc dữ liệu]
+
+---
+
+## 18. Điều kiện sẵn sàng để lập plan kỹ thuật
+
+<!--
+  Chỉ chuyển sang plan kỹ thuật khi các điểm dưới đây đã được xác nhận.
+  Nếu chưa rõ nhưng vẫn chấp nhận đi tiếp, ghi rõ rủi ro hoặc câu hỏi mở tương ứng.
+-->
+
+- [ ] Vấn đề cần giải quyết đã rõ.
+- [ ] MVP đã được xác định.
+- [ ] Luồng P1 có Acceptance Criteria đầy đủ.
+- [ ] Yêu cầu chức năng chính đã có ID.
+- [ ] Quy tắc nghiệp vụ quan trọng đã được ghi nhận.
+- [ ] Phân quyền/bảo mật đã rõ hoặc được đánh dấu là câu hỏi mở.
+- [ ] Ngoài phạm vi đã rõ.
+- [ ] Các câu hỏi mở quan trọng đã được trả lời hoặc được chấp nhận là rủi ro.
