@@ -15,6 +15,10 @@
 - Plan template cần có tóm tắt đúng lifecycle, câu hỏi kỹ thuật cần research, thiết kế tổng quan, chiến lược kiểm thử, và dữ liệu/migration riêng cho feature có DB/data.
 - Bối cảnh kỹ thuật trong plan template ưu tiên ví dụ gần hệ thống backend/enterprise: service/app liên quan, đơn vị deploy, nền tảng chạy, framework/package/internal SDK, storage và test stack thực tế.
 - Rollback trong plan template cần tách rollback code/config với rollback dữ liệu/migration; observability phải ghi rõ dữ liệu không được log như token, secret, API key hoặc dữ liệu nhạy cảm.
+- Constitution gate trong plan template cần dùng bảng có trạng thái ban đầu và trạng thái sau design để review được hai mốc kiểm tra.
+- Plan template cần tách chi tiết `API/Contract Detail`, `Permission Matrix`, và đánh giá idempotency/concurrency/retry khi feature có API, quyền, hoặc xử lý lặp.
+- `Dữ liệu & Migration` mô tả dữ liệu cần xử lý; `Rollout & Rollback` chỉ mô tả cách thực thi migration/backfill khi release để tránh ghi trùng.
+- `Chiến lược kiểm thử` đứng trước `Cấu trúc project` để source/test path thật được quyết định sau khi đã rõ lớp test cần có.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.

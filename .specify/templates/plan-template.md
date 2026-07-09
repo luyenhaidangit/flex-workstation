@@ -63,7 +63,9 @@
 
 *GATE: Phải đạt trước Phase 0 research. Kiểm tra lại sau Phase 1 design.*
 
-[Các gate được xác định dựa trên constitution file]
+| Gate | Trạng thái ban đầu | Trạng thái sau design | Ghi chú |
+|------|--------------------|------------------------|---------|
+| [Tên gate từ constitution] | Pass/Fail/Không áp dụng | Pass/Fail/Không áp dụng | [Lý do hoặc việc cần xử lý] |
 
 ## Câu hỏi kỹ thuật cần research
 
@@ -102,6 +104,9 @@
 **Thay đổi boundary giữa service/module**:
 - [Boundary thay đổi hoặc "Không áp dụng"]
 
+**Idempotency/Concurrency**:
+- [Cách xử lý thao tác lặp, retry, concurrent update hoặc "Không áp dụng"]
+
 ## Traceability từ spec sang thiết kế kỹ thuật
 
 <!--
@@ -130,6 +135,30 @@
 | Logging/Audit | [Log/audit thay đổi hoặc Không áp dụng] | [Thiếu truy vết khi lỗi] | [Kiểm tra log/audit record] |
 | UI/UX | [Màn hình/flow thay đổi hoặc Không áp dụng] | [Rủi ro gián đoạn flow hiện có] | [Manual/e2e test] |
 | Job/Worker/Integration | [Tác động async/integration hoặc Không áp dụng] | [Retry/idempotency/timeout] | [Integration test] |
+
+## API/Contract Detail
+
+<!--
+  Dùng khi feature có thay đổi API, event, webhook, payload, OpenAPI, hoặc public contract.
+  Nếu không có thay đổi contract, ghi "Không áp dụng".
+-->
+
+**Có thay đổi contract không**: [Có/Không áp dụng]
+
+| Contract | Loại | Thay đổi | Backward compatible | Consumer bị ảnh hưởng |
+|----------|------|----------|---------------------|------------------------|
+| [Endpoint/Event/Webhook hoặc "Không áp dụng"] | API/Event/Webhook | [Mô tả thay đổi] | Có/Không/Không áp dụng | [Client/service/job hoặc Không áp dụng] |
+
+## Permission Matrix
+
+<!--
+  Dùng khi feature có phân quyền theo role, tenant, department, member, scope, hoặc trạng thái.
+  Nếu không liên quan, ghi "Không áp dụng".
+-->
+
+| Vai trò/Scope | Xem | Tạo | Sửa | Xóa | Duyệt/Xử lý | Ghi chú |
+|---------------|-----|-----|-----|-----|-------------|---------|
+| [Role/scope hoặc "Không áp dụng"] | Có/Không | Có/Không | Có/Không | Có/Không | Có/Không | [Điều kiện] |
 
 ## Dữ liệu & Migration
 
@@ -167,66 +196,6 @@
 | [DEC-001] | [Cách tiếp cận được chọn] | [Vì sao phù hợp với spec/codebase] | [Cách khác hoặc Không áp dụng] | [Vì sao không chọn] |
 | [DEC-002] | [Cách tiếp cận được chọn] | [Vì sao phù hợp với spec/codebase] | [Cách khác hoặc Không áp dụng] | [Vì sao không chọn] |
 
-## Cấu trúc project
-
-### Tài liệu cho feature này
-
-```text
-specs/[NNNNNN-ten-tinh-nang]/
-├── plan.md              # File này (output của lệnh /speckit-plan)
-├── research.md          # Output Phase 0 (lệnh /speckit-plan)
-├── data-model.md        # Output Phase 1 (lệnh /speckit-plan)
-├── quickstart.md        # Output Phase 1 (lệnh /speckit-plan)
-├── contracts/           # Output Phase 1 (lệnh /speckit-plan)
-└── tasks.md             # Output Phase 2 (lệnh /speckit-tasks - KHÔNG tạo bởi /speckit-plan)
-```
-
-### Source code (repository root)
-
-<!--
-  CẦN THỰC HIỆN: Thay cây placeholder bên dưới bằng layout thật cho feature.
-  Xóa option không dùng và mở rộng cấu trúc đã chọn bằng path thật
-  (ví dụ: apps/admin, packages/something). Plan cuối cùng không được giữ nhãn Option.
--->
-
-```text
-# [XÓA NẾU KHÔNG DÙNG] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [XÓA NẾU KHÔNG DÙNG] Option 2: Web application (khi phát hiện "frontend" + "backend")
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [XÓA NẾU KHÔNG DÙNG] Option 3: Mobile + API (khi phát hiện "iOS/Android")
-api/
-└── [giống backend ở trên]
-
-ios/ hoặc android/
-└── [cấu trúc theo nền tảng: feature modules, UI flows, platform tests]
-```
-
-**Quyết định cấu trúc**: [Ghi lại cấu trúc đã chọn và tham chiếu các thư mục thật ở trên]
-
 ## Chiến lược kiểm thử
 
 <!--
@@ -252,6 +221,60 @@ ios/ hoặc android/
 **Regression test**:
 - [Luồng hiện có có nguy cơ bị ảnh hưởng hoặc "Không áp dụng"]
 
+## Cấu trúc project
+
+### Tài liệu cho feature này
+
+```text
+specs/[NNNNNN-ten-tinh-nang]/
+├── plan.md              # File này (output của lệnh /speckit-plan)
+├── research.md          # Output Phase 0 (lệnh /speckit-plan)
+├── data-model.md        # Output Phase 1 (lệnh /speckit-plan)
+├── quickstart.md        # Output Phase 1 (lệnh /speckit-plan)
+├── contracts/           # Output Phase 1 (lệnh /speckit-plan)
+└── tasks.md             # Output Phase 2 (lệnh /speckit-tasks - KHÔNG tạo bởi /speckit-plan)
+```
+
+### Source code (repository root)
+
+<!--
+  CẦN THỰC HIỆN: Thay cây placeholder bên dưới bằng layout thật cho feature.
+  Chọn cấu trúc gần nhất với repo hiện tại, xóa phần không dùng, và thay bằng path thật.
+  Plan cuối cùng không được giữ nhãn Option hoặc cây thư mục mẫu/generic.
+-->
+
+```text
+# [XÓA NẾU KHÔNG DÙNG] Option 1: .NET/backend service
+src/
+├── [ServiceName]/
+│   ├── Controllers/
+│   ├── Services/
+│   ├── Repositories/
+│   ├── Models/
+│   └── ...
+
+tests/
+├── [ServiceName].UnitTests/
+├── [ServiceName].IntegrationTests/
+└── [ServiceName].ContractTests/
+
+# [XÓA NẾU KHÔNG DÙNG] Option 2: Monorepo app/service/worker
+apps/
+├── admin-web/
+├── gov-api/
+└── worker/
+
+packages/
+└── shared/
+
+tests/
+├── unit/
+├── integration/
+└── contract/
+```
+
+**Quyết định cấu trúc**: [Ghi lại cấu trúc đã chọn và tham chiếu các thư mục thật ở trên]
+
 ## Rollout & Rollback
 
 <!--
@@ -266,6 +289,9 @@ ios/ hoặc android/
 
 **Feature flag/config**: [Flag/config dùng để bật tắt hoặc "Không áp dụng"]
 
+**Thực thi migration/backfill khi rollout**:
+- [Chạy trước deploy / sau deploy / qua job riêng / Không áp dụng]
+
 **Rollback code/config**:
 - [Cách quay lại version/flag/config cũ hoặc "Không áp dụng"]
 
@@ -274,8 +300,6 @@ ios/ hoặc android/
 
 **Điều kiện kích hoạt rollback**:
 - [Error rate, lỗi dữ liệu, lỗi quyền, lỗi contract hoặc "Không áp dụng"]
-
-**Dữ liệu cần backfill/cleanup**: [Có/Không áp dụng. Nếu có, mô tả phạm vi và cách kiểm tra]
 
 ## Observability & Debug
 
@@ -321,8 +345,10 @@ ios/ hoặc android/
 - [ ] Phạm vi kỹ thuật trong/ngoài phase này đã rõ.
 - [ ] Câu hỏi kỹ thuật chặn thiết kế/task generation đã được resolve trong research hoặc ghi rủi ro rõ ràng.
 - [ ] Thiết kế tổng quan đã mô tả luồng chính, component/module tham gia, điểm thay đổi và boundary nếu có.
+- [ ] Các tình huống idempotency/concurrency/retry đã được đánh giá hoặc ghi `Không áp dụng`.
 - [ ] Mỗi `US`/`FR` P1/P2 hoặc FR ảnh hưởng code/data/API/permission có mapping sang module/path, API/contract, data/entity và kiểm thử.
 - [ ] Tác động tới database, API contract, permission, logging/audit và integration đã được đánh giá hoặc ghi `Không áp dụng`.
+- [ ] Các contract/API/event thay đổi đã có consumer bị ảnh hưởng và cách kiểm tra compatibility.
 - [ ] Dữ liệu/migration/backfill/compatibility đã rõ hoặc ghi `Không áp dụng`.
 - [ ] Quyết định kỹ thuật chính đã có lý do chọn và phương án bị loại.
 - [ ] Chiến lược kiểm thử đã bao phủ unit, integration, contract, permission/security, E2E/manual và regression khi liên quan.
