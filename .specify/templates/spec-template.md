@@ -10,12 +10,37 @@
 
 ---
 
-## 0. Tổng quan
+## Nguyên tắc phạm vi
 
 <!--
-  Mô tả ngắn gọn tính năng là gì, tại sao cần làm, và ai được hưởng lợi.
-  Viết cho người đọc không có kỹ thuật hiểu được.
+  Spec này chỉ mô tả WHY và WHAT:
+  - WHY: vấn đề cần giải quyết, lý do cần làm, giá trị mong đợi.
+  - WHAT: hành vi, kết quả, phạm vi, điều kiện chấp nhận ở góc nhìn người dùng/nghiệp vụ.
+  - HOW thuộc về plan kỹ thuật: kiến trúc, framework, database, API, schema, implementation.
+
+  Chỉ đưa ràng buộc kỹ thuật vào spec nếu đó là điều kiện bắt buộc từ nghiệp vụ
+  hoặc từ hệ thống hiện có và ảnh hưởng trực tiếp đến phạm vi/chấp nhận tính năng.
 -->
+
+[Xác nhận ngắn: đặc tả này tập trung vào WHY/WHAT; mọi HOW sẽ được xử lý trong plan kỹ thuật.]
+
+---
+
+## 0. Bối cảnh & vấn đề
+
+<!--
+  Bắt đầu từ vấn đề thật trước khi mô tả tính năng.
+  Trả lời: Hiện tại người dùng gặp vấn đề gì? Hậu quả là gì? Vì sao cần làm bây giờ?
+  Sau đó mô tả ngắn gọn tính năng là gì và ai được hưởng lợi.
+  Viết cho người đọc không có kỹ thuật hiểu được.
+  Không mô tả cách triển khai kỹ thuật ở đây.
+-->
+
+**Vấn đề cần giải quyết**:
+
+[Mô tả vấn đề hiện tại, tác động đến người dùng/nghiệp vụ, và lý do cần xử lý trong thời điểm này.]
+
+**Tổng quan tính năng**:
 
 [Mô tả tổng quan tính năng trong 2-4 câu. Trả lời: Cái gì? Tại sao? Cho ai?]
 
@@ -28,9 +53,9 @@
   Không phải tính năng — mà là kết quả mong muốn.
 -->
 
-- **MĐ-01**: [Mục tiêu 1 — kết quả cụ thể cho người dùng]
-- **MĐ-02**: [Mục tiêu 2 — kết quả cụ thể cho hệ thống hoặc nghiệp vụ]
-- **MĐ-03**: [Mục tiêu 3 — nếu có]
+- **MT-001**: [Mục tiêu 1 — kết quả cụ thể cho người dùng]
+- **MT-002**: [Mục tiêu 2 — kết quả cụ thể cho hệ thống hoặc nghiệp vụ]
+- **MT-003**: [Mục tiêu 3 — nếu có]
 
 ---
 
@@ -57,7 +82,7 @@
   - Mang lại giá trị độc lập nếu chỉ implement mình nó (MVP)
 -->
 
-### Kịch bản 1 — [Tiêu đề ngắn] (Ưu tiên: P1)
+### US-001 — [Tiêu đề ngắn] (Ưu tiên: P1)
 
 [Mô tả hành trình người dùng bằng ngôn ngữ đời thường]
 
@@ -65,14 +90,14 @@
 
 **Test độc lập**: [Mô tả cách test kịch bản này mà không cần kịch bản khác]
 
-**Acceptance Scenarios**:
+**Acceptance Criteria**:
 
-1. **Cho trước** [trạng thái ban đầu], **Khi** [hành động], **Thì** [kết quả mong đợi]
-2. **Cho trước** [trạng thái ban đầu], **Khi** [hành động], **Thì** [kết quả mong đợi]
+1. **AC-001**: **Cho trước** [trạng thái ban đầu], **Khi** [hành động], **Thì** [kết quả mong đợi]
+2. **AC-002**: **Cho trước** [trạng thái ban đầu], **Khi** [hành động], **Thì** [kết quả mong đợi]
 
 ---
 
-### Kịch bản 2 — [Tiêu đề ngắn] (Ưu tiên: P2)
+### US-002 — [Tiêu đề ngắn] (Ưu tiên: P2)
 
 [Mô tả hành trình người dùng bằng ngôn ngữ đời thường]
 
@@ -80,9 +105,9 @@
 
 **Test độc lập**: [Mô tả cách test độc lập]
 
-**Acceptance Scenarios**:
+**Acceptance Criteria**:
 
-1. **Cho trước** [trạng thái ban đầu], **Khi** [hành động], **Thì** [kết quả mong đợi]
+1. **AC-003**: **Cho trước** [trạng thái ban đầu], **Khi** [hành động], **Thì** [kết quả mong đợi]
 
 ---
 
@@ -102,11 +127,11 @@
   - Dùng PHẢI/KHÔNG ĐƯỢC thay vì "nên"
 -->
 
-- **YC-001**: Hệ thống PHẢI [khả năng cụ thể]
-- **YC-002**: Hệ thống PHẢI [khả năng cụ thể]
-- **YC-003**: Người dùng PHẢI có thể [tương tác chính]
-- **YC-004**: Hệ thống KHÔNG ĐƯỢC [ràng buộc quan trọng]
-- **YC-005**: Hệ thống PHẢI [yêu cầu dữ liệu hoặc hành vi]
+- **FR-001**: Hệ thống PHẢI [khả năng cụ thể]
+- **FR-002**: Hệ thống PHẢI [khả năng cụ thể]
+- **FR-003**: Người dùng PHẢI có thể [tương tác chính]
+- **FR-004**: Hệ thống KHÔNG ĐƯỢC [ràng buộc quan trọng]
+- **FR-005**: Hệ thống PHẢI [yêu cầu dữ liệu hoặc hành vi]
 
 ---
 
@@ -115,12 +140,14 @@
 <!--
   Hiệu năng, bảo mật, khả dụng, v.v.
   Phải có thể đo lường — không dùng từ mơ hồ như "nhanh", "ổn định".
+  Chỉ ghi yêu cầu phi chức năng vào spec khi đó là điều kiện chấp nhận từ nghiệp vụ
+  hoặc ràng buộc bắt buộc của hệ thống hiện có. Chi tiết triển khai thuộc plan kỹ thuật.
   Bỏ section này nếu không có yêu cầu phi chức năng rõ ràng.
 -->
 
-- **YCPCK-001**: [Yêu cầu hiệu năng, ví dụ: "Trang tải xong trong vòng 2 giây với kết nối 4G"]
-- **YCPCK-002**: [Yêu cầu bảo mật, ví dụ: "Dữ liệu nhạy cảm PHẢI được mã hóa khi lưu trữ"]
-- **YCPCK-003**: [Yêu cầu khả dụng, ví dụ: "Tính năng hoạt động trên Chrome, Firefox, Edge phiên bản mới nhất"]
+- **NFR-001**: [Yêu cầu hiệu năng, ví dụ: "Người dùng thấy kết quả trong vòng 2 giây với kết nối 4G"]
+- **NFR-002**: [Yêu cầu bảo mật/nghiệp vụ, ví dụ: "Người dùng không có quyền KHÔNG ĐƯỢC xem dữ liệu nhạy cảm"]
+- **NFR-003**: [Yêu cầu khả dụng, ví dụ: "Tính năng hoạt động trên các trình duyệt đang được tổ chức hỗ trợ"]
 
 ---
 
@@ -128,7 +155,7 @@
 
 <!--
   Bao gồm section này nếu tính năng liên quan đến dữ liệu.
-  Mô tả thực thể và quan hệ — không phải schema kỹ thuật.
+  Mô tả thực thể nghiệp vụ và quan hệ — không phải schema, table, field type, index, hoặc API payload.
   Bỏ section này nếu không liên quan.
 -->
 
@@ -149,9 +176,9 @@
   Không tốt: "API response time dưới 200ms" (chi tiết kỹ thuật)
 -->
 
-- **TC-001**: [Chỉ số đo lường, ví dụ: "Người dùng hoàn thành luồng chính trong dưới 3 phút"]
-- **TC-002**: [Chỉ số đo lường, ví dụ: "90% người dùng hoàn thành task chính trong lần thử đầu tiên"]
-- **TC-003**: [Chỉ số nghiệp vụ, ví dụ: "Giảm 50% ticket hỗ trợ liên quan đến [vấn đề X]"]
+- **SC-001**: [Chỉ số đo lường, ví dụ: "Người dùng hoàn thành luồng chính trong dưới 3 phút"]
+- **SC-002**: [Chỉ số đo lường, ví dụ: "90% người dùng hoàn thành task chính trong lần thử đầu tiên"]
+- **SC-003**: [Chỉ số nghiệp vụ, ví dụ: "Giảm 50% ticket hỗ trợ liên quan đến [vấn đề X]"]
 
 ---
 
@@ -160,6 +187,8 @@
 <!--
   Liệt kê những gì đang được giả định là đúng.
   Và những ràng buộc cố định không thể thay đổi.
+  Nếu ràng buộc là kỹ thuật, chỉ đưa vào khi đó là điều kiện bắt buộc từ nghiệp vụ
+  hoặc hệ thống hiện có; còn lại để plan kỹ thuật quyết định.
 -->
 
 **Giả định**:
@@ -202,11 +231,12 @@
 
 <!--
   Tính năng này phụ thuộc vào gì để hoạt động?
-  Service, team, quyết định, tính năng khác.
+  Chỉ ghi service/API/team nếu đó là phụ thuộc bắt buộc từ nghiệp vụ hoặc hệ thống hiện có.
+  Không dùng section này để thiết kế tích hợp kỹ thuật; phần đó thuộc plan kỹ thuật.
   Bỏ section này nếu không có phụ thuộc rõ ràng.
 -->
 
-- [Phụ thuộc vào service/API/team X để có Y]
+- [Phụ thuộc vào hệ thống hiện có hoặc quyết định nghiệp vụ X để có Y]
 - [Cần quyết định từ stakeholder về Z trước khi bắt đầu]
 
 ---
