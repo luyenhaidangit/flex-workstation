@@ -48,7 +48,25 @@ Quy ước này áp dụng cho:
 
 ---
 
-## 4. Nguyên tắc cốt lõi
+## 4. Source of Truth và thứ tự ưu tiên artifact
+
+Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
+
+1. `constitution.md`
+2. `spec.md`
+3. `plan.md`
+4. `tasks.md`
+5. Code implementation
+
+**Quy định**:
+- Nếu `plan.md` khác `spec.md`, PHẢI cập nhật `spec.md` hoặc ghi ngoại lệ được phê duyệt.
+- Nếu `tasks.md` khác `plan.md`, PHẢI cập nhật `plan.md` trước khi code.
+- Nếu code khác task/plan, PR PHẢI giải thích lý do thay đổi.
+- AI/dev KHÔNG ĐƯỢC tự mở rộng hoặc thay đổi ý nghĩa nghiệp vụ đã được duyệt trong spec.
+
+---
+
+## 5. Nguyên tắc cốt lõi
 
 <!--
   Mỗi nguyên tắc phải có Quy định, Lý do, Áp dụng cho, Cách kiểm tra và Ngoại lệ.
@@ -67,6 +85,8 @@ Quy ước này áp dụng cho:
 - `spec.md` có ID rõ cho `US`, `AC`, `FR`, `BR`, `SEC`, `NFR`, `SC` khi áp dụng.
 - `plan.md` có bảng traceability từ `US`/`FR` sang module/path/API/data/test.
 - `tasks.md` có task tham chiếu `US`/`FR`/`AC` liên quan.
+- `tasks.md` KHÔNG ĐƯỢC sinh ra nếu còn câu hỏi `CẦN LÀM RÕ` chặn phạm vi, thiết kế, dữ liệu, permission, contract hoặc rollout.
+- Nếu vẫn đi tiếp khi còn câu hỏi mở, PHẢI ghi rõ rủi ro được chấp nhận và người phê duyệt trong `plan.md`.
 - KHÔNG ĐƯỢC sinh task không liên quan đến spec hoặc plan.
 
 **Ngoại lệ**:
@@ -119,6 +139,10 @@ Quy ước này áp dụng cho:
 - `plan.md` có `API/Contract Detail` nếu contract thay đổi.
 - `plan.md` có `Dữ liệu & Migration` nếu thay schema/data.
 - Rollout/rollback nêu rõ xử lý code/config/data.
+- Migration PHẢI đánh giá khả năng chạy trên dữ liệu hiện có.
+- Thay đổi schema phá vỡ tương thích NÊN được triển khai theo hướng nhiều bước nếu cần: expand -> migrate/backfill -> switch -> cleanup.
+- Nếu thêm field bắt buộc, PHẢI nêu default/backfill/compatibility với dữ liệu cũ.
+- Rollback dữ liệu PHẢI được đánh giá riêng với rollback code.
 - Nếu không rollback được dữ liệu, PHẢI có phương án forward-fix.
 
 **Ngoại lệ**:
@@ -136,7 +160,9 @@ Quy ước này áp dụng cho:
 - `spec.md` có phân quyền/bảo mật ở mức nghiệp vụ.
 - `plan.md` có `Permission Matrix` nếu feature liên quan quyền.
 - `tasks.md` có kiểm thử quyền hợp lệ và không hợp lệ.
-- KHÔNG ĐƯỢC log token, secret, API key hoặc dữ liệu nhạy cảm.
+- KHÔNG ĐƯỢC log token, secret, API key, password, private key, cookie, authorization header hoặc dữ liệu nhạy cảm.
+- Nếu cần log request/response để debug, PHẢI mask/redact dữ liệu nhạy cảm.
+- Log PHẢI đủ correlation để debug mà không cần lộ dữ liệu nhạy cảm.
 
 **Ngoại lệ**:
 - [Khi nào ngoại lệ quyền được chấp nhận, ai phê duyệt, và cách giảm thiểu rủi ro]
@@ -175,7 +201,13 @@ Quy ước này áp dụng cho:
 
 ---
 
-## 5. Tiêu chuẩn cho tài liệu spec/plan/tasks
+## 6. Tiêu chuẩn cho tài liệu spec/plan/tasks
+
+### Cấu trúc artifact
+
+- Các section bắt buộc trong template PHẢI được giữ nguyên.
+- Nếu section không liên quan, PHẢI ghi `Không áp dụng` và nêu lý do ngắn.
+- KHÔNG ĐƯỢC xóa section bắt buộc chỉ vì feature hiện tại không dùng.
 
 ### `spec.md`
 
@@ -197,10 +229,15 @@ Quy ước này áp dụng cho:
 - PHẢI tham chiếu `US`/`FR`/`AC` hoặc artifact thiết kế liên quan khi có thể.
 - KHÔNG ĐƯỢC sinh task ngoài spec/plan.
 - PHẢI bao gồm task kiểm thử cho rủi ro đã nêu trong plan, hoặc ghi rõ lý do không áp dụng.
+- KHÔNG ĐƯỢC sinh `tasks.md` nếu còn câu hỏi `CẦN LÀM RÕ` chặn phạm vi, thiết kế, dữ liệu, permission, contract hoặc rollout.
+- Task PHẢI có đầu ra kiểm tra được.
+- KHÔNG ĐƯỢC tạo task mơ hồ như "cập nhật logic", "xử lý lỗi", "tối ưu code" nếu không nêu module, hành vi và tiêu chí hoàn thành.
+- Task liên quan code PHẢI chỉ rõ file/module/path dự kiến khi có thể.
+- Task test PHẢI chỉ rõ loại test và hành vi cần xác minh.
 
 ---
 
-## 6. Cổng chất lượng
+## 7. Cổng chất lượng
 
 | Gate | Áp dụng tại | Điều kiện pass | Nếu fail |
 |------|-------------|----------------|----------|
@@ -211,10 +248,27 @@ Quy ước này áp dụng cho:
 | Compatibility Gate | `plan.md` / release | Contract/data migration có phương án tương thích | Bổ sung rollout/rollback |
 | Observability Gate | `plan.md` / release | Có log/trace/metric/check sau release | Bổ sung observability |
 | Complexity Gate | `plan.md` / review | Độ phức tạp thêm vào có lý do và phương án đơn giản hơn đã được xem xét | Giảm scope/thiết kế hoặc ghi ngoại lệ |
+| Release Gate | release | Rollout, rollback, migration/backfill, observability và smoke test đã rõ | Không release |
 
 ---
 
-## 7. Ngoại lệ và biện minh độ phức tạp
+## 8. Checklist review tối thiểu
+
+Reviewer PHẢI kiểm tra:
+
+- Scope có khớp spec không?
+- Requirement P1/P2 có trace sang plan/task/test không?
+- Có còn câu hỏi `CẦN LÀM RÕ` chặn task/code/release không?
+- Có thay API/contract không? Consumer bị ảnh hưởng là ai?
+- Có thay dữ liệu/schema không? Migration/backfill/rollback thế nào?
+- Có permission/security impact không?
+- Có log/trace đủ debug không? Có lộ dữ liệu nhạy cảm không?
+- Có task/test cho rủi ro chính không?
+- Có over-engineering hoặc abstraction ngoài scope không?
+
+---
+
+## 9. Ngoại lệ và biện minh độ phức tạp
 
 Mọi ngoại lệ với constitution PHẢI ghi rõ:
 
@@ -229,7 +283,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 
 ---
 
-## 8. Quản trị
+## 10. Quản trị
 
 - Constitution có hiệu lực cao hơn template, practice cá nhân và đề xuất tự động từ AI.
 - Mọi thay đổi constitution PHẢI có lý do, người phê duyệt và lịch sử thay đổi.
@@ -243,7 +297,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 
 ---
 
-## 9. Lịch sử thay đổi
+## 11. Lịch sử thay đổi
 
 | Phiên bản | Ngày | Người thay đổi | Thay đổi | Lý do |
 |-----------|------|----------------|----------|-------|

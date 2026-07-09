@@ -22,6 +22,10 @@
 - Constitution template phải là bộ luật kiểm được, không chỉ là tuyên ngôn: mỗi principle cần có `Quy định`, `Lý do`, `Áp dụng cho`, `Cách kiểm tra`, `Ngoại lệ`.
 - Constitution template cần định nghĩa phạm vi áp dụng, keyword `PHẢI`/`KHÔNG ĐƯỢC`/`NÊN`/`CÓ THỂ`, cổng chất lượng, ngoại lệ/biện minh độ phức tạp, quản trị và lịch sử thay đổi.
 - Cổng chất lượng trong constitution phải map được sang `spec.md`, `plan.md`, `tasks.md`, review và release: scope, traceability, test, security, compatibility, observability và complexity.
+- Constitution template cần có Source of Truth: `constitution.md` > `spec.md` > `plan.md` > `tasks.md` > code implementation.
+- Không sinh `tasks.md` khi còn câu hỏi `CẦN LÀM RÕ` chặn phạm vi, thiết kế, dữ liệu, permission, contract hoặc rollout; nếu đi tiếp phải ghi rủi ro và người phê duyệt trong `plan.md`.
+- Task trong `tasks.md` phải có đầu ra kiểm tra được, tránh task mơ hồ như "cập nhật logic" hoặc "tối ưu code" nếu không nêu module, hành vi và tiêu chí hoàn thành.
+- Constitution template cần có checklist review tối thiểu và Release Gate để kiểm rollout, rollback, migration/backfill, observability và smoke test trước release.
 - Với section không áp dụng trong plan template, ghi `Không áp dụng` thay vì xóa section để giữ cấu trúc ổn định cho AI/automation.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và xác nhận `git diff -- .agents/skills` không có thay đổi.
