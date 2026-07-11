@@ -68,7 +68,7 @@ Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại
 
 ```text
 flex-workstation/
-├── docs/            # Tài liệu workspace (system-map, onboarding, tasks)
+├── docs/            # Tài liệu workspace (system-map, onboarding, speckit)
 ├── scripts/         # Bootstrap và tooling scripts
 ├── .agents/         # Cấu hình Codex agent; skill source tại .agents/skills/
 ├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands)
@@ -85,7 +85,8 @@ flex-workstation/
 - Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
-- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tài liệu tương ứng.
+- Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
 
 ## Source-of-truth
 
@@ -101,5 +102,7 @@ flex-workstation/
 README.md
 docs/onboarding.md
 docs/system-map.md
-docs/tasks.md
+docs/speckit/workflow.md
+docs/speckit/templates.md
+docs/speckit/maintenance.md
 ```

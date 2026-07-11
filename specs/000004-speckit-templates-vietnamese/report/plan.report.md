@@ -18,7 +18,7 @@ Dự kiến 25 task trong `tasks.md`, tập trung vào 5 template Speckit, valid
 6. Kiểm tra technical identifiers còn nguyên.
 7. Xác nhận `git diff -- .agents/skills` không có thay đổi.
 8. Chạy `git diff --check`.
-9. Cập nhật `docs/tasks.md` và `docs/speckit/workflow.md`.
+9. Cập nhật `docs/speckit/templates.md` và `docs/speckit/workflow.md`.
 
 ## Risks và assumptions
 

@@ -40,16 +40,16 @@ Expected outcome:
 Input mẫu:
 
 ```text
-$speckit-quick Cập nhật một câu trong docs/tasks.md để ghi chú quick flow không dùng cho thay đổi data hoặc permission.
+$speckit-quick Cập nhật một câu trong docs/speckit/maintenance.md để ghi chú quick flow không dùng cho thay đổi data hoặc permission.
 ```
 
 Expected pre-change statement:
-- Nêu giả định task chỉ sửa `docs/tasks.md`.
+- Nêu giả định task chỉ sửa `docs/speckit/maintenance.md`.
 - Nêu ngoài phạm vi: không sửa skill/core workflow khác nếu không cần.
 - Nêu cách kiểm tra: đọc diff hoặc `rg` câu vừa thêm.
 
 Expected completion report:
-- Nêu `docs/tasks.md` đã thay đổi.
+- Nêu `docs/speckit/maintenance.md` đã thay đổi.
 - Nêu kiểm tra đã chạy hoặc lý do không chạy.
 - Nêu phần chưa làm nếu có.
 

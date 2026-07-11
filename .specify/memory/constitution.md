@@ -26,7 +26,8 @@ Template đã cập nhật:
   ✅ .specify/templates/commands/*.md — không tồn tại trong workspace này
 Tài liệu đã cập nhật:
   ✅ docs/speckit/workflow.md — làm rõ cú pháp `$speckit-*` cho Codex và `/speckit-*` cho slash command
-  ✅ docs/tasks.md — ghi chú amendment constitution v1.2.0
+  ✅ docs/speckit/templates.md — quy ước template Speckit
+  ✅ docs/speckit/maintenance.md — ghi chú amendment constitution v1.2.0 và bảo trì Speckit
 TODO hoãn lại: Không có
 -->
 
@@ -184,7 +185,8 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 - Xóa import/biến/hàm mà chính thay đổi hiện tại làm thừa.
 - Không tự ý xóa dead code từ trước khi chưa được yêu cầu.
 - Không sửa source code project con khi yêu cầu chỉ thuộc workstation.
-- Khi thay đổi hành vi, cấu trúc hoặc onboarding, cập nhật `docs/tasks.md` và file tài liệu tương ứng.
+- Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
 
 **Ngoại lệ**:
 - Refactor nhỏ được phép nếu là điều kiện trực tiếp để thay đổi hiện tại chạy đúng và được nêu rõ trong task/PR.
@@ -331,7 +333,8 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 - Thay đổi nguyên tắc cốt lõi PHẢI cập nhật các template liên quan: `spec-template.md`, `plan-template.md`, `tasks-template.md`.
 - Nếu plan hoặc task vi phạm constitution, PHẢI ghi ngoại lệ trong `plan.md`.
 - Mọi PR/review PHẢI xác minh các gate liên quan đã pass hoặc có ngoại lệ được phê duyệt.
-- Khi thay đổi hành vi chung, cấu trúc hoặc onboarding, PHẢI cập nhật `docs/tasks.md` và file tài liệu tương ứng.
+- Khi thay đổi hành vi Speckit/template/runtime, PHẢI cập nhật tài liệu tương ứng trong `docs/speckit/`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, PHẢI cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
 - Version dùng SemVer:
   - **MAJOR**: xóa hoặc tái định nghĩa nguyên tắc cốt lõi/gate bắt buộc theo cách không tương thích.
   - **MINOR**: thêm nguyên tắc, section hoặc gate mới; mở rộng guidance có hiệu lực kiểm tra.

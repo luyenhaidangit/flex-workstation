@@ -18,7 +18,7 @@
 - Tạo `.agents/skills/speckit-quick/SKILL.md` làm entrypoint quick flow.
 - Cập nhật `docs/speckit/workflow.md` để thêm nhánh quick flow, command table và điều kiện chuyển sang full Speckit.
 - Cập nhật `AGENTS.md` và `CLAUDE.md` nếu cần để phản ánh command quick trong hướng dẫn runtime chung.
-- Cập nhật `docs/tasks.md` để ghi chú quy ước vận hành quick flow.
+- Cập nhật `docs/speckit/maintenance.md` để ghi chú quy ước vận hành quick flow.
 
 **Ngoài phạm vi kỹ thuật**:
 - Không thay thế hoặc rút gọn workflow `speckit-specify`, `speckit-plan`, `speckit-tasks`, `speckit-implement`.
@@ -86,7 +86,7 @@
 - `.agents/skills/speckit-quick/SKILL.md`: định nghĩa behavior contract, input/output, gates, checklist tối thiểu và ví dụ.
 - `docs/speckit/workflow.md`: tài liệu người dùng về vị trí quick flow trong Speckit.
 - `AGENTS.md`, `CLAUDE.md`: context runtime chung nếu cần thêm dòng command/guardrail.
-- `docs/tasks.md`: ghi chú maintenance cho quick flow.
+- `docs/speckit/maintenance.md`: ghi chú maintenance cho quick flow.
 
 **Điểm mở rộng/thay đổi chính**:
 - Thêm skill mới thay vì chỉnh các skill core.

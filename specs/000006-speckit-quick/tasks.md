@@ -125,10 +125,10 @@
 
 **Mục đích**: Kiểm tra traceability, docs maintenance và regression cho workflow Speckit hiện có.
 
-- [ ] T026 Cập nhật `docs/tasks.md` section `Speckit templates tiếng Việt` để ghi quy ước quick flow và điều kiện không dùng quick cho data/permission/contract/release/nhiều repo
+- [ ] T026 Cập nhật `docs/speckit/maintenance.md` section `Quick Flow` để ghi quy ước quick flow và điều kiện không dùng quick cho data/permission/contract/release/nhiều repo
 - [ ] T027 Chạy command `rg -n "\\$speckit-specify|\\$speckit-plan|\\$speckit-tasks|\\$speckit-implement" docs/speckit/workflow.md AGENTS.md CLAUDE.md` để xác nhận workflow Speckit đầy đủ vẫn được document
 - [ ] T028 Chạy command `rg -n "token|password|API key|connection string|credential|secret" .agents/skills/speckit-quick/SKILL.md` để xác nhận safety guidance không bỏ sót secret/credential
-- [ ] T029 Chạy command `rg -n "T[X]{3}|Phase\\s+N" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md AGENTS.md CLAUDE.md docs/tasks.md` để xác nhận không còn marker template trong output implementation
+- [ ] T029 Chạy command `rg -n "T[X]{3}|Phase\\s+N" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md docs/speckit/maintenance.md AGENTS.md CLAUDE.md` để xác nhận không còn marker template trong output implementation
 - [ ] T030 Chạy command `rg -n "speckit-quick|speckit\\.quick|Quick flow|quick flow" .agents/skills docs AGENTS.md CLAUDE.md` theo `specs/000006-speckit-quick/quickstart.md` để smoke check toàn bộ feature
 
 ---
@@ -138,7 +138,7 @@
 - Static quick identity check: `rg -n "speckit-quick|speckit\.quick|Quick flow|quick flow" .agents/skills docs AGENTS.md CLAUDE.md`
 - Frontmatter check: `Get-Content -First 20 .agents/skills/speckit-quick/SKILL.md`
 - Full Speckit regression check: `rg -n "\$speckit-specify|\$speckit-plan|\$speckit-tasks|\$speckit-implement" docs/speckit/workflow.md AGENTS.md CLAUDE.md`
-- Template marker check: `rg -n "T[X]{3}|Phase\\s+N" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md AGENTS.md CLAUDE.md docs/tasks.md`
+- Template marker check: `rg -n "T[X]{3}|Phase\\s+N" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md docs/speckit/maintenance.md AGENTS.md CLAUDE.md`
 - Secret guidance check: `rg -n "token|password|API key|connection string|credential|secret" .agents/skills/speckit-quick/SKILL.md`
 
 ---
@@ -239,7 +239,7 @@ Nếu runtime không nhận skill mới hoặc quick flow gây nhầm lẫn, rol
 - `docs/speckit/workflow.md`
 - `AGENTS.md`
 - `CLAUDE.md`
-- `docs/tasks.md`
+- `docs/speckit/maintenance.md`
 
 ---
 
