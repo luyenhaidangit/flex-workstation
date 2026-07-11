@@ -1,6 +1,17 @@
-# Speckit Templates
+# Speckit Template Guidelines
 
-Quy ước template Speckit tiếng Việt cho `flex-workstation`.
+Quy ước thiết kế và bảo trì template Speckit tiếng Việt cho `flex-workstation`.
+
+Tài liệu này không phải template runtime và không được Speckit đọc trực tiếp. Runtime chỉ dùng các file trong `.specify/templates/`. Khi sửa template runtime, dùng tài liệu này làm checklist để giữ artifact sinh ra ổn định, có traceability và phù hợp tiếng Việt có dấu.
+
+## Cách dùng
+
+- Khi sửa `.specify/templates/spec-template.md`, rà section `Spec Template`.
+- Khi sửa `.specify/templates/plan-template.md`, rà section `Plan Template`.
+- Khi sửa `.specify/templates/tasks-template.md`, rà section `Tasks Template`.
+- Khi sửa `.specify/templates/checklist-template.md`, rà section `Checklist Template`.
+- Khi sửa `.specify/templates/constitution-template.md`, rà section `Constitution Template`.
+- Sau khi sửa template, chạy static validation theo feature/spec liên quan và kiểm tra artifact sinh ra không còn placeholder hoặc marker ví dụ ngoài chủ đích.
 
 ## Quy tắc chung
 

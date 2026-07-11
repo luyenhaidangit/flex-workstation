@@ -68,6 +68,6 @@ Khai báo repo cần có trong workspace tại `workstation.json`:
 - [docs/onboarding.md](docs/onboarding.md): bootstrap máy mới và cách mở workspace.
 - [docs/system-map.md](docs/system-map.md): bản đồ workspace và runtime AI tooling.
 - [docs/speckit/workflow.md](docs/speckit/workflow.md): luồng sử dụng Speckit.
-- [docs/speckit/templates.md](docs/speckit/templates.md): quy ước template Speckit.
+- [docs/speckit/template-guidelines.md](docs/speckit/template-guidelines.md): quy ước thiết kế và bảo trì template Speckit.
 - [docs/speckit/maintenance.md](docs/speckit/maintenance.md): ghi chú bảo trì Speckit/runtime.
 - [docs/projects.md](docs/projects.md): danh sách project được theo dõi.

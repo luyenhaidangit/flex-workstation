@@ -112,7 +112,7 @@ Người vận hành dùng template tiếng Việt trong workflow Speckit mà kh
 - **TC-002**: Static search không còn các heading/label tiếng Anh phổ biến trong phần người đọc của `.specify/templates/*.md`, trừ định danh kỹ thuật hoặc ví dụ có chủ đích.
 - **TC-003**: `git diff -- .agents/skills` không có thay đổi sau khi hoàn tất feature.
 - **TC-004**: `git diff --check` không báo lỗi whitespace.
-- **TC-005**: `docs/speckit/templates.md` và `docs/speckit/workflow.md` phản ánh quy tắc chung cho toàn bộ Speckit templates, không chỉ checklist.
+- **TC-005**: `docs/speckit/template-guidelines.md` và `docs/speckit/workflow.md` phản ánh quy tắc chung cho toàn bộ Speckit templates, không chỉ checklist.
 
 ---
 

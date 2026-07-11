@@ -84,7 +84,7 @@
 
 - [X] T021 Chạy static search tiếng Anh phổ biến bằng lệnh `rtk rg "Purpose|Created|Feature|Summary|Technical Context|Constitution Check|Project Structure|Organization|Path Conventions|Notes|Core Principles|Governance|Constitution|Version|Ratified|Last Amended|Amendment procedure|Requirements|Success Criteria" .specify/templates`; mọi hit còn lại phải là thuật ngữ kỹ thuật, ví dụ có chủ đích hoặc nội dung trong validation command
 - [X] T022 Chạy kiểm technical identifiers và placeholder hợp lệ bằng lệnh `rtk rg "CHK###|\\[P\\]|\\[Story\\]|\\[TÊN TÍNH NĂNG\\]|\\[TÍNH NĂNG\\]|\\[LOẠI CHECKLIST\\]|\\[PROJECT_NAME\\]|/speckit-|\\.specify/templates|spec.md|plan.md|tasks.md" .specify/templates`
-- [X] T023 Cập nhật `docs/speckit/templates.md` và `docs/speckit/workflow.md` để phản ánh quy tắc toàn bộ Speckit templates dùng tiếng Việt
+- [X] T023 Cập nhật `docs/speckit/template-guidelines.md` và `docs/speckit/workflow.md` để phản ánh quy tắc toàn bộ Speckit templates dùng tiếng Việt
 - [X] T024 Chạy `rtk powershell -NoProfile -Command "git diff --check"`
 - [X] T025 Kiểm tra phạm vi thay đổi bằng lệnh `rtk powershell -NoProfile -Command "git status --short"`
 

@@ -63,5 +63,5 @@ flex-workstation/
 - Onboarding/bootstrap: `docs/onboarding.md`
 - Bản đồ hệ thống: `docs/system-map.md`
 - Workflow Speckit: `docs/speckit/workflow.md`
-- Quy ước template Speckit: `docs/speckit/templates.md`
+- Quy ước template Speckit: `docs/speckit/template-guidelines.md`
 - Bảo trì Speckit/runtime: `docs/speckit/maintenance.md`

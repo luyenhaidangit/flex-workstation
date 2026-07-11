@@ -103,6 +103,6 @@ README.md
 docs/onboarding.md
 docs/system-map.md
 docs/speckit/workflow.md
-docs/speckit/templates.md
+docs/speckit/template-guidelines.md
 docs/speckit/maintenance.md
 ```

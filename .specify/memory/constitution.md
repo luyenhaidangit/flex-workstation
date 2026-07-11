@@ -26,7 +26,7 @@ Template đã cập nhật:
   ✅ .specify/templates/commands/*.md — không tồn tại trong workspace này
 Tài liệu đã cập nhật:
   ✅ docs/speckit/workflow.md — làm rõ cú pháp `$speckit-*` cho Codex và `/speckit-*` cho slash command
-  ✅ docs/speckit/templates.md — quy ước template Speckit
+  ✅ docs/speckit/template-guidelines.md — quy ước thiết kế và bảo trì template Speckit
   ✅ docs/speckit/maintenance.md — ghi chú amendment constitution v1.2.0 và bảo trì Speckit
 TODO hoãn lại: Không có
 -->
