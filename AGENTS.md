@@ -70,9 +70,8 @@ Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại
 flex-workstation/
 ├── docs/            # Tài liệu workspace (system-map, onboarding, tasks)
 ├── scripts/         # Bootstrap và tooling scripts
-├── skills/          # Skill source dùng chung (mỗi skill một thư mục SKILL.md)
+├── .agents/         # Cấu hình Codex agent; skill source tại .agents/skills/
 ├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands)
-├── .agents/         # Cấu hình Codex agent
 ├── .codex/          # Cấu hình Codex CLI
 ├── workstation.json # Manifest repo được clone khi bootstrap
 ├── CLAUDE.md        # Context cho Claude Code
@@ -93,7 +92,7 @@ flex-workstation/
 | Loại | Vị trí |
 | --- | --- |
 | Tài liệu workstation | `docs/` |
-| Skill dùng chung | `skills/<skill-name>/SKILL.md` |
+| Skill dùng chung | `.agents/skills/<skill-name>/SKILL.md` |
 | Runtime config | `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/` |
 
 ## Tài liệu
