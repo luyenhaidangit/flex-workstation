@@ -60,9 +60,21 @@ Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
-| `rtk` | Proxy shell command để giảm token output; dùng khi chạy shell command nếu có |
+| `rtk` | Proxy shell command để giảm token output; quy tắc dùng ở mục "Quy tắc rtk" bên dưới |
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos, cài tool, sync flex-agents, sync skill junctions |
 | `.codex/config.toml` | Cấu hình model, approval policy và sandbox cho Codex CLI |
+
+### Quy tắc rtk (bắt buộc)
+
+Thay lệnh đọc/tìm/liệt kê/git bằng lệnh `rtk` tương ứng — không bọc PowerShell wrapper trong `rtk`:
+
+- Đọc file: `rtk read <file>` (thay `Get-Content`/`cat`; xuất UTF-8 đúng, không cần wrapper `[Console]::OutputEncoding`).
+- Tìm kiếm: `rtk grep <pattern> <path>` (thay `rg`/`Select-String`).
+- Liệt kê: `rtk ls <path>` (thay `Get-ChildItem`/`ls`).
+- Git: `rtk git <args>`.
+- Cấm: `rtk powershell -Command "..."` (tiết kiệm 0 token) và `rtk <PowerShell cmdlet>` (fail). Nếu buộc phải dùng wrapper `powershell -Command`, chạy thẳng không có `rtk`.
+
+Chi tiết đầy đủ tại `~/.codex/RTK.md` (sync từ `scripts/templates/rtk-codex.md` khi bootstrap).
 
 Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.
 

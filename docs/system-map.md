@@ -62,7 +62,7 @@ SYNC_WORKSPACE.cmd
       → clone repo còn thiếu vào flex-workstation\
       → fetch --prune và pull --ff-only repo đã có nếu working tree sạch
     → kiểm tra/cài ccusage
-    → kiểm tra/cài rtk và chạy rtk init nếu cần
+    → kiểm tra/cài rtk, chạy rtk init nếu cần và apply template Codex RTK từ scripts\templates\rtk-codex.md vào ~\.codex\RTK.md
     → kiểm tra/cài Claude Code nếu thiếu
     → kiểm tra/cài uv và specify-cli
     → initialize Spec Kit nếu .specify\templates chưa có

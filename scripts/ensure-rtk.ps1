@@ -167,6 +167,28 @@ function Ensure-ClaudeRtkHook {
     Write-Ok "Patched Claude global rtk hook: $settingsPath"
 }
 
+function Ensure-CodexRtkTemplate {
+    $templatePath = Join-Path $PSScriptRoot "templates\rtk-codex.md"
+    if (-not (Test-Path $templatePath)) {
+        Write-Warn "Codex RTK template not found: $templatePath"
+        return
+    }
+
+    $codexDir = Join-Path $env:USERPROFILE ".codex"
+    New-Item -ItemType Directory -Force -Path $codexDir | Out-Null
+
+    $targetPath = Join-Path $codexDir "RTK.md"
+    $templateContent = Get-Content -Raw -Encoding UTF8 $templatePath
+
+    if ((Test-Path $targetPath) -and ((Get-Content -Raw -Encoding UTF8 $targetPath) -eq $templateContent)) {
+        Write-Ok "Codex RTK.md already matches workstation template: $targetPath"
+        return
+    }
+
+    [System.IO.File]::WriteAllText($targetPath, $templateContent, (New-Object System.Text.UTF8Encoding $false))
+    Write-Ok "Applied workstation Codex RTK template: $targetPath"
+}
+
 Write-Step "Checking rtk"
 
 $defaultInstallDir = Join-Path $env:USERPROFILE ".local\bin"
@@ -220,3 +242,6 @@ try {
 catch {
     Write-Warn "rtk init -g --codex failed: $($_.Exception.Message)"
 }
+
+# Apply after rtk init so the workstation template wins over rtk's embedded template.
+Ensure-CodexRtkTemplate
