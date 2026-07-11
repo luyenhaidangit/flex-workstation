@@ -21,25 +21,25 @@ flowchart TD
         specify["$speckit-specify hoặc /speckit-specify\n&lt;mô tả nghiệp vụ — chỉ WHAT + WHY&gt;"]
 
         clarify_gate{Còn mơ hồ?}
-        clarify["/speckit-clarify\nTối đa 5 câu làm rõ spec"]
+        clarify["$speckit-clarify hoặc /speckit-clarify\nTối đa 5 câu làm rõ spec"]
 
         checklist_gate{Cần validate\nrequirements?}
-        checklist["/speckit-checklist domain\nTạo checklist ux / security / api"]
+        checklist["$speckit-checklist hoặc /speckit-checklist domain\nTạo checklist ux / security / api"]
 
-        plan["/speckit-plan\n&lt;tech stack + architecture&gt;"]
+        plan["$speckit-plan hoặc /speckit-plan\n&lt;tech stack + architecture&gt;"]
 
-        tasks["/speckit-tasks\nSinh task list theo dependency"]
+        tasks["$speckit-tasks hoặc /speckit-tasks\nSinh task list theo dependency"]
 
         issues_gate{Dùng\nGitHub Issues?}
-        taskstoissues["/speckit-taskstoissues\nChuyển tasks → GitHub Issues"]
+        taskstoissues["$speckit-taskstoissues hoặc /speckit-taskstoissues\nChuyển tasks → GitHub Issues"]
 
         analyze_gate{Cần quality\ngate?}
-        analyze["/speckit-analyze\nCross-artifact consistency check"]
+        analyze["$speckit-analyze hoặc /speckit-analyze\nCross-artifact consistency check"]
 
-        implement["/speckit-implement\nThực thi tasks từng phase"]
+        implement["$speckit-implement hoặc /speckit-implement\nThực thi tasks từng phase"]
 
         gap_check{Còn gap\ngiữa code và spec?}
-        converge["/speckit-converge\nAppend task còn thiếu vào tasks.md"]
+        converge["$speckit-converge hoặc /speckit-converge\nAppend task còn thiếu vào tasks.md"]
 
         done(["✅ Feature hoàn thành"])
     end
