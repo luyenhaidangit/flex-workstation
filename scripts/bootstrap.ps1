@@ -157,6 +157,37 @@ function Initialize-WorkspaceProjectConfig {
     Write-Ok "AI runtime config folders ready: $claudeRoot, $agentsRoot, $codexRoot"
 }
 
+function Set-PowerShellUtf8Profile {
+    $marker = "# flex-workstation: UTF-8 encoding"
+    $profilePath = $PROFILE
+
+    if (Test-Path $profilePath) {
+        $existing = Get-Content -Raw -Encoding UTF8 $profilePath
+        if ($existing -match [regex]::Escape($marker)) {
+            Write-Ok "PowerShell UTF-8 encoding already configured: $profilePath"
+            return
+        }
+    }
+    else {
+        $profileDir = Split-Path $profilePath
+        if (-not (Test-Path $profileDir)) {
+            New-Item -ItemType Directory -Force $profileDir | Out-Null
+        }
+    }
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    $lines = [string[]]@(
+        "",
+        $marker,
+        "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8",
+        "[Console]::InputEncoding  = [System.Text.Encoding]::UTF8",
+        "`$OutputEncoding           = [System.Text.Encoding]::UTF8"
+    )
+    [System.IO.File]::AppendAllLines($profilePath, $lines, $utf8NoBom)
+    Write-Ok "PowerShell UTF-8 encoding configured: $profilePath"
+    Write-Warn "Open a new terminal for encoding to take effect"
+}
+
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  flex-workstation - prepare workstation runtime" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
@@ -184,6 +215,9 @@ if (Test-Command "winget") {
 else {
     Write-Warn "WinGet is missing. This is fine because the default Claude Code install path is the native installer."
 }
+
+Write-Step "Configuring PowerShell UTF-8 encoding"
+Set-PowerShellUtf8Profile
 
 Initialize-WorkspaceProjectConfig
 

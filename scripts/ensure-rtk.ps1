@@ -163,7 +163,7 @@ function Ensure-ClaudeRtkHook {
     }
 
     $settings.hooks.PreToolUse = @($preToolUse + $rtkHook)
-    $settings | ConvertTo-Json -Depth 20 | Set-Content -Encoding UTF8 -Path $settingsPath
+    [System.IO.File]::WriteAllText($settingsPath, ($settings | ConvertTo-Json -Depth 20), (New-Object System.Text.UTF8Encoding $false))
     Write-Ok "Patched Claude global rtk hook: $settingsPath"
 }
 
