@@ -18,5 +18,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 ## Quick Flow
 
 - `$speckit-quick` là quick flow cho tác vụ nhỏ, rủi ro thấp trong workstation.
-- Quick flow không dùng cho thay đổi data, permission, contract, migration, release hoặc nhiều repo.
-- Nếu task vượt quick gate, hướng người dùng sang `$speckit-specify <mô tả nghiệp vụ>` trước khi implementation.
+- `/speckit.quick` là tên hiển thị; runtime dùng `$speckit-quick` hoặc `/speckit-quick` tùy agent.
+- Quick flow phải nêu pre-change statement trước khi sửa và completion report sau khi hoàn tất.
+- Quick flow không dùng cho thay đổi data, permission, contract, migration, release, public API hoặc nhiều repo.
+- Nếu task vượt quick gate, dừng quick flow và hướng người dùng sang `$speckit-specify <mô tả nghiệp vụ>` trước khi implementation.

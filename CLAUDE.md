@@ -33,6 +33,12 @@
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
 - Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
 
+## Speckit Workflow (Spec-Before-Code)
+
+Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
+
+Quick flow: dùng `$speckit-quick` hoặc `/speckit-quick` cho tác vụ nhỏ, rõ phạm vi và rủi ro thấp; tên hiển thị là `/speckit.quick`. Không dùng quick flow cho thay đổi data, permission, contract, migration, release hoặc nhiều repo. Khi vượt quick gate, chuyển sang `$speckit-specify <mô tả nghiệp vụ>`.
+
 ## Cấu trúc project
 
 ```text

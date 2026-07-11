@@ -12,9 +12,9 @@
 
 **Mục đích**: Chuẩn bị cấu trúc skill quick và xác nhận không có source-of-truth mới ngoài `.agents/skills/`.
 
-- [ ] T001 Tạo thư mục skill quick `.agents/skills/speckit-quick/`
-- [ ] T002 Tạo khung frontmatter cho skill `speckit-quick` trong `.agents/skills/speckit-quick/SKILL.md`
-- [ ] T003 Chạy command `Get-Content -First 20 .agents/skills/speckit-quick/SKILL.md` để kiểm frontmatter có `name: "speckit-quick"` và `user-invocable: true`
+- [X] T001 Tạo thư mục skill quick `.agents/skills/speckit-quick/`
+- [X] T002 Tạo khung frontmatter cho skill `speckit-quick` trong `.agents/skills/speckit-quick/SKILL.md`
+- [X] T003 Chạy command `Get-Content -First 20 .agents/skills/speckit-quick/SKILL.md` để kiểm frontmatter có `name: "speckit-quick"` và `user-invocable: true`
 
 **Checkpoint**: Skill file tồn tại với frontmatter hợp lệ trước khi viết behavior guidance.
 
@@ -24,10 +24,10 @@
 
 **Mục đích**: Viết nền tảng behavior contract dùng chung cho mọi user story.
 
-- [ ] T004 Viết section `Command Identity` trong `.agents/skills/speckit-quick/SKILL.md` nêu `/speckit.quick`, `$speckit-quick` và `/speckit-quick` là cùng một quick flow
-- [ ] T005 Viết section `Quick Eligibility Gate` trong `.agents/skills/speckit-quick/SKILL.md` theo `specs/000006-speckit-quick/contracts/quick-flow-contract.md`
-- [ ] T006 Viết section `Safety Guardrails` trong `.agents/skills/speckit-quick/SKILL.md` cấm secret/credential, bypass permission/data/contract và sửa project con ngoài phạm vi
-- [ ] T007 Chạy command `rg -n "speckit\\.quick|speckit-quick|secret|credential|permission|contract" .agents/skills/speckit-quick/SKILL.md` để kiểm identity và guardrail đã có
+- [X] T004 Viết section `Command Identity` trong `.agents/skills/speckit-quick/SKILL.md` nêu `/speckit.quick`, `$speckit-quick` và `/speckit-quick` là cùng một quick flow
+- [X] T005 Viết section `Quick Eligibility Gate` trong `.agents/skills/speckit-quick/SKILL.md` theo `specs/000006-speckit-quick/contracts/quick-flow-contract.md`
+- [X] T006 Viết section `Safety Guardrails` trong `.agents/skills/speckit-quick/SKILL.md` cấm secret/credential, bypass permission/data/contract và sửa project con ngoài phạm vi
+- [X] T007 Chạy command `rg -n "speckit\\.quick|speckit-quick|secret|credential|permission|contract" .agents/skills/speckit-quick/SKILL.md` để kiểm identity và guardrail đã có
 
 **Checkpoint**: Quick flow có identity, gate và safety rule trước khi thêm luồng xử lý cụ thể.
 
@@ -45,12 +45,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Viết section `Input Intake` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu hoặc suy ra mục tiêu, phạm vi, đầu ra mong đợi và cách kiểm tra tối thiểu
-- [ ] T009 [US1] Viết section `Pre-Change Statement` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu agent nêu giả định, phạm vi sẽ chạm, ngoài phạm vi và tiêu chí kiểm tra trước khi sửa
-- [ ] T010 [US1] Viết section `Execution Rules` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu thay đổi phẫu thuật, đọc trạng thái hiện có và tránh tạo trùng artifact khi re-run
-- [ ] T011 [US1] Viết section `Completion Report` trong `.agents/skills/speckit-quick/SKILL.md` theo contract gồm phạm vi, file/khu vực đã đổi, checks run, checks not run, not done, risk remaining và audit fields `actor`, `timestamp`, `action`, `changed artifacts`
-- [ ] T012 [US1] Cập nhật bảng command trong `docs/speckit/workflow.md` để thêm `$speckit-quick` / `/speckit-quick` với tên hiển thị `/speckit.quick` và output là pre-change statement + completion report
-- [ ] T013 [US1] Chạy command `rg -n "Pre-Change Statement|Completion Report|checks run|checks not run|speckit\\.quick|speckit-quick" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md` để validate US1
+- [X] T008 [US1] Viết section `Input Intake` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu hoặc suy ra mục tiêu, phạm vi, đầu ra mong đợi và cách kiểm tra tối thiểu
+- [X] T009 [US1] Viết section `Pre-Change Statement` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu agent nêu giả định, phạm vi sẽ chạm, ngoài phạm vi và tiêu chí kiểm tra trước khi sửa
+- [X] T010 [US1] Viết section `Execution Rules` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu thay đổi phẫu thuật, đọc trạng thái hiện có và tránh tạo trùng artifact khi re-run
+- [X] T011 [US1] Viết section `Completion Report` trong `.agents/skills/speckit-quick/SKILL.md` theo contract gồm phạm vi, file/khu vực đã đổi, checks run, checks not run, not done, risk remaining và audit fields `actor`, `timestamp`, `action`, `changed artifacts`
+- [X] T012 [US1] Cập nhật bảng command trong `docs/speckit/workflow.md` để thêm `$speckit-quick` / `/speckit-quick` với tên hiển thị `/speckit.quick` và output là pre-change statement + completion report
+- [X] T013 [US1] Chạy command `rg -n "Pre-Change Statement|Completion Report|checks run|checks not run|speckit\\.quick|speckit-quick" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md` để validate US1
 
 **Definition of Done**:
 
@@ -74,11 +74,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Viết section `Escalation Rules` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu dừng quick flow khi task đụng dữ liệu, permission, contract, release, nhiều repo hoặc nghiệp vụ chưa specify
-- [ ] T015 [US2] Viết section `Ambiguous Input Handling` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu hỏi làm rõ hoặc thu hẹp phạm vi khi mô tả có thể làm đổi scope
-- [ ] T016 [US2] Viết section `Escalation Report` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu nêu `Không xử lý bằng quick flow`, lý do cụ thể, bước `$speckit-specify <mô tả nghiệp vụ>`, xác nhận chưa sửa file nếu chưa có thay đổi và audit fields `actor`, `timestamp`, `action`, `escalation reason`
-- [ ] T017 [US2] Cập nhật phần ghi chú quan trọng trong `docs/speckit/workflow.md` để nêu quick flow phải chuyển sang `$speckit-specify` khi task vượt quick gate
-- [ ] T018 [US2] Chạy command `rg -n "Escalation|Không xử lý bằng quick flow|data|permission|contract|release|nhiều repo|speckit-specify|mơ hồ|làm rõ" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md` để validate US2
+- [X] T014 [US2] Viết section `Escalation Rules` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu dừng quick flow khi task đụng dữ liệu, permission, contract, release, nhiều repo hoặc nghiệp vụ chưa specify
+- [X] T015 [US2] Viết section `Ambiguous Input Handling` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu hỏi làm rõ hoặc thu hẹp phạm vi khi mô tả có thể làm đổi scope
+- [X] T016 [US2] Viết section `Escalation Report` trong `.agents/skills/speckit-quick/SKILL.md` yêu cầu nêu `Không xử lý bằng quick flow`, lý do cụ thể, bước `$speckit-specify <mô tả nghiệp vụ>`, xác nhận chưa sửa file nếu chưa có thay đổi và audit fields `actor`, `timestamp`, `action`, `escalation reason`
+- [X] T017 [US2] Cập nhật phần ghi chú quan trọng trong `docs/speckit/workflow.md` để nêu quick flow phải chuyển sang `$speckit-specify` khi task vượt quick gate
+- [X] T018 [US2] Chạy command `rg -n "Escalation|Không xử lý bằng quick flow|data|permission|contract|release|nhiều repo|speckit-specify|mơ hồ|làm rõ" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md` để validate US2
 
 **Definition of Done**:
 
@@ -103,13 +103,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [US3] Viết section `Complete Quick Example` trong `.agents/skills/speckit-quick/SKILL.md` minh họa task tài liệu nhỏ với input, scope decision, actions, checks và completion report
-- [ ] T020 [US3] Viết section `Escalation Example` trong `.agents/skills/speckit-quick/SKILL.md` minh họa task đụng permission/contract/project con phải chuyển sang `$speckit-specify`
-- [ ] T021 [US3] Viết section `Classification Examples` trong `.agents/skills/speckit-quick/SKILL.md` gồm 5 tình huống mẫu và expected classification `quick` hoặc `cần Speckit đầy đủ`
-- [ ] T022 [US3] Cập nhật `docs/speckit/workflow.md` để thêm mô tả ngắn vị trí quick flow trước nhánh full feature workflow
-- [ ] T023 [US3] Cập nhật `AGENTS.md` section `Speckit Workflow (Spec-Before-Code)` để thêm dòng `$speckit-quick` là quick flow cho tác vụ nhỏ và không dùng cho data/permission/contract/release/nhiều repo
-- [ ] T024 [US3] Cập nhật `CLAUDE.md` section Speckit tương ứng để giữ quy tắc quick flow đồng bộ với `AGENTS.md`
-- [ ] T025 [US3] Chạy command `rg -n "Complete Quick Example|Escalation Example|Classification Examples|speckit-quick|speckit\\.quick|permission|contract|release" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md AGENTS.md CLAUDE.md` để validate US3
+- [X] T019 [US3] Viết section `Complete Quick Example` trong `.agents/skills/speckit-quick/SKILL.md` minh họa task tài liệu nhỏ với input, scope decision, actions, checks và completion report
+- [X] T020 [US3] Viết section `Escalation Example` trong `.agents/skills/speckit-quick/SKILL.md` minh họa task đụng permission/contract/project con phải chuyển sang `$speckit-specify`
+- [X] T021 [US3] Viết section `Classification Examples` trong `.agents/skills/speckit-quick/SKILL.md` gồm 5 tình huống mẫu và expected classification `quick` hoặc `cần Speckit đầy đủ`
+- [X] T022 [US3] Cập nhật `docs/speckit/workflow.md` để thêm mô tả ngắn vị trí quick flow trước nhánh full feature workflow
+- [X] T023 [US3] Cập nhật `AGENTS.md` section `Speckit Workflow (Spec-Before-Code)` để thêm dòng `$speckit-quick` là quick flow cho tác vụ nhỏ và không dùng cho data/permission/contract/release/nhiều repo
+- [X] T024 [US3] Cập nhật `CLAUDE.md` section Speckit tương ứng để giữ quy tắc quick flow đồng bộ với `AGENTS.md`
+- [X] T025 [US3] Chạy command `rg -n "Complete Quick Example|Escalation Example|Classification Examples|speckit-quick|speckit\\.quick|permission|contract|release" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md AGENTS.md CLAUDE.md` để validate US3
 
 **Definition of Done**:
 
@@ -125,11 +125,11 @@
 
 **Mục đích**: Kiểm tra traceability, docs maintenance và regression cho workflow Speckit hiện có.
 
-- [ ] T026 Cập nhật `docs/speckit/maintenance.md` section `Quick Flow` để ghi quy ước quick flow và điều kiện không dùng quick cho data/permission/contract/release/nhiều repo
-- [ ] T027 Chạy command `rg -n "\\$speckit-specify|\\$speckit-plan|\\$speckit-tasks|\\$speckit-implement" docs/speckit/workflow.md AGENTS.md CLAUDE.md` để xác nhận workflow Speckit đầy đủ vẫn được document
-- [ ] T028 Chạy command `rg -n "token|password|API key|connection string|credential|secret" .agents/skills/speckit-quick/SKILL.md` để xác nhận safety guidance không bỏ sót secret/credential
-- [ ] T029 Chạy command `rg -n "T[X]{3}|Phase\\s+N" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md docs/speckit/maintenance.md AGENTS.md CLAUDE.md` để xác nhận không còn marker template trong output implementation
-- [ ] T030 Chạy command `rg -n "speckit-quick|speckit\\.quick|Quick flow|quick flow" .agents/skills docs AGENTS.md CLAUDE.md` theo `specs/000006-speckit-quick/quickstart.md` để smoke check toàn bộ feature
+- [X] T026 Cập nhật `docs/speckit/maintenance.md` section `Quick Flow` để ghi quy ước quick flow và điều kiện không dùng quick cho data/permission/contract/release/nhiều repo
+- [X] T027 Chạy command `rg -n "\\$speckit-specify|\\$speckit-plan|\\$speckit-tasks|\\$speckit-implement" docs/speckit/workflow.md AGENTS.md CLAUDE.md` để xác nhận workflow Speckit đầy đủ vẫn được document
+- [X] T028 Chạy command `rg -n "token|password|API key|connection string|credential|secret" .agents/skills/speckit-quick/SKILL.md` để xác nhận safety guidance không bỏ sót secret/credential
+- [X] T029 Chạy command `rg -n "T[X]{3}|Phase\\s+N" .agents/skills/speckit-quick/SKILL.md docs/speckit/workflow.md docs/speckit/maintenance.md AGENTS.md CLAUDE.md` để xác nhận không còn marker template trong output implementation
+- [X] T030 Chạy command `rg -n "speckit-quick|speckit\\.quick|Quick flow|quick flow" .agents/skills docs AGENTS.md CLAUDE.md` theo `specs/000006-speckit-quick/quickstart.md` để smoke check toàn bộ feature
 
 ---
 

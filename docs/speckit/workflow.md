@@ -5,11 +5,19 @@ Luồng làm việc chuẩn với bộ speckit cho `flex-workstation`.
 Ghi chú cú pháp: trong Codex, invoke skill bằng `$speckit-*`; trong runtime hỗ trợ
 slash command, dùng `/speckit-*`. Hai dạng trỏ tới cùng một bước workflow.
 
+Với tác vụ nhỏ, rõ phạm vi và rủi ro thấp, có thể dùng quick flow trước nhánh full feature:
+`$speckit-quick` hoặc `/speckit-quick`, tên hiển thị `/speckit.quick`. Quick flow chỉ tạo
+pre-change statement và completion report; không thay thế workflow Speckit đầy đủ.
+
 ## Sơ đồ luồng
 
 ```mermaid
 flowchart TD
     START(["Bắt đầu"])
+
+    quick_gate{Tác vụ nhỏ,\nrõ phạm vi,\nrủi ro thấp?}
+    quick["$speckit-quick hoặc /speckit-quick\nTên hiển thị /speckit.quick\nPre-change statement + completion report"]
+    quick_done(["Tác vụ quick hoàn tất"])
 
     %% ── SETUP ──────────────────────────────────────
     subgraph SETUP ["⚙️  Setup — chạy một lần cho project"]
@@ -45,7 +53,10 @@ flowchart TD
     end
 
     %% ── EDGES ───────────────────────────────────────
-    START --> constitution
+    START --> quick_gate
+    quick_gate -->|Có| quick
+    quick --> quick_done
+    quick_gate -->|Không hoặc vượt quick gate| constitution
     constitution --> specify
 
     specify --> clarify_gate
@@ -79,6 +90,7 @@ flowchart TD
 | # | Command | Loại | Input | Output |
 |---|---------|------|-------|--------|
 | 0 | `$speckit-constitution` / `/speckit-constitution` | Core · Setup | Nguyên tắc dự án | `.specify/memory/constitution.md` |
+| Q | `$speckit-quick` / `/speckit-quick` | Quick | Tác vụ nhỏ, rõ phạm vi, rủi ro thấp | Pre-change statement + completion report |
 | 1 | `$speckit-specify` / `/speckit-specify` | Core | Mô tả nghiệp vụ (WHAT + WHY) | `specs/<id>/spec.md`, `checklists/requirements.md` |
 | 2 | `$speckit-clarify` / `/speckit-clarify` | **Optional** | — | `spec.md` cập nhật (tối đa 5 câu hỏi) |
 | 3 | `$speckit-checklist [domain]` / `/speckit-checklist [domain]` | **Optional** | `ux` / `security` / `api` / ... | `checklists/<domain>.md` |
@@ -90,6 +102,12 @@ flowchart TD
 | 9 | `$speckit-converge` / `/speckit-converge` | Core | — | Append task còn thiếu vào `tasks.md` |
 
 ## Ghi chú quan trọng
+
+**`/speckit.quick` là quick flow có điều kiện**
+`$speckit-quick` hoặc `/speckit-quick` chỉ dùng cho tác vụ nhỏ, mục tiêu rõ, phạm vi nhỏ,
+rủi ro thấp và kiểm tra được trong cùng phiên. Quick flow phải dừng và hướng sang
+`$speckit-specify <mô tả nghiệp vụ>` khi task đụng data, permission, contract, migration,
+release, nhiều repo, project con ngoài phạm vi hoặc nghiệp vụ chưa specify.
 
 **`/speckit-specify` vs `/speckit-plan`**
 - `specify` = mô tả **nghiệp vụ** — không có tên framework, ngôn ngữ, database.

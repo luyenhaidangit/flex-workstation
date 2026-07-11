@@ -33,6 +33,8 @@
 
 Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
 
+Quick flow: dùng `$speckit-quick` cho tác vụ nhỏ, rõ phạm vi và rủi ro thấp. Không dùng quick flow cho thay đổi data, permission, contract, migration, release hoặc nhiều repo; khi vượt quick gate, chuyển sang `$speckit-specify <mô tả nghiệp vụ>`.
+
 ### Setup (chạy một lần cho project)
 
 Thiết lập nguyên tắc: `$speckit-constitution`
