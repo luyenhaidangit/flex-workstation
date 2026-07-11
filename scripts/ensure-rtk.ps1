@@ -134,16 +134,29 @@ function Ensure-ClaudeRtkHook {
         $settings.hooks | Add-Member -NotePropertyName "PreToolUse" -NotePropertyValue @()
     }
 
+    $targetMatcher = "Bash|PowerShell"
     $preToolUse = @($settings.hooks.PreToolUse)
     $alreadyConfigured = $false
+    $migrated = $false
 
     foreach ($entry in $preToolUse) {
-        if ($entry.matcher -eq "Bash") {
-            foreach ($hook in @($entry.hooks)) {
-                if ($hook.type -eq "command" -and $hook.command -eq "rtk hook claude") {
-                    $alreadyConfigured = $true
-                }
+        $hasRtkHook = $false
+        foreach ($hook in @($entry.hooks)) {
+            if ($hook.type -eq "command" -and $hook.command -eq "rtk hook claude") {
+                $hasRtkHook = $true
             }
+        }
+
+        if (-not $hasRtkHook) {
+            continue
+        }
+
+        if ($entry.matcher -eq $targetMatcher) {
+            $alreadyConfigured = $true
+        }
+        elseif ($entry.matcher -eq "Bash") {
+            $entry.matcher = $targetMatcher
+            $migrated = $true
         }
     }
 
@@ -152,17 +165,21 @@ function Ensure-ClaudeRtkHook {
         return
     }
 
-    $rtkHook = [pscustomobject]@{
-        matcher = "Bash"
-        hooks = @(
-            [pscustomobject]@{
-                type = "command"
-                command = "rtk hook claude"
-            }
-        )
+    if (-not $migrated) {
+        $rtkHook = [pscustomobject]@{
+            matcher = $targetMatcher
+            hooks = @(
+                [pscustomobject]@{
+                    type = "command"
+                    command = "rtk hook claude"
+                }
+            )
+        }
+
+        $preToolUse = @($preToolUse + $rtkHook)
     }
 
-    $settings.hooks.PreToolUse = @($preToolUse + $rtkHook)
+    $settings.hooks.PreToolUse = @($preToolUse)
     [System.IO.File]::WriteAllText($settingsPath, ($settings | ConvertTo-Json -Depth 20), (New-Object System.Text.UTF8Encoding $false))
     Write-Ok "Patched Claude global rtk hook: $settingsPath"
 }
