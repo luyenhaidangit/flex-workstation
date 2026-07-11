@@ -2,6 +2,9 @@
 
 Luồng làm việc chuẩn với bộ speckit cho `flex-workstation`.
 
+Ghi chú cú pháp: trong Codex, invoke skill bằng `$speckit-*`; trong runtime hỗ trợ
+slash command, dùng `/speckit-*`. Hai dạng trỏ tới cùng một bước workflow.
+
 ## Sơ đồ luồng
 
 ```mermaid
@@ -10,12 +13,12 @@ flowchart TD
 
     %% ── SETUP ──────────────────────────────────────
     subgraph SETUP ["⚙️  Setup — chạy một lần cho project"]
-        constitution["/speckit-constitution\nThiết lập nguyên tắc dự án"]
+        constitution["$speckit-constitution hoặc /speckit-constitution\nThiết lập nguyên tắc dự án"]
     end
 
     %% ── PER FEATURE ─────────────────────────────────
     subgraph FEATURE ["🔁  Mỗi feature"]
-        specify["/speckit-specify\n&lt;mô tả nghiệp vụ — chỉ WHAT + WHY&gt;"]
+        specify["$speckit-specify hoặc /speckit-specify\n&lt;mô tả nghiệp vụ — chỉ WHAT + WHY&gt;"]
 
         clarify_gate{Còn mơ hồ?}
         clarify["/speckit-clarify\nTối đa 5 câu làm rõ spec"]
@@ -75,16 +78,16 @@ flowchart TD
 
 | # | Command | Loại | Input | Output |
 |---|---------|------|-------|--------|
-| 0 | `/speckit-constitution` | Core · Setup | Nguyên tắc dự án | `.specify/memory/constitution.md` |
-| 1 | `/speckit-specify` | Core | Mô tả nghiệp vụ (WHAT + WHY) | `specs/<id>/spec.md`, `checklists/requirements.md` |
-| 2 | `/speckit-clarify` | **Optional** | — | `spec.md` cập nhật (tối đa 5 câu hỏi) |
-| 3 | `/speckit-checklist [domain]` | **Optional** | `ux` / `security` / `api` / ... | `checklists/<domain>.md` |
-| 4 | `/speckit-plan` | Core | Tech stack + architecture | `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md` |
-| 5 | `/speckit-tasks` | Core | — | `tasks.md` |
-| 6 | `/speckit-taskstoissues` | **Optional** | — | GitHub Issues từ `tasks.md` |
-| 7 | `/speckit-analyze` | **Optional** | — | Report cross-artifact (read-only) |
-| 8 | `/speckit-implement` | Core | — | Code, mark tasks `[X]` |
-| 9 | `/speckit-converge` | Core | — | Append task còn thiếu vào `tasks.md` |
+| 0 | `$speckit-constitution` / `/speckit-constitution` | Core · Setup | Nguyên tắc dự án | `.specify/memory/constitution.md` |
+| 1 | `$speckit-specify` / `/speckit-specify` | Core | Mô tả nghiệp vụ (WHAT + WHY) | `specs/<id>/spec.md`, `checklists/requirements.md` |
+| 2 | `$speckit-clarify` / `/speckit-clarify` | **Optional** | — | `spec.md` cập nhật (tối đa 5 câu hỏi) |
+| 3 | `$speckit-checklist [domain]` / `/speckit-checklist [domain]` | **Optional** | `ux` / `security` / `api` / ... | `checklists/<domain>.md` |
+| 4 | `$speckit-plan` / `/speckit-plan` | Core | Tech stack + architecture | `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md` |
+| 5 | `$speckit-tasks` / `/speckit-tasks` | Core | — | `tasks.md` |
+| 6 | `$speckit-taskstoissues` / `/speckit-taskstoissues` | **Optional** | — | GitHub Issues từ `tasks.md` |
+| 7 | `$speckit-analyze` / `/speckit-analyze` | **Optional** | — | Report cross-artifact (read-only) |
+| 8 | `$speckit-implement` / `/speckit-implement` | Core | — | Code, mark tasks `[X]` |
+| 9 | `$speckit-converge` / `/speckit-converge` | Core | — | Append task còn thiếu vào `tasks.md` |
 
 ## Ghi chú quan trọng
 

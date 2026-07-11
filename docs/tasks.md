@@ -1,5 +1,10 @@
 # Ghi chú task workspace
 
+## Constitution
+
+- Constitution hiện ở version `1.2.0`, mở rộng theo template Speckit hiện hành với Source of Truth, cổng chất lượng, Definition of Done, ngoại lệ và lịch sử thay đổi.
+- Tài liệu workflow Speckit phải nêu rõ hai dạng command: `$speckit-*` cho Codex skill invocation và `/speckit-*` cho slash command khi runtime hỗ trợ.
+
 ## Speckit templates tiếng Việt
 
 - Toàn bộ template Speckit trong `.specify/templates/` dùng tiếng Việt có dấu cho phần người dùng đọc và review.
