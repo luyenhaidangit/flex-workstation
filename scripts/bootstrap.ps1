@@ -71,33 +71,33 @@ function Install-ClaudeCodeNative {
     bash -lc "curl -fsSL https://claude.ai/install.sh | bash"
 }
 
-function Sync-SkillJunctions {
+function Sync-AgentSkills {
     $projectRoot = Resolve-Path "$PSScriptRoot\.."
-    $agentsSkillsDir = Join-Path $projectRoot ".agents\skills"
     $claudeSkillsDir = Join-Path $projectRoot ".claude\skills"
+    $agentsSkillsDir = Join-Path $projectRoot ".agents\skills"
 
-    if (-not (Test-Path $agentsSkillsDir)) {
-        Write-Warn "No skills found at $agentsSkillsDir - skipping junction sync"
+    if (-not (Test-Path $claudeSkillsDir)) {
+        Write-Warn "No skills found at $claudeSkillsDir - skipping agent skill sync"
         return
     }
 
-    New-Item -ItemType Directory -Force -Path $claudeSkillsDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $agentsSkillsDir | Out-Null
 
-    foreach ($skill in Get-ChildItem $agentsSkillsDir -Directory) {
-        $junctionPath = Join-Path $claudeSkillsDir $skill.Name
-        if (Test-Path $junctionPath) {
-            $isJunction = (Get-Item $junctionPath).Attributes -band [System.IO.FileAttributes]::ReparsePoint
-            if ($isJunction) { continue }
-            # Real directory exists - migrate its content then remove
-            [System.IO.Directory]::Delete($junctionPath, $true)
+    $synced = 0
+    foreach ($skill in Get-ChildItem $claudeSkillsDir -Directory) {
+        $isJunction = $skill.Attributes -band [System.IO.FileAttributes]::ReparsePoint
+        if ($isJunction) {
+            # Junction already resolves to .agents/skills/<name>; no copy needed
+            $synced++
+            continue
         }
-        cmd /c "mklink /J `"$junctionPath`" `"$($skill.FullName)`"" | Out-Null
+        $destPath = Join-Path $agentsSkillsDir $skill.Name
+        New-Item -ItemType Directory -Force -Path $destPath | Out-Null
+        Copy-Item -Recurse -Force "$($skill.FullName)\*" "$destPath\"
+        $synced++
     }
 
-    $count = (Get-ChildItem $claudeSkillsDir -Directory | Where-Object {
-        $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint
-    }).Count
-    Write-Ok "Skill junctions synced: $count skills (.agents/skills -> .claude/skills)"
+    Write-Ok "Agent skills synced: $synced skills (.claude/skills -> .agents/skills)"
 }
 
 function Initialize-WorkspaceProjectConfig {
@@ -221,8 +221,8 @@ Set-PowerShellUtf8Profile
 
 Initialize-WorkspaceProjectConfig
 
-Write-Step "Syncing skill junctions (.agents/skills -> .claude/skills)"
-Sync-SkillJunctions
+Write-Step "Syncing agent skills (.claude/skills -> .agents/skills)"
+Sync-AgentSkills
 
 & "$PSScriptRoot\sync-repositories.ps1" -PullExisting
 
