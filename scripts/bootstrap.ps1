@@ -157,27 +157,6 @@ function Initialize-WorkspaceProjectConfig {
     Write-Ok "AI runtime config folders ready: $claudeRoot, $agentsRoot, $codexRoot"
 }
 
-function Install-PsCmdletShims {
-    $shimsSrc = Join-Path $PSScriptRoot "shims"
-    $installDir = Join-Path $env:USERPROFILE ".local\bin"
-
-    if (-not (Test-Path $shimsSrc)) {
-        Write-Warn "Shims directory not found: $shimsSrc"
-        return
-    }
-
-    New-Item -ItemType Directory -Force $installDir | Out-Null
-
-    $installed = 0
-    foreach ($shim in Get-ChildItem $shimsSrc -Filter "*.cmd") {
-        $dest = Join-Path $installDir $shim.Name
-        Copy-Item -LiteralPath $shim.FullName -Destination $dest -Force
-        $installed++
-    }
-
-    Write-Ok "PowerShell cmdlet shims installed: $installed shims -> $installDir"
-}
-
 function Set-PowerShellUtf8Profile {
     $marker = "# flex-workstation: UTF-8 encoding"
     $profilePath = $PROFILE
@@ -236,9 +215,6 @@ if (Test-Command "winget") {
 else {
     Write-Warn "WinGet is missing. This is fine because the default Claude Code install path is the native installer."
 }
-
-Write-Step "Installing PowerShell cmdlet shims"
-Install-PsCmdletShims
 
 Write-Step "Configuring PowerShell UTF-8 encoding"
 Set-PowerShellUtf8Profile
