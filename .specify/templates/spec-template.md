@@ -1,15 +1,10 @@
 # Đặc tả tính năng: [TÊN TÍNH NĂNG]
 
 **Branch**: `[NNNNNN-ten-tinh-nang]`
-
 **Ngày tạo**: [NGÀY]
-
 **Trạng thái**: Bản nháp
-
 **Người phụ trách**: {{GIT_USER_NAME}}
-
 **Stakeholder xác nhận**: {{GIT_USER_NAME}}
-
 **Đầu vào**: Mô tả người dùng: "$ARGUMENTS"
 
 ---

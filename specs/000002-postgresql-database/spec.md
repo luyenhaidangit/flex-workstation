@@ -1,15 +1,10 @@
 # Đặc tả tính năng: Nền tảng lưu trữ PostgreSQL
 
 **Branch**: `000002-postgresql-database`
-
 **Ngày tạo**: 2026-07-12
-
 **Trạng thái**: Bản nháp
-
 **Người phụ trách**: Chưa xác định
-
 **Stakeholder xác nhận**: Luyện Hải Đăng
-
 **Đầu vào**: Mô tả người dùng: "sử dụng mã 000002, triển khai db postgree"
 
 ---
