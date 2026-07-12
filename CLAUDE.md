@@ -16,6 +16,7 @@
 
 ### Thay đổi phẫu thuật
 - Chỉ sửa những gì cần. Không "cải thiện" code, comment, hay format không liên quan.
+- Khi sửa prompt, skill hoặc template, chỉ thay đổi phần cần thiết; tránh lặp/mâu thuẫn và kiểm tra trực tiếp phần đã sửa.
 - Giữ nguyên style hiện có dù có thể làm khác.
 - Nếu phát hiện dead code không liên quan, nhắc — không tự xóa.
 - Xóa import/biến/hàm mà **chính thay đổi của mình** làm thừa, không xóa dead code từ trước.
