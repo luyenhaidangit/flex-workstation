@@ -160,13 +160,13 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 
 **Lý do**: Bootstrap tái lập giảm sai lệch môi trường và giúp agent/dev mới vào workspace không cần kiến thức ngầm.
 
-**Áp dụng cho**: `SYNC_WORKSPACE.cmd`, `scripts/bootstrap.ps1`, `workstation.json`, `docs/onboarding.md`.
+**Áp dụng cho**: `SYNC_WORKSPACE.cmd`, `scripts/bootstrap.ps1`, `workstation.json`, `docs/setup/onboarding.md`.
 
 **Cách kiểm tra**:
 - Tool dependency như Claude Code, `uv`, `specify-cli`, `rtk`, `ccusage` được kiểm tra/cài tự động khi phù hợp.
 - `specify init` chạy tự động với `--force --script-type ps` khi cần.
 - `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại.
-- Mọi bước setup thủ công bắt buộc đều được document trong `docs/onboarding.md`.
+- Mọi bước setup thủ công bắt buộc đều được document trong `docs/setup/onboarding.md`.
 - Repo có local changes, origin khác cấu hình hoặc detached HEAD được cảnh báo và bỏ qua, không force overwrite.
 
 **Ngoại lệ**:
@@ -186,7 +186,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 - Không tự ý xóa dead code từ trước khi chưa được yêu cầu.
 - Không sửa source code project con khi yêu cầu chỉ thuộc workstation.
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
 
 **Ngoại lệ**:
 - Refactor nhỏ được phép nếu là điều kiện trực tiếp để thay đổi hiện tại chạy đúng và được nêu rõ trong task/PR.
@@ -334,7 +334,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 - Nếu plan hoặc task vi phạm constitution, PHẢI ghi ngoại lệ trong `plan.md`.
 - Mọi PR/review PHẢI xác minh các gate liên quan đã pass hoặc có ngoại lệ được phê duyệt.
 - Khi thay đổi hành vi Speckit/template/runtime, PHẢI cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, PHẢI cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, PHẢI cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
 - Version dùng SemVer:
   - **MAJOR**: xóa hoặc tái định nghĩa nguyên tắc cốt lõi/gate bắt buộc theo cách không tương thích.
   - **MINOR**: thêm nguyên tắc, section hoặc gate mới; mở rộng guidance có hiệu lực kiểm tra.

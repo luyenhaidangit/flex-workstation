@@ -41,7 +41,7 @@ Trong `flex-environment`:
 ## 4. Tài liệu workstation cần cập nhật
 
 - [ ] `docs/architecture/system-map.md`: thêm vào snapshot cây thư mục, bảng "Manifest repo" và bảng "Projects".
-- [ ] `docs/onboarding.md`: chỉ cập nhật nếu luồng bootstrap thực sự đổi (ví dụ thêm bước cài tool mới) — cây thư mục ví dụ trong file này không cần liệt kê đủ mọi repo (đã có `+-- ...`).
+- [ ] `docs/setup/onboarding.md`: chỉ cập nhật nếu luồng bootstrap thực sự đổi (ví dụ thêm bước cài tool mới) — cây thư mục ví dụ trong file này không cần liệt kê đủ mọi repo (đã có `+-- ...`).
 - [ ] `README.md` (root workstation): thêm liên kết nếu có tài liệu mới cần lên index.
 
 ## 5. Sau khi implement
