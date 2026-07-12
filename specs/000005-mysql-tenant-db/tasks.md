@@ -57,8 +57,8 @@
 
 - [x] T007 [P] [US1] Tạo `flex-environment/scripts/provision-tenant-db.sh` với các phần: (a) kiểm tra biến môi trường bắt buộc (MYSQL_ADMIN_*, PLATFORM_DB_DSN, SECRET_STORE_PATH), (b) hàm `sanitize_id` chuyển tenant_id thành `[a-z0-9_]` max 20 ký tự, (c) kiểm tra tenant tồn tại trong PostgreSQL, (d) kiểm tra không có bản ghi `tenant_databases` status=active/pending cho tenant, (e) INSERT pending record, (f) kết nối MySQL admin, (g) `CREATE DATABASE tenant_{id} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`, (h) sinh password ngẫu nhiên ≥32 ký tự, (i) `CREATE USER 'usr_{id}'@'%' IDENTIFIED BY '...'`, (j) `GRANT ALL PRIVILEGES ON tenant_{id}.* TO 'usr_{id}'@'%'`, (k) `FLUSH PRIVILEGES`, (l) lưu password vào secret store, nhận `secret_ref`, (m) `UPDATE tenant_databases SET status=active, connection_secret_ref, provisioned_at=NOW()`, (n) INSERT audit log `provision_succeeded`, (o) in summary không có password, exit 0 — và rollback path: nếu bước f-l thất bại thì `DROP DATABASE/USER` nếu đã tạo, UPDATE status=error+status_reason, INSERT audit `provision_failed`, exit 3; exit codes 0/1/2/3/4 per `contracts/provision-script.md`
 - [x] T008 [P] [US1] Tạo `flex-environment/scripts/provision-tenant-db.ps1` implement logic giống T007 cho PowerShell 5.1+: cùng exit codes, cùng output contract (không in password), cùng rollback behavior, đọc credentials từ `$env:MYSQL_ADMIN_*` và `$env:PLATFORM_DB_DSN` per `contracts/provision-script.md`
-- [ ] T009 [P] [US1] Validate idempotency của `flex-environment/scripts/provision-tenant-db.sh`: chạy lần 2 với cùng `test-001` → verify exit code `2`, stdout có `already has an active database`, xác nhận chỉ có 1 bản ghi trong `tenant_databases` WHERE tenant_id='test-001' (phụ thuộc T007)
-- [ ] T010 [P] [US1] Validate permission isolation: kết nối MySQL bằng `usr_test001`, chạy `SHOW DATABASES`, xác nhận chỉ thấy `tenant_test001` và `information_schema`; chạy `USE mysql` và verify `ERROR 1044: Access denied`; chạy `USE tenant_test001` và verify thành công (phụ thuộc T007)
+- [x] T009 [P] [US1] Validate idempotency của `flex-environment/scripts/provision-tenant-db.sh`: chạy lần 2 với cùng `test-001` → verify exit code `2`, stdout có `already has an active database`, xác nhận chỉ có 1 bản ghi trong `tenant_databases` WHERE tenant_id='test-001' (phụ thuộc T007)
+- [x] T010 [P] [US1] Validate permission isolation: kết nối MySQL bằng `usr_test001`, chạy `SHOW DATABASES`, xác nhận chỉ thấy `tenant_test001` và `information_schema`; chạy `USE mysql` và verify `ERROR 1044: Access denied`; chạy `USE tenant_test001` và verify thành công (phụ thuộc T007)
 
 **Definition of Done**:
 - T007 và T008 hoàn tất, script chạy được trên cả Linux và Windows.
@@ -112,8 +112,8 @@
 
 ### Validation for User Story 3
 
-- [ ] T013 [US3] Validate rollback behavior của `flex-environment/scripts/provision-tenant-db.sh`: (a) chạy `REVOKE CREATE ON *.* FROM '<admin_user>'@'%'` trên MySQL, (b) chạy `./provision-tenant-db.sh "test-002"` và verify exit 3, (c) chạy `SHOW DATABASES LIKE 'tenant_test002'` → rỗng, (d) chạy `SELECT User FROM mysql.user WHERE User='usr_test002'` → rỗng, (e) query PostgreSQL verify status=error và status_reason không null, (f) query audit log verify provision_failed record, (g) chạy `GRANT CREATE ON *.* TO '<admin_user>'@'%'` để restore, (h) chạy provision lại → exit 0 (phụ thuộc T007)
-- [ ] T014 [US3] Validate security: chạy `./flex-environment/scripts/provision-tenant-db.sh "test-003" 2>&1 | grep -iE 'password|passwd'` và verify không có kết quả; chạy `psql $PLATFORM_DB_DSN -c "SELECT detail FROM tenant_database_audit_logs WHERE tenant_id='test-003'"` và verify detail không chứa chuỗi có định dạng password; kiểm tra `flex-environment/scripts/provision-tenant-db.sh` không chứa hardcoded credential (phụ thuộc T013)
+- [x] T013 [US3] Validate rollback behavior của `flex-environment/scripts/provision-tenant-db.sh`: (a) chạy `REVOKE CREATE ON *.* FROM '<admin_user>'@'%'` trên MySQL, (b) chạy `./provision-tenant-db.sh "test-002"` và verify exit 3, (c) chạy `SHOW DATABASES LIKE 'tenant_test002'` → rỗng, (d) chạy `SELECT User FROM mysql.user WHERE User='usr_test002'` → rỗng, (e) query PostgreSQL verify status=error và status_reason không null, (f) query audit log verify provision_failed record, (g) chạy `GRANT CREATE ON *.* TO '<admin_user>'@'%'` để restore, (h) chạy provision lại → exit 0 (phụ thuộc T007)
+- [x] T014 [US3] Validate security: chạy `./flex-environment/scripts/provision-tenant-db.sh "test-003" 2>&1 | grep -iE 'password|passwd'` và verify không có kết quả; chạy `psql $PLATFORM_DB_DSN -c "SELECT detail FROM tenant_database_audit_logs WHERE tenant_id='test-003'"` và verify detail không chứa chuỗi có định dạng password; kiểm tra `flex-environment/scripts/provision-tenant-db.sh` không chứa hardcoded credential (phụ thuộc T013)
 
 **Definition of Done**:
 - T013: rollback behavior đúng — không orphan resource, status=error, audit log đầy đủ.
@@ -129,8 +129,8 @@
 **Mục đích**: Hoàn tất tài liệu, kiểm tra syntax Compose, và xác minh toàn bộ luồng end-to-end.
 
 - [x] T015 [P] Thêm section "Validate MySQL Tenant DB Provisioning" vào `flex-environment/INSTALL.md` với tóm tắt 4 kịch bản từ `specs/000005-mysql-tenant-db/quickstart.md` (Provision, Status Check, Idempotency, Rollback) và lệnh chạy từng kịch bản (phụ thuộc T003)
-- [ ] T016 [P] Chạy `docker compose -f flex-environment/docker-compose.yml config` và verify service `mysqldb`, volume `mysqldb_data`, network `flex_net` xuất hiện đúng trong output (phụ thuộc T001)
-- [ ] T017 [P] Chạy toàn bộ quickstart end-to-end per `specs/000005-mysql-tenant-db/quickstart.md`: Scenario 1 (provision) → Scenario 2 (status check) → Scenario 3 (idempotency) → Scenario 4 (rollback), ghi kết quả PASS/FAIL cho từng scenario (phụ thuộc T007, T011, T013)
+- [x] T016 [P] Chạy `docker compose -f flex-environment/docker-compose.yml config` và verify service `mysqldb`, volume `mysqldb_data`, network `flex_net` xuất hiện đúng trong output (phụ thuộc T001)
+- [x] T017 [P] Chạy toàn bộ quickstart end-to-end per `specs/000005-mysql-tenant-db/quickstart.md`: Scenario 1 (provision) → Scenario 2 (status check) → Scenario 3 (idempotency) → Scenario 4 (rollback), ghi kết quả PASS/FAIL cho từng scenario (phụ thuộc T007, T011, T013)
 
 **Checkpoint Final**: Tất cả quickstart scenarios PASS. Feature sẵn sàng cho vận hành.
 
