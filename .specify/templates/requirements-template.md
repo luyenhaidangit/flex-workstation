@@ -3,21 +3,13 @@
 ## Metadata
 
 **Mục đích**: Xác nhận `spec.md` đủ rõ, đầy đủ và sẵn sàng trước khi chuyển sang `$speckit-clarify` hoặc `$speckit-plan`.
-
 **Checklist ID**: `REQ-[NNNNNN]`
-
 **Ngày tạo**: [NGÀY]
-
 **Người review**: {{GIT_USER_NAME}}
-
 **Trạng thái review**: Hoàn tất
-
 **Lần review**: Lần 1
-
 **Tính năng**: [spec.md](../spec.md)
-
 **Artifact chính được kiểm tra**: `spec.md`
-
 **Nguồn tham chiếu**: `constitution.md`, `spec.md`
 
 ---
