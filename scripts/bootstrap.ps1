@@ -293,7 +293,7 @@ Write-Step "Next steps"
 Write-Host "1. Run 'claude' in this repository and complete browser login."
 Write-Host "2. Run 'claude doctor' if login or shell integration fails."
 Write-Host "3. Open the flex-workstation project root with:"
-Write-Host "   .\OPEN_WORKSPACE.cmd"
+Write-Host "   .\OPEN_VSCODE.cmd"
 
 if ($OpenWorkspace) {
     if (Test-Command "code") {

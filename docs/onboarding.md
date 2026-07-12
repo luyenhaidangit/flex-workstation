@@ -65,7 +65,7 @@ Trường `branch` là tùy chọn. Không đưa token hoặc credential vào UR
 
 ## Mở workstation và coding agent
 
-- `OPEN_WORKSPACE.cmd`: mở workstation root trong VS Code.
+- `OPEN_VSCODE.cmd`: mở workstation root trong VS Code.
 - `OPEN_CLAUDE.cmd`: mở Claude Code tại workstation root với `--dangerously-skip-permissions`; chỉ dùng trong workstation tin cậy.
 - `OPEN_CODEX.cmd`: mở Codex tại workstation root; hành vi CLI lấy từ `.codex/config.toml`.
 
