@@ -194,7 +194,7 @@ Khi cập nhật hành vi chung trong `CLAUDE.md`, rà lại `AGENTS.md` để C
 | Priority | Vấn đề | Tác động | Khuyến nghị |
 | --- | --- | --- | --- |
 | High | Chi tiết kết nối Oracle Cloud chưa được tài liệu hóa ở mức architecture. | DevOps/security khó xác minh wallet, secret, network access và rotation trong lúc Oracle vẫn còn dùng ở một số repo. | Bổ sung tài liệu riêng về Oracle Cloud connectivity, không ghi secret vào repo; ưu tiên hoàn tất migration theo `specs/000009-auth-multi-tenant-postgres`. |
-| Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong workstation. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật file này (mục 3, 4) khi thay đổi repo trong `workstation.json`; xem checklist `docs/workflows/add-new-service.md`. |
+| Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong workstation. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật file này (mục 3, 4) khi thay đổi repo trong `workstation.json`; xem checklist `docs/checklists/new-service-checklist.md`. |
 | Medium | Quan hệ runtime giữa `flex-api-gateway`, `flex-auth-service` và Oracle Cloud mới ở mức inferred/user-confirmed. | Dễ nhầm giữa ý định kiến trúc và cấu hình triển khai thực tế. | Bổ sung evidence từ app config, connection factory hoặc deployment config của từng service. |
 | Medium | Sơ đồ System Context/Deployment (mục 6, 7) chưa vẽ `flex-agent-service`, `flex-database` và các datastore mới (PostgreSQL, MySQL tenant, Qdrant). | Sơ đồ không phản ánh đúng topology sau khi `000008`/`000009` implement xong. | Vẽ lại sau khi các feature đó có deployment thật; đối chiếu `specs/000008-agent-platform-mvp/plan.md` mục "Cấu trúc project". |
 
