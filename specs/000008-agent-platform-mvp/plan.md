@@ -23,7 +23,8 @@
 - `flex-workstation`: thêm `flex-agent-service` vào `workstation.json`; đánh dấu spec `000003-ai-agent-base` là superseded bởi 000008.
 
 **Ngoài phạm vi kỹ thuật**:
-- Không sửa `flex-auth-service`, `flex-api-gateway`, `flex-ai-gateway` (image Python giữ nguyên, không dùng trong MVP).
+- Không triển khai code trong `flex-auth-service` như một phần của plan này — việc multi-tenant hoá `flex-auth-service` (tenant, membership, vai trò, phát hành JWT) và migrate Oracle→PostgreSQL thuộc feature riêng `000009-auth-multi-tenant-postgres`. `flex-agent-service` chỉ **tiêu thụ** JWT/API do dịch vụ đó cung cấp (xem DEC-005 cập nhật).
+- Không sửa `flex-api-gateway`, `flex-ai-gateway` (image Python giữ nguyên, không dùng trong MVP).
 - Không có Redis, không SignalR backplane (một instance duy nhất ở MVP).
 - Không tích hợp Zalo/Facebook, tool executor, billing/hóa đơn, handoff người thật (spec §14).
 - Không migrate dữ liệu cũ — hệ thống mới hoàn toàn, không có dữ liệu kế thừa.
@@ -76,23 +77,25 @@
 - **TQ-003**: Xử lý spec `000003-ai-agent-base` trùng phạm vi? → Resolved: đánh dấu superseded (research R6).
 - **TQ-004**: Streaming cho widget dùng SignalR hay SSE? → Resolved: DEC-006 (SignalR cho cả admin và widget).
 - **TQ-005**: `ollama`/`qdrant` chỉ còn trong `flex-environment/temp/` — khôi phục thế nào? → Resolved: R5 (đưa về `docker-compose.app.yml` theo bản temp, cập nhật INSTALL.md).
+- **TQ-006** *(mới, 2026-07-13)*: Identity/membership nên tự quản lý trong `flex-agent-service` hay dùng chung? → Resolved: DEC-005 cập nhật — tái dùng `flex-auth-service` làm identity provider dùng chung, thực hiện qua feature riêng `000009-auth-multi-tenant-postgres`. Cơ chế đồng bộ `tenant_id` cụ thể giữa hai repo cần chốt ở research.md trước khi vào `/speckit-tasks`.
 
 ## Thiết kế tổng quan
 
 **Luồng chính**:
-1. **Provisioning (US-001)**: API `POST /api/platform/tenants` → module Tenants tạo MySQL database + user (cùng flow 000005), ghi `tenant_databases`, apply schema tenant v1, tạo tenant owner + membership trong PostgreSQL, ghi audit. Lỗi giữa chừng → rollback DB/user, status=`error` (AC-003).
+1. **Provisioning (US-001)**: Quản trị viên nền tảng khởi tạo tenant + tài khoản chủ tenant tại `flex-auth-service` (theo `000009-auth-multi-tenant-postgres`) — đây là nơi duy nhất sở hữu `tenant_id`, user, membership. API `POST /api/platform/tenants` của `flex-agent-service` nhận `tenant_id` đã tồn tại ở `flex-auth-service` → module Tenants tạo MySQL database + user (cùng flow 000005), ghi `tenant_databases`, apply schema tenant v1, ghi audit — **không** tạo lại user/owner (đã có ở `flex-auth-service`). Lỗi giữa chừng → rollback DB/user, status=`error` (AC-003). Cơ chế đồng bộ `tenant_id` giữa hai hệ thống (gọi trực tiếp lúc provisioning vs sự kiện) do research/data-model quyết định.
 2. **Agent draft (US-002)**: CRUD agent draft ghi vào MySQL tenant DB (resolve connection qua `tenant_databases`). Optimistic concurrency bằng cột `row_version` (AC spec §5 sửa đồng thời).
 3. **Ingestion tri thức (US-003)**: Upload → file gốc vào MinIO bucket `tenant-{id}` → record `knowledge_sources` (MySQL tenant, status=`processing`) → publish job qua RabbitMQ → worker parse (PdfPig/OpenXml) → chunk (1000/200 overlap) → embed (Ollama) → upsert Qdrant collection `knowledge_chunks` với payload `{tenant_id, agent_id, source_id}` → status=`ready`/`error`. Xóa nguồn → xóa point theo `source_id` filter + xóa MinIO object.
 4. **Test chat (US-004)**: SignalR hub `/hubs/chat` (authenticated) → Runtime module load **draft** config + RAG (Qdrant filter đúng tenant/agent) → Ollama streaming → đẩy từng token về client. Hội thoại đánh dấu `is_test=true` (FR-010).
 5. **Publish (US-005)**: `POST .../publish` → transaction PostgreSQL: tạo `agent_versions` (snapshot bất biến: config + danh sách source_id đang ready), gán `agents_runtime.active_version`, ghi outbox event `agent.published`, ghi audit; trả về widget key + snippet nhúng. Idempotent theo content-hash của draft (spec §5 publish lặp).
 6. **Widget chat (US-005)**: `<script src="https://host/widget/flex-agent-widget.js" data-widget-key="...">` → widget gọi `POST /api/public/chat/sessions` bằng widget key (rate-limited, SEC-004) → SignalR anonymous kết nối bằng session token → Runtime load **active snapshot** từ PostgreSQL (không đọc draft — FR-014), RAG filter theo `tenant_id` của snapshot, streaming trả lời, đếm usage.
 7. **Rollback (US-006)**: `POST .../versions/{n}/activate` → đổi `active_version` + audit; request kế tiếp của widget dùng snapshot cũ ngay (SC-004 < 1 phút vì đọc theo `active_version` mỗi session).
-8. **RBAC (US-007)**: JWT chứa `tenant_id` + `role` (owner/editor/viewer); policy per-endpoint; tenant context lấy từ claim, KHÔNG từ body (BR-004).
+8. **RBAC (US-007)**: JWT do `flex-auth-service` phát hành, chứa `tenant_id` + `role` (owner/editor/viewer); `flex-agent-service` chỉ xác minh chữ ký (JWKS/shared secret) và áp policy per-endpoint từ claim có sẵn — không tự quản lý bảng thành viên/vai trò; quản lý thành viên (mời/đổi vai trò) thực hiện ở `flex-auth-service`. Tenant context lấy từ claim, KHÔNG từ body (BR-004).
 9. **Usage (US-008)**: Runtime ghi counter (hội thoại, message, token) vào bảng aggregate PostgreSQL theo tenant/ngày.
 
 **Component/module tham gia**:
 - `flex-agent-service/src/Flex.Agent` — host ASP.NET Core: REST API, SignalR hub, hosted workers (ingestion consumer, outbox dispatcher).
-- Modules trong host: `Tenants` (provisioning, membership, RBAC), `Agents` (draft CRUD), `Knowledge` (upload/ingestion), `Publishing` (version/rollback/outbox), `Runtime` (session, RAG, streaming), `Audit`, `Usage`, `ModelGateway` (interface + OllamaModelGateway).
+- Modules trong host: `Tenants` (provisioning vùng dữ liệu MySQL — **không** sở hữu user/membership, chỉ liên kết `tenant_id` với `flex-auth-service`), `Agents` (draft CRUD), `Knowledge` (upload/ingestion), `Publishing` (version/rollback/outbox), `Runtime` (session, RAG, streaming), `Audit`, `Usage`, `ModelGateway` (interface + OllamaModelGateway).
+- `Auth` (host-level, không phải module nghiệp vụ): xác minh JWT do `flex-auth-service` phát hành (JWKS/shared secret) + policy per-endpoint theo claim `tenant_id`/`role`.
 - `flex-microfrontend/src/app/agent-platform` — Agent Studio UI.
 - `flex-environment` — compose (ollama, qdrant, minio, flex-agent-service), migration 002.
 
@@ -123,7 +126,7 @@
 |---------|---------|------------|----------------------|---------------------|--------------|-------------|----------|
 | US-001 / FR-001 | P1 | Đủ rõ | Provisioning in-app theo flow 000005 | `Modules/Tenants` | `POST /api/platform/tenants` | `tenant_databases`, MySQL db mới | integration |
 | US-001 / FR-002 | P1 | Đủ rõ | Unique tenant_id + rollback transaction-style | `Modules/Tenants/ProvisioningService` | như trên (409/exit-status) | `tenant_databases.status`, audit | integration (fail giữa chừng) |
-| US-001 / FR-003 | P1 | Đủ rõ | Tạo user owner + membership khi provision; JWT login | `Modules/Tenants/Identity` | `POST /api/auth/login` | `platform_users`, `tenant_members` | integration |
+| US-001 / FR-003 | P1 | Đủ rõ | User owner + membership tạo tại `flex-auth-service` (000009), không phải trong `flex-agent-service`; login/JWT cũng do `flex-auth-service` cấp | `Modules/Tenants` (chỉ liên kết `tenant_id`) | `flex-auth-service: POST /api/auth/login` (ngoài repo) | `flex-auth-service` sở hữu user/tenant/membership; `flex-agent-service` không có bảng riêng | integration (xác minh JWT hợp lệ được chấp nhận) |
 | US-002 / FR-004 | P1 | Đủ rõ | CRUD draft trong MySQL tenant DB | `Modules/Agents` | `POST/GET /api/tenant/agents` | `agents` (tenant DB) | unit + integration |
 | US-002 / FR-005 | P1 | Đủ rõ | Update draft + optimistic concurrency | `Modules/Agents` | `PUT /api/tenant/agents/{id}` | `agents.row_version` | unit |
 | US-003 / FR-006 | P1 | Đủ rõ | Upload MinIO + job RabbitMQ + worker parse/chunk/embed/index | `Modules/Knowledge`, `Workers/IngestionWorker` | `POST /api/tenant/agents/{id}/sources` | `knowledge_sources`, Qdrant points, MinIO | integration (end-to-end ingestion) |
@@ -137,8 +140,8 @@
 | US-005 / FR-014 | P1 | Đủ rõ | Runtime public chỉ đọc `agent_versions` theo `active_version` | `Modules/Runtime/SnapshotLoader` | Không áp dụng | `agents_runtime.active_version` | integration (sửa draft ≠ đổi trả lời) |
 | US-006 / FR-015 | P2 | Đủ rõ | List versions + activate version cũ | `Modules/Publishing` | `GET .../versions`, `POST .../versions/{n}/activate` | `agent_versions` | integration |
 | US-006 / FR-016 | P2 | Đủ rõ | Widget key trỏ agent, không trỏ version → rollback không đổi snippet | `Modules/Runtime` | Không áp dụng | `widget_keys.agent_id` | e2e |
-| US-007 / FR-017 | P2 | Đủ rõ | CRUD membership + role trong control plane | `Modules/Tenants/Members` | `POST/PUT /api/tenant/members` | `tenant_members` | integration |
-| US-007 / FR-018 | P2 | Đủ rõ | Authorization policy: `RequireRole(owner)` cho publish/rollback/members; viewer read-only | `Auth/Policies` | 403 chuẩn | Không áp dụng | permission test |
+| US-007 / FR-017 | P2 | Đủ rõ | CRUD membership + role thực hiện tại `flex-auth-service` (000009); `flex-agent-service` không có API/bảng membership riêng | Ngoài repo (`flex-auth-service`) | `flex-auth-service` API quản lý thành viên (ngoài repo) | `flex-auth-service` sở hữu `tenant_members` | integration test tại `flex-auth-service`; contract test claim JWT tại `flex-agent-service` |
+| US-007 / FR-018 | P2 | Đủ rõ | Authorization policy: `RequireRole(owner)` cho publish/rollback; viewer read-only — dựa hoàn toàn vào claim `role` trong JWT | `Auth/Policies` | 403 chuẩn | Không áp dụng | permission test |
 | US-008 / FR-019 | P3 | Đủ rõ | Counter aggregate theo tenant/ngày, API đọc scoped theo claim | `Modules/Usage` | `GET /api/tenant/usage` | `usage_daily` | integration |
 | FR-020 (cách ly) | P1 | Đủ rõ | Tenant context từ JWT/widget-key server-side; mọi query MySQL qua resolver; Qdrant bắt buộc filter `tenant_id`; guard test | xuyên suốt `Runtime`, `Knowledge` | Không áp dụng | mọi entity | permission + isolation test (SC-003) |
 | FR-021 (audit) | P1 | Đủ rõ | `audit_logs` append-only PostgreSQL, không API sửa/xóa; ghi trong cùng transaction nghiệp vụ | `Modules/Audit` | Không áp dụng | `audit_logs` | integration |
@@ -183,6 +186,8 @@ Chi tiết: [contracts/platform-api.md](./contracts/platform-api.md), [contracts
 
 Mọi role tenant: KHÔNG truy cập được bất kỳ resource nào của tenant khác — enforced bằng tenant context từ claim, không từ request body (BR-004).
 
+*Cập nhật 2026-07-13*: Việc mời/gỡ thành viên và đổi vai trò (cột "Sửa"/"Xóa" của member) được thực hiện tại `flex-auth-service`, không phải trong `flex-agent-service`; bảng trên mô tả quyền **sử dụng** các resource của `flex-agent-service` theo vai trò đọc được từ JWT.
+
 ## Dữ liệu & Migration
 
 **Có thay đổi dữ liệu/schema không**: Có — schema mới, không sửa schema hiện có.
@@ -215,7 +220,7 @@ Mọi role tenant: KHÔNG truy cập được bất kỳ resource nào của ten
 | DEC-002 | Provisioning in-app: port flow SQL của script 000005 vào `ProvisioningService` | App cần provisioning programmatic + transaction + audit; scripts 000005 giữ làm công cụ ops | Gọi shell script từ app | Fragile trong container, khó test, khó rollback theo transaction |
 | DEC-003 | Qdrant 1 collection `knowledge_chunks`, payload filter `tenant_id`/`agent_id` bắt buộc | Qdrant đã có cấu hình sẵn trong environment; filter payload đủ cách ly ở scale MVP; ít vận hành hơn | (a) pgvector; (b) collection-per-tenant | (a) thêm extension + tải PostgreSQL control plane; (b) overhead quản lý collection, không cần ở scale MVP |
 | DEC-004 | `IModelGateway` nội bộ gọi thẳng Ollama HTTP (`qwen2.5:1.5b` chat, `nomic-embed-text-v2-moe` embed 768d) | Ollama API đơn giản; bỏ hop Python trung gian; abstraction cho phép swap OpenAI/Claude sau | Tái dùng service `flex-ai-gateway` | Source repo không có trong workspace, thêm 1 service phải vận hành, RAG của nó không multi-tenant |
-| DEC-005 | Identity riêng trong platform: JWT tự phát hành, users/membership trên PostgreSQL | Multi-tenant membership là domain của platform; tránh coupling Oracle của auth-service | Tái dùng `flex-auth-service` | Thiết kế cho sản phẩm khác, single-tenant, Oracle; tích hợp SSO để giai đoạn sau |
+| DEC-005 *(cập nhật 2026-07-13)* | Tái dùng `flex-auth-service` làm identity provider dùng chung: tenant, user, membership/vai trò (owner/editor/viewer), phát hành JWT chứa `tenant_id`+vai trò — thực hiện qua feature riêng `000009-auth-multi-tenant-postgres`. `flex-agent-service` chỉ xác minh JWT (JWKS/shared secret) và đọc claim, KHÔNG sở hữu bảng `platform_users`/`tenant_members` | Tránh nhiều nguồn sự thật về user/tenant/role trong hệ thống Flex khi có thêm sản phẩm multi-tenant khác sau này; `flex-auth-service` lúc quyết định lại (2026-07-13) chưa có consumer/dữ liệu thật nên đổi hướng không rủi ro tương thích ngược | (a) Identity riêng trong platform (JWT tự phát hành, users/membership trên PostgreSQL của `flex-agent-service`); (b) tích hợp SSO ngay | (a) quyết định ban đầu (trước 2026-07-13) — bị thay thế vì gây trùng lặp logic identity giữa các sản phẩm; (b) chưa cần ở MVP |
 | DEC-006 | SignalR cho cả test chat và widget (anonymous qua session token) | Native .NET, tự fallback transport, 1 cơ chế streaming duy nhất cho 2 luồng | SSE cho widget | Hai cơ chế song song tăng bề mặt code; SignalR JS client đủ nhỏ cho widget |
 | DEC-007 | Ingestion qua RabbitMQ + hosted consumer cùng process; publish event qua outbox PostgreSQL | RabbitMQ đã chạy sẵn; outbox đúng yêu cầu tài liệu kiến trúc (§4); cùng process = ít deployable | (a) Hangfire/in-memory queue; (b) worker tách process | (a) mất durability khi restart; (b) thêm deployable không cần ở MVP — tách sau theo §7 |
 | DEC-008 | MinIO cho file tri thức gốc (thêm service vào infra compose) | Tài liệu kiến trúc cấm binary trong DB; S3-compatible chuẩn hóa từ đầu | Lưu file trên volume local của platform | Không theo ràng buộc spec §13; đổi sang object storage sau sẽ phải migrate |
@@ -266,7 +271,7 @@ flex-agent-service/                      # Repo con MỚI (thêm vào workstatio
 ├── src/
 │   └── Flex.Agent/                       # Host: API + SignalR + hosted workers
 │       ├── Program.cs
-│       ├── Auth/                         # JWT, policies, rate limiting, tenant context
+│       ├── Auth/                         # Xác minh JWT do flex-auth-service phát hành, policies, rate limiting, tenant context
 │       ├── Modules/
 │       │   ├── Tenants/                  # provisioning, registry, members, RBAC
 │       │   ├── Agents/                   # draft CRUD (MySQL tenant DB)
@@ -300,6 +305,7 @@ flex-microfrontend/                       # Repo hiện có — thay đổi
 ## Rollout & Rollback
 
 **Kế hoạch rollout**:
+0. **Điều kiện tiên quyết**: `000009-auth-multi-tenant-postgres` (multi-tenant hoá `flex-auth-service` + migrate PostgreSQL) đã triển khai và có API/JWKS sẵn sàng — `flex-agent-service` không tự vận hành được provisioning/login nếu bước này chưa xong.
 1. Thêm `flex-agent-service` vào `workstation.json`; khởi tạo repo.
 2. `flex-environment`: thêm minio/ollama/qdrant → `docker compose up -d`, chờ ollama-init pull model (lần đầu tải ~1-2GB).
 3. Chạy migration 002 (PostgreSQL) — trước khi deploy app.
@@ -350,6 +356,7 @@ flex-microfrontend/                       # Repo hiện có — thay đổi
 |---------|------------|-----------------------------------|
 | Repo con thứ 6 (`flex-agent-service`) | Bounded context sản phẩm mới, không thuộc auth/gateway/frontend; constitution I yêu cầu code sản phẩm trong sub-repo | Nhét vào repo hiện có → coupling Oracle/sai domain; để trong workstation → vi phạm constitution I |
 | 4 datastore (PostgreSQL, MySQL, Qdrant, MinIO) + queue | Là ràng buộc kiến trúc từ spec §13 (chia miền dữ liệu của tài liệu kiến trúc đã duyệt) | Gom về 1 DB → phá mô hình cách ly database-per-tenant đã triển khai ở 000005 |
+| Phụ thuộc cross-repo vào `flex-auth-service`/`000009` cho identity (thay vì tự chứa) *(mới, 2026-07-13)* | Tránh trùng lặp logic user/tenant/role giữa các sản phẩm multi-tenant trong hệ thống Flex (DEC-005 cập nhật) | Tự chứa identity trong `flex-agent-service` → đơn giản hơn trong ngắn hạn nhưng tạo nguồn sự thật thứ hai về user/tenant, phải đồng bộ thủ công khi có sản phẩm multi-tenant tiếp theo |
 
 ## Checklist sẵn sàng cho `/speckit-tasks`
 
