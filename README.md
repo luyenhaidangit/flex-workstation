@@ -33,17 +33,16 @@ Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sẽ:
 - Kiểm tra và cài Claude Code, `ccusage`, `rtk` nếu thiếu.
 - Cập nhật marketplace và plugin `flex-agents`.
 
-Repo đang có local changes, origin khác cấu hình hoặc đang ở detached HEAD sẽ được cảnh báo và bỏ qua. Sau khi sync xong, dùng `OPEN_WORKSTATION.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
+Repo đang có local changes, origin khác cấu hình hoặc đang ở detached HEAD sẽ được cảnh báo và bỏ qua. Sau khi sync xong, dùng `OPEN_WORKSPACE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 
 ## Entrypoint Windows
 
 | File | Mục đích |
 | --- | --- |
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone repos, cài tool, sync flex-agents |
-| `OPEN_WORKSTATION.cmd` | Mở workstation trong VS Code |
+| `OPEN_WORKSPACE.cmd` | Mở workstation trong VS Code |
 | `OPEN_CLAUDE.cmd` | Mở Claude Code với `--dangerously-skip-permissions` |
 | `OPEN_CODEX.cmd` | Mở Codex |
-| `OPEN_WORKSPACE.cmd` | Alias tương thích → `OPEN_WORKSTATION.cmd` |
 
 ## Cấu hình coding agent
 
