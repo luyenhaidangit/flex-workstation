@@ -44,7 +44,7 @@ Trả lời các câu hỏi kỹ thuật TQ-001..TQ-005 trong [plan.md](./plan.m
 
 ## R5 — TQ-005: Khôi phục ollama/qdrant trong flex-environment
 
-**Decision**: Đưa `ollama`, `ollama-init`, `qdrant` từ `temp/docker-compose.override.yml` về `docker-compose.app.yml` (giữ image version cũ: `ollama/ollama:0.6.2`, `qdrant/qdrant:v1.16.3`), sửa `ollama-init` pull đúng cặp model của R3; thêm `minio` vào `docker-compose.infra.yml`; thêm service `flex-agent-platform` vào `docker-compose.app.yml`. Tuân thủ quy ước CLAUDE.md của repo: env var inline default, volume `name:` không explicit, comment `# Mô tả ngắn.`, không secrets mechanism.
+**Decision**: Đưa `ollama`, `ollama-init`, `qdrant` từ `temp/docker-compose.override.yml` về `docker-compose.app.yml` (giữ image version cũ: `ollama/ollama:0.6.2`, `qdrant/qdrant:v1.16.3`), sửa `ollama-init` pull đúng cặp model của R3; thêm `minio` vào `docker-compose.infra.yml`; thêm service `flex-agent-service` vào `docker-compose.app.yml`. Tuân thủ quy ước CLAUDE.md của repo: env var inline default, volume `name:` không explicit, comment `# Mô tả ngắn.`, không secrets mechanism.
 
 **Rationale**: Cấu hình đã chạy trước đó chỉ bị di dời vào `temp/` — khôi phục ít rủi ro hơn viết mới. `flex-ai-gateway` (service cũ trong app.yml) không dùng cho MVP: giữ nguyên, không sửa/xóa (nguyên tắc thay đổi phẫu thuật — nhắc user quyết định riêng nếu muốn gỡ).
 

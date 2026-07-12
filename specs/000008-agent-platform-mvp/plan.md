@@ -10,17 +10,17 @@
 
 **Yêu cầu chính từ spec**: MVP nền tảng AI Agent đa tenant theo `docs/architecture/agent-platform-architecture.md` §7: tenant provisioning (US-001), Agent Studio (US-002), nạp tri thức (US-003), chạy thử (US-004), phát hành web widget + chat streaming (US-005), version/rollback (US-006), RBAC (US-007), usage (US-008); cách ly tenant tuyệt đối (FR-020, SEC-002), audit bất biến (FR-021).
 
-**Hướng tiếp cận kỹ thuật dự kiến**: Một **modular monolith .NET 9** mới — repo con `flex-agent-platform` — chứa toàn bộ control plane + runtime (API, SignalR, background worker trong một deployable), đúng khuyến nghị §7 của tài liệu kiến trúc. Dữ liệu chia đúng mô hình: PostgreSQL `flexdb` = control plane + runtime snapshot (tái dùng `tenant_databases` từ 000005); MySQL database-per-tenant = dữ liệu vận hành (agent draft, knowledge metadata, hội thoại); Qdrant = vector search có filter `tenant_id`; MinIO = file gốc; Ollama = model gateway nội bộ. Admin UI là module Angular trong `flex-microfrontend`; widget là bundle JS tĩnh do platform phục vụ.
+**Hướng tiếp cận kỹ thuật dự kiến**: Một **modular monolith .NET 9** mới — repo con `flex-agent-service` — chứa toàn bộ control plane + runtime (API, SignalR, background worker trong một deployable), đúng khuyến nghị §7 của tài liệu kiến trúc. Dữ liệu chia đúng mô hình: PostgreSQL `flexdb` = control plane + runtime snapshot (tái dùng `tenant_databases` từ 000005); MySQL database-per-tenant = dữ liệu vận hành (agent draft, knowledge metadata, hội thoại); Qdrant = vector search có filter `tenant_id`; MinIO = file gốc; Ollama = model gateway nội bộ. Admin UI là module Angular trong `flex-microfrontend`; widget là bundle JS tĩnh do platform phục vụ.
 
 **Kết quả sau research**: Đã hoàn thành — xem [research.md](./research.md). Toàn bộ TQ-001..TQ-005 đã resolve; không còn CẦN LÀM RÕ chặn task generation.
 
 ## Phạm vi kỹ thuật
 
 **Trong phạm vi**:
-- Repo con **mới** `flex-agent-platform` (.NET 9): modules Tenants, Agents, Knowledge, Publishing, Runtime, Audit, Usage; SignalR hub; worker ingestion; widget JS; Dockerfile.
-- `flex-environment`: khôi phục `ollama`, `ollama-init`, `qdrant` vào compose active; thêm `minio`; thêm service `flex-agent-platform` vào `docker-compose.app.yml`; migration PostgreSQL `002_create_agent_platform_control_plane.sql`.
+- Repo con **mới** `flex-agent-service` (.NET 9): modules Tenants, Agents, Knowledge, Publishing, Runtime, Audit, Usage; SignalR hub; worker ingestion; widget JS; Dockerfile.
+- `flex-environment`: khôi phục `ollama`, `ollama-init`, `qdrant` vào compose active; thêm `minio`; thêm service `flex-agent-service` vào `docker-compose.app.yml`; migration PostgreSQL `002_create_agent_platform_control_plane.sql`.
 - `flex-microfrontend`: module Angular `agent-platform` (màn hình Agent Studio, Knowledge, Test chat, Publish/Versions, Members, Usage).
-- `flex-workstation`: thêm `flex-agent-platform` vào `workstation.json`; đánh dấu spec `000003-ai-agent-base` là superseded bởi 000008.
+- `flex-workstation`: thêm `flex-agent-service` vào `workstation.json`; đánh dấu spec `000003-ai-agent-base` là superseded bởi 000008.
 
 **Ngoài phạm vi kỹ thuật**:
 - Không sửa `flex-auth-service`, `flex-api-gateway`, `flex-ai-gateway` (image Python giữ nguyên, không dùng trong MVP).
@@ -32,7 +32,7 @@
 
 **Ngôn ngữ/Phiên bản**: .NET 9 / C# (backend, đồng bộ với `flex-auth-service`); Angular 16 / TypeScript (admin UI); JavaScript thuần (widget nhúng); SQL (PostgreSQL 16, MySQL 8).
 
-**Service/App liên quan**: `flex-agent-platform` (mới — API + SignalR + worker); `flex-environment` (compose, migration); `flex-microfrontend` (module admin). Không đụng `flex-auth-service`, `flex-api-gateway`.
+**Service/App liên quan**: `flex-agent-service` (mới — API + SignalR + worker); `flex-environment` (compose, migration); `flex-microfrontend` (module admin). Không đụng `flex-auth-service`, `flex-api-gateway`.
 
 **Phụ thuộc chính**: EF Core 9 (Npgsql cho control plane; Pomelo.EntityFrameworkCore.MySql cho tenant DB), ASP.NET Core SignalR, RabbitMQ.Client, Qdrant.Client (gRPC), Minio SDK, Ollama HTTP API (`/api/chat`, `/api/embed` — gọi qua HttpClient, không cần SDK), PdfPig + DocumentFormat.OpenXml (parse PDF/DOCX).
 
@@ -42,7 +42,7 @@
 
 **Nền tảng chạy**: Linux container qua Docker Compose (`flex-environment`), sau HAProxy.
 
-**Đơn vị deploy**: 1 image `flex-agent-platform` (API + SignalR + hosted worker cùng process); bundle Angular trong `flex-microfrontend`; widget JS phục vụ từ chính platform (`/widget/flex-agent-widget.js`).
+**Đơn vị deploy**: 1 image `flex-agent-service` (API + SignalR + hosted worker cùng process); bundle Angular trong `flex-microfrontend`; widget JS phục vụ từ chính platform (`/widget/flex-agent-widget.js`).
 
 **Loại project**: web-service + worker (backend) và admin-web module (frontend) + embeddable widget.
 
@@ -67,7 +67,7 @@
 | Complexity Gate | Pass | Pass | Repo mới được biện minh (xem Theo dõi độ phức tạp); monolith thay vì microservices; không Redis/backplane |
 | Release Gate | Pass | Pass | Rollout theo compose, rollback bằng image tag + migration rollback script |
 
-**Nguyên tắc I (workstation không chứa code sản phẩm)**: Pass — toàn bộ code nằm trong `flex-agent-platform`, `flex-environment`, `flex-microfrontend`; workstation chỉ thêm entry `workstation.json` và spec/plan.
+**Nguyên tắc I (workstation không chứa code sản phẩm)**: Pass — toàn bộ code nằm trong `flex-agent-service`, `flex-environment`, `flex-microfrontend`; workstation chỉ thêm entry `workstation.json` và spec/plan.
 
 ## Câu hỏi kỹ thuật cần research
 
@@ -91,10 +91,10 @@
 9. **Usage (US-008)**: Runtime ghi counter (hội thoại, message, token) vào bảng aggregate PostgreSQL theo tenant/ngày.
 
 **Component/module tham gia**:
-- `flex-agent-platform/src/Flex.AgentPlatform` — host ASP.NET Core: REST API, SignalR hub, hosted workers (ingestion consumer, outbox dispatcher).
+- `flex-agent-service/src/Flex.Agent` — host ASP.NET Core: REST API, SignalR hub, hosted workers (ingestion consumer, outbox dispatcher).
 - Modules trong host: `Tenants` (provisioning, membership, RBAC), `Agents` (draft CRUD), `Knowledge` (upload/ingestion), `Publishing` (version/rollback/outbox), `Runtime` (session, RAG, streaming), `Audit`, `Usage`, `ModelGateway` (interface + OllamaModelGateway).
 - `flex-microfrontend/src/app/agent-platform` — Agent Studio UI.
-- `flex-environment` — compose (ollama, qdrant, minio, flex-agent-platform), migration 002.
+- `flex-environment` — compose (ollama, qdrant, minio, flex-agent-service), migration 002.
 
 **Điểm mở rộng/thay đổi chính**:
 - `IModelGateway` (chat streaming + embed) — swap Ollama → OpenAI/Claude sau này chỉ đổi implementation + config.
@@ -211,7 +211,7 @@ Mọi role tenant: KHÔNG truy cập được bất kỳ resource nào của ten
 
 | Quyết định | Lựa chọn | Lý do chọn | Phương án đã loại | Lý do loại |
 |------------|----------|------------|-------------------|------------|
-| DEC-001 | Repo con mới `flex-agent-platform`, modular monolith .NET 9 (API+hub+worker một deployable) | Đúng khuyến nghị §7 tài liệu kiến trúc; cùng stack .NET 9 với repo hiện có; bounded context riêng | (a) Microservices ngay; (b) nhét vào `flex-auth-service`; (c) mở rộng `flex-ai-gateway` Python thành platform | (a) tài liệu kiến trúc khuyến cáo không tách sớm, solo dev; (b) sai bounded context + coupling Oracle; (c) source không có trong workspace, Python không phải stack chính |
+| DEC-001 | Repo con mới `flex-agent-service`, modular monolith .NET 9 (API+hub+worker một deployable) | Đúng khuyến nghị §7 tài liệu kiến trúc; cùng stack .NET 9 với repo hiện có; bounded context riêng | (a) Microservices ngay; (b) nhét vào `flex-auth-service`; (c) mở rộng `flex-ai-gateway` Python thành platform | (a) tài liệu kiến trúc khuyến cáo không tách sớm, solo dev; (b) sai bounded context + coupling Oracle; (c) source không có trong workspace, Python không phải stack chính |
 | DEC-002 | Provisioning in-app: port flow SQL của script 000005 vào `ProvisioningService` | App cần provisioning programmatic + transaction + audit; scripts 000005 giữ làm công cụ ops | Gọi shell script từ app | Fragile trong container, khó test, khó rollback theo transaction |
 | DEC-003 | Qdrant 1 collection `knowledge_chunks`, payload filter `tenant_id`/`agent_id` bắt buộc | Qdrant đã có cấu hình sẵn trong environment; filter payload đủ cách ly ở scale MVP; ít vận hành hơn | (a) pgvector; (b) collection-per-tenant | (a) thêm extension + tải PostgreSQL control plane; (b) overhead quản lý collection, không cần ở scale MVP |
 | DEC-004 | `IModelGateway` nội bộ gọi thẳng Ollama HTTP (`qwen2.5:1.5b` chat, `nomic-embed-text-v2-moe` embed 768d) | Ollama API đơn giản; bỏ hop Python trung gian; abstraction cho phép swap OpenAI/Claude sau | Tái dùng service `flex-ai-gateway` | Source repo không có trong workspace, thêm 1 service phải vận hành, RAG của nó không multi-tenant |
@@ -259,12 +259,12 @@ specs/000008-agent-platform-mvp/
 ### Source code (repository root)
 
 ```text
-flex-agent-platform/                      # Repo con MỚI (thêm vào workstation.json)
-├── Flex.AgentPlatform.sln
+flex-agent-service/                      # Repo con MỚI (thêm vào workstation.json)
+├── Flex.Agent.sln
 ├── Dockerfile
 ├── .env.example
 ├── src/
-│   └── Flex.AgentPlatform/               # Host: API + SignalR + hosted workers
+│   └── Flex.Agent/                       # Host: API + SignalR + hosted workers
 │       ├── Program.cs
 │       ├── Auth/                         # JWT, policies, rate limiting, tenant context
 │       ├── Modules/
@@ -281,12 +281,12 @@ flex-agent-platform/                      # Repo con MỚI (thêm vào workstati
 │       ├── Data/                         # ControlPlaneDbContext (Npgsql), TenantDbContext (Pomelo), tenant schema DDL
 │       └── wwwroot/widget/               # flex-agent-widget.js (bundle build sẵn)
 └── tests/
-    ├── Flex.AgentPlatform.UnitTests/
-    └── Flex.AgentPlatform.IntegrationTests/
+    ├── Flex.Agent.UnitTests/
+    └── Flex.Agent.IntegrationTests/
 
 flex-environment/                         # Repo hiện có — thay đổi
 ├── docker-compose.infra.yml              # + minio
-├── docker-compose.app.yml                # + ollama, ollama-init, qdrant (khôi phục từ temp/), + flex-agent-platform
+├── docker-compose.app.yml                # + ollama, ollama-init, qdrant (khôi phục từ temp/), + flex-agent-service
 ├── migrations/002_create_agent_platform_control_plane.sql
 ├── migrations/002_create_agent_platform_control_plane_rollback.sql
 └── INSTALL.md                            # + hướng dẫn agent platform
@@ -295,21 +295,21 @@ flex-microfrontend/                       # Repo hiện có — thay đổi
 └── src/app/agent-platform/               # Module mới: agents, knowledge, test-chat, versions, members, usage
 ```
 
-**Quyết định cấu trúc**: Monolith một project host (`Flex.AgentPlatform`) chia module theo folder — không tách class library per module ở MVP (Complexity Gate); tách khi module cần deploy riêng theo lộ trình §7 tài liệu kiến trúc.
+**Quyết định cấu trúc**: Monolith một project host (`Flex.Agent`) chia module theo folder — không tách class library per module ở MVP (Complexity Gate); tách khi module cần deploy riêng theo lộ trình §7 tài liệu kiến trúc.
 
 ## Rollout & Rollback
 
 **Kế hoạch rollout**:
-1. Thêm `flex-agent-platform` vào `workstation.json`; khởi tạo repo.
+1. Thêm `flex-agent-service` vào `workstation.json`; khởi tạo repo.
 2. `flex-environment`: thêm minio/ollama/qdrant → `docker compose up -d`, chờ ollama-init pull model (lần đầu tải ~1-2GB).
 3. Chạy migration 002 (PostgreSQL) — trước khi deploy app.
-4. Build image + up `flex-agent-platform`; app tự tạo Qdrant collection.
+4. Build image + up `flex-agent-service`; app tự tạo Qdrant collection.
 5. Build `flex-microfrontend` với module mới.
 6. Smoke test theo quickstart.
 
 **Tương thích ngược**: Không có client cũ. Sau MVP, widget snippet là public contract phải giữ ổn định.
 
-**Feature flag/config**: Không cần flag riêng — hệ thống mới, chưa có người dùng thật; tắt bằng cách stop service `flex-agent-platform`.
+**Feature flag/config**: Không cần flag riêng — hệ thống mới, chưa có người dùng thật; tắt bằng cách stop service `flex-agent-service`.
 
 **Thực thi migration/backfill khi rollout**: Migration 002 chạy thủ công qua `docker exec ... psql` (cùng quy ước 000005), trước khi start app.
 
@@ -348,7 +348,7 @@ flex-microfrontend/                       # Repo hiện có — thay đổi
 
 | Vi phạm | Vì sao cần | Phương án đơn giản hơn bị loại vì |
 |---------|------------|-----------------------------------|
-| Repo con thứ 6 (`flex-agent-platform`) | Bounded context sản phẩm mới, không thuộc auth/gateway/frontend; constitution I yêu cầu code sản phẩm trong sub-repo | Nhét vào repo hiện có → coupling Oracle/sai domain; để trong workstation → vi phạm constitution I |
+| Repo con thứ 6 (`flex-agent-service`) | Bounded context sản phẩm mới, không thuộc auth/gateway/frontend; constitution I yêu cầu code sản phẩm trong sub-repo | Nhét vào repo hiện có → coupling Oracle/sai domain; để trong workstation → vi phạm constitution I |
 | 4 datastore (PostgreSQL, MySQL, Qdrant, MinIO) + queue | Là ràng buộc kiến trúc từ spec §13 (chia miền dữ liệu của tài liệu kiến trúc đã duyệt) | Gom về 1 DB → phá mô hình cách ly database-per-tenant đã triển khai ở 000005 |
 
 ## Checklist sẵn sàng cho `/speckit-tasks`

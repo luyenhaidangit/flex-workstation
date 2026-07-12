@@ -5,7 +5,7 @@
 ## Điều kiện tiên quyết
 
 - Docker Desktop chạy; đủ dung lượng cho model Ollama (~2 GB lần pull đầu).
-- Đã hoàn thành implement theo `tasks.md` (repo `flex-agent-platform`, thay đổi `flex-environment`, `flex-microfrontend`).
+- Đã hoàn thành implement theo `tasks.md` (repo `flex-agent-service`, thay đổi `flex-environment`, `flex-microfrontend`).
 
 ## Setup
 
@@ -21,7 +21,7 @@ docker exec -i flex-platform-postgresdb-1 psql -U flex -d flexdb \
   < migrations/002_create_agent_platform_control_plane.sql
 
 # 3. Khởi động platform
-docker compose up -d flex-agent-platform
+docker compose up -d flex-agent-service
 curl -fsS http://localhost:{PORT}/health   # OK; app tự tạo Qdrant collection
 ```
 

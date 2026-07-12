@@ -1,6 +1,6 @@
 # Contract: Platform REST API
 
-**Feature**: `000008-agent-platform-mvp` | Base URL: qua HAProxy → `flex-agent-platform`
+**Feature**: `000008-agent-platform-mvp` | Base URL: qua HAProxy → `flex-agent-service`
 
 Quy ước chung:
 - Auth: `Authorization: Bearer <JWT>` (claims: `sub`, `tenant_id`, `role`), trừ nhóm `/api/public` và `/api/auth/login`.

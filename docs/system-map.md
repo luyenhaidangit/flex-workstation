@@ -18,6 +18,7 @@ flex-workstation/
 ├── flex-api-gateway/     # Repo con độc lập - API Gateway
 ├── flex-microfrontend/   # Repo con độc lập - frontend client
 ├── flex-environment/     # Repo con độc lập - local/dev infrastructure stack
+├── flex-agent-service/   # Repo con độc lập - nền tảng AI Agent đa tenant
 ├── AGENTS.md             # Context cho Codex agent
 ├── CLAUDE.md             # Context cho Claude Code
 ├── README.md             # Index và hướng dẫn tổng quan
@@ -37,6 +38,7 @@ Các repo con được clone vào trong root này nhưng là Git repo độc l�
 | `flex-api-gateway` | `https://github.com/luyenhaidangit/flex-api-gateway.git` |
 | `flex-microfrontend` | `https://github.com/luyenhaidangit/flex-microfrontend` |
 | `flex-environment` | `https://github.com/luyenhaidangit/flex-environment` |
+| `flex-agent-service` | `https://github.com/luyenhaidangit/flex-agent-service.git` |
 
 Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch` là tùy chọn; nếu không có, script clone theo default branch của remote và pull theo branch hiện tại của repo local.
 
@@ -49,6 +51,7 @@ Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch
 | `flex-api-gateway` | API Gateway | .NET, Dockerfile, Jenkinsfile |
 | `flex-microfrontend` | Frontend client | Angular, Node.js |
 | `flex-environment` | Local/dev infrastructure stack | Docker Compose |
+| `flex-agent-service` | Nền tảng AI Agent đa tenant (control plane + runtime) | .NET 9, SignalR |
 
 ## Luồng bootstrap
 

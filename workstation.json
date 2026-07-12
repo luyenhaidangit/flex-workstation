@@ -21,6 +21,10 @@
       {
         "name": "flex-environment",
         "url": "https://github.com/luyenhaidangit/flex-environment"
+      },
+      {
+        "name": "flex-agent-service",
+        "url": "https://github.com/luyenhaidangit/flex-agent-service.git"
       }
     ]
   }
