@@ -16,6 +16,11 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và rà `git diff -- .agents/skills`.
 
+## Requirements Quality Gate
+
+- `checklists/requirements.md` là quality gate bắt buộc của `$speckit-specify` và phải được sinh từ `.specify/templates/requirements-template.md`.
+- `$speckit-checklist` tiếp tục dùng `.specify/templates/checklist-template.md` để tạo checklist tùy biến theo domain; không thay thế hoặc ghi đè requirements quality gate.
+
 ## Quick Flow
 
 - `$speckit-quick` là quick flow cho tác vụ nhỏ, rủi ro thấp trong workstation.

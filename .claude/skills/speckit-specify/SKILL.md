@@ -144,97 +144,30 @@ Given that feature description, do this:
 
 6. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
 
-7. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+7. **Specification Quality Validation**: After writing the initial spec, create and evaluate the mandatory requirements quality gate:
 
-   a. **Create Spec Quality Checklist**: Generate a checklist file at `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` using the checklist template structure with these validation items:
+   a. **Create Requirements Checklist from Template**:
+      - Resolve the active `requirements-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve requirements-template`).
+      - If the template cannot be resolved, stop with a clear error. Do not fall back to a hard-coded checklist.
+      - Copy the resolved template to `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md`.
+      - Replace `[TÊN TÍNH NĂNG]`, `[NNNNNN]`, `[NGÀY]`, and `{{GIT_USER_NAME}}` with feature values. Use `Chưa xác định` when `git config user.name` is unavailable.
+      - Keep `requirements.md` as the mandatory quality gate for `spec.md`. It is distinct from domain checklists created by `$speckit-checklist` using `checklist-template.md`.
 
-      ```markdown
-      # Specification Quality Checklist: [FEATURE NAME]
-      
-      **Purpose**: Validate specification completeness and quality before proceeding to planning
-      **Created**: [DATE]
-      **Feature**: [Link to spec.md]
-      
-      ## Content Quality
-      
-      - [ ] No implementation details (languages, frameworks, APIs)
-      - [ ] Focused on user value and business needs
-      - [ ] Written for non-technical stakeholders
-      - [ ] All mandatory sections completed
-      
-      ## Requirement Completeness
-      
-      - [ ] No [NEEDS CLARIFICATION] markers remain
-      - [ ] Requirements are testable and unambiguous
-      - [ ] Success criteria are measurable
-      - [ ] Success criteria are technology-agnostic (no implementation details)
-      - [ ] All acceptance scenarios are defined
-      - [ ] Edge cases are identified
-      - [ ] Scope is clearly bounded
-      - [ ] Dependencies and assumptions identified
-      
-      ## Feature Readiness
-      
-      - [ ] All functional requirements have clear acceptance criteria
-      - [ ] User scenarios cover primary flows
-      - [ ] Feature meets measurable outcomes defined in Success Criteria
-      - [ ] No implementation details leak into specification
-      
-      ## Notes
-      
-      - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`
-      ```
-
-   b. **Run Validation Check**: Review the spec against each checklist item:
-      - For each item, determine if it passes or fails
-      - Document specific issues found (quote relevant spec sections)
+   b. **Run Validation Check**:
+      - Review `spec.md` against every `CHK###` item in the generated requirements checklist.
+      - Set each item to `Status: Pass`, `Status: Fail`, or `Status: Không áp dụng`; update the checkbox consistently.
+      - For every Fail, add `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`, `Owner`, and `Hạn xử lý` directly beneath the item.
+      - Update the summary counts, review status, conclusion, and permitted next step after each review iteration.
 
    c. **Handle Validation Results**:
+      - **If all Blocker and High items pass**: Set the checklist result to `Pass` and allow `$speckit-clarify` or `$speckit-plan`.
+      - **If no Blocker fails but High items have approved exceptions**: Set the result to `Pass có điều kiện`; document every exception and its approved owner/deadline.
+      - **If any Blocker fails**: Set the result to `Fail`, do not proceed to clarification or planning, and update the spec before re-validating.
+      - If non-blocking items fail, update the spec and re-run validation up to three iterations; document any remaining approved exception.
 
-      - **If all items pass**: Mark checklist complete and proceed to the Mandatory Post-Execution Hooks section
-
-      - **If items fail (excluding [NEEDS CLARIFICATION])**:
-        1. List the failing items and specific issues
-        2. Update the spec to address each issue
-        3. Re-run validation until all items pass (max 3 iterations)
-        4. If still failing after 3 iterations, document remaining issues in checklist notes and warn user
-
-      - **If [NEEDS CLARIFICATION] markers remain**:
-        1. Extract all [NEEDS CLARIFICATION: ...] markers from the spec
-        2. **LIMIT CHECK**: If more than 3 markers exist, keep only the 3 most critical (by scope/security/UX impact) and make informed guesses for the rest
-        3. For each clarification needed (max 3), present options to user in this format:
-
-           ```markdown
-           ## Question [N]: [Topic]
-           
-           **Context**: [Quote relevant spec section]
-           
-           **What we need to know**: [Specific question from NEEDS CLARIFICATION marker]
-           
-           **Suggested Answers**:
-           
-           | Option | Answer | Implications |
-           |--------|--------|--------------|
-           | A      | [First suggested answer] | [What this means for the feature] |
-           | B      | [Second suggested answer] | [What this means for the feature] |
-           | C      | [Third suggested answer] | [What this means for the feature] |
-           | Custom | Provide your own answer | [Explain how to provide custom input] |
-           
-           **Your choice**: _[Wait for user response]_
-           ```
-
-        4. **CRITICAL - Table Formatting**: Ensure markdown tables are properly formatted:
-           - Use consistent spacing with pipes aligned
-           - Each cell should have spaces around content: `| Content |` not `|Content|`
-           - Header separator must have at least 3 dashes: `|--------|`
-           - Test that the table renders correctly in markdown preview
-        5. Number questions sequentially (Q1, Q2, Q3 - max 3 total)
-        6. Present all questions together before waiting for responses
-        7. Wait for user to respond with their choices for all questions (e.g., "Q1: A, Q2: Custom - [details], Q3: B")
-        8. Update the spec by replacing each [NEEDS CLARIFICATION] marker with the user's selected or provided answer
-        9. Re-run validation after all clarifications are resolved
-
-   d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
+   d. **Clarification Markers**:
+      - Treat `[NEEDS CLARIFICATION]` and `[CẦN LÀM RÕ]` markers that affect scope, security, data, permission, contract, or user experience as Blocker failures.
+      - Present no more than three critical clarification questions at once, then update the spec and requirements checklist after the user responds.
 
 ## Mandatory Post-Execution Hooks
 

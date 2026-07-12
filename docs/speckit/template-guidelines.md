@@ -10,6 +10,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Khi sửa `.specify/templates/plan-template.md`, rà section `Plan Template`.
 - Khi sửa `.specify/templates/tasks-template.md`, rà section `Tasks Template`.
 - Khi sửa `.specify/templates/checklist-template.md`, rà section `Checklist Template`.
+- Khi sửa `.specify/templates/requirements-template.md`, rà section `Requirements Template`.
 - Khi sửa `.specify/templates/constitution-template.md`, rà section `Constitution Template`.
 - Sau khi sửa template, chạy static validation theo feature/spec liên quan và kiểm tra artifact sinh ra không còn placeholder hoặc marker ví dụ ngoài chủ đích.
 
@@ -59,6 +60,13 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Checklist item phải kiểm một vấn đề cụ thể, trả lời được bằng Pass/Fail/Không áp dụng, và có format ghi fail gồm `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`.
 - Checklist template cần có người review, trạng thái/lần review, số item `Không áp dụng`, rule kết luận `Pass`/`Pass có điều kiện`/`Fail`, owner/deadline cho item fail, tag `[Constitution]`/`[Readiness]`, evidence cho item quan trọng và bảng ngoại lệ được phê duyệt.
 - Checklist template cần có `Checklist ID`, bước hiện tại/tiếp theo, artifact đã kiểm, status từng item `[Status: Pass/Fail/Không áp dụng/Chưa kiểm]`, quy tắc đánh dấu `Không áp dụng`, tag `[Data]`/`[Migration]`, và quy tắc mã `CHK###` duy nhất.
+
+## Requirements Template
+
+- Requirements template là quality gate bắt buộc do `$speckit-specify` sinh tại `checklists/requirements.md`; không dùng cho checklist domain tùy biến.
+- Template cần có metadata review, artifact `spec.md`, kết quả tổng hợp, rule `Pass`/`Pass có điều kiện`/`Fail`, transition gate và bảng ngoại lệ được phê duyệt.
+- Mỗi item phải có mã `CHK###`, severity, status, một tiêu chí kiểm chất lượng requirement và tham chiếu hoặc marker phù hợp; item Fail phải dùng format phát hiện, ảnh hưởng, đề xuất, tham chiếu, owner và hạn xử lý.
+- `$speckit-specify` phải resolve template này; không fallback về Markdown hard-code nếu template không có.
 
 ## Tasks Template
 
