@@ -98,6 +98,7 @@ Given that feature description, do this:
    - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
    - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
+   - Replace `{{GIT_USER_NAME}}` in `SPEC_FILE` with `git config user.name` for both metadata fields; use `Chưa xác định` if unavailable. User-provided values take precedence.
    - Persist the resolved path to `.specify/feature.json`:
      ```json
      {

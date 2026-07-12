@@ -6,9 +6,9 @@
 
 **Trạng thái**: Bản nháp
 
-**Người phụ trách**: [Tên người viết/owner]
+**Người phụ trách**: {{GIT_USER_NAME}}
 
-**Stakeholder xác nhận**: [PO/BA/Khách hàng/Team liên quan]
+**Stakeholder xác nhận**: {{GIT_USER_NAME}}
 
 **Đầu vào**: Mô tả người dùng: "$ARGUMENTS"
 
