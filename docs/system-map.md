@@ -19,6 +19,7 @@ flex-workstation/
 ├── flex-microfrontend/   # Repo con độc lập - frontend client
 ├── flex-environment/     # Repo con độc lập - local/dev infrastructure stack
 ├── flex-agent-service/   # Repo con độc lập - nền tảng AI Agent đa tenant
+├── flex-database/        # Repo con độc lập - migration/schema script dùng chung cho các database
 ├── AGENTS.md             # Context cho Codex agent
 ├── CLAUDE.md             # Context cho Claude Code
 ├── README.md             # Index và hướng dẫn tổng quan
@@ -39,6 +40,7 @@ Các repo con được clone vào trong root này nhưng là Git repo độc l�
 | `flex-microfrontend` | `https://github.com/luyenhaidangit/flex-microfrontend` |
 | `flex-environment` | `https://github.com/luyenhaidangit/flex-environment` |
 | `flex-agent-service` | `https://github.com/luyenhaidangit/flex-agent-service.git` |
+| `flex-database` | `https://github.com/luyenhaidangit/flex-database` |
 
 Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch` là tùy chọn; nếu không có, script clone theo default branch của remote và pull theo branch hiện tại của repo local.
 
@@ -52,6 +54,7 @@ Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch
 | `flex-microfrontend` | Frontend client | Angular, Node.js |
 | `flex-environment` | Local/dev infrastructure stack | Docker Compose |
 | `flex-agent-service` | Nền tảng AI Agent đa tenant (control plane + runtime) | .NET 9, SignalR |
+| `flex-database` | Migration/schema script dùng chung cho các database (MySQL tenant, PostgreSQL shared); đang thay thế dần Oracle | SQL migration scripts |
 
 ## Luồng bootstrap
 
