@@ -2,7 +2,7 @@
 
 Áp dụng khi thêm một service/product mới vào workspace dưới dạng repo con độc lập (ví dụ: một backend service .NET mới tương tự `flex-auth-service`). Không áp dụng cho thay đổi bên trong repo con đã có — checklist đó thuộc về repo con, không phải workstation.
 
-Tham chiếu: [system-map.md](../system-map.md) (bản đồ workspace), [speckit/workflow.md](../speckit/workflow.md) (luồng spec-trước-code).
+Tham chiếu: [system-map.md](../architecture/system-map.md) (bản đồ workspace & kiến trúc), [speckit/workflow.md](../speckit/workflow.md) (luồng spec-trước-code).
 
 ## 0. Trước khi tạo repo
 
@@ -40,7 +40,7 @@ Trong `flex-environment`:
 
 ## 4. Tài liệu workstation cần cập nhật
 
-- [ ] `docs/system-map.md`: thêm vào snapshot cây thư mục, bảng "Manifest repo" và bảng "Projects".
+- [ ] `docs/architecture/system-map.md`: thêm vào snapshot cây thư mục, bảng "Manifest repo" và bảng "Projects".
 - [ ] `docs/onboarding.md`: chỉ cập nhật nếu luồng bootstrap thực sự đổi (ví dụ thêm bước cài tool mới) — cây thư mục ví dụ trong file này không cần liệt kê đủ mọi repo (đã có `+-- ...`).
 - [ ] `README.md` (root workstation): thêm liên kết nếu có tài liệu mới cần lên index.
 

@@ -101,7 +101,7 @@ flex-workstation/
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
 
 ## Source-of-truth
 
@@ -116,7 +116,7 @@ flex-workstation/
 ```text
 README.md
 docs/onboarding.md
-docs/system-map.md
+docs/architecture/system-map.md
 docs/speckit/workflow.md
 docs/speckit/template-guidelines.md
 docs/speckit/maintenance.md

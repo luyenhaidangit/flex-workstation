@@ -32,7 +32,7 @@
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
 
 ## Speckit Workflow (Spec-Before-Code)
 
@@ -68,7 +68,7 @@ flex-workstation/
 
 - Index đầy đủ: `README.md`
 - Onboarding/bootstrap: `docs/onboarding.md`
-- Bản đồ hệ thống: `docs/system-map.md`
+- Bản đồ hệ thống & kiến trúc: `docs/architecture/system-map.md`
 - Workflow Speckit: `docs/speckit/workflow.md`
 - Quy ước template Speckit: `docs/speckit/template-guidelines.md`
 - Bảo trì Speckit/runtime: `docs/speckit/maintenance.md`

@@ -186,7 +186,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 - Không tự ý xóa dead code từ trước khi chưa được yêu cầu.
 - Không sửa source code project con khi yêu cầu chỉ thuộc workstation.
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
 
 **Ngoại lệ**:
 - Refactor nhỏ được phép nếu là điều kiện trực tiếp để thay đổi hiện tại chạy đúng và được nêu rõ trong task/PR.
@@ -334,7 +334,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 - Nếu plan hoặc task vi phạm constitution, PHẢI ghi ngoại lệ trong `plan.md`.
 - Mọi PR/review PHẢI xác minh các gate liên quan đã pass hoặc có ngoại lệ được phê duyệt.
 - Khi thay đổi hành vi Speckit/template/runtime, PHẢI cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, PHẢI cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, PHẢI cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
 - Version dùng SemVer:
   - **MAJOR**: xóa hoặc tái định nghĩa nguyên tắc cốt lõi/gate bắt buộc theo cách không tương thích.
   - **MINOR**: thêm nguyên tắc, section hoặc gate mới; mở rộng guidance có hiệu lực kiểm tra.

@@ -10,7 +10,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 ## Quy ước bảo trì
 
 - Khi thay đổi hành vi Speckit, template Speckit hoặc runtime guidance, cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/system-map.md`.
+- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/onboarding.md` hoặc `docs/architecture/system-map.md`.
 - Khi thay đổi quy tắc hành vi chung trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.
 - Khi sửa prompt hoặc skill, giữ diff tối thiểu, không lặp/mâu thuẫn và kiểm tra trực tiếp phần đã sửa.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
