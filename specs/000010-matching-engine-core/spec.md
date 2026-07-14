@@ -1,10 +1,10 @@
 # Đặc tả tính năng: Lõi khớp lệnh và order book (FlexSim MVP 01)
 
-**Branch**: `000010-matching-engine-core`
-**Ngày tạo**: 2026-07-14
-**Trạng thái**: Bản nháp
-**Người phụ trách**: Luyện Hải Đăng
-**Stakeholder xác nhận**: Luyện Hải Đăng
+**Branch**: `000010-matching-engine-core`  
+**Ngày tạo**: 2026-07-14  
+**Trạng thái**: Bản nháp  
+**Người phụ trách**: Luyện Hải Đăng  
+**Stakeholder xác nhận**: Luyện Hải Đăng  
 **Đầu vào**: Mô tả người dùng: "Review và lên kế hoạch thực hiện cho tôi mvp 1 C:\Workspace\Project\flex-workstation\docs\mvp\01-matching-rules.md"
 
 ---
@@ -260,7 +260,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - Chưa áp dụng quy tắc chống tự khớp (self-match): hai lệnh đối ứng cùng `DemoBroker` vẫn khớp bình thường, vì MVP chỉ có một broker giả lập.
 - "Hết phiên" ở MVP này chỉ có nghĩa là kết thúc một lần chạy demo/test; vòng đời phiên giao dịch đầy đủ thuộc MVP 04.
 - Thứ tự thời gian của lệnh xác định theo thứ tự lệnh được đưa vào hệ thống (trình tự vào), không phụ thuộc đồng hồ hệ thống.
-- Code sản phẩm của MVP 01 sẽ nằm trong một sub-repo được khai báo trong `workstation.json` (hiện chưa có repo exchange — plan kỹ thuật sẽ chốt repo đích, xem Phụ thuộc).
+- Code sản phẩm của MVP 01 nằm trong sub-repo `flex-exchange-service` được khai báo trong `workstation.json` (đã chốt — xem Phụ thuộc).
 
 **Ràng buộc**:
 - PHẢI giữ đúng ranh giới scope: không API, database, UI, WebSocket, bot, kiểm tra số dư (FR-010) — các phần này thuộc MVP 02–07.
@@ -290,13 +290,13 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 | Quy tắc khớp có kẽ hở ở trường hợp biên (khớp xuyên nhiều mức giá, dư khối lượng lẻ) khiến MVP sau phải sửa lõi | Trung | Cao | Bộ test bắt buộc 6 nhóm hành vi (SC-003) + kịch bản khớp xuyên nhiều lệnh chờ trong US-003 |
 | Tính không xác định lọt vào (phụ thuộc đồng hồ, thứ tự không ổn định) làm test chập chờn | Trung | Cao | FR-009 và SC-002 là điều kiện hoàn thành; thứ tự thời gian dựa trên trình tự vào |
 | Hợp đồng đầu ra thiếu thông tin khiến MVP 02 phải phá vỡ tương thích | Thấp | Trung | SC-004; sự kiện `TradeExecuted` yêu cầu đủ trường đối chiếu (FR-007) |
-| Chưa chốt repo đích làm chậm bước plan | Trung | Thấp | Ghi rõ ở Phụ thuộc; chốt ngay đầu `speckit-plan` |
+| Chưa chốt repo đích làm chậm bước plan | Trung | Thấp | Đã xử lý: repo đích `flex-exchange-service` đã được chốt (xem Phụ thuộc) |
 
 ---
 
 ## 16. Phụ thuộc
 
-- Quyết định stakeholder về repo đích chứa code MVP 01 (repo mới, ví dụ `flex-exchange`, cần được thêm vào `workstation.json`) — cần chốt tại bước plan kỹ thuật, trước khi sinh task.
+- Repo đích chứa code MVP 01: **đã chốt** (2026-07-14) là `flex-exchange-service` (https://github.com/luyenhaidangit/flex-exchange-service), đã khai báo trong `workstation.json`; service dựng theo pattern của `flex-auth-service`.
 - Tài liệu nguồn: `docs/mvp/01-matching-rules.md` và `docs/mvp/flexsim-roadmap.md` — spec này bám theo phạm vi đã định ở đó.
 - Không phụ thuộc hệ thống/hạ tầng nào khác (chạy cục bộ, không mạng, không database).
 
@@ -304,7 +304,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ## 17. Câu hỏi mở
 
-- Không còn câu hỏi mở chặn plan kỹ thuật. Quyết định duy nhất còn lại (repo đích cho code) là quyết định triển khai, đã ghi ở mục Phụ thuộc và Giả định, sẽ chốt ở đầu bước `speckit-plan`.
+- Không còn câu hỏi mở chặn plan kỹ thuật. Repo đích cho code đã được stakeholder chốt là `flex-exchange-service` (xem Phụ thuộc).
 
 ---
 

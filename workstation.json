@@ -29,6 +29,10 @@
       {
         "name": "flex-database",
         "url": "https://github.com/luyenhaidangit/flex-database"
+      },
+      {
+        "name": "flex-exchange-service",
+        "url": "https://github.com/luyenhaidangit/flex-exchange-service"
       }
     ]
   }

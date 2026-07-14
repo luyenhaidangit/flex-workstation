@@ -2,14 +2,14 @@
 
 ## Metadata
 
-**Mục đích**: Xác nhận `spec.md` đủ rõ, đầy đủ và sẵn sàng trước khi chuyển sang `$speckit-clarify` hoặc `$speckit-plan`.
-**Checklist ID**: `REQ-000010`
-**Ngày tạo**: 2026-07-14
-**Người review**: Luyện Hải Đăng
-**Trạng thái review**: Hoàn tất
-**Lần review**: Lần 1
-**Tính năng**: [spec.md](../spec.md)
-**Artifact chính được kiểm tra**: `spec.md`
+**Mục đích**: Xác nhận `spec.md` đủ rõ, đầy đủ và sẵn sàng trước khi chuyển sang `$speckit-clarify` hoặc `$speckit-plan`.  
+**Checklist ID**: `REQ-000010`  
+**Ngày tạo**: 2026-07-14  
+**Người review**: Luyện Hải Đăng  
+**Trạng thái review**: Hoàn tất  
+**Lần review**: Lần 1  
+**Tính năng**: [spec.md](../spec.md)  
+**Artifact chính được kiểm tra**: `spec.md`  
 **Nguồn tham chiếu**: `constitution.md`, `spec.md`
 
 ---
