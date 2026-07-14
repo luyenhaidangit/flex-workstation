@@ -17,4 +17,4 @@ Mỗi MVP là một lát cắt nghiệp vụ có thể demo độc lập. Chỉ 
 | D — Research | 11 | [Kho tri thức theo tenant](11-tenant-research-knowledge.md) |
 | D — Research | 12 | [Nhóm agent và báo cáo](12-research-agent-reporting.md) |
 
-Quy ước: Exchange khớp lệnh; Broker/CTCK quản lý khách hàng và kiểm soát trước giao dịch; Clearing–Settlement xử lý nghĩa vụ sau khớp; tenant là một CTCK ảo. Không dùng tiền thật, kết nối sàn thật hoặc dữ liệu trả phí.
+Quy ước: Exchange mô phỏng vai trò Sở giao dịch và khớp lệnh; Broker/CTCK quản lý khách hàng, kiểm soát trước giao dịch rồi gửi lệnh lên Exchange; Clearing–Settlement mô phỏng phần hậu giao dịch của VSDC, xử lý nghĩa vụ sau khớp. Tenant là một CTCK ảo. Không dùng tiền thật, kết nối sàn thật hoặc dữ liệu trả phí.

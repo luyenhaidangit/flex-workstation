@@ -10,6 +10,20 @@ Tạo lõi Exchange có kết quả khớp xác định được: cùng tập l�
 - Chỉ một mã cổ phiếu giả lập, một phiên `continuous` và limit order mua/bán.
 - Lệnh gồm mã, chiều mua/bán, giá, khối lượng, thời điểm và `BrokerId`.
 
+## Vị trí nghiệp vụ trong thị trường thực tế
+
+MVP này mô phỏng phần việc của **Sở giao dịch chứng khoán**: nhận lệnh từ các CTCK, giữ order book và xác định kết quả khớp lệnh. `DemoBroker` chỉ là bên gửi lệnh mô phỏng, không phải chủ của matching engine.
+
+Các vai trò thực tế được tách riêng:
+
+- **CTCK** nhận lệnh từ nhà đầu tư, kiểm tra tiền/chứng khoán và gửi lệnh lên Sở giao dịch. Phần này thuộc các MVP CTCK từ MVP 05.
+- **Sở giao dịch** khớp lệnh theo ưu tiên giá-thời gian và phát kết quả giao dịch. Đây là phạm vi của MVP 01.
+- **VSDC** thực hiện lưu ký, bù trừ và thanh toán sau khi giao dịch đã khớp. Phần này được mô phỏng từ MVP 08.
+
+```text
+Nhà đầu tư → CTCK → Sở giao dịch (khớp lệnh) → VSDC (bù trừ, thanh toán)
+```
+
 ## Quy tắc nghiệp vụ
 
 - Giá và khối lượng phải hợp lệ theo bước giá, biên độ và lô chẵn cấu hình.
