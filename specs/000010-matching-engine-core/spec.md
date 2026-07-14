@@ -15,7 +15,7 @@ Spec này chỉ mô tả WHY và WHAT. Các chi tiết HOW sẽ được xử l�
 
 ---
 
-## 0. Bối cảnh & vấn đề
+## 1. Bối cảnh & vấn đề
 
 **Vấn đề cần giải quyết**:
 
@@ -27,26 +27,27 @@ Xây dựng lõi Exchange khớp lệnh limit mua/bán cho một mã cổ phiế
 
 ---
 
-## 1. Mục tiêu
+## 2. Mục tiêu
 
 - **MT-001**: Lõi khớp lệnh cho kết quả xác định: cùng chuỗi lệnh đầu vào luôn sinh ra cùng chuỗi sự kiện và cùng trạng thái order book cuối cùng.
-- **MT-002**: Quy tắc khớp lệnh giá — thời gian được kiểm chứng bằng bộ test bao phủ đủ các tình huống: không khớp, khớp toàn phần, khớp một phần, ưu tiên giá, ưu tiên thời gian, hủy lệnh.
-- **MT-003**: Kết quả của MVP 01 cung cấp đủ hợp đồng nghiệp vụ (lệnh vào, sự kiện ra, snapshot order book) để MVP 02 xây Exchange API mà không phải sửa lại quy tắc khớp.
+- **MT-002**: Quy tắc khớp lệnh giá — thời gian được kiểm chứng bằng bộ kịch bản kiểm tra qua API bao phủ đủ các tình huống: không khớp, khớp toàn phần, khớp một phần, ưu tiên giá, ưu tiên thời gian, hủy lệnh.
+- **MT-003**: Kết quả của MVP 01 là một service hoàn chỉnh theo chuẩn service Flex (như `flex-auth-service`), cung cấp đủ hợp đồng nghiệp vụ (lệnh vào, sự kiện ra, snapshot order book) để MVP 02 mở rộng Exchange API/sự kiện realtime mà không phải sửa lại quy tắc khớp.
 
 ---
 
-## 2. Phạm vi MVP
+## 3. Phạm vi MVP
 
 Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 - **MVP-001**: Nhận lệnh limit mua/bán (`PlaceOrder`) và lệnh hủy (`CancelOrder`) từ một `DemoBroker` duy nhất cho một mã cổ phiếu giả lập duy nhất.
 - **MVP-002**: Kiểm tra hợp lệ lệnh theo bước giá, biên độ giá và lô chẵn được cấu hình; chấp nhận (`OrderAccepted`) hoặc từ chối (`OrderRejected`) kèm lý do.
 - **MVP-003**: Khớp lệnh liên tục theo ưu tiên giá — thời gian, hỗ trợ khớp một phần, phát sự kiện `TradeExecuted`, `OrderCancelled` và cung cấp snapshot order book.
-- **MVP-004**: Giới hạn rõ: chỉ một mã, một phiên `continuous`, chỉ limit order; không API, không database, không UI, không WebSocket, không bot, không kiểm tra số dư.
+- **MVP-004**: Service được dựng hoàn chỉnh theo chuẩn service Flex, cho phép đặt lệnh, hủy lệnh và truy vấn snapshot order book/sự kiện qua API phục vụ demo cục bộ.
+- **MVP-005**: Giới hạn rõ: chỉ một mã, một phiên `continuous`, chỉ limit order; không database, không UI, không WebSocket, không bot, không kiểm tra số dư, không bộ test tự động (quyết định stakeholder 2026-07-14 — xem Giả định & Ràng buộc).
 
 ---
 
-## 3. Người dùng & Bối cảnh
+## 4. Người dùng & Bối cảnh
 
 **Người dùng chính**: Nhà phát triển FlexSim, đóng vai `DemoBroker` — thành phần giả lập gửi lệnh vào lõi Exchange.
 
@@ -56,7 +57,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 4. Kịch bản người dùng *(bắt buộc)*
+## 5. Kịch bản người dùng *(bắt buộc)*
 
 ### US-001 — Khớp toàn phần hai lệnh đối ứng (Ưu tiên: P1)
 
@@ -142,20 +143,20 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 5. Trạng thái dữ liệu, lỗi & thao tác lặp
+## 6. Trạng thái dữ liệu, lỗi & thao tác lặp
 
 - **Không có dữ liệu**: Order book rỗng — lệnh mới vào không khớp với ai thì nằm chờ trong sổ; snapshot trả về sổ rỗng, không phải lỗi.
 - **Dữ liệu không hợp lệ**: Lệnh sai bước giá/biên độ/lô chẵn, khối lượng ≤ 0, giá ≤ 0, sai mã cổ phiếu hoặc thiếu trường bắt buộc → `OrderRejected` kèm lý do; order book không đổi.
 - **Không có quyền**: Không áp dụng — chỉ có một `DemoBroker` giả lập, chưa có mô hình quyền.
 - **Lỗi hệ thống**: Nếu xử lý một lệnh thất bại bất thường, lệnh đó không được ghi nhận một phần (không có giao dịch "nửa chừng"); trạng thái order book vẫn nhất quán.
-- **Timeout**: Không áp dụng — xử lý trong tiến trình, không có gọi mạng.
+- **Timeout**: Không áp dụng ở mức nghiệp vụ — API chạy cục bộ, mỗi lệnh xử lý tức thời trong tiến trình.
 - **Dữ liệu bị thay đổi bởi người khác**: Không áp dụng — một nguồn gửi lệnh duy nhất, lệnh được xử lý tuần tự theo thứ tự vào.
 - **Người dùng thao tác lặp lại**: Hủy lặp lại cùng một lệnh: lần hủy sau bị từ chối vì lệnh không còn trong sổ (AC-008). Gửi lại lệnh giống hệt: được coi là lệnh mới độc lập.
 - **Trường hợp biên khác**: Lệnh mua/bán đối ứng đều thuộc cùng `DemoBroker` vẫn khớp bình thường (chưa có quy tắc chống tự khớp — xem Giả định).
 
 ---
 
-## 6. Yêu cầu chức năng *(bắt buộc)*
+## 7. Yêu cầu chức năng *(bắt buộc)*
 
 - **FR-001** `[P2]`: Hệ thống PHẢI kiểm tra lệnh theo bước giá, biên độ giá và lô chẵn cấu hình cho mã; lệnh hợp lệ nhận `OrderAccepted`, lệnh vi phạm nhận `OrderRejected` kèm lý do cụ thể.
   **Liên quan**: US-005, AC-009
@@ -175,12 +176,14 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
   **Liên quan**: US-001, US-002, US-004, AC-002, AC-004, AC-007
 - **FR-009** `[P1]`: Hệ thống PHẢI cho kết quả xác định: cùng một chuỗi lệnh đầu vào (cùng nội dung, cùng thứ tự) PHẢI luôn sinh ra cùng chuỗi sự kiện và cùng trạng thái order book cuối cùng qua mọi lần chạy.
   **Liên quan**: MT-001, SC-002
-- **FR-010** `[P1]`: Hệ thống KHÔNG ĐƯỢC phụ thuộc vào API, database, UI, WebSocket, bot hay kiểm tra số dư để thực hiện khớp lệnh trong MVP này.
-  **Liên quan**: MVP-004
+- **FR-010** `[P1]`: Hệ thống KHÔNG ĐƯỢC phụ thuộc vào database, UI, WebSocket, bot hay kiểm tra số dư trong MVP này; lõi khớp lệnh PHẢI hoạt động độc lập với lớp API (API chỉ là lớp giao tiếp, không chứa quy tắc khớp).
+  **Liên quan**: MVP-005
+- **FR-011** `[P1]`: `DemoBroker` PHẢI có thể đặt lệnh, hủy lệnh và truy vấn snapshot order book qua API của service; phản hồi API PHẢI phản ánh đúng kết quả nghiệp vụ (chấp nhận/từ chối kèm lý do, giao dịch sinh ra).
+  **Liên quan**: MVP-004, US-001..US-005
 
 ---
 
-## 7. Quy tắc nghiệp vụ
+## 8. Quy tắc nghiệp vụ
 
 - **BR-001**: Lệnh chỉ được vào sổ hoặc khớp khi đã qua kiểm tra hợp lệ (bước giá, biên độ, lô chẵn, trường bắt buộc).
 - **BR-002**: Thứ tự khớp tuân thủ tuyệt đối ưu tiên giá trước, thời gian sau; không có ngoại lệ trong phiên `continuous`.
@@ -201,7 +204,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 8. Thực thể dữ liệu
+## 9. Thực thể dữ liệu
 
 - **Lệnh (Order)**: Yêu cầu mua/bán gồm mã cổ phiếu, chiều mua/bán, giá, khối lượng, thời điểm gửi và `BrokerId`; có trạng thái vòng đời (chờ, khớp một phần, hoàn tất, đã hủy, bị từ chối) và khối lượng còn lại.
 - **Sổ lệnh (Order book)**: Tập lệnh đang chờ của một mã, tổ chức theo hai bên mua/bán, sắp theo ưu tiên giá — thời gian; có thể chụp snapshot.
@@ -211,7 +214,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 9. Phân quyền & Bảo mật
+## 10. Phân quyền & Bảo mật
 
 **Ai được xem**:
 - `DemoBroker` (thành phần giả lập duy nhất) xem được snapshot order book và toàn bộ sự kiện.
@@ -220,40 +223,41 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - `DemoBroker` được đặt và hủy lệnh. Chưa có phân biệt nhiều broker hay người dùng.
 
 **Ai không được phép**:
-- Không áp dụng — MVP chạy cục bộ, không có bề mặt truy cập từ bên ngoài (không API/UI/mạng).
+- Không áp dụng — API chỉ phục vụ demo cục bộ trên máy dev, chưa có mô hình xác thực/phân quyền (bổ sung ở MVP sau khi có nhiều broker).
 
 **Dữ liệu nhạy cảm**:
 - Không. Toàn bộ dữ liệu là giả lập (mã FXS, tiền ảo); không có dữ liệu cá nhân hay tiền thật.
 
 - **SEC-001**: Mọi lệnh và yêu cầu hủy PHẢI mang `BrokerId`; sự kiện đầu ra PHẢI gắn được về `BrokerId` gửi lệnh, làm nền cho mô hình đa broker ở MVP sau.
-- **SEC-002**: Hệ thống KHÔNG ĐƯỢC mở bất kỳ bề mặt truy cập mạng nào trong MVP này.
+- **SEC-002**: API của MVP này chỉ phục vụ demo cục bộ và KHÔNG ĐƯỢC triển khai ra môi trường truy cập công khai khi chưa có xác thực (thuộc MVP sau).
 
 ---
 
-## 10. Audit & Lịch sử thay đổi
+## 11. Audit & Lịch sử thay đổi
 
 **Có cần audit không**: Không áp dụng ở mức audit người dùng — chưa có người dùng thật hay thao tác quản trị. Tuy nhiên dòng sự kiện có thứ tự (`OrderAccepted`, `OrderRejected`, `TradeExecuted`, `OrderCancelled`) chính là lịch sử đầy đủ của mọi thay đổi order book và là yêu cầu chức năng (FR-007, FR-009).
 
 ---
 
-## 11. Yêu cầu phi chức năng
+## 12. Yêu cầu phi chức năng
 
 - **NFR-001**: Tính tái lập: chạy lại cùng một kịch bản lệnh bất kỳ số lần nào PHẢI cho kết quả (sự kiện + order book) giống nhau hoàn toàn, kể cả trên máy khác.
-- **NFR-002**: Bộ kịch bản demo trong tài liệu MVP (mục Kịch bản demo) chạy hoàn tất trong vài giây trên máy phát triển thông thường — đủ nhanh để dùng trong vòng lặp test.
+- **NFR-002**: Bộ kịch bản demo trong tài liệu MVP (mục Kịch bản demo) chạy hoàn tất trong vài giây trên máy phát triển thông thường — đủ nhanh để dùng trong vòng lặp phát triển.
 - **NFR-003**: Các tham số bước giá, biên độ, lô chẵn PHẢI là cấu hình thay đổi được mà không sửa quy tắc khớp.
 
 ---
 
-## 12. Tiêu chí thành công *(bắt buộc)*
+## 13. Tiêu chí thành công *(bắt buộc)*
 
 - **SC-001**: 100% ba kịch bản demo trong tài liệu MVP 01 chạy đúng như mô tả (một `TradeExecuted`, order book rỗng; khớp một phần với phần dư 100 nằm sổ).
-- **SC-002**: Chạy lại cùng một tập lệnh đầu vào 10 lần liên tiếp cho kết quả giống nhau 100% (cùng danh sách giao dịch, cùng order book cuối).
-- **SC-003**: Bộ test bao phủ đủ 6 nhóm hành vi bắt buộc — không khớp, khớp toàn phần, khớp một phần, ưu tiên giá, ưu tiên thời gian, hủy lệnh — và toàn bộ đều đạt.
-- **SC-004**: MVP 02 có thể bắt đầu chỉ dựa trên các đầu ra đã định nghĩa (`PlaceOrder`, `CancelOrder`, 4 sự kiện, snapshot order book) mà không cần sửa quy tắc khớp của MVP 01.
+- **SC-002**: Chạy lại cùng một tập lệnh đầu vào ít nhất 2 lần liên tiếp (khởi động lại service giữa các lần) cho kết quả giống nhau 100% (cùng danh sách giao dịch, cùng order book cuối).
+- **SC-003**: Bộ kịch bản kiểm tra qua API bao phủ đủ 6 nhóm hành vi bắt buộc — không khớp, khớp toàn phần, khớp một phần, ưu tiên giá, ưu tiên thời gian, hủy lệnh — được thực hiện và toàn bộ đều đạt.
+- **SC-004**: MVP 02 có thể bắt đầu chỉ dựa trên các đầu ra đã định nghĩa (`PlaceOrder`, `CancelOrder`, 4 sự kiện, snapshot order book, API hiện có) mà không cần sửa quy tắc khớp của MVP 01.
+- **SC-005**: Service khởi động và phục vụ được toàn bộ thao tác nghiệp vụ (đặt/hủy/truy vấn) ngay sau khi clone repo và chạy một lệnh duy nhất, không cần cài đặt hạ tầng nào khác.
 
 ---
 
-## 13. Giả định & Ràng buộc
+## 14. Giả định & Ràng buộc
 
 **Giả định**:
 - Giá trị cụ thể của bước giá, biên độ và lô chẵn cho mã FXS do plan kỹ thuật chọn (ví dụ tham khảo quy tắc HOSE), miễn là cấu hình được (NFR-003).
@@ -261,18 +265,21 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - "Hết phiên" ở MVP này chỉ có nghĩa là kết thúc một lần chạy demo/test; vòng đời phiên giao dịch đầy đủ thuộc MVP 04.
 - Thứ tự thời gian của lệnh xác định theo thứ tự lệnh được đưa vào hệ thống (trình tự vào), không phụ thuộc đồng hồ hệ thống.
 - Code sản phẩm của MVP 01 nằm trong sub-repo `flex-exchange-service` được khai báo trong `workstation.json` (đã chốt — xem Phụ thuộc).
+- Stakeholder đã điều chỉnh phạm vi ngày 2026-07-14 so với tài liệu MVP gốc: (a) dựng service hoàn chỉnh có API và hạ tầng theo chuẩn service Flex ngay trong MVP 01 (kéo một phần MVP 02 lên trước); (b) không yêu cầu bộ test tự động — kiểm chứng bằng kịch bản demo qua API. Spec này là source-of-truth hiện hành.
 
 **Ràng buộc**:
-- PHẢI giữ đúng ranh giới scope: không API, database, UI, WebSocket, bot, kiểm tra số dư (FR-010) — các phần này thuộc MVP 02–07.
+- PHẢI giữ đúng ranh giới scope: không database, UI, WebSocket, bot, kiểm tra số dư (FR-010) — các phần này thuộc MVP 03–07; API giới hạn ở đặt/hủy lệnh và truy vấn (FR-011).
 - Đầu ra PHẢI gồm đủ: `PlaceOrder`, `CancelOrder`, `OrderAccepted`, `OrderRejected`, `TradeExecuted`, `OrderCancelled` và snapshot order book — đây là hợp đồng bắt buộc cho MVP 02.
 - Theo constitution workstation, code sản phẩm KHÔNG ĐƯỢC nằm trong `flex-workstation` root.
 
 ---
 
-## 14. Ngoài phạm vi
+## 15. Ngoài phạm vi
 
-- Exchange API, sự kiện đẩy qua mạng, WebSocket (MVP 02).
+- Sự kiện đẩy realtime qua mạng, WebSocket, mở rộng Exchange API đầy đủ (MVP 02) — MVP 01 chỉ có API đặt/hủy lệnh và truy vấn.
 - Bảng điện, UI hiển thị (MVP 03).
+- Bộ test tự động (unit/integration) — bỏ theo quyết định stakeholder 2026-07-14; có thể bổ sung ở MVP sau.
+- Xác thực/phân quyền API, container hóa (Dockerfile) và CI/CD pipeline.
 - Vòng đời phiên (mở/đóng cửa, ATO/ATC), bot tạo thanh khoản (MVP 04).
 - Kiểm tra số dư tiền/chứng khoán, kiểm soát trước lệnh (MVP 05+).
 - Nhiều broker, đa tenant (MVP 06).
@@ -283,32 +290,34 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 15. Rủi ro
+## 16. Rủi ro
 
 | Rủi ro | Khả năng | Tác động | Biện pháp |
 |--------|----------|----------|-----------|
-| Quy tắc khớp có kẽ hở ở trường hợp biên (khớp xuyên nhiều mức giá, dư khối lượng lẻ) khiến MVP sau phải sửa lõi | Trung | Cao | Bộ test bắt buộc 6 nhóm hành vi (SC-003) + kịch bản khớp xuyên nhiều lệnh chờ trong US-003 |
-| Tính không xác định lọt vào (phụ thuộc đồng hồ, thứ tự không ổn định) làm test chập chờn | Trung | Cao | FR-009 và SC-002 là điều kiện hoàn thành; thứ tự thời gian dựa trên trình tự vào |
+| Quy tắc khớp có kẽ hở ở trường hợp biên (khớp xuyên nhiều mức giá, dư khối lượng lẻ) khiến MVP sau phải sửa lõi | Trung | Cao | Bộ kịch bản kiểm tra qua API bắt buộc 6 nhóm hành vi (SC-003) + kịch bản khớp xuyên nhiều lệnh chờ trong US-003 |
+| Tính không xác định lọt vào (phụ thuộc đồng hồ, thứ tự không ổn định) làm kết quả không tái lập | Trung | Cao | FR-009 và SC-002 là điều kiện hoàn thành; thứ tự thời gian dựa trên trình tự vào |
 | Hợp đồng đầu ra thiếu thông tin khiến MVP 02 phải phá vỡ tương thích | Thấp | Trung | SC-004; sự kiện `TradeExecuted` yêu cầu đủ trường đối chiếu (FR-007) |
-| Chưa chốt repo đích làm chậm bước plan | Trung | Thấp | Đã xử lý: repo đích `flex-exchange-service` đã được chốt (xem Phụ thuộc) |
+| Không có test tự động → regression khó phát hiện khi MVP sau sửa engine | Cao | Trung | Rủi ro được stakeholder chấp nhận (2026-07-14); giảm thiểu bằng bộ kịch bản kiểm tra chuẩn hóa lặp lại được (SC-003) và lõi khớp tách biệt khỏi API để dễ bổ sung test sau |
+| Lệnh gửi đồng thời qua API phá vỡ thứ tự xử lý tuần tự | Trung | Cao | Yêu cầu xử lý lệnh tuần tự theo thứ tự nhận (BR-005) phải được bảo toàn ở lớp service; kiểm chứng bằng kịch bản demo |
 
 ---
 
-## 16. Phụ thuộc
+## 17. Phụ thuộc
 
 - Repo đích chứa code MVP 01: **đã chốt** (2026-07-14) là `flex-exchange-service` (https://github.com/luyenhaidangit/flex-exchange-service), đã khai báo trong `workstation.json`; service dựng theo pattern của `flex-auth-service`.
-- Tài liệu nguồn: `docs/mvp/01-matching-rules.md` và `docs/mvp/flexsim-roadmap.md` — spec này bám theo phạm vi đã định ở đó.
-- Không phụ thuộc hệ thống/hạ tầng nào khác (chạy cục bộ, không mạng, không database).
+- Tài liệu nguồn: `docs/mvp/01-matching-rules.md` và `docs/mvp/flexsim-roadmap.md` — spec bám theo nghiệp vụ ở đó, với hai điều chỉnh phạm vi đã được stakeholder phê duyệt 2026-07-14 (có API + hạ tầng service, bỏ test tự động — xem Giả định & Ràng buộc).
+- Pattern tham chiếu: `flex-auth-service` (cấu trúc solution, naming, hạ tầng service) — chỉ đọc tham khảo, không sửa repo auth.
+- Không phụ thuộc hệ thống/hạ tầng nào khác (chạy cục bộ, không database, không message broker).
 
 ---
 
-## 17. Câu hỏi mở
+## 18. Câu hỏi mở
 
 - Không còn câu hỏi mở chặn plan kỹ thuật. Repo đích cho code đã được stakeholder chốt là `flex-exchange-service` (xem Phụ thuộc).
 
 ---
 
-## 18. Điều kiện sẵn sàng để lập plan kỹ thuật
+## 19. Điều kiện sẵn sàng để lập plan kỹ thuật
 
 - [x] Vấn đề cần giải quyết đã rõ.
 - [x] MVP đã được xác định.

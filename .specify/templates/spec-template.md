@@ -20,7 +20,7 @@ Spec này chỉ mô tả WHY và WHAT. Các chi tiết HOW sẽ được xử l�
 
 ---
 
-## 0. Bối cảnh & vấn đề
+## 1. Bối cảnh & vấn đề
 
 <!--
   Bắt đầu từ vấn đề thật trước khi mô tả tính năng.
@@ -40,7 +40,7 @@ Spec này chỉ mô tả WHY và WHAT. Các chi tiết HOW sẽ được xử l�
 
 ---
 
-## 1. Mục tiêu
+## 2. Mục tiêu
 
 <!--
   Liệt kê các mục tiêu cụ thể, có thể đo lường.
@@ -53,7 +53,7 @@ Spec này chỉ mô tả WHY và WHAT. Các chi tiết HOW sẽ được xử l�
 
 ---
 
-## 2. Phạm vi MVP
+## 3. Phạm vi MVP
 
 <!--
   Xác định phiên bản đầu tiên cần tối thiểu những gì để tạo giá trị.
@@ -69,7 +69,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 3. Người dùng & Bối cảnh
+## 4. Người dùng & Bối cảnh
 
 <!--
   Ai sẽ dùng tính năng này? Trong hoàn cảnh nào?
@@ -84,7 +84,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 4. Kịch bản người dùng *(bắt buộc)*
+## 5. Kịch bản người dùng *(bắt buộc)*
 
 <!--
   Ưu tiên theo thứ tự quan trọng. Mỗi kịch bản phải:
@@ -126,7 +126,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 5. Trạng thái dữ liệu, lỗi & thao tác lặp
+## 6. Trạng thái dữ liệu, lỗi & thao tác lặp
 
 <!--
   Mô tả phản ứng mong đợi của hệ thống ở các trạng thái phổ biến.
@@ -146,7 +146,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 6. Yêu cầu chức năng *(bắt buộc)*
+## 7. Yêu cầu chức năng *(bắt buộc)*
 
 <!--
   Mỗi yêu cầu phải:
@@ -168,7 +168,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 7. Quy tắc nghiệp vụ
+## 8. Quy tắc nghiệp vụ
 
 <!--
   Ghi các quy tắc nghiệp vụ bắt buộc, đặc biệt là quyền, trạng thái, trùng lặp,
@@ -188,7 +188,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 8. Thực thể dữ liệu
+## 9. Thực thể dữ liệu
 
 <!--
   Mô tả thực thể nghiệp vụ và quan hệ nếu tính năng liên quan đến dữ liệu.
@@ -201,7 +201,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 9. Phân quyền & Bảo mật
+## 10. Phân quyền & Bảo mật
 
 <!--
   Mô tả quyền truy cập và bảo mật ở mức nghiệp vụ.
@@ -225,7 +225,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ---
 
-## 10. Audit & Lịch sử thay đổi
+## 11. Audit & Lịch sử thay đổi
 
 <!--
   Với nghiệp vụ duyệt, phân quyền, cấu hình, publish, hoặc cập nhật trạng thái,
@@ -244,7 +244,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 11. Yêu cầu phi chức năng
+## 12. Yêu cầu phi chức năng
 
 <!--
   Hiệu năng, khả dụng, tương thích, khả năng vận hành, v.v.
@@ -260,7 +260,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 12. Tiêu chí thành công *(bắt buộc)*
+## 13. Tiêu chí thành công *(bắt buộc)*
 
 <!--
   Mỗi tiêu chí phải:
@@ -278,7 +278,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 13. Giả định & Ràng buộc
+## 14. Giả định & Ràng buộc
 
 <!--
   Liệt kê những gì đang được giả định là đúng.
@@ -298,7 +298,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 14. Ngoài phạm vi
+## 15. Ngoài phạm vi
 
 <!--
   Liệt kê rõ ràng những gì KHÔNG thuộc tính năng này.
@@ -310,7 +310,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 15. Rủi ro
+## 16. Rủi ro
 
 <!--
   Những rủi ro có thể ảnh hưởng đến việc deliver tính năng.
@@ -323,7 +323,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 16. Phụ thuộc
+## 17. Phụ thuộc
 
 <!--
   Tính năng này phụ thuộc vào gì để hoạt động?
@@ -337,7 +337,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 17. Câu hỏi mở
+## 18. Câu hỏi mở
 
 <!--
   Những điều chưa rõ cần làm rõ trước khi plan kỹ thuật.
@@ -350,7 +350,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
-## 18. Điều kiện sẵn sàng để lập plan kỹ thuật
+## 19. Điều kiện sẵn sàng để lập plan kỹ thuật
 
 <!--
   Chỉ chuyển sang plan kỹ thuật khi các điểm dưới đây đã được xác nhận.

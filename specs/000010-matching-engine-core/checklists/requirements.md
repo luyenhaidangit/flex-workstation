@@ -7,7 +7,7 @@
 **Ngày tạo**: 2026-07-14  
 **Người review**: Luyện Hải Đăng  
 **Trạng thái review**: Hoàn tất  
-**Lần review**: Lần 1  
+**Lần review**: Lần 2 (2026-07-14 — sau khi stakeholder điều chỉnh phạm vi: thêm API + hạ tầng service theo pattern `flex-auth-service`, bỏ bộ test tự động)  
 **Tính năng**: [spec.md](../spec.md)  
 **Artifact chính được kiểm tra**: `spec.md`  
 **Nguồn tham chiếu**: `constitution.md`, `spec.md`
@@ -123,4 +123,4 @@ Khi item có `Status: Fail`, ghi trực tiếp bên dưới item:
 - Không còn item `[Blocker]` fail.
 - Mọi item `[High]` fail còn lại có ngoại lệ được phê duyệt hoặc đã được xử lý.
 
-**Ghi chú**: Đây là quality gate bắt buộc của `$speckit-specify`, không thay thế checklist domain do `$speckit-checklist` tạo. Ghi nhận: sự kiện (`OrderAccepted`, `TradeExecuted`...) là định danh hợp đồng nghiệp vụ lấy từ `docs/mvp/01-matching-rules.md`, không phải chi tiết implementation (CHK001/CHK014).
+**Ghi chú**: Đây là quality gate bắt buộc của `$speckit-specify`, không thay thế checklist domain do `$speckit-checklist` tạo. Ghi nhận: sự kiện (`OrderAccepted`, `TradeExecuted`...) là định danh hợp đồng nghiệp vụ lấy từ `docs/mvp/01-matching-rules.md`, không phải chi tiết implementation (CHK001/CHK014). Lần 2: spec khác tài liệu MVP gốc ở hai điểm (có API + hạ tầng service; không test tự động) — cả hai là quyết định phạm vi được stakeholder phê duyệt 2026-07-14, đã ghi trong spec §Giả định/§Ngoài phạm vi/§Rủi ro; việc bỏ test tự động được xử lý như ngoại lệ Test Gate trong `plan.md` (EX-001).
