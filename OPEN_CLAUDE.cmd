@@ -25,5 +25,15 @@ if errorlevel 1 (
     exit /b 1
 )
 
+call claude --version >nul 2>nul
+if errorlevel 1 (
+    echo Claude Code CLI was found but could not start correctly.
+    echo Reinstall it with: npm install -g @anthropic-ai/claude-code --include=optional
+    echo Then open a new terminal and try again.
+    echo.
+    pause
+    exit /b 1
+)
+
 cd /d "%PROJECT_ROOT%"
 cmd /k claude --dangerously-skip-permissions
