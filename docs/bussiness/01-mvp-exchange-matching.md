@@ -8,6 +8,33 @@ FlexSim là **simulation only**. MVP 01 không kết nối HOSE, CTCK, VSDC, ng�
 
 MVP 01 chỉ mô phỏng lõi của **Sở giao dịch** cho một mã cổ phiếu giả lập: nhận limit order, duy trì order book và xác định giao dịch trong một phiên `continuous`. Các quy tắc chi tiết mà hệ thống phải thực hiện nằm trong [Quy tắc khớp lệnh MVP 01](../mvp/01-matching-rules.md); bề mặt kỹ thuật nằm trong [đặc tả lõi khớp lệnh](../../specs/000010-matching-engine-core/spec.md).
 
+## Bản chất công việc của HOSE
+
+Hãy hình dung HOSE là **người vận hành một chợ đấu giá tập trung**, chứ không phải là cửa hàng bán cổ phiếu hoặc ngân hàng giữ tiền của nhà đầu tư.
+
+- Nhà đầu tư nói với CTCK: “Tôi muốn mua 100 cổ phiếu ở giá tối đa 20.000 đồng.”
+- CTCK kiểm tra nhà đầu tư có đủ điều kiện giao dịch hay không, rồi gửi lệnh đã hợp lệ vào hệ thống của HOSE.
+- HOSE đặt lệnh đó vào hàng chờ mua. Khi có lệnh bán phù hợp, HOSE chọn đúng cặp lệnh theo quy tắc công khai và **xác lập giao dịch**.
+- HOSE trả kết quả khớp cho CTCK và chuyển kết quả giao dịch sang VSDC. VSDC cùng ngân hàng thanh toán mới là nơi hoàn tất chuyển tiền và chuyển quyền sở hữu chứng khoán.
+
+Nói ngắn gọn: **CTCK kiểm tra và đại diện khách hàng gửi lệnh; HOSE tìm đối tác và chốt kết quả khớp; VSDC/ngân hàng hoàn tất giao nhận tiền và chứng khoán.**
+
+| HOSE nhận vào | HOSE xử lý | HOSE phát ra |
+| --- | --- | --- |
+| Lệnh mua/bán của các CTCK thành viên, cùng thông tin mã, giá, khối lượng và loại lệnh. | Kiểm tra lệnh theo quy tắc giao dịch/sàn; xếp lệnh vào order book; so khớp theo giá và thời gian; quản lý trạng thái phiên. | Xác nhận hoặc từ chối lệnh, trạng thái lệnh, giao dịch đã khớp và dữ liệu thị trường cho thành viên/thị trường. |
+
+| Việc HOSE **không** làm trong một giao dịch thông thường | Bên chịu trách nhiệm chính |
+| --- | --- |
+| Không mở tài khoản, không biết quan hệ chăm sóc khách hàng, không kiểm tra trực tiếp số dư tiền hay chứng khoán của từng nhà đầu tư trước khi CTCK gửi lệnh. | CTCK. |
+| Không tự chuyển tiền từ người mua sang người bán và không ghi nhận lưu ký cuối cùng cho nhà đầu tư. | VSDC và ngân hàng thanh toán. |
+| Không quyết định nhà đầu tư nên mua hay bán mã nào. | Nhà đầu tư hoặc đơn vị tư vấn được phép. |
+
+### Ví dụ một giao dịch
+
+CTCK A gửi lệnh bán 100 FPT giá 100.000 đồng. HOSE lưu lệnh này ở bên bán của order book. Sau đó CTCK B gửi lệnh mua 100 FPT giá 101.000 đồng. Vì giá mua chấp nhận giá bán, HOSE khớp hai lệnh ở giá 100.000 đồng — giá của lệnh bán đang chờ — và thông báo kết quả cho hai CTCK. Ở thời điểm đó giao dịch đã được xác lập, nhưng tiền và chứng khoán chưa chuyển ngay giữa hai nhà đầu tư; việc bù trừ, thanh toán diễn ra sau đó theo chu kỳ thị trường.
+
+**MVP 01 chính là phần “HOSE lưu hàng chờ và tìm cặp lệnh để khớp” trong ví dụ này.** Nó cố ý không mô phỏng việc CTCK kiểm tra tài khoản hoặc việc VSDC/ngân hàng thanh toán sau khớp.
+
 ## Vai trò trong thị trường thực tế
 
 ```text
