@@ -99,6 +99,7 @@ Given that feature description, do this:
    - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
    - Replace `{{GIT_USER_NAME}}` in `SPEC_FILE` with `git config user.name` for both metadata fields; use `Chưa xác định` if unavailable. User-provided values take precedence.
+   - Replace `[Tóm tắt mong muốn người dùng trong 1-2 câu]` in `SPEC_FILE` with a concise 1-2 sentence summary of the user's intent distilled from the feature description — not the raw input. Capture the core goal and scope only; omit file paths, command syntax, and meta-instructions.
    - Persist the resolved path to `.specify/feature.json`:
      ```json
      {

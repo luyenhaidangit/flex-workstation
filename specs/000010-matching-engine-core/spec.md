@@ -5,7 +5,7 @@
 **Trạng thái**: Bản nháp  
 **Người phụ trách**: Luyện Hải Đăng  
 **Stakeholder xác nhận**: Luyện Hải Đăng  
-**Đầu vào**: Mô tả người dùng: "Review và lên kế hoạch thực hiện cho tôi mvp 1 C:\Workspace\Project\flex-workstation\docs\mvp\01-matching-rules.md"
+**Đầu vào**: Xây dựng lõi khớp lệnh limit order với ưu tiên giá — thời gian cho FlexSim MVP 01, dựa trên nghiệp vụ trong `docs/mvp/01-matching-rules.md`.
 
 ---
 

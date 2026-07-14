@@ -5,7 +5,7 @@
 **Trạng thái**: Bản nháp  
 **Người phụ trách**: {{GIT_USER_NAME}}  
 **Stakeholder xác nhận**: {{GIT_USER_NAME}}  
-**Đầu vào**: Mô tả người dùng: "$ARGUMENTS"
+**Đầu vào**: [Tóm tắt mong muốn người dùng trong 1-2 câu]
 
 ---
 
