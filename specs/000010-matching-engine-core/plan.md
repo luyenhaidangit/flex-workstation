@@ -45,7 +45,7 @@
 
 **Loại project**: web-service (API host) + domain library + infrastructure library.
 
-**Mục tiêu hiệu năng**: Toàn bộ kịch bản demo hoàn tất trong vài giây (NFR-002); không có mục tiêu throughput.
+**Mục tiêu hiệu năng**: Toàn bộ 8 nhóm kịch bản trong `Flex.Exchange.http` hoàn tất trong ≤ 5 giây, không tính thời gian khởi động Kestrel, trên máy phát triển thông thường (NFR-002); không có mục tiêu throughput.
 
 **Ràng buộc**: Tính xác định tuyệt đối (FR-009/NFR-001): không đồng hồ hệ thống trong logic khớp, không random, xử lý lệnh tuần tự (BR-005) — kể cả khi request API đến đồng thời (spec §Rủi ro).
 

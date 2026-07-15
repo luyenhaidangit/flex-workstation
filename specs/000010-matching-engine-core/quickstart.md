@@ -61,5 +61,6 @@ git diff --no-index run1-book.json run2-book.json
 
 - [ ] `dotnet build` thành công và Swagger mở được ở Development.
 - [ ] Tất cả 8 nhóm kịch bản trong `Flex.Exchange.http` cho đúng response.
+- [ ] Toàn bộ 8 nhóm kịch bản trong `Flex.Exchange.http` hoàn tất trong ≤ 5 giây, không tính thời gian khởi động Kestrel.
 - [ ] Chạy lại cùng chuỗi request sau restart cho event log và snapshot giống hệt.
 - [ ] `src/Flex.Domain/Flex.Domain.csproj` không tham chiếu package runtime nào (FR-010).

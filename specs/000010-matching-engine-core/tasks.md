@@ -143,7 +143,7 @@
 - [ ] T045 Kiểm tra launch profile chỉ dùng cho local demo và không thêm auth/secret vào config trong `flex-exchange-service/src/Flex.Exchange/{Properties/launchSettings.json,appsettings.json,appsettings.Development.json}`
 - [ ] T046 Cập nhật README với restore/build/run, Swagger và quy trình demo `.http` trong `flex-exchange-service/README.md`
 - [ ] T047 Hoàn thiện tám nhóm kịch bản manual và hướng dẫn so sánh determinism sau restart trong `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.http`
-- [ ] T048 Chạy `dotnet restore Flex.Exchange.sln`, `dotnet build Flex.Exchange.sln` và toàn bộ kịch bản trong `specs/000010-matching-engine-core/quickstart.md`; ghi nhận thời gian chạy demo theo NFR-002 và review commands, bốn events, snapshot trong `specs/000010-matching-engine-core/contracts/exchange-core.md` đối chiếu implementation/Swagger cho MVP 02
+- [ ] T048 Chạy `dotnet restore Flex.Exchange.sln`, `dotnet build Flex.Exchange.sln` và toàn bộ kịch bản trong `specs/000010-matching-engine-core/quickstart.md`; xác nhận 8 nhóm `.http` hoàn tất trong ≤ 5 giây không tính khởi động Kestrel, rồi review commands, bốn events và snapshot trong `specs/000010-matching-engine-core/contracts/exchange-core.md` đối chiếu implementation/Swagger cho MVP 02
 
 ---
 

@@ -242,7 +242,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 ## 12. Yêu cầu phi chức năng
 
 - **NFR-001**: Tính tái lập: chạy lại cùng một kịch bản lệnh bất kỳ số lần nào PHẢI cho kết quả (sự kiện + order book) giống nhau hoàn toàn, kể cả trên máy khác.
-- **NFR-002**: Bộ kịch bản demo trong tài liệu MVP (mục Kịch bản demo) chạy hoàn tất trong vài giây trên máy phát triển thông thường — đủ nhanh để dùng trong vòng lặp phát triển.
+- **NFR-002**: Toàn bộ 8 nhóm kịch bản trong `Flex.Exchange.http` PHẢI chạy hoàn tất trong **≤ 5 giây**, không tính thời gian khởi động Kestrel, trên máy phát triển thông thường — đủ nhanh để dùng trong vòng lặp phát triển.
 - **NFR-003**: Các tham số bước giá, biên độ, lô chẵn PHẢI là cấu hình thay đổi được mà không sửa quy tắc khớp.
 
 ---
