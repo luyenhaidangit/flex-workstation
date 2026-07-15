@@ -270,17 +270,18 @@ else {
 
 & "$PSScriptRoot\ensure-specify.ps1" -SkipInstall:$SkipSpecifyInstall -SkipInit:$SkipSpecifyInit
 
-Write-Step "Syncing flex-agents marketplace"
+Write-Step "Installing selected flex skill profile"
 
-if (Test-Command "claude") {
-    claude plugin marketplace add luyenhaidangit/flex-agents 2>$null
-    claude plugin marketplace update flex-agents 2>$null
-    claude plugin install flex-agents@flex-agents 2>$null
-    claude plugin update flex-agents@flex-agents 2>$null
-    Write-Ok "flex-agents marketplace and plugin synced"
+$flexProfileInstaller = Join-Path $PSScriptRoot "install-flex-profile.ps1"
+if (Test-Path $flexProfileInstaller) {
+    if (Test-Command "claude") {
+        claude plugin uninstall flex-agents@flex-agents 2>$null
+    }
+    & $flexProfileInstaller -Profile flex -Target Both -Clean -Force
+    Write-Ok "Selected flex skill profile installed"
 }
 else {
-    Write-Warn "Claude Code not found - skipping flex-agents sync"
+    Write-Warn "flex-agents profile installer not found - skipping selected skill installation"
 }
 
 Write-Host ""
