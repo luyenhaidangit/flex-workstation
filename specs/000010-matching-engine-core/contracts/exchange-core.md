@@ -1,7 +1,7 @@
 # Contract: Exchange Core (in-process) — FlexSim MVP 01
 
 **Ngày**: 2026-07-14
-**Loại**: In-process API (C#), không phải HTTP/event bus. Đây là hợp đồng mà MVP 02 sẽ bọc API/WebSocket lên trên (SC-004); danh sách thành phần khớp mục "Đầu ra cho MVP 02" trong `docs/mvp/01-matching-rules.md`: `PlaceOrder`, `CancelOrder`, `OrderAccepted`, `OrderRejected`, `TradeExecuted`, `OrderCancelled`, snapshot order book.
+**Loại**: REST API cục bộ và contract in-process (C#). REST API phục vụ demo MVP 01; engine không tự publish event bus/WebSocket. Danh sách thành phần khớp mục "Đầu ra cho MVP 02" trong `docs/mvp/01-matching-rules.md`.
 
 **Breaking change**: Không áp dụng — contract tạo mới, chưa có consumer bên ngoài solution.
 
@@ -29,7 +29,20 @@ public sealed class MatchingEngine
 }
 ```
 
-Engine **không** tự publish sự kiện ra ngoài (DEC-005); caller (demo console, test, và sau này MVP 02) nhận sự kiện từ giá trị trả về hoặc `EventLog`.
+Engine **không** tự publish sự kiện ra ngoài (DEC-005); `ExchangeService` trả chúng trong REST response và lưu event log để truy vấn. MVP 02 có thể thêm publisher mà không sửa engine.
+
+## REST API
+
+Base path: `/api`. API chỉ chạy local để demo (SEC-002); mọi business reject trả HTTP `200` kèm mã lý do, request sai cấu trúc trả `400`.
+
+| Endpoint | Request | Kết quả |
+|----------|---------|---------|
+| `POST /api/orders` | `brokerId`, `symbol`, `side`, `price`, `quantity` | `accepted`, `orderId`, `reason`, `events` |
+| `DELETE /api/orders/{orderId}` | `brokerId` (query string) | `cancelled`, `reason`, `events` |
+| `GET /api/orderbook` | Không có | `OrderBookSnapshot` |
+| `GET /api/events` | Không có | Dòng `ExchangeEvent` theo `eventSequence` tăng dần |
+
+Mọi response dùng response wrapper chuẩn của service; payload nghiệp vụ giữ nguyên các field ở phần contract in-process bên dưới.
 
 ## Commands
 
@@ -85,6 +98,6 @@ Trường chung (base `ExchangeEvent`): `EventSequence` (`long`, tuần tự to�
 
 | Consumer | Dùng gì | Thời điểm |
 |----------|---------|-----------|
-| Console demo (`src/Flex.Exchange`) | Toàn bộ API | MVP 01 |
-| Unit tests (`tests/Flex.Exchange.UnitTests`) | Toàn bộ API + guarantees | MVP 01 |
-| Exchange API host (MVP 02) | Bọc HTTP/WebSocket lên commands/events/snapshot | Tương lai — không được yêu cầu sửa engine |
+| `Flex.Exchange.http` / Swagger | REST endpoints | MVP 01 |
+| `ExchangeService` | Toàn bộ API in-process | MVP 01 |
+| MVP 02 publisher | Commands/events/snapshot, thêm WebSocket hoặc event publisher | Tương lai — không được yêu cầu sửa engine |

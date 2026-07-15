@@ -10,19 +10,19 @@ Hướng dẫn này xác minh feature chạy đúng end-to-end sau khi implement
 - .NET 9 SDK (`dotnet --version` ≥ 9.0).
 - Không cần database, message broker hay biến môi trường nào (FR-010).
 
-## Build và test
+## Build và chạy service
 
 Chạy từ root repo `flex-exchange-service`:
 
 ```powershell
 dotnet restore Flex.Exchange.sln
 dotnet build Flex.Exchange.sln
-dotnet test Flex.Exchange.sln
+dotnet run --project src/Flex.Exchange/Flex.Exchange.csproj
 ```
 
-**Kỳ vọng**: build 0 warning nghiêm trọng; toàn bộ test pass, trong đó tối thiểu có các nhóm (SC-003):
+**Kỳ vọng**: Service chạy Kestrel cục bộ; mở Swagger UI tại URL được in trong console. Không có test tự động theo EX-001; dùng `Flex.Exchange.http` để kiểm chứng các kịch bản sau.
 
-| Nhóm test | Xác minh |
+| Nhóm kịch bản `.http` | Xác minh |
 |-----------|----------|
 | Không khớp | Lệnh vào sổ nằm chờ, không sinh trade |
 | Khớp toàn phần | AC-001, AC-002 |
@@ -33,35 +33,33 @@ dotnet test Flex.Exchange.sln
 | Validate lệnh | AC-009 — từng ràng buộc tick/biên độ/lô/khối lượng |
 | Determinism | Cùng kịch bản chạy 10 lần → kết quả giống hệt (SC-002) |
 
-## Chạy demo console
+## Chạy kịch bản API
 
-```powershell
-dotnet run --project src/Flex.Exchange/Flex.Exchange.csproj
-```
+Mở `src/Flex.Exchange/Flex.Exchange.http` trong IDE, đặt biến `@baseUrl` theo URL Kestrel rồi gửi request theo thứ tự từng kịch bản. Có thể thực hiện cùng request trên Swagger UI.
 
-Demo chạy 3 kịch bản trong `docs/mvp/01-matching-rules.md` (workstation) và in dòng sự kiện + snapshot sau mỗi kịch bản.
-
-**Kỳ vọng output theo kịch bản** (SC-001):
+**Kỳ vọng response theo kịch bản** (SC-001):
 
 1. **Khớp toàn phần**: bán 100 FXS @20.000 rồi mua 100 FXS @20.000 → in `OrderAccepted` ×2, đúng **một** `TradeExecuted` (100 @20.000); snapshot rỗng hai bên.
 2. **Khớp một phần**: bán 100 @20.000 rồi mua 200 @20.000 → một `TradeExecuted` (100 @20.000); snapshot: bên mua còn một mức 20.000 khối lượng 100, bên bán rỗng.
-3. **Hủy lệnh** (mở rộng demo): đặt lệnh chờ, hủy (`OrderCancelled`), lệnh đối ứng vào sau không khớp — snapshot xác nhận.
+3. **Hủy lệnh**: đặt lệnh chờ, gọi `DELETE /api/orders/{orderId}?brokerId=DemoBroker`, nhận `OrderCancelled`; lệnh đối ứng vào sau không khớp — snapshot xác nhận.
 
 ## Kiểm tra tính xác định thủ công (tùy chọn)
 
-Chạy demo 2 lần liên tiếp và so sánh output:
+Khởi động lại service, chạy cùng chuỗi request hai lần và so sánh JSON từ `GET /api/events` cùng `GET /api/orderbook`:
 
 ```powershell
-dotnet run --project src/Flex.Exchange/Flex.Exchange.csproj > run1.txt
-dotnet run --project src/Flex.Exchange/Flex.Exchange.csproj > run2.txt
-git diff --no-index run1.txt run2.txt   # kỳ vọng: không khác biệt
+Invoke-RestMethod "$baseUrl/api/events" | ConvertTo-Json -Depth 10 > run1-events.json
+Invoke-RestMethod "$baseUrl/api/orderbook" | ConvertTo-Json -Depth 10 > run1-book.json
+# restart service, chạy lại đúng request, rồi lưu run2-events.json và run2-book.json
+git diff --no-index run1-events.json run2-events.json
+git diff --no-index run1-book.json run2-book.json
 ```
 
-(Nếu output có in timestamp `ReceivedAt`, demo phải in phần so sánh được — dòng sự kiện — tách khỏi phần timestamp, hoặc bỏ timestamp khỏi output demo.)
+(Các payload dùng để so sánh không được chứa timestamp sinh từ đồng hồ máy.)
 
 ## Tiêu chí hoàn tất xác minh
 
-- [ ] `dotnet test` pass 100%, đủ 8 nhóm test ở trên.
-- [ ] Demo console cho đúng output 3 kịch bản.
-- [ ] Chạy demo 2 lần cho output giống hệt.
+- [ ] `dotnet build` thành công và Swagger mở được ở Development.
+- [ ] Tất cả 8 nhóm kịch bản trong `Flex.Exchange.http` cho đúng response.
+- [ ] Chạy lại cùng chuỗi request sau restart cho event log và snapshot giống hệt.
 - [ ] `src/Flex.Domain/Flex.Domain.csproj` không tham chiếu package runtime nào (FR-010).

@@ -25,28 +25,28 @@ Trả lời các câu hỏi kỹ thuật TQ-001..TQ-006 trong `plan.md`. Không 
 - Không có test project trong repo auth.
 
 **Decision**:
-- Solution `Flex.Exchange.sln`, project `src/Flex.Exchange` (console host) + `src/Flex.Domain` (toàn bộ engine); **không tạo** `Flex.Infrastructures` ở MVP 01; **bổ sung** `tests/Flex.Exchange.UnitTests`.
+- Solution `Flex.Exchange.sln` gồm `src/Flex.Exchange` (ASP.NET Core Web API host), `src/Flex.Domain` (toàn bộ engine) và `src/Flex.Infrastructures` (cross-cutting dùng ngay).
 - Engine khớp lệnh (entities, events, commands, `MatchingEngine`, `OrderValidator`) đặt trong `Flex.Domain`.
 
 **Rationale**:
-- Giữ được khung `src/` + naming + phân lớp của auth để MVP 02 thêm API host/infra không phải tái cấu trúc.
-- `Flex.Infrastructures` ở MVP 01 sẽ là project rỗng — vi phạm Nguyên tắc V (không abstraction suy đoán).
+- Giữ được khung `src/` + naming + phân lớp của auth; spec yêu cầu service có API ngay trong MVP 01 (MVP-004, FR-011).
+- `Flex.Infrastructures` chỉ mang các thành phần được host dùng ngay: Logging/Serilog, Exceptions, Observability, OpenAPI, Json và Responses; không tạo lớp persistence hay messaging suy đoán.
 - Engine là pure logic không phụ thuộc hạ tầng → đúng định nghĩa project Domain; đặt ở host (như `Services/` của auth) sẽ buộc MVP 02 refactor khi thay host console bằng API.
-- Test project phải thêm dù auth chưa có, vì bộ test là điều kiện hoàn thành bắt buộc của MVP 01 (spec §"Điều kiện hoàn thành", SC-003).
+- Kiểm chứng thủ công qua `Flex.Exchange.http` và Swagger đáp ứng quyết định stakeholder không có test tự động (MVP-005, EX-001 trong plan).
 
 **Alternatives considered**:
-- Tạo đủ 3 project như auth ngay từ đầu — loại: project infra rỗng, thêm chi phí duy trì không có giá trị.
+- Console demo không API — loại: không đáp ứng MVP-004 và FR-011.
 - Engine trong `src/Flex.Exchange/Services` — loại: trộn business logic thuần vào host, khó tái dùng ở MVP 02.
 
 ---
 
 ## TQ-003 — Backward compatibility của contract (DEC-005)
 
-**Decision**: Chưa cần backward compatibility — chưa có consumer nào tồn tại. Contract in-process (commands/events/snapshot) được thiết kế theo đúng danh sách "Đầu ra cho MVP 02" trong `docs/mvp/01-matching-rules.md` để MVP 02 tái dùng nguyên vẹn (SC-004).
+**Decision**: Chưa cần backward compatibility — chưa có consumer nào tồn tại. Contract gồm REST API cho demo cục bộ và contract in-process (commands/events/snapshot), được thiết kế theo đúng danh sách "Đầu ra cho MVP 02" để MVP 02 tái dùng nguyên vẹn (SC-004).
 
-**Rationale**: Repo mới; consumer đầu tiên là console demo + unit test trong cùng solution. Ràng buộc thật là *forward* compatibility: sự kiện phải đủ trường đối chiếu (FR-007) để API/WebSocket của MVP 02 chỉ serialize lại, không phải thêm dữ liệu vào engine.
+**Rationale**: Repo mới; consumer đầu tiên là `Flex.Exchange.http` và Swagger. Ràng buộc thật là *forward* compatibility: sự kiện phải đủ trường đối chiếu (FR-007) để API/WebSocket của MVP 02 chỉ serialize lại, không phải thêm dữ liệu vào engine.
 
-**Alternatives considered**: Định nghĩa luôn contract HTTP/OpenAPI cho MVP 02 — loại: vượt scope MVP 01 (FR-010), thiết kế API là việc của MVP 02.
+**Alternatives considered**: Event bus nội bộ hoặc WebSocket ngay MVP 01 — loại: vượt scope FR-010; MVP 02 mới thêm cơ chế publish realtime.
 
 ---
 
@@ -66,13 +66,13 @@ Trả lời các câu hỏi kỹ thuật TQ-001..TQ-006 trong `plan.md`. Không 
 
 ---
 
-## TQ-005 — Test framework (DEC-006)
+## TQ-005 — Chiến lược kiểm chứng khi không có test tự động (DEC-006)
 
-**Decision**: xUnit + `Microsoft.NET.Test.Sdk` trong `tests/Flex.Exchange.UnitTests`.
+**Decision**: Commit `Flex.Exchange.http` chứa các request/kỳ vọng cho sáu nhóm hành vi của SC-003, đồng thời bật Swagger UI trong Development để chạy demo cục bộ. Không tạo test project tự động.
 
-**Rationale**: Không repo Flex nào có precedent test framework để phải theo; xUnit là chuẩn de-facto cho .NET 9, tài liệu và tooling tốt nhất, phù hợp test thuần logic không cần mock framework (engine không có dependency).
+**Rationale**: Đây là quyết định stakeholder đã được ghi thành EX-001 trong plan. File `.http` là pattern sẵn có của auth service, lặp lại được, và trả về đúng payload REST mà MVP 02 sẽ kế thừa.
 
-**Alternatives considered**: NUnit, MSTest — loại: không có lợi thế cụ thể trong bối cảnh này.
+**Alternatives considered**: Bộ xUnit tối thiểu cho engine — loại theo quyết định stakeholder; rủi ro được chấp nhận và theo dõi trong EX-001.
 
 ---
 
