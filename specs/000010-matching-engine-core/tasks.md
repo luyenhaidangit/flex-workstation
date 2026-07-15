@@ -13,7 +13,7 @@
 - [X] T003 [P] Tạo project hạ tầng với package Serilog và Swashbuckle cần thiết trong `flex-exchange-service/src/Flex.Infrastructures/Flex.Infrastructures.csproj`
 - [X] T004 Tạo project Web API tham chiếu `Flex.Domain` và `Flex.Infrastructures` trong `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.csproj`
 - [X] T005 [P] Tạo file nền, ignore .NET và context agent trong `flex-exchange-service/{README.md,CLAUDE.md,.gitignore,.gitattributes,.env.example}`
-- [ ] T006 Tạo cấu hình chạy cục bộ HTTP/HTTPS, chỉ phục vụ demo local, trong `flex-exchange-service/src/Flex.Exchange/Properties/launchSettings.json`
+- [X] T006 Tạo cấu hình chạy cục bộ HTTP/HTTPS, chỉ phục vụ demo local, trong `flex-exchange-service/src/Flex.Exchange/Properties/launchSettings.json`
 
 ---
 
