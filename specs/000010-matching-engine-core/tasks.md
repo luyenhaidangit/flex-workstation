@@ -35,7 +35,7 @@
 - [ ] T016 [P] Tạo cấu hình Serilog, correlation ID và request/response logging middleware trong `flex-exchange-service/src/Flex.Infrastructures/{Logging/SeriLogger.cs,Observability/CorrelationIdMiddleware.cs,Observability/GlobalLoggingMiddleware.cs,Observability/LogFields.cs}`
 - [ ] T017 [P] Tạo cấu hình Swagger và JSON dùng chung trong `flex-exchange-service/src/Flex.Infrastructures/{OpenApi/SwaggerConfiguration.cs,Json/JsonOptions.cs,AssemblyReference.cs}`
 - [ ] T018 Tạo `ExchangeOptions`, bind `Exchange:Instrument` và chuyển sang `InstrumentConfig` trong `flex-exchange-service/src/Flex.Exchange/Models/ExchangeOptions.cs`
-- [ ] T019 Tạo cấu hình FXS (20.000, tick 100, trần 21.400, sàn 18.600, lô 100) và Serilog trong `flex-exchange-service/src/Flex.Exchange/appsettings.json`
+- [ ] T019 Tạo cấu hình FXS (20.000, tick 100, trần 21.400, sàn 18.600, lô 100) và Serilog trong `flex-exchange-service/src/Flex.Exchange/{appsettings.json,appsettings.Development.json}`
 - [ ] T020 Tạo bootstrap host, đăng ký middleware/Swagger và DI options theo pattern service Flex trong `flex-exchange-service/src/Flex.Exchange/{Program.cs,Extensions/HostExtensions.cs,Extensions/ServiceExtensions.cs,Extensions/ApplicationExtensions.cs}`
 
 ---
@@ -104,12 +104,13 @@
 
 1. Đặt lệnh chờ, gọi `DELETE /api/orders/{orderId}?brokerId=DemoBroker`, rồi đặt đối ứng; xác nhận không có trade và lệnh đã biến mất khỏi snapshot.
 2. Cancel lại hoặc cancel ID đã filled; xác nhận HTTP 200 business reject `OrderNotFound`, event list rỗng, book không đổi.
+3. Cancel với `brokerId` rỗng; xác nhận HTTP 200 business reject `MissingBrokerId`, event list rỗng, book không đổi.
 
-- [ ] T034 [US4] Implement `MatchingEngine.CancelOrder` để gỡ lệnh còn dư, cập nhật `Cancelled` và phát `OrderCancelled` hoặc trả `OrderNotFound` trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T028)
+- [ ] T034 [US4] Implement `MatchingEngine.CancelOrder` để từ chối `BrokerId` rỗng bằng `MissingBrokerId`, hoặc gỡ lệnh còn dư/cập nhật `Cancelled`/phát `OrderCancelled`, hoặc trả `OrderNotFound` trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T028)
 - [ ] T035 [P] [US4] Tạo `CancelOrderResponse` theo contract trong `flex-exchange-service/src/Flex.Exchange/Models/CancelOrderResponse.cs`
 - [ ] T036 [US4] Mở rộng `IExchangeService`/`ExchangeService` với cancel được serialize bằng cùng lock và log kết quả trong `flex-exchange-service/src/Flex.Exchange/Services/{Interfaces/IExchangeService.cs,ExchangeService.cs}` (phụ thuộc T034)
 - [ ] T037 [US4] Implement `DELETE /api/orders/{orderId}` nhận `brokerId` query string và trả business reject HTTP 200 trong `flex-exchange-service/src/Flex.Exchange/Controllers/OrdersController.cs` (phụ thuộc T035, T036)
-- [ ] T038 [US4] Thêm kịch bản hủy thành công, hủy lặp và hủy sau filled vào `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.http` (phụ thuộc T037)
+- [ ] T038 [US4] Thêm kịch bản hủy thành công, hủy lặp, hủy sau filled và `brokerId` rỗng vào `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.http` (phụ thuộc T037)
 
 **Definition of Done**: AC-007/AC-008 đạt; lệnh cancelled/filled không thể khớp lại.
 
@@ -142,7 +143,7 @@
 - [ ] T045 Kiểm tra launch profile chỉ dùng cho local demo và không thêm auth/secret vào config trong `flex-exchange-service/src/Flex.Exchange/{Properties/launchSettings.json,appsettings.json,appsettings.Development.json}`
 - [ ] T046 Cập nhật README với restore/build/run, Swagger và quy trình demo `.http` trong `flex-exchange-service/README.md`
 - [ ] T047 Hoàn thiện tám nhóm kịch bản manual và hướng dẫn so sánh determinism sau restart trong `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.http`
-- [ ] T048 Chạy `dotnet restore Flex.Exchange.sln`, `dotnet build Flex.Exchange.sln` và toàn bộ kịch bản trong `specs/000010-matching-engine-core/quickstart.md`
+- [ ] T048 Chạy `dotnet restore Flex.Exchange.sln`, `dotnet build Flex.Exchange.sln` và toàn bộ kịch bản trong `specs/000010-matching-engine-core/quickstart.md`; ghi nhận thời gian chạy demo theo NFR-002 và review commands, bốn events, snapshot trong `specs/000010-matching-engine-core/contracts/exchange-core.md` đối chiếu implementation/Swagger cho MVP 02
 
 ---
 
@@ -157,13 +158,14 @@
 | US-005 / AC-009 / FR-001 | T039–T041 |
 | FR-002, FR-003, FR-005 | T021, T031, T032, T033 |
 | FR-004 | T028–T030 |
-| FR-006 | T034, T036–T038 |
+| FR-006 / SEC-001 (CancelOrder) | T034, T036–T038 |
 | FR-007, FR-008 | T011, T021–T022, T026, T029 |
 | FR-009 / NFR-001 | T024, T031–T032, T043–T044, T047 |
 | FR-010 | T002, T004, T042 |
 | FR-011 | T023–T027, T035–T038 |
 | SEC-001, SEC-002 | T008, T011, T039, T045 |
 | NFR-003 | T009, T018–T019, T039 |
+| NFR-002 / SC-001…SC-004 | T027, T030, T033, T038, T041, T047–T048 |
 
 ## Dependencies & Execution Order
 
