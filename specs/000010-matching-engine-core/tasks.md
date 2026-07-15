@@ -8,11 +8,11 @@
 
 **Mục đích**: Tạo solution .NET 9 và các file nền theo cấu trúc đã chốt.
 
-- [ ] T001 Tạo solution ba project và project references trong `flex-exchange-service/Flex.Exchange.sln`
-- [ ] T002 [P] Tạo project domain thuần BCL `net9.0` trong `flex-exchange-service/src/Flex.Domain/Flex.Domain.csproj`
-- [ ] T003 [P] Tạo project hạ tầng với package Serilog và Swashbuckle cần thiết trong `flex-exchange-service/src/Flex.Infrastructures/Flex.Infrastructures.csproj`
-- [ ] T004 Tạo project Web API tham chiếu `Flex.Domain` và `Flex.Infrastructures` trong `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.csproj`
-- [ ] T005 [P] Tạo file nền, ignore .NET và context agent trong `flex-exchange-service/{README.md,CLAUDE.md,.gitignore,.gitattributes,.env.example}`
+- [X] T001 Tạo solution ba project và project references trong `flex-exchange-service/Flex.Exchange.sln`
+- [X] T002 [P] Tạo project domain thuần BCL `net9.0` trong `flex-exchange-service/src/Flex.Domain/Flex.Domain.csproj`
+- [X] T003 [P] Tạo project hạ tầng với package Serilog và Swashbuckle cần thiết trong `flex-exchange-service/src/Flex.Infrastructures/Flex.Infrastructures.csproj`
+- [X] T004 Tạo project Web API tham chiếu `Flex.Domain` và `Flex.Infrastructures` trong `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.csproj`
+- [X] T005 [P] Tạo file nền, ignore .NET và context agent trong `flex-exchange-service/{README.md,CLAUDE.md,.gitignore,.gitattributes,.env.example}`
 - [ ] T006 Tạo cấu hình chạy cục bộ HTTP/HTTPS, chỉ phục vụ demo local, trong `flex-exchange-service/src/Flex.Exchange/Properties/launchSettings.json`
 
 ---
@@ -50,7 +50,7 @@
 2. Xác nhận response thứ hai có đúng một `TradeExecuted` 100 @20.000, và `GET /api/orderbook` trả hai phía rỗng.
 3. Xác nhận `GET /api/events` có event sequence tăng dần, gồm hai `OrderAccepted` và một `TradeExecuted`.
 
-- [ ] T021 [US1] Implement `MatchingEngine.PlaceOrder`, cấp ID/sequence, phát `OrderAccepted` và khớp toàn phần tại giá lệnh chờ trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T007–T013)
+- [X] T021 [US1] Implement `MatchingEngine.PlaceOrder`, cấp ID/sequence, phát `OrderAccepted` và khớp toàn phần tại giá lệnh chờ trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T007–T013)
 - [ ] T022 [US1] Bổ sung snapshot read-only rỗng/đầy đủ cùng event log append-only trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T021)
 - [ ] T023 [P] [US1] Tạo DTO request/response đặt lệnh map đúng contract trong `flex-exchange-service/src/Flex.Exchange/Models/{PlaceOrderRequest.cs,PlaceOrderResponse.cs}`
 - [ ] T024 [US1] Tạo `IExchangeService` và `ExchangeService` singleton bọc engine, serialize place/read bằng lock và ghi log nghiệp vụ trong `flex-exchange-service/src/Flex.Exchange/Services/{Interfaces/IExchangeService.cs,ExchangeService.cs}` (phụ thuộc T018, T021, T022)
@@ -71,7 +71,7 @@
 1. Từ service mới khởi động, gửi bán 100 FXS @20.000 rồi mua 200 FXS @20.000.
 2. Xác nhận một giao dịch 100 @20.000, lệnh mua `PartiallyFilled` còn 100 và snapshot chỉ còn bid 20.000/100.
 
-- [ ] T028 [US2] Mở rộng vòng lặp matching để giảm `RemainingQuantity`, cập nhật `PartiallyFilled`/`Filled` và đưa phần dư hợp lệ vào sổ trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T021)
+- [X] T028 [US2] Mở rộng vòng lặp matching để giảm `RemainingQuantity`, cập nhật `PartiallyFilled`/`Filled` và đưa phần dư hợp lệ vào sổ trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T021)
 - [ ] T029 [US2] Hoàn thiện tổng hợp price level và danh sách lệnh FIFO trong snapshot trong `flex-exchange-service/src/Flex.Domain/Entities/OrderBook.cs` (phụ thuộc T013, T028)
 - [ ] T030 [US2] Thêm kịch bản khớp một phần và kiểm tra `GET /api/orderbook` vào `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.http` (phụ thuộc T028, T029)
 
@@ -89,7 +89,7 @@
 2. Dựng hai ask 20.000 tuần tự, rồi mua 100; xác nhận `SellOrderId` của lệnh đến trước xuất hiện trong trade.
 
 - [ ] T031 [US3] Sắp xếp bid giảm/ask tăng và FIFO bằng `SequenceNumber`, bảo đảm không dùng `ReceivedAt` trong priority tại `flex-exchange-service/src/Flex.Domain/Entities/OrderBook.cs` (phụ thuộc T029)
-- [ ] T032 [US3] Bảo đảm `MatchingEngine` luôn chọn lệnh đối ứng tốt nhất, giá trade từ passive order và `ExecutedSequence` xác định trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T028, T031)
+- [X] T032 [US3] Bảo đảm `MatchingEngine` luôn chọn lệnh đối ứng tốt nhất, giá trade từ passive order và `ExecutedSequence` xác định trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T028, T031)
 - [ ] T033 [US3] Thêm kịch bản ưu tiên giá, FIFO và khớp xuyên nhiều mức vào `flex-exchange-service/src/Flex.Exchange/Flex.Exchange.http` (phụ thuộc T032)
 
 **Definition of Done**: AC-005/AC-006 đạt; thứ tự event/trade tái lập với cùng chuỗi input.
@@ -106,7 +106,7 @@
 2. Cancel lại hoặc cancel ID đã filled; xác nhận HTTP 200 business reject `OrderNotFound`, event list rỗng, book không đổi.
 3. Cancel với `brokerId` rỗng; xác nhận HTTP 200 business reject `MissingBrokerId`, event list rỗng, book không đổi.
 
-- [ ] T034 [US4] Implement `MatchingEngine.CancelOrder` để từ chối `BrokerId` rỗng bằng `MissingBrokerId`, hoặc gỡ lệnh còn dư/cập nhật `Cancelled`/phát `OrderCancelled`, hoặc trả `OrderNotFound` trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T028)
+- [X] T034 [US4] Implement `MatchingEngine.CancelOrder` để từ chối `BrokerId` rỗng bằng `MissingBrokerId`, hoặc gỡ lệnh còn dư/cập nhật `Cancelled`/phát `OrderCancelled`, hoặc trả `OrderNotFound` trong `flex-exchange-service/src/Flex.Domain/Matching/MatchingEngine.cs` (phụ thuộc T028)
 - [ ] T035 [P] [US4] Tạo `CancelOrderResponse` theo contract trong `flex-exchange-service/src/Flex.Exchange/Models/CancelOrderResponse.cs`
 - [ ] T036 [US4] Mở rộng `IExchangeService`/`ExchangeService` với cancel được serialize bằng cùng lock và log kết quả trong `flex-exchange-service/src/Flex.Exchange/Services/{Interfaces/IExchangeService.cs,ExchangeService.cs}` (phụ thuộc T034)
 - [ ] T037 [US4] Implement `DELETE /api/orders/{orderId}` nhận `brokerId` query string và trả business reject HTTP 200 trong `flex-exchange-service/src/Flex.Exchange/Controllers/OrdersController.cs` (phụ thuộc T035, T036)

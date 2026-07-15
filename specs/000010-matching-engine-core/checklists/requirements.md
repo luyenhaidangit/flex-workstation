@@ -9,8 +9,10 @@
 **Trạng thái review**: Hoàn tất  
 **Lần review**: Lần 2 (2026-07-14 — sau khi stakeholder điều chỉnh phạm vi: thêm API + hạ tầng service theo pattern `flex-auth-service`, bỏ bộ test tự động)  
 **Tính năng**: [spec.md](../spec.md)  
-**Artifact chính được kiểm tra**: `spec.md`  
+**Artifact chính được kiểm tra**: `spec.md`
 **Nguồn tham chiếu**: `constitution.md`, `spec.md`
+
+**Service triển khai**: `flex-exchange-service/` (repo Git độc lập, được ignore tại workstation)
 
 ---
 
@@ -33,6 +35,7 @@
 |----------|----------------|------------|---------|
 | `spec.md` | [spec.md](../spec.md) | Đã kiểm | Artifact nguồn của quality gate |
 | `constitution.md` | [constitution.md](../../../.specify/memory/constitution.md) | Đã kiểm | Áp dụng các gate Scope, Security, Complexity |
+| `flex-exchange-service` | [../../../../flex-exchange-service/](../../../../flex-exchange-service/) | Đã tạo | Service .NET 9 độc lập; không đưa source vào Git của workstation |
 
 ---
 
