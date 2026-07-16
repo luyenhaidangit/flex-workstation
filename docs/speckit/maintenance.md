@@ -20,11 +20,3 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 
 - `checklists/requirements.md` là quality gate bắt buộc của `$speckit-specify` và phải được sinh từ `.specify/templates/requirements-template.md`.
 - `$speckit-checklist` tiếp tục dùng `.specify/templates/checklist-template.md` để tạo checklist tùy biến theo domain; không thay thế hoặc ghi đè requirements quality gate.
-
-## Quick Flow
-
-- `$speckit-quick` là quick flow cho tác vụ nhỏ, rủi ro thấp trong workstation.
-- `/speckit.quick` là tên hiển thị; runtime dùng `$speckit-quick` hoặc `/speckit-quick` tùy agent.
-- Quick flow phải nêu pre-change statement trước khi sửa và completion report sau khi hoàn tất.
-- Quick flow không dùng cho thay đổi data, permission, contract, migration, release, public API hoặc nhiều repo.
-- Nếu task vượt quick gate, dừng quick flow và hướng người dùng sang `$speckit-specify <mô tả nghiệp vụ>` trước khi implementation.
