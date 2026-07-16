@@ -34,6 +34,19 @@
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
 - Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
 
+## Skills
+
+Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào phù hợp không. Skill được load tự động — chỉ cần áp dụng khi trigger khớp:
+
+| Context | Skill |
+| --- | --- |
+| Viết, review hoặc generate C#/.NET code | `dotnet-conventions` |
+| Tính năng mới chưa có spec | `spec-driven-development` |
+| Có spec, cần breakdown task | `planning-and-task-breakdown` |
+| Implement code | `incremental-implementation` |
+
+Xem danh sách đầy đủ và cách phối hợp nhiều skill: `using-agent-skills`.
+
 ## Speckit Workflow (Spec-Before-Code)
 
 Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
