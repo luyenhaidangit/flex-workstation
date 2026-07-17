@@ -1,0 +1,274 @@
+{
+  "info": {
+    "_postman_id": "58c6e6c9-7aac-45a0-88e7-95a994fd06df",
+    "name": "Flex Exchange Service - Local",
+    "description": "Bộ request kiểm thử local cho Flex Exchange Service. Engine chạy in-memory nên dữ liệu bị xóa khi khởi động lại API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5266"
+    },
+    {
+      "key": "brokerId",
+      "value": "DemoBroker"
+    },
+    {
+      "key": "orderId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Khớp lệnh",
+      "item": [
+        {
+          "name": "01. Đặt lệnh bán chờ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders",
+            "description": "Lệnh không có đối ứng, được giữ trong order book."
+          },
+          "response": []
+        },
+        {
+          "name": "02. Đặt lệnh mua khớp toàn phần",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders",
+            "description": "Chạy sau request 01 để tạo TradeExecuted với khối lượng 100."
+          },
+          "response": []
+        },
+        {
+          "name": "03. Đặt lệnh bán để khớp một phần",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders"
+          },
+          "response": []
+        },
+        {
+          "name": "04. Đặt lệnh mua khớp một phần",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders",
+            "description": "Chạy sau request 03. Lệnh mua còn dư 100 trong order book."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Hủy lệnh",
+      "item": [
+        {
+          "name": "01. Đặt lệnh chờ để hủy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.accepted && response.orderId) {",
+                  "    pm.collectionVariables.set(\"orderId\", response.orderId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Sell\",\n  \"price\": 21000,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders",
+            "description": "Lưu orderId từ response vào collection variable để request hủy dùng tự động."
+          },
+          "response": []
+        },
+        {
+          "name": "02. Hủy lệnh chờ",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}?brokerId={{brokerId}}",
+            "description": "Chạy sau request 01 trong cùng folder."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Validation",
+      "item": [
+        {
+          "name": "01. BrokerId rỗng",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders"
+          },
+          "response": []
+        },
+        {
+          "name": "02. Symbol không hỗ trợ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"BAD\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders"
+          },
+          "response": []
+        },
+        {
+          "name": "03. Giá không đúng bước giá",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brokerId\": \"{{brokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20050,\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/orders"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Trạng thái",
+      "item": [
+        {
+          "name": "01. Xem order book",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orderbook"
+          },
+          "response": []
+        },
+        {
+          "name": "02. Xem event log",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/events"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
