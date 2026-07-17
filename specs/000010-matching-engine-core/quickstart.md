@@ -16,11 +16,12 @@ Chạy từ root repo `flex-exchange-service`:
 
 ```powershell
 dotnet restore Flex.Exchange.sln
-dotnet build Flex.Exchange.sln
-dotnet run --project src/Flex.Exchange/Flex.Exchange.csproj
+dotnet build Flex.Exchange.sln --configuration Release
+dotnet test Flex.Exchange.sln --configuration Release --no-build
+dotnet run --project src/Flex.Exchange.Api/Flex.Exchange.Api.csproj --launch-profile http
 ```
 
-**Kỳ vọng**: Service chạy Kestrel cục bộ; mở Swagger UI tại URL được in trong console. Không có test tự động theo EX-001; dùng `Flex.Exchange.http` để kiểm chứng các kịch bản sau.
+**Kỳ vọng**: Service chạy Kestrel cục bộ; mở Swagger UI tại URL được in trong console. Domain/API tests xác minh các rule và contract trọng yếu; dùng `Flex.Exchange.http` để kiểm chứng thủ công các kịch bản sau.
 
 | Nhóm kịch bản `.http` | Xác minh |
 |-----------|----------|
@@ -35,7 +36,7 @@ dotnet run --project src/Flex.Exchange/Flex.Exchange.csproj
 
 ## Chạy kịch bản API
 
-Mở `src/Flex.Exchange/Flex.Exchange.http` trong IDE, đặt biến `@baseUrl` theo URL Kestrel rồi gửi request theo thứ tự từng kịch bản. Có thể thực hiện cùng request trên Swagger UI.
+Mở `src/Flex.Exchange.Api/Flex.Exchange.http` trong IDE, đặt biến `@baseUrl` theo URL Kestrel rồi gửi request theo thứ tự từng kịch bản. Restart service trước mỗi nhóm để đưa order book về trạng thái trống. Có thể thực hiện cùng request trên Swagger UI.
 
 **Kỳ vọng response theo kịch bản** (SC-001):
 
