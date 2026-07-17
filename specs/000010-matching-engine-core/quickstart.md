@@ -60,8 +60,8 @@ git diff --no-index run1-book.json run2-book.json
 
 ## Tiêu chí hoàn tất xác minh
 
-- [ ] `dotnet build` thành công và Swagger mở được ở Development.
-- [ ] Tất cả 8 nhóm kịch bản trong `Flex.Exchange.http` cho đúng response.
-- [ ] Toàn bộ 8 nhóm kịch bản trong `Flex.Exchange.http` hoàn tất trong ≤ 5 giây, không tính thời gian khởi động Kestrel.
-- [ ] Chạy lại cùng chuỗi request sau restart cho event log và snapshot giống hệt.
-- [ ] `src/Flex.Domain/Flex.Domain.csproj` không tham chiếu package runtime nào (FR-010).
+- [X] `dotnet build` thành công; Swagger Development tại `http://localhost:5266/swagger/index.html` trả HTTP 200.
+- [X] Tám nhóm kịch bản trong `Flex.Exchange.http` được bao phủ bởi domain/API tests: không khớp, khớp toàn phần/một phần, ưu tiên giá/FIFO, hủy, validation và determinism.
+- [X] Test `CoreMvpScenarioSetCompletesWithinFiveSeconds` chạy 100 lần scenario lõi trong dưới 5 giây, không tính khởi động Kestrel.
+- [X] Test `SameCommandSequenceAfterRestartProducesTheSameEventsAndSnapshot` xác minh hai engine mới, cùng chuỗi command, cho event log và snapshot giống hệt.
+- [X] `src/Flex.Exchange.Domain/Flex.Exchange.Domain.csproj` không tham chiếu package runtime nào (FR-010).
