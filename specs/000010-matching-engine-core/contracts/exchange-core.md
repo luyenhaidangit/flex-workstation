@@ -10,7 +10,7 @@
 ## Bề mặt API của engine
 
 ```csharp
-namespace Flex.Domain.Matching;
+namespace Flex.Exchange.Domain.Matching;
 
 public sealed class MatchingEngine
 {
@@ -42,7 +42,7 @@ Base path: `/api`. API chỉ chạy local để demo (SEC-002); mọi business r
 | `GET /api/orderbook` | Không có | `OrderBookSnapshot` |
 | `GET /api/events` | Không có | Dòng `ExchangeEvent` theo `eventSequence` tăng dần |
 
-Mọi response dùng response wrapper chuẩn của service; payload nghiệp vụ giữ nguyên các field ở phần contract in-process bên dưới.
+Mọi response dùng direct DTO của endpoint, không có generic response envelope. Payload nghiệp vụ nằm ở top-level và giữ nguyên các field ở phần contract in-process bên dưới; business reject là HTTP `200` với `reason`, request sai cấu trúc là HTTP `400`.
 
 ## Commands
 

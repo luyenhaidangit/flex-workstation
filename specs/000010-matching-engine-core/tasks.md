@@ -199,3 +199,10 @@ dotnet run --project src/Flex.Exchange.Api/Flex.Exchange.Api.csproj --launch-pro
 ```
 
 Mở `src/Flex.Exchange.Api/Flex.Exchange.http`, đặt `@baseUrl` theo URL Kestrel, restart service trước mỗi nhóm rồi chạy tám nhóm kịch bản.
+
+## Phase 9: Convergence
+
+- [X] T049 Bổ sung API integration acceptance tests chạy độc lập tám nhóm kịch bản MVP, bao gồm `GET /api/orderbook` và `GET /api/events`, rồi đo thời gian xử lý request không gồm khởi động host theo SC-003, NFR-002 (partial).
+- [X] T050 Chốt response wrapper chuẩn: hoặc triển khai wrapper trong API, hoặc cập nhật contract/plan kèm ngoại lệ được duyệt để xác nhận direct DTO là contract chính thức theo DEC-005, FR-011 (partial).
+- [X] T051 Loại lệnh `Filled`/`Cancelled` khỏi cấu trúc lưu trữ nội bộ của `OrderBook` ngay sau khi trạng thái kết thúc và bổ sung test bất biến theo data-model.md §2, FR-008 (partial).
+- [X] T052 Đồng bộ `plan.md`, `data-model.md` và contract với kiến trúc `Api → Application → Domain ← Infrastructure`, paths hiện hành, chiến lược automated test và quyết định về `ReceivedAt`; ghi ngoại lệ được duyệt nếu giữ khác biệt theo DEC-001, DEC-006, DEC-008, Constitution II (contradicts).

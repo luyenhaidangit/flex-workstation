@@ -1,7 +1,7 @@
 # Data Model: Lõi khớp lệnh và order book (FlexSim MVP 01)
 
 **Ngày**: 2026-07-14
-**Phạm vi**: Thực thể in-memory trong `src/Flex.Domain` của `flex-exchange-service`. Không có database/schema (FR-010).
+**Phạm vi**: Thực thể in-memory trong `src/Flex.Exchange.Domain` của `flex-exchange-service`. Không có database/schema (FR-010).
 
 Quy ước chung: giá và khối lượng là `long` (VND nguyên / số cổ phiếu nguyên); mọi ID và sequence là `long` tuần tự do engine cấp (DEC-003, DEC-004).
 
@@ -21,8 +21,9 @@ Quy ước chung: giá và khối lượng là `long` (VND nguyên / số cổ p
 | `Quantity` | `long` | Khối lượng đặt ban đầu | > 0; chia hết cho `LotSize` |
 | `RemainingQuantity` | `long` | Khối lượng chưa khớp | 0 ≤ x ≤ `Quantity`; giảm dần theo từng lần khớp |
 | `SequenceNumber` | `long` | Số tuần tự cấp khi nhận — khóa ưu tiên thời gian | Tăng dần nghiêm ngặt; không dùng timestamp để so ưu tiên |
-| `ReceivedAt` | `DateTimeOffset` | Thời điểm nhận (chỉ hiển thị/đối chiếu) | Không tham gia logic khớp |
 | `Status` | `OrderStatus` | Trạng thái vòng đời | Theo bảng chuyển trạng thái bên dưới |
+
+`ReceivedAt` không thuộc Domain MVP 01: không có yêu cầu hiển thị thời gian và kết quả phải tái lập hoàn toàn. Nếu cần metadata thời gian ở MVP sau, nó phải được thiết kế ở presentation/audit boundary và không tham gia priority hay event determinism.
 
 ### OrderStatus — chuyển trạng thái (khớp spec §7)
 
@@ -44,7 +45,7 @@ Tập lệnh đang chờ (`Pending`/`PartiallyFilled`) của một mã, hai bên
 **Bất biến (invariants)**:
 - Bên mua duyệt theo giá **giảm dần**, bên bán theo giá **tăng dần** (FR-002).
 - Trong cùng mức giá, duyệt theo `SequenceNumber` **tăng dần** — FIFO (FR-003).
-- Chỉ chứa lệnh có `RemainingQuantity` > 0; lệnh `Filled`/`Cancelled` phải rời sổ ngay.
+- Chỉ lưu lệnh có `RemainingQuantity` > 0; lệnh `Filled`/`Cancelled` bị gỡ khỏi cấu trúc nội bộ ngay.
 - Không tồn tại trạng thái "crossed" sau khi xử lý xong một command: giá mua tốt nhất < giá bán tốt nhất (nếu cả hai bên có lệnh) — vì lệnh vào được khớp ngay đến khi hết khả năng khớp (BR-005).
 - Thứ tự duyệt phải xác định tuyệt đối (không phụ thuộc hash order) — FR-009.
 

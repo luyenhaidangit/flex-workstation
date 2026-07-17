@@ -51,6 +51,37 @@
 
 **Quy mô/Phạm vi**: 1 mã, 1 broker giả lập, hàng trăm lệnh mỗi kịch bản — quy mô demo.
 
+## Điều chỉnh sau Clean Architecture refactor
+
+Phần này là mapping kỹ thuật hiện hành và **thay thế mọi path/cấu trúc mâu thuẫn ở các phần lịch sử bên dưới**. Refactor được thực hiện sau plan ban đầu để tách rõ HTTP, application orchestration, domain policy và composition/configuration; không mở rộng nghiệp vụ MVP 01.
+
+### Kiến trúc và project graph hiện hành
+
+```text
+Flex.Exchange.Api → Flex.Exchange.Application → Flex.Exchange.Domain
+                  ↘ Flex.Exchange.Infrastructure → Flex.Exchange.Domain
+```
+
+- `src/Flex.Exchange.Domain`: engine thuần, entities, commands, events, validation và matching.
+- `src/Flex.Exchange.Application`: command/result contracts, `IExchangeService` và serialization lock quanh engine.
+- `src/Flex.Exchange.Infrastructure`: bind `ExchangeOptions`, tạo `InstrumentConfig` và đăng ký `MatchingEngine`.
+- `src/Flex.Exchange.Api`: controllers, HTTP request/response DTO, exception handling, observability, JSON, Swagger và composition root.
+- `tests/Flex.Exchange.Domain.Tests` và `tests/Flex.Exchange.Api.Tests`: test domain và integration qua `WebApplicationFactory`.
+
+Dependency direction là `Api → Application → Domain` và `Api → Infrastructure → Domain`; Domain không tham chiếu HTTP, package runtime, persistence hay messaging.
+
+### REST contract và response shape
+
+MVP 01 dùng **direct DTO response**, không dùng generic `ApiResponse` envelope. Các response `PlaceOrderResponse`, `CancelOrderResponse`, `OrderBookSnapshot` và event list là payload top-level của endpoint. Đây là lựa chọn tương thích với `Flex.Exchange.http` và Postman collection hiện có; business reject vẫn là HTTP 200 với `reason`, còn request sai cấu trúc là HTTP 400 theo `[ApiController]`.
+
+`OrderCancelled` phải dùng field `cancelledQuantity`; các event còn lại giữ fields được mô tả trong `contracts/exchange-core.md`. Bất kỳ consumer MVP 02 nào phải dùng contract này, không suy luận field theo event type khác.
+
+### Determinism, thời gian và test
+
+`ReceivedAt` không được lưu trong Domain của MVP 01. MVP không có yêu cầu hiển thị thời gian; thêm clock vào model sẽ không đóng góp cho priority và làm giảm khả năng so sánh kết quả giữa các lần chạy. `SequenceNumber` và `EventSequence` là nguồn thứ tự xác định duy nhất. Metadata thời gian, nếu được MVP sau cần, thuộc lớp presentation/audit với contract riêng.
+
+Ngoại lệ EX-001 về không có test tự động được thay thế bởi domain/API tests đã được stakeholder yêu cầu trong quá trình refactor. `MvpAcceptanceTests` chạy tám nhóm behavior qua HTTP, gồm snapshot/event log, cancellation, validation và determinism sau hai host mới; benchmark trong test đo xử lý request không gồm khởi động host.
+
 ## Kiểm tra constitution
 
 *GATE: Phải đạt trước Phase 0 research. Kiểm tra lại sau Phase 1 design.*
