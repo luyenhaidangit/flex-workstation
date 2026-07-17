@@ -12,7 +12,7 @@
     },
     {
       "key": "exchangeBrokerId",
-      "value": "DemoBroker"
+      "value": "SSI"
     },
     {
       "key": "exchangeOrderId",
@@ -22,7 +22,7 @@
   "item": [
     {
       "name": "Flex Exchange Service",
-      "description": "API khớp lệnh FXS in-memory. Dữ liệu bị xóa khi khởi động lại service.",
+      "description": "API khớp lệnh FPT in-memory. Dữ liệu bị xóa khi khởi động lại service.",
       "item": [
         {
           "name": "01 - Khớp lệnh",
@@ -39,7 +39,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -63,7 +63,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -87,7 +87,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -110,7 +110,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 200\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 200\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -153,7 +153,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Sell\",\n  \"price\": 21000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Sell\",\n  \"price\": 21000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -192,7 +192,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -238,7 +238,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FXS\",\n  \"side\": \"Buy\",\n  \"price\": 20050,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20050,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
