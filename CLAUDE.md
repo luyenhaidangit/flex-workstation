@@ -33,12 +33,7 @@
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
 - Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
-
-## Quy ước API client/Swagger
-
-- Trong workspace này, “cập nhật Swagger” đối với API service mặc định nghĩa là cập nhật collection/context tại `postman/`, đặc biệt `postman/flex.postman_collection.json`.
-- Collection phải phản ánh route, payload, biến môi trường và luồng nghiệp vụ hiện tại; luôn parse/validate JSON sau khi sửa.
-- Chỉ cập nhật Swashbuckle/OpenAPI trong source khi người dùng yêu cầu rõ Swagger UI/OpenAPI document hoặc cần đồng bộ contract kỹ thuật.
+- Với API service, `postman/` là nơi duy trì collection và luồng gọi API; chỉ cập nhật Swashbuckle/OpenAPI source khi phạm vi yêu cầu là Swagger UI hoặc OpenAPI document.
 
 ## Skills
 
