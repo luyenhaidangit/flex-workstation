@@ -215,3 +215,8 @@ MVP triển khai tối thiểu là **Phase 1 + Phase 2 + User Story 1**. User St
 - [x] Không có database/migration; không tạo task migration ngoài scope.
 - [x] Correlation, observability, error safety, rollout và rollback đều có task.
 - [x] Task `[P]` chỉ dùng cho file khác nhau và không phụ thuộc task chưa hoàn tất.
+
+## Phase 7: Convergence
+
+- [X] T039 [US2] Bổ sung `BrokerMismatch` cho luồng hủy lệnh theo FR-006, AC-005 và plan DEC-007 (partial): phân biệt broker không sở hữu lệnh với `OrderNotFound`, bảo đảm không thay đổi order state/order book và thêm unit/API contract test.
+- [X] T040 [P] Dọn artifact exception details trùng tên theo quy ước `ApplicationProblemDetails` (unrequested): xóa `flex-exchange-service/src/Flex.Exchange.Api/ExceptionHandling/ExchangeProblemDetails.cs` nếu không còn consumer và xác nhận build/test không tham chiếu file này.
