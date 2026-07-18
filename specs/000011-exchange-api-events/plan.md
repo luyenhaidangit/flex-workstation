@@ -1,217 +1,273 @@
-# Kế hoạch triển khai: Exchange API và nhật ký sự kiện
+# Kế hoạch triển khai: Exchange API và nhật ký sự kiện (FlexSim MVP 02)
 
 **Branch**: `000011-exchange-api-events` | **Ngày**: 2026-07-18 | **Đặc tả**: [spec.md](spec.md)
 
 **Đầu vào**: Đặc tả tính năng từ `specs/000011-exchange-api-events/spec.md`
 
+---
+
 ## Tóm tắt
 
-**Yêu cầu chính từ spec**: Mở rộng matching engine MVP 01 thành contract dịch vụ có thể đặt/hủy lệnh, tra cứu trạng thái theo `OrderId`, order book, trade tape và lịch sử event theo order; bổ sung event metadata (`EventId`, logical `OccurredAt`, `CorrelationId`) mà không làm thay đổi quy tắc matching hoặc route hiện có.
+**Yêu cầu chính từ spec**: Đưa matching engine của MVP 01 thành dịch vụ có thể gọi, quan sát và replay ở mức cơ bản: Gateway tra cứu trạng thái lệnh theo `OrderId` (FR-007), xem trade tape (FR-009), xem lịch sử sự kiện theo lệnh với correlationId (FR-010); hủy lệnh kiểm tra quyền sở hữu BrokerId (FR-006); tính xác định MVP 01 được giữ nguyên (FR-011, BR-002).
 
-**Hướng tiếp cận kỹ thuật dự kiến**: Giữ `Domain → Application → Api`, mở rộng engine bằng immutable state/read methods, đặt mapping và HTTP contract ở Application/Api, serialize command/read bằng lock hiện có, không thêm database. Các event sequence và logical timestamp là canonical deterministic values; request correlation được truyền từ boundary khi có.
+**Hướng tiếp cận kỹ thuật dự kiến**: Mở rộng `flex-exchange-service` trong cùng repo: bổ sung ba endpoint mới (`GET /api/orders/{orderId}`, `GET /api/trades`, `GET /api/orders/{orderId}/events`), thêm order index vào `MatchingEngine` cho O(1) lookup, kiểm tra BrokerId ownership trong `CancelOrder`, làm giàu event (correlationId, timestamp, EventSequence làm EventId) ở lớp Application.
 
-**Kết quả sau research**: Đã chốt in-memory read models, additive HTTP compatibility, deterministic event metadata, không custom correlation middleware, không idempotency cho retry `PlaceOrder` trong MVP.
+**Kết quả sau research**: Đã resolve tất cả câu hỏi kỹ thuật (xem phần TQ bên dưới). Matching rules MVP 01 giữ nguyên hoàn toàn; mọi thay đổi là additive — không break contract MVP 01.
+
+---
 
 ## Phạm vi kỹ thuật
 
 **Trong phạm vi**:
-
-- `flex-exchange-service/src/Flex.Exchange.Domain`: event metadata, trạng thái/lookup order, trade collection và event correlation.
-- `flex-exchange-service/src/Flex.Exchange.Application`: immutable contracts, command/query methods và mapping Domain → contract.
-- `flex-exchange-service/src/Flex.Exchange.Api`: endpoints tra cứu order/trades/events, request correlation và Problem Details contract.
-- `flex-exchange-service/tests`: domain unit, API integration, JSON contract và deterministic replay tests.
-- `specs/000011-exchange-api-events/contracts`, quickstart và manual smoke flow.
+- Repo `flex-exchange-service`: thêm endpoint `GET /api/orders/{orderId}`, `GET /api/trades`, `GET /api/orders/{orderId}/events`
+- `MatchingEngine`: thêm `_orderIndex` (`Dictionary<long, Order>`) để tra cứu mọi lệnh đã chấp nhận; mở rộng `CancelOrder` kiểm tra BrokerId ownership → `RejectReason.BrokerMismatch`
+- Application layer (`ExchangeService`): thêm enriched event store với `CorrelationId` (từ `X-Correlation-Id` header) và `RecordedAt` (wall-clock tại thời điểm lệnh được xử lý); `MatchingEngine.EventLog` trở thành internal
+- Cập nhật `Flex.Exchange.http` với 3 nhóm kịch bản mới (nhóm 9-11); bổ sung acceptance test cho MVP 02 behavior
 
 **Ngoài phạm vi kỹ thuật**:
+- Không thay đổi quy tắc khớp, ưu tiên giá-thời gian, tính xác định của engine (BR-002, MVP-004)
+- Không database nghiệp vụ, không lưu trữ bền vững (in-memory như MVP 01)
+- Không WebSocket/SSE, không push sự kiện realtime (MVP 03)
+- Không xác thực, không phân quyền, không đa broker, không đa tenant (MVP 06)
+- Không kiểm tra số dư, margin, settlement (MVP 05+)
+- Không UI, bảng điện (MVP 03)
+- Không sửa repo nào ngoài `flex-exchange-service` và artifact Speckit của feature này
 
-- Database/event store, migration, backfill hoặc durable recovery.
-- UI, WebSocket/realtime push, nhiều broker/tenant, authentication/authorization và pre-trade balance checks.
-- Idempotency/deduplication đầy đủ cho retry đặt lệnh sau timeout.
+---
 
 ## Bối cảnh kỹ thuật
 
-**Ngôn ngữ/Phiên bản**: C# trên .NET 9, nullable và implicit usings bật.
+**Ngôn ngữ/Phiên bản**: C# / .NET 9 (`net9.0`) — đồng bộ MVP 01.
 
-**Service/App liên quan**: `flex-exchange-service`, solution `Flex.Exchange.sln`.
+**Service/App liên quan**: `flex-exchange-service` (repo hiện có từ MVP 01). Pattern không đổi: `Flex.Exchange.Api → Flex.Exchange.Application → Flex.Exchange.Domain ← Flex.Exchange.Infrastructure`.
 
-**Phụ thuộc chính**: ASP.NET Core Web API, xUnit, `WebApplicationFactory`, Serilog, existing `MatchingEngine` và contracts.
+**Phụ thuộc chính**: Như MVP 01 — ASP.NET Core, Serilog.AspNetCore, Swashbuckle.AspNetCore. Thêm `IHttpContextAccessor` (có sẵn trong ASP.NET Core) để đọc `X-Correlation-Id` tại ExchangeService.
 
-**Lưu trữ**: In-memory process state; không có database.
+**Lưu trữ**: Không áp dụng — in-memory; mất khi restart (không đổi từ MVP 01).
 
-**Kiểm thử**: xUnit domain unit/API integration, serialization/contract assertions và `.http` manual smoke.
+**Kiểm thử**: Domain tests, API integration tests (`WebApplicationFactory`), kịch bản `Flex.Exchange.http` — thêm 3 nhóm cho MVP 02.
 
-**Nền tảng chạy**: ASP.NET Core service local/demo; có thể chạy sau reverse proxy nhưng MVP chưa public.
+**Nền tảng chạy**: Kestrel self-host cục bộ, như MVP 01.
 
-**Đơn vị deploy**: `src/Flex.Exchange.Api/Flex.Exchange.Api.csproj` cùng Domain/Application/Infrastructure.
+**Đơn vị deploy**: Không áp dụng — chưa deploy; chạy cục bộ demo.
 
-**Loại project**: Clean Architecture web service.
+**Loại project**: Không đổi — web-service (API host) + domain library + infrastructure + application library.
 
-**Mục tiêu hiệu năng**: Luồng demo đặt hai lệnh và truy vấn kết quả hoàn tất trong ≤ 5 giây, không tính startup.
+**Mục tiêu hiệu năng**: Gateway hoàn tất gửi lệnh + tra cứu trạng thái + trade tape + sự kiện trong ≤ 5 giây, không tính khởi động Kestrel (NFR-001).
 
-**Ràng buộc**: Không làm thay đổi price-time priority, event order, cancellation semantics hay response fields MVP 01.
+**Ràng buộc**: Tính xác định của matching kết quả (order book, trades, EventSequence) PHẢI giữ nguyên. CorrelationId và RecordedAt là metadata presentation — không được dùng làm khóa xác định thứ tự khớp.
 
-**Quy mô/Phạm vi**: Một process, một instrument FXS, một `DemoBroker`/các broker demo, dữ liệu bounded theo phiên chạy.
+**Quy mô/Phạm vi**: 1 mã, 1 broker giả lập, hàng trăm lệnh mỗi kịch bản — quy mô demo.
+
+---
 
 ## Kiểm tra constitution
 
-*GATE: Đạt trước Phase 0 và giữ nguyên sau Phase 1 design.*
-
 | Gate | Trạng thái ban đầu | Trạng thái sau design | Ghi chú |
-|------|--------------------|-----------------------|---------|
-| Spec trước code / source of truth | Pass | Pass | Spec 000011 có trước plan/tasks/code; plan không mở rộng nghiệp vụ |
-| Dependency direction / boundary | Pass | Pass | Domain không phụ thuộc HTTP; Api là composition root |
-| Thay đổi phẫu thuật và đơn giản | Pass | Pass | Tận dụng engine/service/route hiện có, không thêm database hoặc project |
-| API/contract compatibility | Pass | Pass | Field/route hiện có giữ nguyên; additions có contract và regression test |
-| Security và dữ liệu nhạy cảm | Pass có điều kiện | Pass có điều kiện | API chưa auth chỉ local/demo; trước public deployment phải có security MVP sau |
-| Test/observability/release gate | Pass | Pass | Có unit/integration/contract/manual, correlation, health và rollback smoke |
+|------|--------------------|------------------------|---------|
+| Scope Gate | Pass | Pass | Phạm vi khớp MVP-001..005 (spec); không thêm kênh/auth/DB ngoài spec |
+| Traceability Gate | Pass | Pass | Bảng traceability map FR-001..FR-011 sang module/path/test |
+| Test Gate | Pass | Pass | Domain/API tests + kịch bản `.http` nhóm 9-11 cho SC-001..SC-004 |
+| Security Gate | Pass | Pass | API chỉ demo cục bộ (SEC-003); BrokerId ownership kiểm tra tại engine |
+| Compatibility Gate | Pass | Pass | Contract MVP 01 không bị phá vỡ (mở rộng additive, DEC-001) |
+| Observability Gate | Pass | Pass | CorrelationId + RecordedAt + EventSequence đủ để trace và replay một lệnh |
+| Complexity Gate | Pass | Pass | Mở rộng additive trong cùng repo; không thêm datastore/service/process |
+| Release Gate | Không áp dụng | Không áp dụng | Demo cục bộ như MVP 01 |
+
+---
 
 ## Câu hỏi kỹ thuật cần research
 
-- **TQ-001**: Làm thế nào vừa cung cấp event time/correlation vừa giữ replay deterministic?
-- **TQ-002**: Read model/status/trade lookup nên đặt ở boundary nào để không làm lộ mutable Domain state?
-- **TQ-003**: Bổ sung query contract thế nào để không phá các route và response MVP 01?
+- **TQ-001**: Lưu trữ order state cho lookup ở đâu khi MVP 01 đã loại Filled/Cancelled khỏi `OrderBook` (T051)? → Resolve: thêm `_orderIndex: Dictionary<long, Order>` vào `MatchingEngine` — theo dõi mọi lệnh được chấp nhận (DEC-002).
+- **TQ-002**: Trade tape lấy từ đâu? → Resolve: project từ enriched event store (lọc `TradeExecuted`). Không cần cấu trúc riêng (DEC-003).
+- **TQ-003**: CorrelationId và RecordedAt tích hợp vào Domain hay Application? → Resolve: Application layer giữ Domain thuần; `ExchangeService` làm giàu events trước khi lưu vào enriched store (DEC-004).
+- **TQ-004**: EventId — dùng GUID hay EventSequence? → Resolve: EventSequence đã là định danh duy nhất và xác định; không thêm GUID tránh vi phạm tính xác định (DEC-005).
+- **TQ-005**: Tính xác định với metadata mới? → Resolve: assertion determinism chỉ so sánh trường nghiệp vụ (EventSequence, BrokerId, OrderId, Price...); CorrelationId và RecordedAt ngoài phạm vi so sánh (DEC-006).
+- **TQ-006**: BrokerId ownership cho CancelOrder — Domain hay Application? → Resolve: Domain — đây là quy tắc nghiệp vụ (lệnh của broker nào chỉ broker đó hủy được), không phải auth/HTTP concern (DEC-007).
 
-Các câu hỏi trên đã được resolve trong [research.md](research.md).
+---
 
 ## Thiết kế tổng quan
 
 **Luồng chính**:
-
-1. Api nhận command, bind/validate payload và lấy `X-Correlation-Id` hoặc deterministic fallback.
-2. Application đưa command cùng correlation vào `ExchangeService`; service lock engine và gọi Domain validator/matching/cancel.
-3. Domain append event/order/trade state với sequence, event metadata và logical timestamp deterministic.
-4. Application map kết quả thành immutable response/read model; Api trả response additive, Problem Details khi lỗi bất ngờ.
-5. Query endpoint lock cùng gate, lấy bản copy status/trades/events/snapshot và filter theo `OrderId`/`BrokerId` trước khi trả.
+1. Gateway gửi `POST /api/orders` hoặc `DELETE /api/orders/{orderId}` với `X-Correlation-Id` header tùy chọn; nếu thiếu, middleware tự sinh.
+2. `OrdersController` chuyển request sang `ExchangeService`; `ExchangeService` đọc `X-Correlation-Id` từ `IHttpContextAccessor`.
+3. `ExchangeService` tạo command (`PlaceOrder`/`CancelOrder`) → gọi `MatchingEngine` (serialize bằng lock như MVP 01) → nhận domain events.
+4. `ExchangeService` làm giàu mỗi domain event thành `EnrichedEvent { DomainEvent, CorrelationId, RecordedAt }` → append vào `_enrichedEventLog` (in-memory, append-only).
+5. Controller trả response: kết quả chấp nhận/từ chối + danh sách events đã làm giàu.
+6. `GET /api/orders/{orderId}` → `ExchangeService.GetOrder(orderId)` → tra `MatchingEngine._orderIndex` → trả `OrderResponse`.
+7. `GET /api/trades` → `ExchangeService.GetTradeTape()` → lọc `_enrichedEventLog` lấy `TradeExecuted` → trả danh sách giao dịch.
+8. `GET /api/orders/{orderId}/events` → `ExchangeService.GetOrderEvents(orderId)` → lọc `_enrichedEventLog` theo OrderId → trả sự kiện liên quan.
 
 **Component/module tham gia**:
-
-- `Flex.Exchange.Domain/Matching/MatchingEngine.cs`: command processing, state transition, event/trade/order lookup.
-- `Flex.Exchange.Domain/Events/*`: event metadata và type-specific payload.
-- `Flex.Exchange.Application/Contracts/ExchangeContracts.cs`: public application read/command contracts.
-- `Flex.Exchange.Application/Services/ExchangeService.cs`: serialization, mapping, logging, correlation propagation.
-- `Flex.Exchange.Api/Controllers/*`: HTTP binding, status/response mapping và query endpoints.
-- `Flex.Exchange.Api/RequestContext/*` hoặc request boundary helper: correlation extraction; không tạo custom correlation middleware.
-- `tests/Flex.Exchange.Domain.Tests` và `tests/Flex.Exchange.Api.Tests`: regression/contract proof.
+- `src/Flex.Exchange.Domain`:
+  - `Entities/Order.cs` — không đổi logic; `_orderIndex` lưu trực tiếp tham chiếu `Order` object
+  - `Matching/MatchingEngine.cs` — thêm `_orderIndex`; thêm `GetOrder(orderId)` API; mở rộng `CancelOrder` validate BrokerId ownership; domain events không đổi cấu trúc
+  - `Enums/RejectReason.cs` — thêm `BrokerMismatch`
+- `src/Flex.Exchange.Application`:
+  - Thêm `EnrichedEvent` record (wraps `ExchangeEvent` + `CorrelationId` + `RecordedAt`)
+  - `IExchangeService` + `ExchangeService` — thêm `_enrichedEventLog`; thêm `GetOrder`, `GetTradeTape`, `GetOrderEvents`; inject `IHttpContextAccessor`; đọc correlation ID từ header
+- `src/Flex.Exchange.Api`:
+  - `Controllers/OrdersController.cs` — thêm `GET /api/orders/{orderId}`, `GET /api/orders/{orderId}/events`
+  - Thêm `Controllers/TradesController.cs` — `GET /api/trades`
+  - `Models/` — thêm `OrderResponse`, `OrderEventResponse`, `TradeResponse`
 
 **Điểm mở rộng/thay đổi chính**:
-
-- Bổ sung event metadata và correlation vào Domain/Application contracts.
-- Bổ sung `GetOrder`, `GetOrderEvents`, `GetTrades` qua Application service.
-- Bổ sung `GET /api/orders/{orderId}`, `GET /api/orders/{orderId}/events`, `GET /api/trades`; giữ route cũ.
-- Bổ sung tests và cập nhật `.http`/Swagger contract.
+- `_enrichedEventLog` (Application layer) thay thế việc đọc trực tiếp `MatchingEngine.EventLog` trong `GET /api/events`; `MatchingEngine.EventLog` trở thành internal audit.
+- `_orderIndex` (Domain) làm seam cho MVP 06 khi có đa broker: mọi lookup đã đi qua một điểm.
 
 **Luồng thay thế/lỗi chính**:
+- `GET /api/orders/{orderId}` với OrderId không tồn tại → HTTP 404 (không phải business reject 200, vì đây là tra cứu tài nguyên).
+- `DELETE` với BrokerId khác chủ lệnh → HTTP 200 business reject `BrokerMismatch`, không đổi order book (AC-005).
+- `GET /api/orders/{orderId}/events` với OrderId không tồn tại → HTTP 404.
+- Yêu cầu lỗi MVP 01 (thiếu BrokerId, lệnh sai quy tắc, hủy lệnh không tồn tại) → giống MVP 01; event từ chối vẫn được append vào `_enrichedEventLog`.
 
-- Thiếu/sai `BrokerId`, invalid order hoặc broker mismatch trả business rejection, không mutate state.
-- Unexpected exception đi qua `GlobalExceptionHandler`, trả Problem Details có correlation an toàn.
-- Timeout sau khi command có thể đã xử lý không tự động replay; Gateway phải query correlation/order trước khi retry.
+**Thay đổi boundary giữa service/module**:
+- `ExchangeService` nay inject `IHttpContextAccessor` — cần đăng ký `AddHttpContextAccessor()` trong DI.
+- `MatchingEngine.EventLog` (public property) trở thành implementation detail; `ExchangeService` không expose trực tiếp mà dùng `_enrichedEventLog`.
 
-**Thay đổi boundary giữa service/module**: Không có service-to-service integration. HTTP Api contract mới là boundary public của Exchange; Domain/Application không tham chiếu ASP.NET Core.
+**Idempotency/Concurrency**:
+- Như MVP 01: lock trong `ExchangeService` serialize mọi thao tác ghi và đọc `_orderIndex`/`_enrichedEventLog`.
+- `GetOrder`, `GetTradeTape`, `GetOrderEvents` đọc dưới lock để nhất quán.
 
-**Idempotency/Concurrency**: Mọi command và state read tiếp tục dùng một lock tại `ExchangeService`; retry `PlaceOrder` là command mới, không deduplicate. Cancel lặp lại không có side effect.
+---
 
 ## Traceability từ spec sang thiết kế kỹ thuật
 
 | Spec ID | Ưu tiên | Trạng thái | Hướng xử lý kỹ thuật | Module/Path dự kiến | API/Contract | Data/Entity | Kiểm thử |
 |---------|---------|------------|----------------------|---------------------|--------------|-------------|----------|
-| US-001 / FR-001–FR-004 | P1 | Đủ rõ | Giữ command flow hiện tại, truyền correlation và mở rộng result metadata; rejection không mutate | `Domain/Matching`, `Application/Services`, `Api/Controllers/OrdersController` | `POST /api/orders` additive | `Order`, `ExchangeEvent` | Domain + API integration |
-| US-002 / FR-005–FR-007 | P1 | Đủ rõ | Engine lưu/lookup order history; Application map status; Api thêm status query và giữ cancel contract | `Domain/Matching/MatchingEngine`, `Application/Contracts`, `Api/Controllers/OrdersController` | `DELETE /api/orders/{id}`, `GET /api/orders/{id}` | `OrderStatusView` | Domain state + API contract |
-| US-003 / FR-008 | P1 | Đủ rõ | Dùng snapshot copy hiện có, filter order còn active | `Domain/Entities/OrderBook`, `Application/Services` | `GET /api/orderbook` | `OrderBookSnapshot` | API regression |
-| US-003 / FR-009 | P1 | Đủ rõ | Giữ trade append order và expose read-only tape | `Domain/Matching`, `Application/Services` | `GET /api/trades` | `TradeTapeEntry` | Domain/API integration |
-| US-003 / FR-010 | P1 | Đủ rõ | Event metadata deterministic, filter per order và global history additive | `Domain/Events`, `Application/Contracts`, `Api/Controllers/EventsController` | `GET /api/events`, `GET /api/orders/{id}/events` | `ExchangeEvent` | JSON contract/correlation |
-| US-003 / FR-011 | P1 | Đủ rõ | Sequence/logical timestamp/fallback correlation deterministic; giữ lock | `Domain/Matching`, `Application/Services` | Event contract | In-memory sequence state | Replay regression |
-| BR-001–BR-005 / SEC-001–SEC-003 | P1 | Đủ rõ | Validate broker, filter access, không log secret; local-only security boundary | `OrderValidator`, Api boundary, logging | Command/event metadata | `BrokerId`, correlation | Negative/security smoke |
-| NFR-001–NFR-003 | P1 | Đủ rõ | Bounded in-memory flow, Problem Details, structured correlation logs | Api/Application/tests | Error/health contract | Không thêm persistence | Timed integration + log smoke |
+| US-001 / FR-001 | P1 | Đủ rõ | PlaceOrder — tái dùng nguyên vẹn từ MVP 01 | `MatchingEngine.PlaceOrder`, `OrdersController` | `POST /api/orders` | `Order`, events | kịch bản `.http` nhóm 1-2 (reuse) |
+| US-001 / FR-002 | P1 | Đủ rõ | Response chấp nhận trả `OrderId` + trạng thái; từ chối trả lý do — shape MVP 01 đã đủ | `ExchangeService`, `OrdersController` | `POST /api/orders` response | `PlaceOrderResponse` | AC-001, AC-002 |
+| US-001 / FR-003 | P1 | Đủ rõ | Trades trong kết quả đặt lệnh — qua `PlaceOrderResponse.Events` (TradeExecuted); bổ sung `TradeIds` summary | `ExchangeService.PlaceOrder`, `PlaceOrderResponse` | `POST /api/orders` response | `EnrichedEvent` | AC-003 |
+| US-001 / FR-004 | P1 | Đủ rõ | Lệnh bị từ chối không đổi order book — bảo đảm từ MVP 01 (engine invariant) | `MatchingEngine.OrderValidator` | Không áp dụng | order book | AC-002 |
+| US-002 / FR-005 | P1 | Đủ rõ | Hủy lệnh — tái dùng logic từ MVP 01 | `MatchingEngine.CancelOrder`, `OrdersController` | `DELETE /api/orders/{orderId}` | `Order` (`Cancelled`) | AC-004 |
+| US-002 / FR-006 | P1 | Đủ rõ | BrokerId ownership: `_orderIndex[orderId].BrokerId ≠ command.BrokerId` → business reject `BrokerMismatch`; order book không đổi | `MatchingEngine.CancelOrder`, `RejectReason.BrokerMismatch` | `DELETE` response `reason: BrokerMismatch` | `RejectReason` enum | AC-005 |
+| US-002 / FR-007 | P1 | Đủ rõ | Order lookup: `MatchingEngine.GetOrder(orderId)` từ `_orderIndex` → trả OrderResponse | `MatchingEngine._orderIndex`, `ExchangeService.GetOrder`, `OrdersController` | `GET /api/orders/{orderId}` | `Order` entity | AC-006 |
+| US-003 / FR-008 | P1 | Đủ rõ | Snapshot order book — tái dùng từ MVP 01 (`GET /api/orderbook`) | `OrderBookController` | `GET /api/orderbook` | `OrderBookSnapshot` | AC-007 |
+| US-003 / FR-009 | P1 | Đủ rõ | Trade tape: lọc `_enrichedEventLog` lấy `TradeExecuted` events, project thành `TradeResponse` | `ExchangeService.GetTradeTape`, `TradesController` | `GET /api/trades` | `EnrichedEvent` (TradeExecuted) | AC-008 |
+| US-003 / FR-010 | P1 | Đủ rõ | Event history by order: lọc `_enrichedEventLog` theo OrderId; mỗi event có `EventSequence`, `RecordedAt`, `BrokerId`, `CorrelationId` | `ExchangeService.GetOrderEvents`, `OrdersController` | `GET /api/orders/{orderId}/events` | `EnrichedEvent` | AC-009 |
+| FR-011 | P1 | Đủ rõ | Determinism: matching outcome (EventSequence, trades, order book) xác định; CorrelationId/RecordedAt ngoài phạm vi determinism assertion (DEC-006) | `MatchingEngine` — không đổi | Guarantee trong contract | Business fields only | SC-004 |
+
+---
 
 ## Phân tích tác động
 
 | Khu vực | Tác động dự kiến | Tương thích ngược/Rủi ro | Cách kiểm tra |
 |---------|------------------|--------------------------|---------------|
-| Database/Migration | Không áp dụng; chỉ in-memory | Không có dữ liệu cần migrate; mất state khi restart là constraint | Xác nhận không thêm package/schema; restart smoke |
-| API/Contract | Additive event fields và 3 query endpoints; route cũ giữ nguyên | Client deserialize strict có thể bị ảnh hưởng bởi field mới; contract test và tài liệu hóa | API integration + JSON snapshots |
-| Permission/Security | Chưa có auth; broker filter cho lookup/cancel theo `BrokerId` | Không được public deploy trước auth; test broker mismatch không lộ data | Negative API tests + launch config review |
-| Logging/Audit | Event history và structured logs có correlation/event/order ids | Không log token/secret; logical time cần giải thích rõ | Log assertion/redaction review |
-| UI/UX | Không áp dụng; chỉ Gateway/Swagger/.http | Không có UI consumer trong MVP | Manual API smoke |
-| Job/Worker/Integration | Không áp dụng; không có async worker/broker | Timeout retry không idempotent | Contract ghi rõ, test repeated cancel |
+| Database/Migration | Không áp dụng — in-memory | Không áp dụng | Không áp dụng |
+| API/Contract | 3 endpoint mới; `DELETE` thêm reject reason `BrokerMismatch`; event response thêm `correlationId`/`recordedAt` — additive | Consumer MVP 01 không expect field mới — backward compatible (field thêm không phá JSON consumer cũ) | Chạy lại 8 kịch bản `.http` MVP 01 sau khi bổ sung MVP 02 |
+| Permission/Security | Không áp dụng — API demo cục bộ (SEC-003) | Rủi ro nếu deploy công khai — bị cấm | Kiểm tra launch profile không expose ngoài localhost |
+| Logging/Audit | `_enrichedEventLog` là audit nghiệp vụ đầy đủ (correlationId, timestamp, EventSequence) | Thiếu truy vết nếu correlation không truyền → middleware tự sinh (acceptable) | Soi `GET /api/orders/{orderId}/events` sau mỗi lệnh trong `.http` |
+| UI/UX | Không áp dụng — Swagger và `.http` là bề mặt demo | Không áp dụng | Mở Swagger, chạy kịch bản |
+| Job/Worker/Integration | Không áp dụng | Không áp dụng | Không áp dụng |
+
+---
 
 ## API/Contract Detail
 
-**Có thay đổi contract không**: Có, additive.
+**Có thay đổi contract không**: Có — mở rộng additive (3 endpoint mới, 1 reject reason mới, 2 field metadata mới). Contract MVP 01 không bị phá vỡ.
 
 | Contract | Loại | Thay đổi | Backward compatible | Consumer bị ảnh hưởng |
 |----------|------|----------|---------------------|------------------------|
-| `POST /api/orders` | API | Giữ wrapper/fields cũ; events có metadata mới | Có | Gateway demo, `.http`, API tests |
-| `DELETE /api/orders/{orderId}` | API | Giữ cancel response; correlation/events bổ sung | Có | Gateway demo |
-| `GET /api/orders/{orderId}` | API | Mới: order status lookup | Có | Gateway/operator mới |
-| `GET /api/orders/{orderId}/events` | API | Mới: per-order event history | Có | Gateway/operator mới |
-| `GET /api/orderbook` | API | Giữ snapshot; chỉ bổ sung metadata nếu cần | Có | Existing tests/clients |
-| `GET /api/trades` | API | Mới: ordered trade tape | Có | Gateway/operator mới |
-| `GET /api/events` | API | Giữ route; event metadata additive | Có | Existing tests/clients |
-| `ExchangeEvent` | In-process/public JSON | EventId/time/correlation/broker/type fields bắt buộc | Additive | Api/Application/tests |
+| `GET /api/orders/{orderId}` | REST API | Mới | Không áp dụng | `.http`/Swagger demo; MVP 06 đa broker |
+| `GET /api/trades` | REST API | Mới | Không áp dụng | `.http`/Swagger demo; MVP 03 bảng điện (tương lai) |
+| `GET /api/orders/{orderId}/events` | REST API | Mới | Không áp dụng | `.http`/Swagger demo |
+| `DELETE /api/orders/{orderId}` | REST API | Mở rộng: thêm `BrokerMismatch` | Backward compatible (field mới trong enum) | `.http`/Swagger demo |
+| Event response (trong `PlaceOrder`/`Cancel` response và `GET /api/events`) | Response schema | Thêm `correlationId` (string?), `recordedAt` (DateTimeOffset?) | Backward compatible (field mới trong JSON) | Consumer `.http`/Swagger |
+
+### Payload endpoint mới
+
+**`GET /api/orders/{orderId}`** — HTTP 200 hoặc 404:
+```json
+{
+  "orderId": 1,
+  "brokerId": "DemoBroker",
+  "symbol": "FXS",
+  "side": "Buy",
+  "price": 20000,
+  "originalQuantity": 200,
+  "remainingQuantity": 100,
+  "status": "PartiallyFilled",
+  "tradeIds": [1]
+}
+```
+
+**`GET /api/trades`** — HTTP 200:
+```json
+[
+  {
+    "tradeId": 1,
+    "symbol": "FXS",
+    "buyOrderId": 2,
+    "sellOrderId": 1,
+    "price": 20000,
+    "quantity": 100,
+    "executedSequence": 1,
+    "correlationId": "abc-123",
+    "recordedAt": "2026-07-18T10:00:00Z"
+  }
+]
+```
+
+**`GET /api/orders/{orderId}/events`** — HTTP 200 hoặc 404: danh sách enriched events của lệnh (OrderAccepted, TradeExecuted liên quan, OrderCancelled nếu hủy).
+
+---
 
 ## Permission Matrix
 
-| Vai trò/Scope | Xem | Tạo | Sửa | Xóa | Duyệt/Xử lý | Ghi chú |
-|---------------|-----|-----|-----|-----|-------------|---------|
-| `DemoBroker` + matching `BrokerId` | Order của mình, global demo snapshot/tape theo local policy | Đặt lệnh | Không áp dụng | Hủy order còn chờ của mình | Không áp dụng | Chưa có authentication |
-| Broker khác `BrokerId` | Không xem chi tiết order của broker khác | Đặt command riêng | Không áp dụng | Không được hủy | Không áp dụng | Trả not-found an toàn |
-| Operator local demo | Xem diagnostics/demo data | Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng | Chỉ local, auth thuộc MVP sau |
+Không áp dụng — một `DemoBroker`, API demo cục bộ không xác thực. BrokerId trong cancel là nhận dạng nghiệp vụ, không phải cơ chế auth (như MVP 01, SEC-001).
+
+---
 
 ## Dữ liệu & Migration
 
-**Có thay đổi dữ liệu/schema không**: Không áp dụng — không có database.
+**Có thay đổi dữ liệu/schema không**: Không áp dụng — in-memory, không schema.
 
-**Migration**: Không áp dụng.
+**Migration/Backfill/Tương thích/Rủi ro/Cách xác minh**: Không áp dụng.
 
-**Backfill/Cleanup**: Không áp dụng.
-
-**Tương thích dữ liệu cũ**: Event/order state chỉ tồn tại trong process; state cũ không được restore sau restart.
-
-**Rủi ro dữ liệu**: Event metadata mới phải được tạo cho mọi event; thiếu metadata làm hỏng contract/replay.
-
-**Cách xác minh**: Domain tests assert mọi event type có metadata; API tests assert JSON fields và deterministic projection.
+---
 
 ## Quyết định kỹ thuật
 
 | Quyết định | Lựa chọn | Lý do chọn | Phương án đã loại | Lý do loại |
 |------------|----------|------------|-------------------|------------|
-| DEC-001 | Mở rộng engine và application read models, không thêm DB | Đúng scope, giữ deterministic và đơn giản | Repository/DB/event store | Ngoài MVP, tăng vận hành |
-| DEC-002 | EventId/logical time deterministic theo sequence | Vừa đáp ứng metadata vừa replay được | Guid + UTC now | Làm stream không deterministic |
-| DEC-003 | Correlation lấy request value, fallback deterministic; Activity chỉ diagnostics | Không custom middleware, vẫn truy vết request | Random trace id làm event key | Không tái lập |
-| DEC-004 | Additive contract, giữ route/wrapper MVP 01 | Bảo vệ consumer hiện tại | Version/breaking rewrite | Không cần cho MVP |
-| DEC-005 | Một lock tại `ExchangeService` cho command/read | Bảo toàn ordering với in-memory singleton | Concurrent mutation/async queue | Tăng race và scope |
-| DEC-006 | Query status/tape/history bằng immutable DTO | Không lộ mutable domain state | Trả trực tiếp entity | Coupling và risk mutation |
+| DEC-001 | Contract MVP 01 (4 endpoint, event shape) giữ nguyên; MVP 02 là extension additive | FR-011 + BR-002: không được phá contract MVP 01; consumer `.http` hiện hành phải pass không sửa | Thay thế endpoint MVP 01 | Rủi ro regression; vi phạm BR-002 |
+| DEC-002 | Thêm `_orderIndex: Dictionary<long, Order>` vào `MatchingEngine` | O(1) lookup; engine tự quản order lifecycle; sạch hơn scan EventLog O(n) | (a) Scan EventLog; (b) Lưu ở Application | (a) O(n) tạo pattern xấu khi scale; (b) domain logic rò rỉ ra Application |
+| DEC-003 | Trade tape = project từ `_enrichedEventLog` (lọc `TradeExecuted`) | Không nhân đôi storage; `TradeExecuted` đã có đủ thông tin đối chiếu | `List<Trade> TradeTape` riêng trong engine | Trùng lặp data; engine biết quá nhiều về presentation |
+| DEC-004 | CorrelationId và RecordedAt ở Application layer (`EnrichedEvent`); Domain events không thay đổi | Giữ Domain thuần (không phụ thuộc HTTP/request context); dễ test Domain độc lập | Truyền correlationId vào Domain event | Coupling HTTP concept vào Domain; làm phức tạp unit test engine |
+| DEC-005 | EventId = `EventSequence` (long) — không thêm GUID | EventSequence đã là định danh duy nhất và xác định; GUID ngẫu nhiên vi phạm FR-011 | GUID riêng | Phá tính xác định; complexity không cần thiết |
+| DEC-006 | Determinism test assert chỉ business fields (EventSequence, OrderId, Price, Quantity, BrokerId, Symbol); không assert CorrelationId và RecordedAt | CorrelationId phụ thuộc HTTP header; RecordedAt là wall-clock — cả hai không ảnh hưởng tính đúng của matching | Assert toàn bộ event object | Test sẽ fail khi replay với timestamp/correlationId khác dù matching hoàn toàn đúng |
+| DEC-007 | BrokerId ownership check trong `MatchingEngine.CancelOrder` (Domain) | Quy tắc nghiệp vụ: lệnh của broker nào chỉ broker đó hủy được; không phải auth HTTP; cần test ở Domain level | Application/Controller | Engine có thể bị gọi trực tiếp với lệnh không hợp lệ; vi phạm domain invariant |
+| DEC-008 | `GET /api/events` đọc từ `_enrichedEventLog` (Application) thay vì `MatchingEngine.EventLog` | Enriched events có đầy đủ correlationId/timestamp; nhất quán với `GET /api/orders/{orderId}/events` | Giữ đọc `MatchingEngine.EventLog` | Trả events thiếu correlationId/timestamp, vi phạm FR-010 |
+
+---
 
 ## Chiến lược kiểm thử
 
-**Unit test**:
+**Unit test** (`Flex.Exchange.Domain.Tests`):
+- `MatchingEngine._orderIndex` có đầy đủ orders đã chấp nhận sau mỗi command.
+- `CancelOrder` trả `BrokerMismatch` khi BrokerId không khớp; order book không đổi.
+- `GetOrder(orderId)` trả đúng trạng thái order sau fill/cancel.
 
-- Event metadata/event sequence/logical timestamp cho accepted, rejected, trade, cancelled.
-- Order status transitions, broker match, order lookup, trade tape ordering và event filtering.
-- Deterministic replay projection và rejection không side effect.
+**Integration test** (`Flex.Exchange.Api.Tests` — `WebApplicationFactory`):
+- Đặt hai lệnh đối ứng → `GET /api/orders/{orderId}` trả đúng trạng thái; `GET /api/trades` trả đúng trade; `GET /api/orders/{orderId}/events` trả đúng sự kiện với correlationId.
+- `DELETE` với BrokerId khác chủ lệnh → reject `BrokerMismatch`, order book không đổi.
+- `GET /api/orders/{orderId}` với OrderId không tồn tại → 404.
+- Chạy lại cùng kịch bản hai lần → business fields giống nhau 100% (CorrelationId/RecordedAt ngoài phạm vi so sánh — DEC-006, SC-004).
+- Tám nhóm kịch bản MVP 01 vẫn pass sau thay đổi (regression).
 
-**Integration test**:
+**Contract test**: Response shape của 3 endpoint mới khớp API/Contract Detail. `GET /api/events` vẫn trả kết quả đúng sau khi đổi source sang `_enrichedEventLog`.
 
-- `WebApplicationFactory` cho place/cancel/status/orderbook/trades/events, Problem Details và health.
-- Correlation header propagation/fallback, malformed payload và broker mismatch.
+**Permission/security test**: Không áp dụng.
 
-**Contract test**:
+**E2E/manual test** — 3 nhóm kịch bản mới trong `Flex.Exchange.http` (bổ sung vào 8 nhóm MVP 01):
+- **Nhóm 9**: Tra cứu lệnh — đặt hai lệnh đối ứng, lấy `OrderId`, tra cứu trạng thái lệnh (AC-006).
+- **Nhóm 10**: Trade tape và sự kiện — xem `GET /api/trades` + `GET /api/orders/{orderId}/events`; đối chiếu correlationId xuyên event và request (AC-008, AC-009).
+- **Nhóm 11**: BrokerId mismatch — hủy lệnh của broker A bằng broker B; xác nhận reject + book bất biến (AC-005).
 
-- JSON property names, additive response fields, event type payload và backward assertions cho existing routes.
-- OpenAPI/Swagger endpoint presence cho query routes.
+**Regression test**: Toàn bộ 8 nhóm kịch bản MVP 01 phải pass không sửa sau khi bổ sung MVP 02.
 
-**Permission/security test**:
-
-- Broker A không hủy/tra cứu chi tiết order của Broker B.
-- Không có token/secret trong event/log/problem response; xác nhận API chỉ local theo deployment config.
-
-**E2E/manual test**:
-
-- Hai lệnh đối ứng, partial/rejection/cancel, query order/trades/history theo [quickstart.md](quickstart.md) và `.http`.
-
-**Regression test**:
-
-- Chạy toàn bộ tests MVP 01 hiện có và deterministic scenario sau restart; so sánh snapshot/trade/event sequence.
+---
 
 ## Cấu trúc project
 
@@ -219,102 +275,96 @@ Các câu hỏi trên đã được resolve trong [research.md](research.md).
 
 ```text
 specs/000011-exchange-api-events/
-├── spec.md
-├── plan.md
-├── research.md
-├── data-model.md
-├── quickstart.md
-├── contracts/exchange-api.md
-└── checklists/requirements.md
+├── plan.md              # File này
+├── checklists/
+│   └── requirements.md
+└── tasks.md             # Output /speckit-tasks — bước tiếp theo
 ```
 
-### Source code (repository root)
+### Source code (`flex-exchange-service/`)
 
 ```text
 flex-exchange-service/
 ├── src/
 │   ├── Flex.Exchange.Domain/
-│   │   ├── Entities/{Order,Trade,OrderBook,OrderBookSnapshot}.cs
-│   │   ├── Events/{ExchangeEvent,OrderAccepted,OrderRejected,TradeExecuted,OrderCancelled}.cs
-│   │   └── Matching/MatchingEngine.cs
+│   │   ├── Entities/Order.cs              # Không đổi matching logic
+│   │   ├── Enums/RejectReason.cs          # + BrokerMismatch
+│   │   └── Matching/MatchingEngine.cs     # + _orderIndex: Dictionary<long,Order>
+│   │                                      # + GetOrder(orderId): Order?
+│   │                                      # CancelOrder: + BrokerMismatch check
 │   ├── Flex.Exchange.Application/
-│   │   ├── Contracts/ExchangeContracts.cs
-│   │   └── Services/{IExchangeService,ExchangeService}.cs
+│   │   ├── EnrichedEvent.cs               # record: DomainEvent + CorrelationId + RecordedAt
+│   │   ├── Interfaces/IExchangeService.cs # + GetOrder, GetTradeTape, GetOrderEvents
+│   │   └── ExchangeService.cs             # + _enrichedEventLog; + IHttpContextAccessor
+│   │                                      # + 3 new methods; GET /api/events từ _enrichedEventLog
 │   └── Flex.Exchange.Api/
-│       ├── Controllers/{OrdersController,OrderBookController,EventsController,TradesController}.cs
-│       ├── RequestContext/
-│       ├── ExceptionHandling/GlobalExceptionHandler.cs
-│       └── Flex.Exchange.http
+│       ├── Controllers/OrdersController.cs  # + GET /api/orders/{orderId}
+│       │                                    # + GET /api/orders/{orderId}/events
+│       ├── Controllers/TradesController.cs  # Mới: GET /api/trades
+│       └── Models/
+│           ├── OrderResponse.cs             # Mới
+│           ├── OrderEventResponse.cs        # Mới
+│           └── TradeResponse.cs             # Mới
 └── tests/
-    ├── Flex.Exchange.Domain.Tests/MatchingEngineTests.cs
-    └── Flex.Exchange.Api.Tests/{MvpAcceptanceTests,OrdersApiTests}.cs
+    ├── Flex.Exchange.Domain.Tests/          # + test _orderIndex, BrokerMismatch, GetOrder
+    └── Flex.Exchange.Api.Tests/             # + acceptance tests MVP 02 (nhóm 9-11)
 ```
 
-**Quyết định cấu trúc**: Giữ solution 4 production projects và 2 test projects hiện tại; chỉ mở rộng module sở hữu contract, không tạo project mới.
+**Quyết định cấu trúc**: Mở rộng trong cùng project layout MVP 01; không thêm project/layer mới; `EnrichedEvent` đặt trong `Flex.Exchange.Application` (tầng đúng cho presentation enrichment).
+
+---
 
 ## Rollout & Rollback
 
-**Kế hoạch rollout**:
+**Kế hoạch rollout**: Không áp dụng — không deploy; hoàn thành = merge vào `main` của `flex-exchange-service` với kịch bản nhóm 9-11 đạt và 8 nhóm MVP 01 vẫn pass.
 
-1. Build/test solution và contract smoke trong CI/local.
-2. Chạy local demo với API chưa public; so sánh output với MVP 01 baseline.
-3. Deploy cùng service binary/config hiện tại sau khi health và smoke pass.
+**Tương thích ngược**: Contract MVP 01 không bị phá (DEC-001); consumer `.http` hiện hành không cần sửa.
 
-**Tương thích ngược**: Giữ các route, HTTP status và response fields MVP 01; consumer cũ bỏ qua field mới.
+**Feature flag/config**: Không cần — extension additive, hành vi cũ không đổi.
 
-**Feature flag/config**: Không áp dụng; query routes và metadata luôn bật trong MVP.
+**Rollback code/config**: Revert commit/PR — không có state ngoài code.
 
-**Thực thi migration/backfill khi rollout**: Không áp dụng.
+**Rollback dữ liệu/migration**: Không áp dụng.
 
-**Rollback code/config**: Quay về binary MVP 01 nếu contract/query hoặc matching regression; không cần đổi data.
+**Điều kiện kích hoạt rollback**: Không áp dụng — demo cục bộ.
 
-**Rollback dữ liệu/migration**: Không áp dụng; in-memory state bị bỏ khi process restart.
-
-**Điều kiện kích hoạt rollback**: Existing MVP 01 tests fail, event sequence không deterministic, contract smoke fail, hoặc lỗi 5xx/query tăng trong demo.
+---
 
 ## Observability & Debug
 
 **Log cần có**:
+- `ExchangeService`: log command nhận được (type, BrokerId, OrderId khi cancel, CorrelationId) + kết quả.
+- Enriched event append: log EventSequence, CorrelationId, event type.
 
-- `traceId`, `correlationId`, `eventId`, `eventSequence`, `orderId`, `tradeId`, `brokerId`, `operation`, `result`, `reason`, duration.
+**Dữ liệu không được log**: Không áp dụng — toàn bộ giả lập, không credential/PII.
 
-**Dữ liệu không được log**:
+**Metric cần theo dõi**: Không áp dụng ở MVP 02 (không deploy).
 
-- Token, authorization header, secret, connection string và raw sensitive payload.
+**Trace/Correlation**: `CorrelationId` gắn vào mọi enriched event và response; dùng `GET /api/orders/{orderId}/events` để replay đầy đủ diễn biến một lệnh với context request gốc.
 
-**Metric cần theo dõi**:
-
-- Command count/success/rejection, query count, 5xx/429, latency, event count và active order count trong demo.
-
-**Trace/Correlation**:
-
-- Nhận `X-Correlation-Id` tại request boundary; truyền vào application/domain event; enrich Serilog bằng W3C `Activity` trace/span. Fallback canonical correlation deterministic.
-
-**Cách kiểm tra sau release**:
-
-- `/health`, smoke two-order flow, query status/trade/history, kiểm tra event metadata và log correlation.
+**Cách kiểm tra sau release**: Build → run → 8 nhóm `.http` MVP 01 pass → 3 nhóm MVP 02 pass → SC-004 (chạy lại cùng chuỗi lệnh, so sánh business fields).
 
 **Tình huống debug chính**:
+- `GET /api/orders/{orderId}` trả 404 bất ngờ → lệnh bị `OrderRejected` (rejected orders không vào `_orderIndex`).
+- `BrokerMismatch` không mong đợi → kiểm tra BrokerId trong cancel request vs BrokerId khi đặt lệnh.
+- CorrelationId thiếu trong event → kiểm tra `X-Correlation-Id` header có được middleware sinh và `IHttpContextAccessor` đọc đúng.
+- Kết quả matching khác MVP 01 sau thay đổi → scan `_enrichedEventLog` kiểm tra engine không bị sửa.
 
-- Broker mismatch, missing correlation, rejection side effect, wrong passive price, event ordering, partial fill và replay mismatch.
-
-## Theo dõi độ phức tạp
-
-Không có vi phạm constitution cần biện minh. Kế hoạch không thêm project, database, mediator, repository hay custom middleware dùng một lần.
+---
 
 ## Checklist sẵn sàng cho `/speckit-tasks`
 
 - [x] Phạm vi kỹ thuật trong/ngoài phase này đã rõ.
-- [x] Câu hỏi kỹ thuật đã được resolve trong [research.md](research.md).
-- [x] Thiết kế tổng quan đã mô tả luồng, component, điểm thay đổi và boundary.
-- [x] Idempotency/concurrency/retry đã được đánh giá.
-- [x] Mỗi US/FR P1 và security/NFR liên quan có mapping path, contract, data và test.
-- [x] Tác động database, API, permission, logging/audit và integration đã được đánh giá.
-- [x] Contract thay đổi có consumer và compatibility check.
-- [x] Data/migration/backfill/compatibility đã rõ.
-- [x] Quyết định kỹ thuật có lý do và phương án bị loại.
-- [x] Chiến lược test bao phủ unit, integration, contract, security, manual và regression.
-- [x] Rollout, rollback, config và backward compatibility đã rõ.
-- [x] Observability/debug có log field, redaction, metric, trace và smoke check.
-- [x] Cây source code dùng path thật trong repository.
+- [x] Câu hỏi kỹ thuật chặn thiết kế/task generation đã được resolve (TQ-001..TQ-006).
+- [x] Thiết kế tổng quan đã mô tả luồng chính, component/module tham gia, điểm thay đổi và boundary.
+- [x] Các tình huống idempotency/concurrency/retry đã được đánh giá (lock như MVP 01, không thay đổi).
+- [x] Mỗi FR P1 có mapping sang module/path, API/contract, data/entity và kiểm thử.
+- [x] Tác động tới database, API contract, permission, logging/audit và integration đã được đánh giá hoặc ghi `Không áp dụng`.
+- [x] Các contract/API thay đổi đã có consumer bị ảnh hưởng và cách kiểm tra compatibility.
+- [x] Dữ liệu/migration/backfill: Không áp dụng (in-memory như MVP 01).
+- [x] Quyết định kỹ thuật chính (DEC-001..DEC-008) đã có lý do chọn và phương án bị loại.
+- [x] Chiến lược kiểm thử bao phủ Domain, API integration và `.http` nhóm 9-11 + regression 8 nhóm MVP 01.
+- [x] Rollout/rollback: Không áp dụng (demo cục bộ).
+- [x] Observability: CorrelationId + RecordedAt + EventSequence đủ để trace và replay.
+- [x] Cấu trúc source code là path thật trong repo `flex-exchange-service`.
 - [x] Constitution gate không còn blocker.

@@ -8,7 +8,7 @@
 
 **Mục đích**: xác nhận baseline và chuẩn bị cấu trúc test/contract cho thay đổi additive.
 
-- [ ] T001 Xác nhận baseline hiện tại của `flex-exchange-service` bằng `dotnet test Flex.Exchange.sln --configuration Release` trước khi thay đổi source
+- [ ] T001 Xác nhận baseline từ thư mục `flex-exchange-service/` bằng `dotnet test Flex.Exchange.sln --configuration Release` trước khi thay đổi source
 - [ ] T002 [P] Cập nhật fixture HTTP cho luồng MVP 02 trong `flex-exchange-service/src/Flex.Exchange.Api/Flex.Exchange.http`, gồm place/cancel/status/orderbook/trades/events và `X-Correlation-Id`
 - [ ] T003 [P] Bổ sung kiểm tra presence của các route MVP 02 vào `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Contract/ExchangeApiContractTests.cs`
 
@@ -72,7 +72,7 @@
 ### Implementation for User Story 2
 
 - [ ] T019 [US2] Implement order status lookup, broker ownership check và cancel result bất biến trong `flex-exchange-service/src/Flex.Exchange.Domain/Matching/MatchingEngine.cs` (phụ thuộc T007, T017)
-- [ ] T020 [US2] Mở rộng `IExchangeService`/`ExchangeService` với `GetOrder` và cập nhật `CancelOrder` mapping, reason và events trong `flex-exchange-service/src/Flex.Exchange.Application/Services/` (phụ thuộc T009, T019)
+- [ ] T020 [US2] Mở rộng `GetOrder` và contract trong `flex-exchange-service/src/Flex.Exchange.Application/Services/IExchangeService.cs`, đồng thời cập nhật `CancelOrder` mapping, reason và events trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T009, T019)
 - [ ] T021 [US2] Cập nhật `DELETE /api/orders/{orderId}` và thêm `GET /api/orders/{orderId}` trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/OrdersController.cs` theo contract, trả not-found an toàn cho broker mismatch (phụ thuộc T020)
 - [ ] T022 [US2] Bổ sung structured cancel/status logging và correlation propagation trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T021)
 
@@ -122,7 +122,7 @@
 - [ ] T034 [P] Rà soát `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` và `flex-exchange-service/src/Flex.Exchange.Api/RequestContext/` để log đủ event/order/trade/correlation fields nhưng không log token, authorization header, secret hoặc raw sensitive payload
 - [ ] T035 [P] Cập nhật `specs/000011-exchange-api-events/quickstart.md` và `flex-exchange-service/src/Flex.Exchange.Api/Flex.Exchange.http` với smoke flow, expected responses, restart replay check và rollback binary MVP 01
 - [ ] T036 Chạy `dotnet format Flex.Exchange.sln --verify-no-changes`, `dotnet build Flex.Exchange.sln --configuration Release` và `dotnet test Flex.Exchange.sln --configuration Release`; sửa regression nếu có trong các source/test path liên quan
-- [ ] T037 Chạy manual smoke theo `specs/000011-exchange-api-events/quickstart.md`, kiểm tra `/health`, latency luồng hai lệnh ≤ 5 giây, event metadata/correlation và xác nhận không có database/migration mới
+- [ ] T037 Chạy manual smoke theo `specs/000011-exchange-api-events/quickstart.md`, kiểm tra `/health`, latency luồng hai lệnh ≤ 5 giây, event metadata/correlation, xác nhận launch profile chỉ bind local/demo và không expose API ra public interface, đồng thời xác nhận không có database/migration mới
 - [ ] T038 Cập nhật `specs/000011-exchange-api-events/plan.md` hoặc ghi chú release nếu phát hiện sai khác contract/rollout/rollback sau validation (phụ thuộc T036, T037)
 
 ## Dependencies & Execution Order
@@ -189,6 +189,10 @@
 | SEC-001–SEC-003 | T016, T018, T026, T032–T034, T037 |
 | NFR-001 | T011, T024, T036–T037 |
 | NFR-003 | T033–T034, T026 |
+| SC-001 | T011, T024, T037 |
+| SC-002 | T010, T013, T024 |
+| SC-003 | T024, T031, T037 |
+| SC-004 | T025, T037 |
 | API contracts | T003, T012, T018, T024, T029–T031 |
 | Rollout/rollback | T035–T038 |
 
