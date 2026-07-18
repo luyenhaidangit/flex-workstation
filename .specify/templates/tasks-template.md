@@ -147,6 +147,7 @@ Khi sinh `tasks.md`, phải đảm bảo:
 - Mỗi endpoint/event trong `contracts/` có task implementation hoặc contract test tương ứng khi áp dụng.
 - Mỗi constraint trong `plan.md` có task hoặc ghi chú xử lý tương ứng.
 - Rollout, rollback, migration, feature flag, observability và security review có task khi `plan.md` đánh dấu liên quan.
+- FR chứa nhiều điều kiện hoặc vế khác nhau (ví dụ: "từ chối X; sau khi Y thì Z"): mỗi vế phải xuất hiện tường minh trong description của ít nhất một task — không đủ khi chỉ liệt kê FR ID trong traceability.
 
 ## Quy ước path
 
@@ -473,6 +474,7 @@ Với nhiều developer:
 - [ ] User story không có automated test task đã có manual validation task hoặc command validation task.
 - [ ] Mỗi user story có Definition of Done cụ thể.
 - [ ] Mỗi `US`/`FR` P1/P2 và requirement ảnh hưởng code/data/API/permission có task tương ứng.
+- [ ] FR có nhiều sub-hành vi: mỗi sub-hành vi đã có task description rõ hoặc task riêng — trace ID không đủ.
 - [ ] Traceability Matrix đã map source quan trọng sang task.
 - [ ] Migration, permission, contract, observability, rollout/rollback có task khi `plan.md` đánh dấu liên quan.
 - [ ] Task `[P]` không sửa cùng file và không phụ thuộc nhau.
