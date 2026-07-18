@@ -42,6 +42,7 @@
 - [x] T013 [US1] Thêm interface `ITradingSessionService` và mapping view trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/ITradingSessionService.cs` (phụ thuộc T007, T012)
 - [x] T014 [US1] Implement `TradingSessionWorker` xử lý `open → continuous → close` theo host cancellation trong `flex-exchange-service/src/Flex.Exchange.Api/HostedServices/TradingSessionWorker.cs` (phụ thuộc T012, T011)
 - [x] T015 [US1] Thêm `TradingSessionController` cho `POST /api/trading-session/start` và `GET /api/trading-session` trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/TradingSessionController.cs` (phụ thuộc T013, T010)
+- [x] T038 [US1] Thêm nút `Khởi động phiên` cho operator, gọi start session và hiển thị lỗi phiên đang chạy trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts`, `flex-microfrontend/src/app/exchange/market-board.component.ts` và `flex-microfrontend/src/app/exchange/market-board.component.html` (FR-001, FR-009, AC-001)
 
 ## Phase 4: User Story 2 — Quan sát market realtime qua WebSocket (P1)
 
@@ -165,7 +166,7 @@ Setup → Foundation → US1 → US2
 
 | Source | Covered by tasks |
 |---|---|
-| US-001 / FR-001, FR-009 | T004, T010–T015 |
+| US-001 / FR-001, FR-009 | T004, T010–T015, T038 |
 | US-002 / FR-003–FR-005, FR-011 | T005, T016–T022 |
 | US-003 / FR-006, FR-007, FR-010 | T023–T027 |
 | US-004 / FR-002, FR-008 | T028–T032 |
