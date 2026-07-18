@@ -94,6 +94,8 @@ Trường chung (base `ExchangeEvent`): `EventSequence` (`long`, tuần tự to�
 4. **Giá khớp** = giá lệnh chờ (BR-003); ưu tiên giá rồi thời gian (BR-002).
 5. **Lệnh đã hủy/hoàn tất không bao giờ khớp lại** (BR-004).
 
+Contract không chứa wall-clock timestamp trong MVP 01. “Thời điểm” của lệnh và giao dịch được biểu diễn bằng thứ tự logic: `SequenceNumber` cho thứ tự tiếp nhận, `ExecutedSequence` cho thứ tự khớp và `EventSequence` cho dòng sự kiện. Nếu MVP sau cần metadata thời gian hiển thị/audit, đó là phần mở rộng presentation/audit riêng và không được thay đổi các khóa determinism này.
+
 ## Consumer
 
 | Consumer | Dùng gì | Thời điểm |

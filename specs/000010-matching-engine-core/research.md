@@ -32,7 +32,7 @@ Trả lời các câu hỏi kỹ thuật TQ-001..TQ-006 trong `plan.md`. Không 
 - Giữ được khung `src/` + naming + phân lớp của auth; spec yêu cầu service có API ngay trong MVP 01 (MVP-004, FR-011).
 - `Flex.Infrastructures` chỉ mang các thành phần được host dùng ngay: Logging/Serilog, Exceptions, Observability, OpenAPI, Json và Responses; không tạo lớp persistence hay messaging suy đoán.
 - Engine là pure logic không phụ thuộc hạ tầng → đúng định nghĩa project Domain; đặt ở host (như `Services/` của auth) sẽ buộc MVP 02 refactor khi thay host console bằng API.
-- Kiểm chứng thủ công qua `Flex.Exchange.http` và Swagger đáp ứng quyết định stakeholder không có test tự động (MVP-005, EX-001 trong plan).
+- Kiểm chứng kết hợp domain/API tests, `Flex.Exchange.http` và Swagger; các test tự động bảo vệ matching/acceptance còn `.http` giữ vai trò tài liệu demo sống.
 
 **Alternatives considered**:
 - Console demo không API — loại: không đáp ứng MVP-004 và FR-011.
@@ -54,7 +54,7 @@ Trả lời các câu hỏi kỹ thuật TQ-001..TQ-006 trong `plan.md`. Không 
 
 **Decision**:
 - Giá: `long` (đồng VND nguyên). Khối lượng: `long` (số cổ phiếu nguyên).
-- Ưu tiên thời gian: `SequenceNumber` (long, tăng dần) do engine cấp tại thời điểm nhận command; timestamp (`ReceivedAt`) chỉ ghi nhận để hiển thị, **không** tham gia so sánh ưu tiên.
+- Ưu tiên thời gian: `SequenceNumber` (long, tăng dần) do engine cấp khi nhận command; MVP 01 không lưu wall-clock `ReceivedAt` trong Domain.
 - Sự kiện đầu ra đánh số `EventSequence` tuần tự toàn cục.
 - Cấm trong `Flex.Domain/Matching`: `DateTime.Now/UtcNow` trong logic quyết định, `Random`, `Guid.NewGuid()` cho ID (dùng số tuần tự), duyệt `Dictionary`/`HashSet` không có thứ tự xác định trong luồng khớp.
 
@@ -66,13 +66,13 @@ Trả lời các câu hỏi kỹ thuật TQ-001..TQ-006 trong `plan.md`. Không 
 
 ---
 
-## TQ-005 — Chiến lược kiểm chứng khi không có test tự động (DEC-006)
+## TQ-005 — Chiến lược kiểm chứng matching và API (DEC-006)
 
-**Decision**: Commit `Flex.Exchange.http` chứa các request/kỳ vọng cho sáu nhóm hành vi của SC-003, đồng thời bật Swagger UI trong Development để chạy demo cục bộ. Không tạo test project tự động.
+**Decision**: Kết hợp domain tests, API integration/acceptance tests, `Flex.Exchange.http` chứa các request/kỳ vọng cho tám nhóm hành vi của SC-003 và Swagger UI trong Development để chạy demo cục bộ.
 
-**Rationale**: Đây là quyết định stakeholder đã được ghi thành EX-001 trong plan. File `.http` là pattern sẵn có của auth service, lặp lại được, và trả về đúng payload REST mà MVP 02 sẽ kế thừa.
+**Rationale**: Domain/API tests bắt regression của engine và REST contract; file `.http` là pattern sẵn có của auth service, lặp lại được và trả về đúng payload REST mà MVP 02 sẽ kế thừa.
 
-**Alternatives considered**: Bộ xUnit tối thiểu cho engine — loại theo quyết định stakeholder; rủi ro được chấp nhận và theo dõi trong EX-001.
+**Alternatives considered**: Chỉ dùng `.http` + Swagger — loại vì không đủ bảo vệ regression; chỉ dùng test tự động — loại vì không thay thế được tài liệu demo và kiểm chứng thủ công.
 
 ---
 

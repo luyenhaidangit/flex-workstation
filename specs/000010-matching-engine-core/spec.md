@@ -43,7 +43,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - **MVP-002**: Kiểm tra hợp lệ lệnh theo bước giá, biên độ giá và lô chẵn được cấu hình; chấp nhận (`OrderAccepted`) hoặc từ chối (`OrderRejected`) kèm lý do.
 - **MVP-003**: Khớp lệnh liên tục theo ưu tiên giá — thời gian, hỗ trợ khớp một phần, phát sự kiện `TradeExecuted`, `OrderCancelled` và cung cấp snapshot order book.
 - **MVP-004**: Service được dựng hoàn chỉnh theo chuẩn service Flex, cho phép đặt lệnh, hủy lệnh và truy vấn snapshot order book/sự kiện qua API phục vụ demo cục bộ.
-- **MVP-005**: Giới hạn rõ: chỉ một mã, một phiên `continuous`, chỉ limit order; không database, không UI, không WebSocket, không bot, không kiểm tra số dư, không bộ test tự động (quyết định stakeholder 2026-07-14 — xem Giả định & Ràng buộc).
+- **MVP-005**: Giới hạn rõ: chỉ một mã, một phiên `continuous`, chỉ limit order; không database, không UI, không WebSocket, không bot, không kiểm tra số dư. Bộ automated test domain/API thuộc phạm vi kiểm chứng của MVP; các hạ tầng test ngoài phạm vi nghiệp vụ vẫn không áp dụng.
 
 ---
 
@@ -206,9 +206,9 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 ## 9. Thực thể dữ liệu
 
-- **Lệnh (Order)**: Yêu cầu mua/bán gồm mã cổ phiếu, chiều mua/bán, giá, khối lượng, thời điểm gửi và `BrokerId`; có trạng thái vòng đời (chờ, khớp một phần, hoàn tất, đã hủy, bị từ chối) và khối lượng còn lại.
+- **Lệnh (Order)**: Yêu cầu mua/bán gồm mã cổ phiếu, chiều mua/bán, giá, khối lượng, thứ tự tiếp nhận và `BrokerId`; có trạng thái vòng đời (chờ, khớp một phần, hoàn tất, đã hủy, bị từ chối) và khối lượng còn lại. Thứ tự tiếp nhận được biểu diễn bằng `SequenceNumber`, không phụ thuộc đồng hồ hệ thống.
 - **Sổ lệnh (Order book)**: Tập lệnh đang chờ của một mã, tổ chức theo hai bên mua/bán, sắp theo ưu tiên giá — thời gian; có thể chụp snapshot.
-- **Giao dịch (Trade)**: Kết quả một lần khớp giữa hai lệnh: tham chiếu hai lệnh, giá khớp, khối lượng khớp, thời điểm/thứ tự khớp.
+- **Giao dịch (Trade)**: Kết quả một lần khớp giữa hai lệnh: tham chiếu hai lệnh, giá khớp, khối lượng khớp và thứ tự khớp logic. Thứ tự này được biểu diễn bằng `ExecutedSequence`/`EventSequence`, không phải wall-clock timestamp.
 - **Sự kiện lệnh**: `OrderAccepted`, `OrderRejected`, `TradeExecuted`, `OrderCancelled` — dòng đầu ra có thứ tự xác định, là hợp đồng cho MVP 02.
 - **Cấu hình mã (Instrument config)**: Bước giá, biên độ giá (trần/sàn), đơn vị lô chẵn của mã cổ phiếu giả lập.
 
@@ -265,7 +265,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - "Hết phiên" ở MVP này chỉ có nghĩa là kết thúc một lần chạy demo/test; vòng đời phiên giao dịch đầy đủ thuộc MVP 04.
 - Thứ tự thời gian của lệnh xác định theo thứ tự lệnh được đưa vào hệ thống (trình tự vào), không phụ thuộc đồng hồ hệ thống.
 - Code sản phẩm của MVP 01 nằm trong sub-repo `flex-exchange-service` được khai báo trong `workstation.json` (đã chốt — xem Phụ thuộc).
-- Stakeholder đã điều chỉnh phạm vi ngày 2026-07-14 so với tài liệu MVP gốc: (a) dựng service hoàn chỉnh có API và hạ tầng theo chuẩn service Flex ngay trong MVP 01 (kéo một phần MVP 02 lên trước); (b) không yêu cầu bộ test tự động — kiểm chứng bằng kịch bản demo qua API. Spec này là source-of-truth hiện hành.
+- Stakeholder đã điều chỉnh phạm vi so với tài liệu MVP gốc: (a) dựng service hoàn chỉnh có API và hạ tầng theo chuẩn service Flex ngay trong MVP 01; (b) bổ sung automated test domain/API để bảo vệ matching và acceptance flow, bên cạnh kịch bản demo qua API. Spec này là source-of-truth hiện hành.
 
 **Ràng buộc**:
 - PHẢI giữ đúng ranh giới scope: không database, UI, WebSocket, bot, kiểm tra số dư (FR-010) — các phần này thuộc MVP 03–07; API giới hạn ở đặt/hủy lệnh và truy vấn (FR-011).
@@ -278,7 +278,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 - Sự kiện đẩy realtime qua mạng, WebSocket, mở rộng Exchange API đầy đủ (MVP 02) — MVP 01 chỉ có API đặt/hủy lệnh và truy vấn.
 - Bảng điện, UI hiển thị (MVP 03).
-- Bộ test tự động (unit/integration) — bỏ theo quyết định stakeholder 2026-07-14; có thể bổ sung ở MVP sau.
+- Automated test domain và API phục vụ regression/acceptance của MVP; không bao gồm test hạ tầng triển khai, persistence hoặc realtime ngoài phạm vi.
 - Xác thực/phân quyền API, container hóa (Dockerfile) và CI/CD pipeline.
 - Vòng đời phiên (mở/đóng cửa, ATO/ATC), bot tạo thanh khoản (MVP 04).
 - Kiểm tra số dư tiền/chứng khoán, kiểm soát trước lệnh (MVP 05+).
@@ -297,7 +297,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 | Quy tắc khớp có kẽ hở ở trường hợp biên (khớp xuyên nhiều mức giá, dư khối lượng lẻ) khiến MVP sau phải sửa lõi | Trung | Cao | Bộ kịch bản kiểm tra qua API bắt buộc 6 nhóm hành vi (SC-003) + kịch bản khớp xuyên nhiều lệnh chờ trong US-003 |
 | Tính không xác định lọt vào (phụ thuộc đồng hồ, thứ tự không ổn định) làm kết quả không tái lập | Trung | Cao | FR-009 và SC-002 là điều kiện hoàn thành; thứ tự thời gian dựa trên trình tự vào |
 | Hợp đồng đầu ra thiếu thông tin khiến MVP 02 phải phá vỡ tương thích | Thấp | Trung | SC-004; sự kiện `TradeExecuted` yêu cầu đủ trường đối chiếu (FR-007) |
-| Không có test tự động → regression khó phát hiện khi MVP sau sửa engine | Cao | Trung | Rủi ro được stakeholder chấp nhận (2026-07-14); giảm thiểu bằng bộ kịch bản kiểm tra chuẩn hóa lặp lại được (SC-003) và lõi khớp tách biệt khỏi API để dễ bổ sung test sau |
+| Regression khi MVP sau sửa engine hoặc contract | Trung | Trung | Domain/API tests chạy tự động cùng bộ kịch bản chuẩn hóa (SC-003); lõi khớp vẫn tách biệt khỏi API để kiểm thử độc lập |
 | Lệnh gửi đồng thời qua API phá vỡ thứ tự xử lý tuần tự | Trung | Cao | Yêu cầu xử lý lệnh tuần tự theo thứ tự nhận (BR-005) phải được bảo toàn ở lớp service; kiểm chứng bằng kịch bản demo |
 
 ---

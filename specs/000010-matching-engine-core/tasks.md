@@ -206,3 +206,8 @@ Mở `src/Flex.Exchange.Api/Flex.Exchange.http`, đặt `@baseUrl` theo URL Kest
 - [X] T050 Chốt response wrapper chuẩn: hoặc triển khai wrapper trong API, hoặc cập nhật contract/plan kèm ngoại lệ được duyệt để xác nhận direct DTO là contract chính thức theo DEC-005, FR-011 (partial).
 - [X] T051 Loại lệnh `Filled`/`Cancelled` khỏi cấu trúc lưu trữ nội bộ của `OrderBook` ngay sau khi trạng thái kết thúc và bổ sung test bất biến theo data-model.md §2, FR-008 (partial).
 - [X] T052 Đồng bộ `plan.md`, `data-model.md` và contract với kiến trúc `Api → Application → Domain ← Infrastructure`, paths hiện hành, chiến lược automated test và quyết định về `ReceivedAt`; ghi ngoại lệ được duyệt nếu giữ khác biệt theo DEC-001, DEC-006, DEC-008, Constitution II (contradicts).
+
+## Phase 10: Convergence
+
+- [X] T053 Đồng bộ quyết định automated test giữa `spec.md` (MVP-005), `plan.md`, `tasks.md` và các project test hiện hành; ghi nhận automated domain/API tests là phạm vi đã được chấp thuận, Constitution II (unrequested/contradicts).
+- [X] T054 Đồng bộ việc biểu diễn thời điểm gửi lệnh và thời điểm khớp giữa `spec.md` §9, `plan.md`, `data-model.md`, contract và model Domain; chuẩn hóa `SequenceNumber`/`ExecutedSequence`/`EventSequence` thay cho wall-clock để bảo toàn determinism, Constitution II (contradicts).

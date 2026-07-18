@@ -23,7 +23,7 @@ Quy ước chung: giá và khối lượng là `long` (VND nguyên / số cổ p
 | `SequenceNumber` | `long` | Số tuần tự cấp khi nhận — khóa ưu tiên thời gian | Tăng dần nghiêm ngặt; không dùng timestamp để so ưu tiên |
 | `Status` | `OrderStatus` | Trạng thái vòng đời | Theo bảng chuyển trạng thái bên dưới |
 
-`ReceivedAt` không thuộc Domain MVP 01: không có yêu cầu hiển thị thời gian và kết quả phải tái lập hoàn toàn. Nếu cần metadata thời gian ở MVP sau, nó phải được thiết kế ở presentation/audit boundary và không tham gia priority hay event determinism.
+`ReceivedAt` không thuộc Domain MVP 01: “thời điểm” trong đặc tả được chuẩn hóa thành thứ tự logic khi engine tiếp nhận lệnh. Kết quả phải tái lập hoàn toàn nên `SequenceNumber` là nguồn sự thật cho priority; `ExecutedSequence`/`EventSequence` là nguồn sự thật cho thứ tự khớp và sự kiện. Nếu cần wall-clock metadata ở MVP sau, nó phải được thiết kế ở presentation/audit boundary và không tham gia priority hay event determinism.
 
 ### OrderStatus — chuyển trạng thái (khớp spec §7)
 

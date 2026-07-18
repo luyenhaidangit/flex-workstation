@@ -8,7 +8,7 @@
 
 ## Tóm tắt
 
-**Yêu cầu chính từ spec**: Service Exchange hoàn chỉnh theo chuẩn service Flex: lõi khớp lệnh limit mua/bán một mã FXS, phiên `continuous`, ưu tiên giá — thời gian (FR-002/003), khớp một phần (FR-004), giá khớp theo lệnh chờ (FR-005), hủy lệnh (FR-006), 4 sự kiện + snapshot (FR-007/008), kết quả xác định (FR-009), API đặt/hủy/truy vấn (FR-011); không database/UI/WebSocket/bot/số dư và lõi khớp độc lập với API (FR-010). Không có bộ test tự động (quyết định stakeholder — MVP-005).
+**Yêu cầu chính từ spec**: Service Exchange hoàn chỉnh theo chuẩn service Flex: lõi khớp lệnh limit mua/bán một mã FXS, phiên `continuous`, ưu tiên giá — thời gian (FR-002/003), khớp một phần (FR-004), giá khớp theo lệnh chờ (FR-005), hủy lệnh (FR-006), 4 sự kiện + snapshot (FR-007/008), kết quả xác định (FR-009), API đặt/hủy/truy vấn (FR-011); không database/UI/WebSocket/bot/số dư và lõi khớp độc lập với API (FR-010). Có automated test domain/API để kiểm chứng matching và acceptance flow.
 
 **Hướng tiếp cận kỹ thuật dự kiến**: Dựng `flex-exchange-service` theo đúng pattern `flex-auth-service`: .NET 9, solution 3 project `src/Flex.Exchange` (ASP.NET Core Web API host) + `src/Flex.Domain` (engine khớp lệnh thuần) + `src/Flex.Infrastructures` (hạ tầng cross-cutting: logging, exception, observability, OpenAPI, response). Engine là pure logic trong `Flex.Domain`; API là lớp giao tiếp mỏng; kiểm chứng bằng file `.http` + Swagger theo kịch bản demo.
 
@@ -21,7 +21,7 @@
 - File nền repo: `README.md` (cách chạy/demo), `CLAUDE.md` (context agent), `.gitignore`, `.gitattributes`, `.env.example` — theo pattern auth service.
 
 **Ngoài phạm vi kỹ thuật**:
-- Bộ test tự động (unit/integration) — bỏ theo quyết định stakeholder (EX-001 bên dưới).
+- Automated test domain/API cho matching và acceptance; không bao gồm test hạ tầng triển khai, persistence hoặc realtime ngoài phạm vi.
 - Persistence (EF Core/Oracle), messaging (RabbitMQ/outbox-inbox), xác thực JWT, rate limiting, resilience — các module infra này của auth chưa có nhu cầu; thêm ở MVP sau khi nghiệp vụ cần.
 - Dockerfile, Jenkinsfile, CI/CD — chưa deploy ở MVP 01.
 - WebSocket/sự kiện đẩy realtime (MVP 02); bảng điện UI (MVP 03).
@@ -37,7 +37,7 @@
 
 **Lưu trữ**: Không áp dụng — trạng thái in-memory trong tiến trình service, mất khi restart (đúng spec §Ngoài phạm vi).
 
-**Kiểm thử**: Không có test tự động (EX-001). Kiểm chứng thủ công qua `Flex.Exchange.http` (bộ kịch bản chuẩn hóa 6 nhóm hành vi) + Swagger UI; quy trình trong [quickstart.md](quickstart.md).
+**Kiểm thử**: Kết hợp domain tests, API integration/acceptance tests và kiểm chứng thủ công qua `Flex.Exchange.http` + Swagger UI; quy trình trong [quickstart.md](quickstart.md).
 
 **Nền tảng chạy**: Kestrel self-host cục bộ trên máy dev (`dotnet run`), Windows/Linux đều được.
 
@@ -78,9 +78,9 @@ MVP 01 dùng **direct DTO response**, không dùng generic `ApiResponse` envelop
 
 ### Determinism, thời gian và test
 
-`ReceivedAt` không được lưu trong Domain của MVP 01. MVP không có yêu cầu hiển thị thời gian; thêm clock vào model sẽ không đóng góp cho priority và làm giảm khả năng so sánh kết quả giữa các lần chạy. `SequenceNumber` và `EventSequence` là nguồn thứ tự xác định duy nhất. Metadata thời gian, nếu được MVP sau cần, thuộc lớp presentation/audit với contract riêng.
+`ReceivedAt` không được lưu trong Domain của MVP 01. “Thời điểm” được biểu diễn bằng thứ tự logic; thêm wall-clock vào model sẽ không đóng góp cho priority và làm giảm khả năng so sánh kết quả giữa các lần chạy. `SequenceNumber` và `EventSequence` là nguồn thứ tự xác định duy nhất. Metadata thời gian, nếu MVP sau cần, thuộc lớp presentation/audit với contract riêng.
 
-Ngoại lệ EX-001 về không có test tự động được thay thế bởi domain/API tests đã được stakeholder yêu cầu trong quá trình refactor. `MvpAcceptanceTests` chạy tám nhóm behavior qua HTTP, gồm snapshot/event log, cancellation, validation và determinism sau hai host mới; benchmark trong test đo xử lý request không gồm khởi động host.
+Phạm vi test tự động được bổ sung trong quá trình refactor để bảo vệ matching và acceptance flow. `MvpAcceptanceTests` chạy tám nhóm behavior qua HTTP, gồm snapshot/event log, cancellation, validation và determinism sau hai host mới; benchmark trong test đo xử lý request không gồm khởi động host.
 
 ## Kiểm tra constitution
 
@@ -90,7 +90,7 @@ Ngoại lệ EX-001 về không có test tự động được thay thế bởi 
 |------|--------------------|------------------------|---------|
 | Scope Gate | Pass | Pass | Phạm vi khớp MVP-001..005 (spec đã được stakeholder cập nhật 2026-07-14); code nằm trong sub-repo `flex-exchange-service` do người dùng chỉ định |
 | Traceability Gate | Pass | Pass | Bảng traceability map FR-001..FR-011 sang module/path/cách kiểm chứng |
-| Test Gate | Fail → Ngoại lệ | Ngoại lệ Approved | Không có test tự động theo quyết định stakeholder — xem EX-001 tại "Theo dõi độ phức tạp"; thay bằng bộ kịch bản kiểm tra chuẩn hóa qua `.http` (SC-003) |
+| Test Gate | Fail → Ngoại lệ | Pass | Domain/API tests và bộ kịch bản `.http` cùng kiểm chứng các rủi ro matching (SC-003) |
 | Security Gate | Pass | Pass | API chỉ demo cục bộ, không deploy công khai (SEC-002); không dữ liệu nhạy cảm; `BrokerId` trên mọi lệnh/sự kiện (SEC-001); không hardcode secret |
 | Compatibility Gate | Không áp dụng | Không áp dụng | Repo mới, chưa có consumer; contract thiết kế cho MVP 02 tái dùng (SC-004) |
 | Observability Gate | Pass | Pass | Serilog + correlation ID + global logging middleware theo pattern auth; dòng sự kiện engine là audit nghiệp vụ; endpoint truy vấn event log |
@@ -103,7 +103,7 @@ Ngoại lệ EX-001 về không có test tự động được thay thế bởi 
 - **TQ-002**: Layout solution theo pattern auth — thành phần nào của `Flex.Infrastructures` lấy vào MVP 01, engine đặt ở đâu, API host tổ chức thế nào? → Đã resolve (DEC-001, DEC-002, DEC-008).
 - **TQ-003**: Contract backward compatibility? → Chưa có consumer; REST contract + engine contract thiết kế đủ cho MVP 02 (DEC-005).
 - **TQ-004**: Biểu diễn giá/khối lượng và cơ chế bảo đảm tính xác định khi có API đồng thời? → Đã resolve (DEC-003, DEC-004, DEC-009).
-- **TQ-005**: Chiến lược kiểm chứng khi không có test tự động? → Đã resolve (DEC-006).
+- **TQ-005**: Chiến lược kiểm chứng matching và API? → Đã resolve bằng domain/API tests kết hợp `.http` và Swagger (DEC-006).
 - **TQ-006**: Giá trị mặc định config FXS và cách nạp config? → Đã resolve (DEC-007).
 
 ## Thiết kế tổng quan
@@ -200,26 +200,26 @@ Không áp dụng — một `DemoBroker`, API demo cục bộ không xác thực
 | DEC-001 | Solution 3 project đúng pattern auth: `src/Flex.Exchange` (Web API host) + `src/Flex.Domain` + `src/Flex.Infrastructures` | Yêu cầu stakeholder: service hoàn chỉnh theo chuẩn Flex, đồng nhất cấu trúc giữa các service, MVP sau không phải tái cấu trúc | Console demo không API (plan v1) | Stakeholder đổi phạm vi 2026-07-14: cần API + hạ tầng ngay MVP 01 |
 | DEC-002 | Engine khớp lệnh trong `Flex.Domain`; API host chỉ có `ExchangeService` mỏng + controllers | Engine thuần logic, tách khỏi API (FR-010); MVP 02 thêm publisher không sửa engine | Đặt engine trong `Services/` của host như auth | Logic auth gắn HTTP/DB nên ở host hợp lý; engine ở đây là domain thuần |
 | DEC-003 | Giá/khối lượng dùng `long` (VND nguyên, cổ phiếu nguyên) | Số học nguyên tuyệt đối xác định (FR-009); giá VN không lẻ dưới đồng | `decimal` | Không cần độ chính xác thập phân; kiểm tra tick/lô bằng modulo nguyên đơn giản hơn |
-| DEC-004 | Ưu tiên thời gian theo `SequenceNumber` engine cấp; timestamp chỉ hiển thị | Loại bỏ phụ thuộc đồng hồ — nguồn phi xác định chính (NFR-001) | `DateTime.UtcNow` làm khóa ưu tiên | Trùng timestamp là thực tế; kết quả phụ thuộc máy chạy |
+| DEC-004 | Ưu tiên thời gian theo `SequenceNumber` engine cấp; không lưu wall-clock trong Domain MVP 01 | Loại bỏ phụ thuộc đồng hồ — nguồn phi xác định chính (NFR-001) | `DateTime.UtcNow` làm khóa ưu tiên hoặc metadata Domain | Trùng timestamp là thực tế; kết quả phụ thuộc máy chạy |
 | DEC-005 | Engine expose API đồng bộ (command in → events out + snapshot); REST controller bọc 1-1, business-reject trả HTTP 200 với body reject | Đơn giản, tái lập; phân biệt rõ lỗi nghiệp vụ (200 + reason) và lỗi request (400)/hệ thống (500) | Event bus nội bộ; map reject sang 4xx | Indirection thừa; reject nghiệp vụ không phải lỗi giao thức, MVP 02 cần nguyên payload sự kiện |
-| DEC-006 | Kiểm chứng bằng `Flex.Exchange.http` (bộ kịch bản chuẩn hóa, commit vào repo) + Swagger; không test tự động | Quyết định stakeholder (EX-001); `.http` là pattern auth đã có (`Flex.Auth.http`), lặp lại được và làm tài liệu sống | Bộ xUnit test (plan v1) | Stakeholder bỏ yêu cầu test tự động để tập trung dựng skeleton |
+| DEC-006 | Kiểm chứng bằng domain/API tests, `Flex.Exchange.http` (bộ kịch bản chuẩn hóa, commit vào repo) + Swagger | Kết hợp regression tự động và kịch bản thủ công giúp bảo vệ matching, contract và trải nghiệm demo; `.http` vẫn là tài liệu sống | Chỉ dùng test tự động, hoặc chỉ dùng `.http` | Chỉ test tự động không đủ làm tài liệu demo; chỉ `.http` khó phát hiện regression |
 | DEC-007 | Config FXS bind từ `appsettings.json` section `Exchange:Instrument` (options pattern như auth): tham chiếu 20.000, tick 100, trần 21.400/sàn 18.600 (±7%), lô 100 | Đúng NFR-003 (đổi config không sửa code), đúng pattern options của auth (`{Feature}Options`) | Hardcode trong code | Vi phạm NFR-003 |
 | DEC-008 | `Flex.Infrastructures` chỉ gồm Logging, Exceptions, Observability, OpenApi, Json, Responses | Đây là các module auth đang dùng mà exchange cần ngay (log/debug/swagger/response chuẩn); giữ namespace + cấu trúc thư mục giống auth để MVP sau thêm Messaging/Persistence đúng chỗ | Copy đủ 16 module infra của auth | EF/Oracle, RabbitMQ, JWT, RateLimiting, Resilience, Random... không có nhu cầu → project phình to, vi phạm nguyên tắc V |
 | DEC-009 | `ExchangeService` singleton, serialize thao tác ghi bằng `lock` quanh engine | Bảo toàn BR-005/FR-009 khi request API đồng thời; quy mô demo không cần queue/channel | `System.Threading.Channels` + background processor | Phức tạp hơn đáng kể, chỉ cần khi có yêu cầu throughput — chưa phải MVP 01 |
 
 ## Chiến lược kiểm thử
 
-**Unit test**: Không áp dụng — bỏ theo quyết định stakeholder (EX-001). Lõi khớp tách biệt trong `Flex.Domain` để có thể bổ sung test sau mà không refactor.
+**Unit test**: `tests/Flex.Exchange.Domain.Tests` kiểm tra validator, price-time priority, partial fill, cancellation, event sequence và invariant order book.
 
-**Integration test**: Không áp dụng — như trên.
+**Integration test**: `tests/Flex.Exchange.Api.Tests` kiểm tra REST contract, business reject, snapshot/event log và determinism qua `WebApplicationFactory`.
 
-**Contract test**: Không áp dụng ở MVP 01; contract REST được mô tả trong [contracts/exchange-core.md](contracts/exchange-core.md) và Swagger là nguồn đối chiếu khi MVP 02 mở rộng.
+**Contract test**: API integration tests đối chiếu response JSON với [contracts/exchange-core.md](contracts/exchange-core.md); Swagger là nguồn tương tác thủ công khi MVP 02 mở rộng.
 
 **Permission/security test**: Không áp dụng — không có mô hình quyền; kiểm tra thủ công service chỉ bind localhost (SEC-002).
 
 **E2E/manual test** (cơ chế kiểm chứng chính — SC-001/002/003): Bộ kịch bản chuẩn hóa trong `Flex.Exchange.http` commit vào repo, bao phủ 8 nhóm: (1) không khớp, (2) khớp toàn phần AC-001/002, (3) khớp một phần AC-003/004, (4) ưu tiên giá AC-005 + khớp xuyên mức giá, (5) ưu tiên thời gian AC-006, (6) hủy lệnh AC-007/008 + hủy lặp, (7) validate AC-009 từng ràng buộc, (8) determinism — restart service, chạy lại kịch bản, so sánh `GET /api/events`. Quy trình chi tiết trong [quickstart.md](quickstart.md).
 
-**Regression test**: Không áp dụng — repo mới; rủi ro regression tương lai đã ghi ở spec §Rủi ro và được stakeholder chấp nhận.
+**Regression test**: Domain/API test suite chạy trong validation command để phát hiện regression trước khi mở rộng MVP sau.
 
 ## Cấu trúc project
 
@@ -286,7 +286,9 @@ flex-exchange-service/
 │       ├── OpenApi/SwaggerConfiguration.cs
 │       ├── Json/JsonOptions.cs
 │       └── Responses/                 # API response wrapper chuẩn
-└── (không có tests/ — EX-001)
+└── tests/
+    ├── Flex.Exchange.Domain.Tests/
+    └── Flex.Exchange.Api.Tests/
 ```
 
 **Quyết định cấu trúc**: Mirror 1-1 cấu trúc `flex-auth-service` (host + Domain + Infrastructures, cùng naming convention); `Flex.Infrastructures` chỉ chứa module có nhu cầu ngay (DEC-008); không thư mục `Repositories`/`Persistence` vì không có DB; không `tests/` (EX-001).
@@ -330,9 +332,9 @@ Ngoại lệ constitution (theo format constitution §10):
 
 | ID | Nguyên tắc vi phạm | Lý do | Rủi ro | Người phê duyệt | Trạng thái | Hạn xử lý |
 |----|--------------------|-------|--------|------------------|------------|-----------|
-| EX-001 | Test Gate (constitution §7) — không có test tự động cho engine rủi ro cao | Stakeholder quyết định 2026-07-14: tập trung dựng service skeleton + API, bỏ unit test để rút ngắn phạm vi | Regression khó phát hiện khi MVP sau sửa engine; sai sót quy tắc khớp chỉ lộ qua kiểm tra thủ công | Luyện Hải Đăng | Approved | Xem lại khi bắt đầu MVP 02 (khuyến nghị bổ sung test cho engine trước khi mở rộng API) |
+| EX-001 | Test Gate (constitution §7) — quyết định ban đầu không có automated test | Phạm vi đã được điều chỉnh trong quá trình refactor: automated domain/API tests được bổ sung để bảo vệ matching và acceptance flow | Tăng thời gian chạy validation và bảo trì test | Luyện Hải Đăng | Resolved | 2026-07-18 |
 
-**Phương án đơn giản hơn đã xem xét**: giữ bộ xUnit tối thiểu cho 6 nhóm hành vi (plan v1) — bị loại theo chỉ đạo trực tiếp của stakeholder. Biện pháp giảm thiểu: engine tách biệt trong `Flex.Domain` (thêm test sau không cần refactor) + bộ kịch bản `.http` chuẩn hóa commit vào repo.
+**Phương án đơn giản hơn đã xem xét**: chỉ dùng `.http` + Swagger — không chọn vì không đủ bảo vệ regression của engine; bộ domain/API test hiện hành vẫn giữ phạm vi tối thiểu, không thêm hạ tầng ngoài feature.
 
 ## Checklist sẵn sàng cho `/speckit-tasks`
 
@@ -345,7 +347,7 @@ Ngoại lệ constitution (theo format constitution §10):
 - [x] Các contract/API/event thay đổi đã có consumer bị ảnh hưởng và cách kiểm tra compatibility.
 - [x] Dữ liệu/migration/backfill/compatibility đã rõ hoặc ghi `Không áp dụng`.
 - [x] Quyết định kỹ thuật chính đã có lý do chọn và phương án bị loại.
-- [x] Chiến lược kiểm thử đã bao phủ các lớp liên quan; việc bỏ test tự động có ngoại lệ EX-001 được phê duyệt.
+- [x] Chiến lược kiểm thử đã bao phủ Domain, API integration và kịch bản `.http`; EX-001 ban đầu đã được resolved bằng automated tests.
 - [x] Rollout, rollback code/config, rollback dữ liệu/migration, feature flag/config và backward compatibility đã rõ hoặc ghi `Không áp dụng`.
 - [x] Observability/debug plan có log field, dữ liệu không được log, metric/trace và cách kiểm tra sau release.
 - [x] Không còn cây thư mục mẫu/generic; toàn bộ path trong cấu trúc source code là path thật trong repository.
