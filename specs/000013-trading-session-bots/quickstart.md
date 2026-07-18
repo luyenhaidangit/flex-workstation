@@ -20,3 +20,9 @@ Cấu hình `open=10s`, `continuous=60s`, bật bot; chạy Exchange và fronten
 ## Tiêu chí đạt
 
 AC-001–AC-009 có test hoặc bằng chứng manual; không có hai session đồng thời và không có order tồn tại qua close. Ghi rõ mọi legacy test failure ngoài scope.
+
+## Kết quả triển khai hiện tại
+
+- Exchange build pass; Exchange test pass `34/34` (20 Domain, 14 API).
+- Frontend `tsc --noEmit -p tsconfig.app.json` pass và Angular production build pass.
+- Karma full suite chưa hoàn tất trong môi trường hiện tại do tiến trình vượt timeout; manual two-tab/reconnect smoke vẫn cần thực hiện.

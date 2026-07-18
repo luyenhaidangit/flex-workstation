@@ -6,20 +6,20 @@
 
 **Mục đích**: Chuẩn bị dependency, configuration và cấu trúc file cho Exchange API và Angular client.
 
-- [ ] T001 Thêm package `@microsoft/signalr` và script kiểm tra realtime trong `flex-microfrontend/package.json` (FR-004, FR-005)
-- [ ] T002 [P] Tạo thư mục feature `TradingSession`, `MarketData`, `Hubs` và `HostedServices` trong `flex-exchange-service/src/Flex.Exchange.{Domain,Application,Api}` theo `plan.md`
-- [ ] T003 [P] Thêm section cấu hình `TradingSession` và `Bot` với duration, symbol, reference price, spread, quantity và cycle interval trong `flex-exchange-service/src/Flex.Exchange.Api/appsettings.json`
+- [x] T001 Thêm package `@microsoft/signalr` và script kiểm tra realtime trong `flex-microfrontend/package.json` (FR-004, FR-005)
+- [x] T002 [P] Tạo thư mục feature `TradingSession`, `MarketData`, `Hubs` và `HostedServices` trong `flex-exchange-service/src/Flex.Exchange.{Domain,Application,Api}` theo `plan.md`
+- [x] T003 [P] Thêm section cấu hình `TradingSession` và `Bot` với duration, symbol, reference price, spread, quantity và cycle interval trong `flex-exchange-service/src/Flex.Exchange.Api/appsettings.json`
 
 ## Phase 2: Foundational
 
 **Mục đích**: Hoàn tất contract, state model và DI foundation dùng chung trước các user story.
 
-- [ ] T004 [P] Viết unit test cho invariant `None → Open → Continuous → Close → None` trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/TradingSessionStateTests.cs` (BR-001, FR-001)
+- [x] T004 [P] Viết unit test cho invariant `None → Open → Continuous → Close → None` trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/TradingSessionStateTests.cs` (BR-001, FR-001)
 - [ ] T005 [P] Viết contract test kiểm tra các message `MARKET_SNAPSHOT`, `SESSION_STATE_CHANGED`, `ORDER_BOOK_CHANGED`, `TRADE_EXECUTED` trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/MarketRealtimeContractTests.cs` (FR-003–FR-005, FR-011)
-- [ ] T006 Tạo `TradingSessionState`, transition result và close invariant trong `flex-exchange-service/src/Flex.Exchange.Domain/TradingSession/TradingSessionState.cs` (phụ thuộc T004)
-- [ ] T007 Tạo application DTO `TradingSessionView`, `MarketEvent` và snapshot contract trong `flex-exchange-service/src/Flex.Exchange.Application/MarketData/MarketContracts.cs` (phụ thuộc T005)
-- [ ] T008 Tạo `TradingSessionOptions` và `MarketMakerOptions` có validation duration/price/spread/quantity trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/TradingSessionOptions.cs` (phụ thuộc T003)
-- [ ] T009 Đăng ký options, session service, event publisher và SignalR trong `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ServiceExtensions.cs` (phụ thuộc T006, T007, T008)
+- [x] T006 Tạo `TradingSessionState`, transition result và close invariant trong `flex-exchange-service/src/Flex.Exchange.Domain/TradingSession/TradingSessionState.cs` (phụ thuộc T004)
+- [x] T007 Tạo application DTO `TradingSessionView`, `MarketEvent` và snapshot contract trong `flex-exchange-service/src/Flex.Exchange.Application/MarketData/MarketContracts.cs` (phụ thuộc T005)
+- [x] T008 Tạo `TradingSessionOptions` và `MarketMakerOptions` có validation duration/price/spread/quantity trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/TradingSessionOptions.cs` (phụ thuộc T003)
+- [x] T009 Đăng ký options, session service, event publisher và SignalR trong `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ServiceExtensions.cs` (phụ thuộc T006, T007, T008)
 
 ## Phase 3: User Story 1 — Khởi động và quan sát vòng đời phiên (P1, MVP)
 
@@ -33,15 +33,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Viết integration test cho start/status, duplicate start và transition timing trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/TradingSessionApiTests.cs` (AC-001, FR-001, FR-009)
+- [x] T010 [P] [US1] Viết integration test cho start/status, duplicate start và transition timing trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/TradingSessionApiTests.cs` (AC-001, FR-001, FR-009)
 - [ ] T011 [P] [US1] Viết unit test cho duration transition và cancellation của worker trong `flex-exchange-service/tests/Flex.Exchange.Application.Tests/TradingSessionWorkerTests.cs` (AC-001)
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implement `TradingSessionService` với atomic start/status/transition trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/TradingSessionService.cs` (phụ thuộc T006, T008, T010)
-- [ ] T013 [US1] Thêm interface `ITradingSessionService` và mapping view trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/ITradingSessionService.cs` (phụ thuộc T007, T012)
-- [ ] T014 [US1] Implement `TradingSessionWorker` xử lý `open → continuous → close` theo host cancellation trong `flex-exchange-service/src/Flex.Exchange.Api/HostedServices/TradingSessionWorker.cs` (phụ thuộc T012, T011)
-- [ ] T015 [US1] Thêm `TradingSessionController` cho `POST /api/trading-session/start` và `GET /api/trading-session` trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/TradingSessionController.cs` (phụ thuộc T013, T010)
+- [x] T012 [US1] Implement `TradingSessionService` với atomic start/status/transition trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/TradingSessionService.cs` (phụ thuộc T006, T008, T010)
+- [x] T013 [US1] Thêm interface `ITradingSessionService` và mapping view trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/ITradingSessionService.cs` (phụ thuộc T007, T012)
+- [x] T014 [US1] Implement `TradingSessionWorker` xử lý `open → continuous → close` theo host cancellation trong `flex-exchange-service/src/Flex.Exchange.Api/HostedServices/TradingSessionWorker.cs` (phụ thuộc T012, T011)
+- [x] T015 [US1] Thêm `TradingSessionController` cho `POST /api/trading-session/start` và `GET /api/trading-session` trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/TradingSessionController.cs` (phụ thuộc T013, T010)
 
 ## Phase 4: User Story 2 — Quan sát market realtime qua WebSocket (P1)
 
@@ -60,11 +60,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Implement `IMarketEventPublisher` và broadcast snapshot/incremental event qua `IHubContext<MarketHub>` trong `flex-exchange-service/src/Flex.Exchange.Api/Hubs/MarketEventPublisher.cs` (phụ thuộc T007, T016)
-- [ ] T019 [US2] Implement read-only `MarketHub` gửi snapshot nguyên tử khi `OnConnectedAsync` trong `flex-exchange-service/src/Flex.Exchange.Api/Hubs/MarketHub.cs` (phụ thuộc T012, T018)
-- [ ] T020 [US2] Map `/hubs/market`, cấu hình WebSocket transport và CORS trong `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ApplicationExtensions.cs` (phụ thuộc T009, T019)
-- [ ] T021 [US2] Implement Angular `ExchangeRealtimeService` dùng `HubConnection`, WebSocket transport, reconnect và `marketEvent` reducer trong `flex-microfrontend/src/app/exchange/exchange-realtime.service.ts` (phụ thuộc T001, T017)
-- [ ] T022 [US2] Thay polling bằng realtime state, hiển thị session state và disconnected/reconnecting trong `flex-microfrontend/src/app/exchange/market-board.component.ts` và `flex-microfrontend/src/app/exchange/market-board.component.html` (phụ thuộc T021)
+- [x] T018 [US2] Implement `IMarketEventPublisher` và broadcast snapshot/incremental event qua `IHubContext<MarketHub>` trong `flex-exchange-service/src/Flex.Exchange.Api/Hubs/MarketEventPublisher.cs` (phụ thuộc T007, T016)
+- [x] T019 [US2] Implement read-only `MarketHub` gửi snapshot nguyên tử khi `OnConnectedAsync` trong `flex-exchange-service/src/Flex.Exchange.Api/Hubs/MarketHub.cs` (phụ thuộc T012, T018)
+- [x] T020 [US2] Map `/hubs/market`, cấu hình WebSocket transport và CORS trong `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ApplicationExtensions.cs` (phụ thuộc T009, T019)
+- [x] T021 [US2] Implement Angular `ExchangeRealtimeService` dùng `HubConnection`, WebSocket transport, reconnect và `marketEvent` reducer trong `flex-microfrontend/src/app/exchange/exchange-realtime.service.ts` (phụ thuộc T001, T017)
+- [x] T022 [US2] Thay polling bằng realtime state, hiển thị session state và disconnected/reconnecting trong `flex-microfrontend/src/app/exchange/market-board.component.ts` và `flex-microfrontend/src/app/exchange/market-board.component.html` (phụ thuộc T021)
 
 ## Phase 5: User Story 3 — Market-maker bot và khớp lệnh (P1)
 
@@ -83,9 +83,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Implement `IMarketMakerBot` tạo bid/ask command theo fixed reference price trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/MarketMakerBot.cs` (phụ thuộc T008, T023)
-- [ ] T026 [US3] Tích hợp bot cycle vào `TradingSessionWorker` và chỉ chạy khi state `continuous` trong `flex-exchange-service/src/Flex.Exchange.Api/HostedServices/TradingSessionWorker.cs` (phụ thuộc T014, T025)
-- [ ] T027 [US3] Publish order book/trade event sau mutation trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T018, T024)
+- [x] T025 [US3] Implement `IMarketMakerBot` tạo bid/ask command theo fixed reference price trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/MarketMakerBot.cs` (phụ thuộc T008, T023)
+- [x] T026 [US3] Tích hợp bot cycle vào `TradingSessionWorker` và chỉ chạy khi state `continuous` trong `flex-exchange-service/src/Flex.Exchange.Api/HostedServices/TradingSessionWorker.cs` (phụ thuộc T014, T025)
+- [x] T027 [US3] Publish order book/trade event sau mutation trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T018, T024)
 
 ## Phase 6: User Story 4 — Từ chối lệnh khi phiên đóng (P1)
 
@@ -104,15 +104,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T030 [US4] Thêm session-state gate vào `PlaceOrder` trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` và mapping reject reason phiên (phụ thuộc T012, T028)
-- [ ] T031 [US4] Implement graceful bot cancel và backstop cancel remaining orders khi transition `close` trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/TradingSessionService.cs` (phụ thuộc T025, T029)
-- [ ] T032 [US4] Reset matching engine/order book/trade tape khi tạo session mới sau `close` trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T031)
+- [x] T030 [US4] Thêm session-state gate vào `PlaceOrder` trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` và mapping reject reason phiên (phụ thuộc T012, T028)
+- [x] T031 [US4] Implement graceful bot cancel và backstop cancel remaining orders khi transition `close` trong `flex-exchange-service/src/Flex.Exchange.Application/TradingSession/TradingSessionService.cs` (phụ thuộc T025, T029)
+- [x] T032 [US4] Reset matching engine/order book/trade tape khi tạo session mới sau `close` trong `flex-exchange-service/src/Flex.Exchange.Application/Services/TradingSessionService.cs` (phụ thuộc T031)
 
 ## Final Phase: Polish & Cross-Cutting Concerns
 
 - [ ] T033 [P] Thêm structured logging cho session transition, bot cycle, broadcast, connection và correlation trong `flex-exchange-service/src/Flex.Exchange.Api/Observability` và `flex-exchange-service/src/Flex.Exchange.Application/TradingSession` (SEC-001, observability)
 - [ ] T034 [P] Kiểm tra hub không có method đặt lệnh và không phát token/secret trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/MarketHubSecurityTests.cs` (BR-007, SEC-002, SEC-003)
-- [ ] T035 Chạy backend build/test theo `specs/000013-trading-session-bots/quickstart.md` bằng `dotnet build flex-exchange-service/Flex.Exchange.sln --no-restore` và `dotnet test flex-exchange-service/Flex.Exchange.sln --no-build --no-restore`
+- [x] T035 Chạy backend build/test theo `specs/000013-trading-session-bots/quickstart.md` bằng `dotnet build flex-exchange-service/Flex.Exchange.sln --no-restore` và `dotnet test flex-exchange-service/Flex.Exchange.sln --no-build --no-restore`
 - [ ] T036 Chạy frontend `npm test -- --watch=false`, `npx tsc --noEmit -p tsconfig.app.json` và `npx ng build --progress=false` trong `flex-microfrontend` (AC-004, AC-005)
 - [ ] T037 Thực hiện manual smoke hai tab `/exchange`, reconnect, bot match, close reject và cập nhật bằng chứng vào `specs/000013-trading-session-bots/quickstart.md` (AC-001–AC-009)
 
