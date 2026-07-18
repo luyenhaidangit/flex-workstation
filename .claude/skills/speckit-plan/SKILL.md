@@ -109,6 +109,8 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generated artifacts.
 
+Suggested next step: `/speckit-tasks` to generate the implementation task list from the design artifacts.
+
 ## Phases
 
 ### Phase 0: Outline & Research

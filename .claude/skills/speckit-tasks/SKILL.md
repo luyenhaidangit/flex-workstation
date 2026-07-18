@@ -133,6 +133,7 @@ Output path to generated tasks.md and summary:
 - Independent test criteria for each story
 - Suggested MVP scope (typically just User Story 1)
 - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
+- Suggested next step: `/speckit-implement` to begin executing tasks. If GitHub Issues are used, run `/speckit-taskstoissues` first. If a cross-artifact quality gate is needed, run `/speckit-analyze` first.
 
 Context for task generation: $ARGUMENTS
 

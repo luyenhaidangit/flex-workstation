@@ -258,6 +258,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Depth level
    - Actor/timing
    - Any explicit user-specified must-have items incorporated
+   - Suggested next step: `/speckit-plan` to begin technical planning (or `/speckit-clarify` if the spec still has open ambiguities).
 
 **Important**: Each `/speckit-checklist` command invocation uses a short, descriptive checklist filename and either creates a new file or appends to an existing one. This allows:
 

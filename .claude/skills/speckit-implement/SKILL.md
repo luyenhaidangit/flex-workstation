@@ -216,7 +216,9 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 ## Completion Report
 
-Report final status with summary of completed work.
+Report final status with summary of completed work, tasks completed vs remaining, and any blockers encountered.
+
+Suggested next step: `/speckit-converge` to check for remaining gaps between the implementation and the spec/plan.
 
 ## Done When
 
