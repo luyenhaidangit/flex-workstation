@@ -1,1 +1,7 @@
-hooks: {}
+hooks:
+  after_specify:
+    - extension: "speckit-docbiz"
+      command: "speckit-docbiz"
+      description: "Cập nhật tài liệu nghiệp vụ trong docs/bussiness/ sau khi spec hoàn thành"
+      optional: true
+      enabled: true
