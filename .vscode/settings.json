@@ -3,5 +3,7 @@
     // "*.md": "vscode.markdown.preview.editor"
   },
   "git.autoRepositoryDetection": "subFolders",
-  "scm.alwaysShowRepositories": true
+  "scm.alwaysShowRepositories": true,
+  "typescript.tsdk": "flex-microfrontend/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
