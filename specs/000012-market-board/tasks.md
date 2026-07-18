@@ -8,17 +8,17 @@
 
 **Mục đích**: Chuẩn bị cấu hình và cấu trúc feature Angular, không thay đổi Exchange API.
 
-- [ ] T001 [P] Thêm `exchangeApiBaseUrl`, `marketBoardPollingIntervalMs` và danh sách hai broker demo vào `flex-microfrontend/src/environments/environment.ts`.
-- [ ] T002 [P] Đồng bộ các key cấu hình `exchangeApiBaseUrl`, `marketBoardPollingIntervalMs` và broker demo cho production trong `flex-microfrontend/src/environments/environment.prod.ts`.
-- [ ] T003 Tạo khung feature module và thư mục `flex-microfrontend/src/app/exchange/` theo cấu trúc trong `plan.md`.
+- [X] T001 [P] Thêm `exchangeApiBaseUrl`, `marketBoardPollingIntervalMs` và danh sách hai broker demo vào `flex-microfrontend/src/environments/environment.ts`.
+- [X] T002 [P] Đồng bộ các key cấu hình `exchangeApiBaseUrl`, `marketBoardPollingIntervalMs` và broker demo cho production trong `flex-microfrontend/src/environments/environment.prod.ts`.
+- [X] T003 Tạo khung feature module và thư mục `flex-microfrontend/src/app/exchange/` theo cấu trúc trong `plan.md`.
 
 ## Phase 2: Foundational
 
 **Mục đích**: Hoàn tất nền tảng dùng chung trước khi triển khai từng user story.
 
-- [ ] T004 [P] Tạo typed model cho order book, trade tape, lệnh demo, broker demo và trạng thái bảng điện trong `flex-microfrontend/src/app/exchange/exchange.models.ts`.
-- [ ] T005 [P] Tạo Angular feature module `ExchangeModule` và khai báo component dự kiến trong `flex-microfrontend/src/app/exchange/exchange.module.ts`.
-- [ ] T006 Tạo service `ExchangeApiService` với base URL lấy từ environment, header `X-Correlation-Id` cho command và các kiểu response trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts`.
+- [X] T004 [P] Tạo typed model cho order book, trade tape, lệnh demo, broker demo và trạng thái bảng điện trong `flex-microfrontend/src/app/exchange/exchange.models.ts`.
+- [X] T005 [P] Tạo Angular feature module `ExchangeModule` và khai báo component dự kiến trong `flex-microfrontend/src/app/exchange/exchange.module.ts`.
+- [X] T006 Tạo service `ExchangeApiService` với base URL lấy từ environment, header `X-Correlation-Id` cho command và các kiểu response trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts`.
 
 **Checkpoint**: Cấu hình, model và service boundary sẵn sàng; không có migration hoặc thay đổi backend.
 
@@ -34,17 +34,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T007 [P] [US1] Viết unit test cho mapping `GET /api/orderbook` và `GET /api/trades`, header correlation, giữ snapshot cũ khi refresh lỗi trong `flex-microfrontend/src/app/exchange/exchange-api.service.spec.ts`.
-- [ ] T008 [P] [US1] Viết component test cho render dữ liệu trống/có dữ liệu, giới hạn năm mức giá, thứ tự trade tape và trạng thái loading/error trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
-- [ ] T009 [US1] Viết test polling lifecycle bảo đảm interval 2 giây, không tạo request chồng lấn và dừng khi component bị destroy trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts` (phụ thuộc T008).
+- [X] T007 [P] [US1] Viết unit test cho mapping `GET /api/orderbook` và `GET /api/trades`, header correlation, giữ snapshot cũ khi refresh lỗi trong `flex-microfrontend/src/app/exchange/exchange-api.service.spec.ts`.
+- [X] T008 [P] [US1] Viết component test cho render dữ liệu trống/có dữ liệu, giới hạn năm mức giá, thứ tự trade tape và trạng thái loading/error trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
+- [X] T009 [US1] Viết test polling lifecycle bảo đảm interval 2 giây, không tạo request chồng lấn và dừng khi component bị destroy trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts` (phụ thuộc T008).
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Triển khai các hàm query order book/trades, mapping dữ liệu và chuyển lỗi thành trạng thái UI trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts` (phụ thuộc T004, T006, T007).
-- [ ] T011 [US1] Tạo routing lazy-loaded cho `/exchange` không gắn `AuthGuard` trong `flex-microfrontend/src/app/exchange/exchange-routing.module.ts` và tích hợp route trong `flex-microfrontend/src/app/app-routing.module.ts` (phụ thuộc T005).
-- [ ] T012 [US1] Tạo component điều phối snapshot, polling có lifecycle bounded, refresh sau command và giữ snapshot cuối khi query lỗi trong `flex-microfrontend/src/app/exchange/market-board.component.ts` (phụ thuộc T006, T009, T010).
-- [ ] T013 [US1] Dựng layout hiển thị mã FXS, giá gần nhất, năm mức bid/ask, khối lượng chờ, trade tape, thời điểm cập nhật và trạng thái empty/loading/error trong `flex-microfrontend/src/app/exchange/market-board.component.html` (phụ thuộc T012).
-- [ ] T014 [US1] Tạo style desktop dễ đọc, phân biệt bid/ask/trade và trạng thái lỗi mà không mở rộng phạm vi responsive trong `flex-microfrontend/src/app/exchange/market-board.component.scss` (phụ thuộc T013).
+- [X] T010 [US1] Triển khai các hàm query order book/trades, mapping dữ liệu và chuyển lỗi thành trạng thái UI trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts` (phụ thuộc T004, T006, T007).
+- [X] T011 [US1] Tạo routing lazy-loaded cho `/exchange` không gắn `AuthGuard` trong `flex-microfrontend/src/app/exchange/exchange-routing.module.ts` và tích hợp route trong `flex-microfrontend/src/app/app-routing.module.ts` (phụ thuộc T005).
+- [X] T012 [US1] Tạo component điều phối snapshot, polling có lifecycle bounded, refresh sau command và giữ snapshot cuối khi query lỗi trong `flex-microfrontend/src/app/exchange/market-board.component.ts` (phụ thuộc T006, T009, T010).
+- [X] T013 [US1] Dựng layout hiển thị mã FXS, giá gần nhất, năm mức bid/ask, khối lượng chờ, trade tape, thời điểm cập nhật và trạng thái empty/loading/error trong `flex-microfrontend/src/app/exchange/market-board.component.html` (phụ thuộc T012).
+- [X] T014 [US1] Tạo style desktop dễ đọc, phân biệt bid/ask/trade và trạng thái lỗi mà không mở rộng phạm vi responsive trong `flex-microfrontend/src/app/exchange/market-board.component.scss` (phụ thuộc T013).
 
 **Definition of Done**:
 
@@ -67,16 +67,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T015 [P] [US2] Viết unit test cho request `POST /api/orders`, query `GET /api/orders/{orderId}` và `DELETE /api/orders/{orderId}`, broker allow-list, correlation header và mapping lỗi trong `flex-microfrontend/src/app/exchange/exchange-api.service.spec.ts`.
-- [ ] T016 [P] [US2] Viết component test cho validation broker/side/price/quantity, khóa submit khi đang xử lý, hiển thị accepted/rejected và không báo thành công giả khi cancel lỗi trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
+- [X] T015 [P] [US2] Viết unit test cho request `POST /api/orders`, query `GET /api/orders/{orderId}` và `DELETE /api/orders/{orderId}`, broker allow-list, correlation header và mapping lỗi trong `flex-microfrontend/src/app/exchange/exchange-api.service.spec.ts`.
+- [X] T016 [P] [US2] Viết component test cho validation broker/side/price/quantity, khóa submit khi đang xử lý, hiển thị accepted/rejected và không báo thành công giả khi cancel lỗi trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Bổ sung typed command methods `placeOrder`, `getOrder` và `cancelOrder` theo contract trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts` (phụ thuộc T006, T015).
-- [ ] T018 [US2] Bổ sung Reactive Form với allow-list broker từ environment, side, price, quantity và validation thông báo tại trường trong `flex-microfrontend/src/app/exchange/market-board.component.ts` (phụ thuộc T004, T016).
-- [ ] T019 [US2] Hiển thị form đặt lệnh, kết quả command, danh sách lệnh demo còn chờ và thao tác cancel trong `flex-microfrontend/src/app/exchange/market-board.component.html` (phụ thuộc T017, T018).
-- [ ] T020 [US2] Xử lý submit/cancel một lần, disable thao tác đang chờ, giữ nguyên lý do từ chối, giới hạn broker demo và gọi refresh snapshot sau kết quả trong `flex-microfrontend/src/app/exchange/market-board.component.ts` (phụ thuộc T012, T017, T018, T019).
-- [ ] T021 [US2] Bổ sung style cho form, kết quả accepted/rejected và lệnh đang chờ trong `flex-microfrontend/src/app/exchange/market-board.component.scss` (phụ thuộc T019).
+- [X] T017 [US2] Bổ sung typed command methods `placeOrder`, `getOrder` và `cancelOrder` theo contract trong `flex-microfrontend/src/app/exchange/exchange-api.service.ts` (phụ thuộc T006, T015).
+- [X] T018 [US2] Bổ sung Reactive Form với allow-list broker từ environment, side, price, quantity và validation thông báo tại trường trong `flex-microfrontend/src/app/exchange/market-board.component.ts` (phụ thuộc T004, T016).
+- [X] T019 [US2] Hiển thị form đặt lệnh, kết quả command, danh sách lệnh demo còn chờ và thao tác cancel trong `flex-microfrontend/src/app/exchange/market-board.component.html` (phụ thuộc T017, T018).
+- [X] T020 [US2] Xử lý submit/cancel một lần, disable thao tác đang chờ, giữ nguyên lý do từ chối, giới hạn broker demo và gọi refresh snapshot sau kết quả trong `flex-microfrontend/src/app/exchange/market-board.component.ts` (phụ thuộc T012, T017, T018, T019).
+- [X] T021 [US2] Bổ sung style cho form, kết quả accepted/rejected và lệnh đang chờ trong `flex-microfrontend/src/app/exchange/market-board.component.scss` (phụ thuộc T019).
 
 **Definition of Done**:
 
@@ -89,10 +89,10 @@
 
 ## Final Phase: Polish & Cross-Cutting Concerns
 
-- [ ] T022 [P] Kiểm tra route `/exchange` công khai, broker allow-list và không render token/secret/header nội bộ trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
+- [X] T022 [P] Kiểm tra route `/exchange` công khai, broker allow-list và không render token/secret/header nội bộ trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
 - [ ] T023 [P] Bổ sung test regression cho Angular route, service và component bằng `flex-microfrontend/package.json` (`npm test -- --watch=false` và `npm run build`).
 - [ ] T024 [P] Chạy kiểm tra regression Exchange không thay đổi contract bằng `flex-exchange-service/Flex.Exchange.slnx` (`dotnet build` và test hiện có).
-- [ ] T025 Cập nhật hướng dẫn chạy và smoke flow nếu có khác biệt so với [quickstart.md](quickstart.md), chỉ trong `specs/000012-market-board/quickstart.md`.
+- [X] T025 Cập nhật hướng dẫn chạy và smoke flow nếu có khác biệt so với [quickstart.md](quickstart.md), chỉ trong `specs/000012-market-board/quickstart.md`.
 - [ ] T026 Chạy toàn bộ validation commands và ghi kết quả demo/rollback trong `specs/000012-market-board/quickstart.md`.
 
 ## Traceability Matrix

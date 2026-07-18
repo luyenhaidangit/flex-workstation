@@ -12,10 +12,26 @@
     },
     {
       "key": "exchangeBrokerId",
-      "value": "SSI"
+      "value": "DEMO-BUYER"
+    },
+    {
+      "key": "exchangeBuyerBrokerId",
+      "value": "DEMO-BUYER"
+    },
+    {
+      "key": "exchangeSellerBrokerId",
+      "value": "DEMO-SELLER"
     },
     {
       "key": "exchangeOrderId",
+      "value": "1"
+    },
+    {
+      "key": "exchangeBuyerOrderId",
+      "value": "1"
+    },
+    {
+      "key": "exchangeSellerOrderId",
       "value": "1"
     },
     {
@@ -328,6 +344,125 @@
                 "method": "GET",
                 "header": [],
                 "url": "{{exchangeBaseUrl}}/api/events"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "06 - MVP 03 Bảng điện demo",
+          "description": "Smoke flow cho bảng điện FXS: đọc market snapshot, tạo hai lệnh đối ứng bằng hai broker demo và hủy lệnh còn chờ.",
+          "item": [
+            {
+              "name": "01. Bảng điện - order book",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{exchangeBaseUrl}}/api/orderbook",
+                "description": "Nguồn dữ liệu bid/ask và khối lượng chờ của mã FXS."
+              },
+              "response": []
+            },
+            {
+              "name": "02. Bảng điện - trade tape",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{exchangeBaseUrl}}/api/trades",
+                "description": "Nguồn dữ liệu giao dịch mới nhất để UI hiển thị trade tape."
+              },
+              "response": []
+            },
+            {
+              "name": "03. Demo seller - đặt lệnh bán chờ",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();",
+                      "if (response.accepted && response.orderId) {",
+                      "    pm.collectionVariables.set(\"exchangeSellerOrderId\", response.orderId);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Correlation-Id", "value": "{{exchangeCorrelationId}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"brokerId\": \"{{exchangeSellerBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{exchangeBaseUrl}}/api/orders",
+                "description": "Chạy trước request 04 để tạo thanh khoản bán cho lệnh đối ứng."
+              },
+              "response": []
+            },
+            {
+              "name": "04. Demo buyer - đặt lệnh mua khớp",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Correlation-Id", "value": "{{exchangeCorrelationId}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"brokerId\": \"{{exchangeBuyerBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{exchangeBaseUrl}}/api/orders",
+                "description": "Chạy sau request 03. Sau khi khớp, kiểm tra lại order book và trade tape."
+              },
+              "response": []
+            },
+            {
+              "name": "05. Demo buyer - đặt lệnh chờ để hủy",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();",
+                      "if (response.accepted && response.orderId) {",
+                      "    pm.collectionVariables.set(\"exchangeBuyerOrderId\", response.orderId);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Correlation-Id", "value": "{{exchangeCorrelationId}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"brokerId\": \"{{exchangeBuyerBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Buy\",\n  \"price\": 19000,\n  \"quantity\": 100\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": "{{exchangeBaseUrl}}/api/orders"
+              },
+              "response": []
+            },
+            {
+              "name": "06. Demo buyer - hủy lệnh chờ",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  { "key": "X-Correlation-Id", "value": "{{exchangeCorrelationId}}" }
+                ],
+                "url": "{{exchangeBaseUrl}}/api/orders/{{exchangeBuyerOrderId}}?brokerId={{exchangeBuyerBrokerId}}",
+                "description": "Chạy sau request 05 để kiểm tra vòng đời hủy lệnh demo."
               },
               "response": []
             }
