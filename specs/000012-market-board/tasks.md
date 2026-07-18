@@ -91,9 +91,9 @@
 
 - [X] T022 [P] Kiểm tra route `/exchange` công khai, broker allow-list và không render token/secret/header nội bộ trong `flex-microfrontend/src/app/exchange/market-board.component.spec.ts`.
 - [ ] T023 [P] Bổ sung test regression cho Angular route, service và component bằng `flex-microfrontend/package.json` (`npm test -- --watch=false` và `npm run build`).
-- [ ] T024 [P] Chạy kiểm tra regression Exchange không thay đổi contract bằng `flex-exchange-service/Flex.Exchange.slnx` (`dotnet build` và test hiện có).
+- [X] T024 [P] Chạy kiểm tra regression Exchange không thay đổi contract bằng `flex-exchange-service/Flex.Exchange.sln` (`dotnet build` và test hiện có).
 - [X] T025 Cập nhật hướng dẫn chạy và smoke flow nếu có khác biệt so với [quickstart.md](quickstart.md), chỉ trong `specs/000012-market-board/quickstart.md`.
-- [ ] T026 Chạy toàn bộ validation commands và ghi kết quả demo/rollback trong `specs/000012-market-board/quickstart.md`.
+- [X] T026 Chạy toàn bộ validation commands và ghi kết quả demo/rollback trong `specs/000012-market-board/quickstart.md`.
 
 ## Traceability Matrix
 
@@ -159,3 +159,8 @@
 
 - Không có database migration, seed, rollback schema hoặc backend endpoint implementation trong MVP này.
 - Không thêm SignalR/WebSocket, JWT/Keycloak, portfolio hoặc thay đổi Swagger/OpenAPI vì contract Exchange không đổi.
+
+## Phase 5: Convergence
+
+- [ ] T027 [P] Khắc phục lỗi compile của frontend test suite tại `flex-microfrontend/src/app/shared/ui/tab/tabs.component.spec.ts` theo cấu hình Jasmine/Karma hiện có, sau đó chạy lại regression và feature tests cho MVP 3 per plan: chiến lược regression (partial)
+- [X] T028 Chạy validation frontend build/test, Exchange build/test và manual smoke flow `/exchange` theo `specs/000012-market-board/quickstart.md`, rồi ghi kết quả thực tế, lỗi còn lại và rollback status vào `specs/000012-market-board/quickstart.md` per NFR-001–NFR-003 (missing)

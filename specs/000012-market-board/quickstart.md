@@ -59,3 +59,13 @@ Các contract/API test MVP 02 phải tiếp tục pass; MVP 3 bổ sung test cho
 ## Rollback demo
 
 Dừng frontend hoặc quay về build frontend trước MVP 3. Không cần rollback database hoặc Exchange state; nếu có order demo đang chờ, hủy qua API trước khi dừng môi trường.
+
+## Kết quả validation MVP 3
+
+Ngày kiểm tra: 2026-07-18.
+
+- `flex-microfrontend`: `npx ng build --progress=false` đạt; lazy chunk `exchange` được tạo thành công.
+- `flex-exchange-service`: `dotnet build Flex.Exchange.sln --no-restore` đạt; `dotnet test Flex.Exchange.sln --no-build --no-restore` đạt với 33 test pass.
+- Frontend test suite: Karma đã chạy đủ 148 test sau khi chuyển `jest.spyOn` sang Jasmine `spyOn` và thay bootstrap `require.context` bằng import tĩnh trong `src/test.ts`; kết quả 107 pass, 41 fail ở các test cũ của module khác (thiếu provider/template declaration). Nhóm test `exchange` không phát sinh failure trong lần chạy này; regression toàn bộ vẫn chưa đạt.
+- Smoke API Exchange: endpoint `/api/orderbook` trả HTTP 200 và snapshot symbol `FXS` khi Exchange HTTP profile chạy; manual browser flow đầy đủ cần thực hiện sau khi xử lý blocker Karma.
+- Rollback: không phát sinh migration hoặc thay đổi backend; có thể redeploy frontend artifact trước MVP 3 và hủy các lệnh demo còn chờ qua API.
