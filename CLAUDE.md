@@ -43,7 +43,8 @@ Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào ph
 | Viết, review hoặc generate C#/.NET code | `dotnet-conventions` |
 | Tính năng mới chưa có spec | `spec-driven-development` |
 | Có spec, cần breakdown task | `planning-and-task-breakdown` |
-| Implement code | `incremental-implementation` |
+| Viết code / implement (có hoặc không có plan) | `incremental-implementation` |
+| Fix bug, lỗi runtime, test thất bại | `debugging-and-error-recovery` |
 
 Xem danh sách đầy đủ và cách phối hợp nhiều skill: `using-agent-skills`.
 
