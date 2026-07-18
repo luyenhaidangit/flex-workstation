@@ -17,12 +17,20 @@
     {
       "key": "exchangeOrderId",
       "value": "1"
+    },
+    {
+      "key": "exchangeSymbol",
+      "value": "FXS"
+    },
+    {
+      "key": "exchangeCorrelationId",
+      "value": "postman-mvp02-001"
     }
   ],
   "item": [
     {
       "name": "Flex Exchange Service",
-      "description": "API khớp lệnh FPT in-memory. Dữ liệu bị xóa khi khởi động lại service.",
+      "description": "API khớp lệnh instrument mô phỏng trong-memory. Dữ liệu bị xóa khi khởi động lại service.",
       "item": [
         {
           "name": "01 - Khớp lệnh",
@@ -35,11 +43,15 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "X-Correlation-Id",
+                    "value": "{{exchangeCorrelationId}}"
                   }
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -63,7 +75,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -87,7 +99,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Sell\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -110,7 +122,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 200\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 200\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -153,7 +165,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Sell\",\n  \"price\": 21000,\n  \"quantity\": 100\n}",
+              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Sell\",\n  \"price\": 21000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -169,7 +181,12 @@
               "name": "02. Hủy lệnh chờ",
               "request": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "X-Correlation-Id",
+                    "value": "{{exchangeCorrelationId}}"
+                  }
+                ],
                 "url": "{{exchangeBaseUrl}}/api/orders/{{exchangeOrderId}}?brokerId={{exchangeBrokerId}}",
                 "description": "Chạy sau request 01 trong cùng folder."
               },
@@ -192,7 +209,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
+                  "raw": "{\n  \"brokerId\": \"\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Buy\",\n  \"price\": 20000,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -238,7 +255,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-              "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"FPT\",\n  \"side\": \"Buy\",\n  \"price\": 20050,\n  \"quantity\": 100\n}",
+                  "raw": "{\n  \"brokerId\": \"{{exchangeBrokerId}}\",\n  \"symbol\": \"{{exchangeSymbol}}\",\n  \"side\": \"Buy\",\n  \"price\": 20050,\n  \"quantity\": 100\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -265,6 +282,48 @@
             },
             {
               "name": "02. Xem event log",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{exchangeBaseUrl}}/api/events"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "05 - MVP 02 Tra cứu",
+          "description": "Tra cứu order status, trade tape và event history của MVP 02.",
+          "item": [
+            {
+              "name": "01. Tra cứu trạng thái order",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{exchangeBaseUrl}}/api/orders/{{exchangeOrderId}}?brokerId={{exchangeBrokerId}}"
+              },
+              "response": []
+            },
+            {
+              "name": "02. Tra cứu event history của order",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{exchangeBaseUrl}}/api/orders/{{exchangeOrderId}}/events?brokerId={{exchangeBrokerId}}"
+              },
+              "response": []
+            },
+            {
+              "name": "03. Tra cứu trade tape",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{exchangeBaseUrl}}/api/trades"
+              },
+              "response": []
+            },
+            {
+              "name": "04. Tra cứu event journal",
               "request": {
                 "method": "GET",
                 "header": [],

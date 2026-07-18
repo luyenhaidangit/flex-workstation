@@ -63,6 +63,12 @@ Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos, cài tool, sync flex-agents, sync skill junctions |
 | `.codex/config.toml` | Cấu hình model, approval policy và sandbox cho Codex CLI |
 
+### Quy ước API client/Swagger
+
+- Trong workspace này, khi người dùng nói **“cập nhật Swagger”** đối với API service, mặc định phải cập nhật collection/context tại `postman/` (đặc biệt `postman/flex.postman_collection.json`), không chỉ cấu hình Swashbuckle trong source.
+- Collection Postman phải phản ánh route, payload, biến môi trường và luồng nghiệp vụ hiện tại của service; sau khi sửa phải parse/validate JSON.
+- Cấu hình Swashbuckle/OpenAPI trong service chỉ cập nhật khi người dùng yêu cầu rõ Swagger UI/OpenAPI document hoặc cần đồng bộ contract kỹ thuật.
+
 ### Quy tắc rtk (bắt buộc)
 
 Thay lệnh đọc/tìm/liệt kê/git bằng lệnh `rtk` tương ứng — không bọc PowerShell wrapper trong `rtk`:
