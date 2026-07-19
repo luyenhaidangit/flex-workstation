@@ -53,6 +53,8 @@ Xem danh sách đầy đủ và cách phối hợp nhiều skill: `using-agent-s
 
 Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
 
+**Gate bắt buộc giữa các bước**: Mỗi lệnh `/speckit-*` là bước người dùng gọi tường minh. Sau khi hoàn thành, DỪNG và chờ — không tự chuyển sang bước tiếp theo. "Suggested next step" chỉ là thông tin, không phải lệnh. `/speckit-implement` chỉ chạy khi được gọi trực tiếp. Lệnh cấp cao như "implement X" chỉ tương đương với `/speckit-specify`, không phải toàn bộ pipeline.
+
 ## Cấu trúc project
 
 ```text

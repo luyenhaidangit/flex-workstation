@@ -280,6 +280,8 @@ Report completion (after questioning loop ends or early termination):
 - If any Outstanding or Deferred remain, recommend whether to proceed to `/speckit-plan` or run `/speckit-clarify` again later post-plan.
 - Suggested next command.
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-plan` or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 ## Done When
 
 - [ ] Spec ambiguities identified and clarifications integrated into spec file

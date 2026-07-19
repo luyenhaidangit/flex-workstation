@@ -111,6 +111,8 @@ Command ends after Phase 2 planning. Report branch, IMPL_PLAN path, and generate
 
 Suggested next step: `/speckit-tasks` to generate the implementation task list from the design artifacts.
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-tasks` or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 ## Phases
 
 ### Phase 0: Outline & Research

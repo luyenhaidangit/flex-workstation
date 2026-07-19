@@ -213,6 +213,8 @@ Report completion to the user with:
 - Checklist results summary
 - Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-clarify`, `/speckit-plan`, or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 **NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
 
 ## Quick Guidelines

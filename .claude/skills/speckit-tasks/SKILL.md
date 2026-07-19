@@ -135,6 +135,8 @@ Output path to generated tasks.md and summary:
 - Format validation: Confirm ALL tasks follow the checklist format (checkbox, ID, labels, file paths)
 - Suggested next step: `/speckit-implement` to begin executing tasks. If GitHub Issues are used, run `/speckit-taskstoissues` first. If a cross-artifact quality gate is needed, run `/speckit-analyze` first.
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-analyze`, `/speckit-implement`, or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 Context for task generation: $ARGUMENTS
 
 The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.

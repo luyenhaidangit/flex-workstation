@@ -238,6 +238,8 @@ Append to the **end** of `tasks.md`, per the append contract:
 - On `converged`: recommend proceeding to review / opening a PR. No further implement pass
   is needed for this feature's specified scope.
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-implement` or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 ### 9. Check for extension hooks
 
 After producing the result, check if `.specify/extensions.yml` exists in the project root.

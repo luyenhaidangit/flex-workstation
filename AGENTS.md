@@ -54,6 +54,16 @@ Thiết lập nguyên tắc: `$speckit-constitution`
 
 Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho cả Codex và Claude Code.
 
+### Gate bắt buộc giữa các bước
+
+**Mỗi lệnh `$speckit-*` là một bước riêng biệt do người dùng chủ động gọi.**
+
+- Không tự chuyển sang bước tiếp theo sau khi hoàn thành một lệnh.
+- "Suggested next step" trong completion report chỉ là thông tin — không được tự thực thi.
+- Sau khi mỗi lệnh hoàn thành, DỪNG và chờ người dùng gọi lệnh tiếp theo tường minh.
+- `$speckit-implement` chỉ chạy khi người dùng gọi trực tiếp — không bao giờ tự chạy.
+- Lệnh cấp cao như "thực hiện X" hay "implement X" chỉ tương đương với bước 1 (`$speckit-specify`) — không phải toàn bộ pipeline.
+
 ## Tooling Codex
 
 | Tool | Mục đích |
