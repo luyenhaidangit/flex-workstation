@@ -20,4 +20,5 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 ## Requirements Quality Gate
 
 - `checklists/requirements.md` là quality gate bắt buộc của `$speckit-specify` và phải được sinh từ `.specify/templates/requirements-template.md`.
+- Trong `checklists/requirements.md`, `Status: Pass` và `Status: Không áp dụng` dùng checkbox `[x]`; chỉ `Status: Fail` dùng `[ ]` và chặn gate `$speckit-implement`.
 - `$speckit-checklist` tiếp tục dùng `.specify/templates/checklist-template.md` để tạo checklist tùy biến theo domain; không thay thế hoặc ghi đè requirements quality gate.

@@ -108,7 +108,10 @@ Clarify sửa `spec.md` (chi phí thấp). Nếu chạy sau plan, phát hiện a
 sẽ phải làm lại toàn bộ `plan.md`, `data-model.md`, `contracts/`.
 
 **`/speckit-checklist` là gate cứng của `/speckit-implement`**
-Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa được tick.
+Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa được tick. Với
+`checklists/requirements.md`, item `Status: Không áp dụng` vẫn phải dùng `[x]`:
+checkbox xác nhận item đã được review, còn status ghi nhận tiêu chí không áp dụng;
+do đó item này không chặn gate.
 
 Artifact mới sinh bởi các lệnh Speckit dùng template canonical trong
 `.specify/templates/`. Trong `flex-workstation`, toàn bộ template Speckit được

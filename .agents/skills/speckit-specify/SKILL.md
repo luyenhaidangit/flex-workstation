@@ -168,7 +168,7 @@ Given that feature description, do this:
 
    b. **Run Validation Check**:
       - Review `spec.md` against every `CHK###` item in the generated requirements checklist.
-      - Set each item to `Status: Pass`, `Status: Fail`, or `Status: Không áp dụng`; update the checkbox consistently.
+      - Set each item to `Status: Pass`, `Status: Fail`, or `Status: Không áp dụng`; update the checkbox consistently: `Pass` and `Không áp dụng` use `[x]`, while `Fail` uses `[ ]`. A checked `Không áp dụng` item is reviewed and complete; it does not block the implementation checklist gate.
       - For every Fail, add `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`, `Owner`, and `Hạn xử lý` directly beneath the item.
       - Update the summary counts, review status, conclusion, and permitted next step after each review iteration.
 

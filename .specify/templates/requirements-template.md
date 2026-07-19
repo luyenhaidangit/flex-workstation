@@ -58,6 +58,12 @@
 - `Pass có điều kiện`: Không có `[Blocker]` fail; mọi item `[High]` fail có owner, hạn xử lý và được chấp thuận không chặn bước sau.
 - `Fail`: Có ít nhất một item `[Blocker]` fail hoặc `spec.md` không đủ để đánh giá.
 
+**Quy ước checkbox và Status**:
+
+- `Status: Pass`: dùng checkbox `[x]`.
+- `Status: Fail`: dùng checkbox `[ ]`; item này được gate của `$speckit-implement` xem là chưa hoàn tất.
+- `Status: Không áp dụng`: dùng checkbox `[x]`. Checkbox xác nhận item đã được review, còn status nêu rõ tiêu chí không áp dụng; item này không chặn gate.
+
 ---
 
 ## Chất lượng nội dung
