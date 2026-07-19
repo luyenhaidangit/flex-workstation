@@ -98,6 +98,11 @@ flowchart TD
 - `specify` = mô tả **nghiệp vụ** — không có tên framework, ngôn ngữ, database.
 - `plan` = quyết định **kỹ thuật** — tech stack, architecture đưa vào đây.
 
+**Tránh tạo trùng short-name khi chạy lại `/speckit-specify`**
+- Trước khi tạo feature, `specify` dò các thư mục `specs/*-<short-name>`.
+- Nếu đã có một thư mục trùng, command hỏi chọn **cập nhật spec hiện có** hoặc **tạo feature mới**; không tự tăng số thứ tự để tạo bản sao.
+- Nếu có nhiều thư mục trùng, command liệt kê các thư mục và yêu cầu chọn một thư mục để cập nhật hoặc xác nhận tạo feature mới.
+
 **`/speckit-clarify` nên chạy trước `/speckit-plan`**
 Clarify sửa `spec.md` (chi phí thấp). Nếu chạy sau plan, phát hiện assumption sai
 sẽ phải làm lại toàn bộ `plan.md`, `data-model.md`, `contracts/`.

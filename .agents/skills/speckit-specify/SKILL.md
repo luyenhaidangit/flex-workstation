@@ -73,13 +73,24 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Branch creation** (optional, via hook):
+2. **Guard against an existing short name**:
+
+   Before invoking extension hooks or creating a branch/spec directory, scan `specs/` for directories whose name ends exactly with `-<short-name>`.
+
+   - If no directory matches, continue normally.
+   - If exactly one directory matches, ask the user: **"Đã có spec `<existing-directory>` cùng short-name `<short-name>`. Bạn muốn cập nhật spec hiện có hay tạo feature mới?"** Stop and wait for the user's answer; do not invoke hooks or create files before it.
+   - If multiple directories match, list their paths and ask the user to select one directory to update or to create a feature mới. Stop and wait for the user's answer; do not invoke hooks or create files before it.
+   - If the user chooses **cập nhật spec hiện có**, set `SPECIFY_FEATURE_DIRECTORY` to the selected existing directory. Treat its `spec.md` as the document to update; do not copy the spec template over it or create a new directory. Persist that selected path to `.specify/feature.json` after the spec is updated.
+   - If the user chooses **tạo feature mới**, continue with the normal auto-generated directory and numbering flow.
+   - If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY`, treat it as their selected target and do not run this guard. If it already contains `spec.md`, update that file rather than replacing it from the template.
+
+3. **Branch creation** (optional, via hook):
 
    If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
 
    If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
 
-3. **Create the spec feature directory**:
+4. **Resolve or create the spec feature directory**:
 
    Specs live under the default `specs/` directory unless the user explicitly provides `SPECIFY_FEATURE_DIRECTORY`.
 
@@ -93,10 +104,11 @@ Given that feature description, do this:
       - Set `SPECIFY_FEATURE_DIRECTORY` to `specs/<directory-name>`
       - If `branch_numbering` was used (and `feature_numbering` was absent), emit a one-line warning: "⚠️ `branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
 
-   **Create the directory and spec file**:
-   - `mkdir -p SPECIFY_FEATURE_DIRECTORY`
+   **Create or update the directory and spec file**:
+   - For a new feature directory, run `mkdir -p SPECIFY_FEATURE_DIRECTORY`.
+   - For a selected existing directory, verify `SPECIFY_FEATURE_DIRECTORY/spec.md` exists and update it in place.
    - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
-   - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
+   - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` only for a new feature directory; for an existing directory, use its current `spec.md` as the starting point.
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
    - Replace `{{GIT_USER_NAME}}` in `SPEC_FILE` with `git config user.name` for both metadata fields; use `Chưa xác định` if unavailable. User-provided values take precedence.
    - Replace `[Tóm tắt mong muốn người dùng trong 1-2 câu]` in `SPEC_FILE` with a concise 1-2 sentence summary of the user's intent distilled from the feature description — not the raw input. Capture the core goal and scope only; omit file paths, command syntax, and meta-instructions.
