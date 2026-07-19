@@ -207,8 +207,6 @@ At end of report, output a concise Next Actions block:
 
 Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply them automatically.)
 
-**HARD STOP**: This command is complete after reporting. Do NOT auto-invoke `/speckit-implement` or any other command — even if no CRITICAL issues were found. Report completion and wait for the user to explicitly invoke the next step.
-
 ### 9. Check for extension hooks
 
 After reporting, check if `.specify/extensions.yml` exists in the project root.
@@ -262,3 +260,5 @@ After reporting, check if `.specify/extensions.yml` exists in the project root.
 ## Context
 
 $ARGUMENTS
+
+**HARD STOP**: This command is complete after all steps above (including extension hooks). Do NOT auto-invoke `/speckit-implement` or any other command — even if no CRITICAL issues were found. Report completion and wait for the user to explicitly invoke the next step.
