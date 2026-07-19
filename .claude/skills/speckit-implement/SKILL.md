@@ -181,6 +181,8 @@ Report final status with summary of completed work, tasks completed vs remaining
 
 Suggested next step: `/speckit-converge` to check for remaining gaps between the implementation and the spec/plan.
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-converge` or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 ## Done When
 
 - [ ] All tasks in tasks.md completed and marked `[X]`
