@@ -149,7 +149,7 @@ SYNC_WORKSPACE.cmd
   → scripts\bootstrap.ps1
     → kiểm tra git, VS Code CLI code và winget
     → kiểm tra runtime config CLAUDE.md, AGENTS.md, .claude, .agents, .codex
-    → đồng bộ skill vào .agents/skills và tạo junction từ .claude/skills
+    → tạo junction .claude/skills → .agents/skills (source dùng chung, được git track)
     → scripts\sync-repositories.ps1 -PullExisting
       → đọc workstation.json
       → clone repo còn thiếu vào flex-workstation\

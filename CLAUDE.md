@@ -61,9 +61,8 @@ Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất 
 flex-workstation/
 ├── docs/            # Tài liệu workspace (system-map, onboarding, speckit)
 ├── scripts/         # Bootstrap và tooling scripts
-├── skills/          # Skill source dùng chung (mỗi skill một thư mục SKILL.md)
-├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands)
-├── .agents/         # Cấu hình Codex agent
+├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands); .claude/skills junction tới .agents/skills
+├── .agents/         # Cấu hình Codex agent; skill source dùng chung tại .agents/skills/
 ├── .codex/          # Cấu hình Codex CLI
 ├── workstation.json # Manifest repo được clone khi bootstrap
 ├── CLAUDE.md        # File này — context cho Claude Code
@@ -76,7 +75,7 @@ flex-workstation/
 | Loại | Vị trí |
 | --- | --- |
 | Tài liệu workstation | `docs/` |
-| Skill dùng chung | `skills/<skill-name>/SKILL.md` |
+| Skill dùng chung | `.agents/skills/<skill-name>/SKILL.md` (`.claude/skills` là junction) |
 | Runtime config | `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/` |
 
 ## Tài liệu

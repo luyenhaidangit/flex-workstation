@@ -73,31 +73,33 @@ function Install-ClaudeCodeNative {
 
 function Sync-AgentSkills {
     $projectRoot = Resolve-Path "$PSScriptRoot\.."
-    $claudeSkillsDir = Join-Path $projectRoot ".claude\skills"
     $agentsSkillsDir = Join-Path $projectRoot ".agents\skills"
+    $claudeSkillsDir = Join-Path $projectRoot ".claude\skills"
 
-    if (-not (Test-Path $claudeSkillsDir)) {
-        Write-Warn "No skills found at $claudeSkillsDir - skipping agent skill sync"
+    # .agents/skills is the tracked source of truth (checked out by git).
+    # .claude/skills mirrors it via junctions so Claude Code sees the same skills.
+    if (-not (Test-Path $agentsSkillsDir)) {
+        Write-Warn "No skills found at $agentsSkillsDir - skipping agent skill sync"
         return
     }
 
-    New-Item -ItemType Directory -Force -Path $agentsSkillsDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $claudeSkillsDir | Out-Null
 
     $synced = 0
-    foreach ($skill in Get-ChildItem $claudeSkillsDir -Directory) {
-        $isJunction = $skill.Attributes -band [System.IO.FileAttributes]::ReparsePoint
-        if ($isJunction) {
-            # Junction already resolves to .agents/skills/<name>; no copy needed
-            $synced++
-            continue
+    foreach ($skill in Get-ChildItem $agentsSkillsDir -Directory) {
+        $linkPath = Join-Path $claudeSkillsDir $skill.Name
+        if (Test-Path $linkPath) {
+            $existing = Get-Item -LiteralPath $linkPath -Force
+            $isJunction = $existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint
+            if ($isJunction) {
+                # Junction already points at .agents/skills/<name>; nothing to do
+                $synced++
+                continue
+            }
+            # Stale real copy from an older checkout; replace with a junction
+            Remove-Item -LiteralPath $linkPath -Recurse -Force
         }
-        $destPath = Join-Path $agentsSkillsDir $skill.Name
-        if (-not (Test-Path $destPath)) {
-            New-Item -ItemType Directory -Force -Path $destPath | Out-Null
-            Copy-Item -Recurse -Force "$($skill.FullName)\*" "$destPath\"
-        }
-        Remove-Item -LiteralPath $skill.FullName -Recurse -Force
-        New-Item -ItemType Junction -Path $skill.FullName -Target $destPath | Out-Null
+        New-Item -ItemType Junction -Path $linkPath -Target $skill.FullName | Out-Null
         $synced++
     }
 

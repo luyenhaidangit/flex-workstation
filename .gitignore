@@ -19,9 +19,9 @@ Thumbs.db
 *.tmp
 *.temp
 
-# .agents/skills/ is the local runtime source for shared skills.
-# .claude/skills/ contains tracked aliases that bootstrap converts to junctions.
-.agents/skills/
+# .agents/skills/ is the tracked source of truth for shared skills.
+# .claude/skills/ are junctions to .agents/skills, created by bootstrap (not tracked).
+.claude/skills/
 
 # Nested Flex repositories cloned by workstation sync
 /flex-agent-service/
