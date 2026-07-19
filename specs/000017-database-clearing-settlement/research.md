@@ -5,6 +5,8 @@
 **Rationale**: Khớp ownership mô phỏng, tránh shared database và tránh VSD đọc trực tiếp dữ liệu CTCK/Sở.
 **Alternatives considered**: Một database `exchange` bị loại vì trộn ownership tổ chức.
 
+**Assumption**: Mỗi database `broker` đại diện cho một CTCK; `brokerId` là business identity/configuration, không cần bảng `Broker` trong schema CTCK.
+
 ## R-002 — Thứ tự migration
 **Decision**: reference/order/trade → account/reservation → ledger → settlement/reconciliation.
 **Rationale**: Mọi record bước sau cần tham chiếu nguồn bước trước.

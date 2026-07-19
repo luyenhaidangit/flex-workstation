@@ -19,7 +19,7 @@ Persistence được chia theo tổ chức mô phỏng: Sở giao dịch quản 
 | Runtime | C#/.NET 9, ASP.NET Core tại `flex-exchange-service` |
 | Data access | `Npgsql` + SQL transaction trực tiếp |
 | Migration | Liquibase SQL-first tại `flex-database/changelog/databases/{exchange,broker,vsd}` |
-| Ownership | `exchange` (HoSE/HNX), `broker` (CTCK), `vsd` (VSD); không shared database |
+| Ownership | `exchange` (HoSE/HNX), `broker` (một CTCK/database), `vsd` (VSD); không shared database |
 | Tests | xUnit domain/API, PostgreSQL integration, Liquibase validate/update-sql smoke, staging restore drill |
 
 ## Kiểm tra constitution
@@ -70,7 +70,7 @@ Persistence được chia theo tổ chức mô phỏng: Sở giao dịch quản 
 
 ## Dữ liệu & Migration
 
-Mỗi database có điểm vào riêng: `changelog/databases/exchange/db.changelog-master.yaml`, `broker/...` và `vsd/...`; pipeline truyền đúng master changelog mục tiêu. SQL là Liquibase formatted SQL với changeset bất biến. Không có foreign key hoặc transaction xuyên database: external IDs/correlation là contract, outbox/inbox bảo đảm xử lý lặp. Seed local/test tách khỏi changelog production; forward-fix hoặc restore backup áp dụng độc lập từng database.
+Mỗi database có điểm vào riêng và release `v1.0`: `exchange` tạo reference, orders, order history, trades, outbox; `broker` tạo customers, accounts, reservations, inbox, outbox; `vsd` tạo journals, ledger entries, balances, obligations, statements, reconciliation, inbox, outbox, audit. SQL là Liquibase formatted SQL với changeset bất biến. Không có foreign key hoặc transaction xuyên database: external IDs/correlation là contract, outbox/inbox bảo đảm xử lý lặp. Seed local/test tách khỏi changelog production; forward-fix hoặc restore backup áp dụng độc lập từng database.
 
 ## Quyết định kỹ thuật
 
@@ -91,11 +91,21 @@ Mỗi database có điểm vào riêng: `changelog/databases/exchange/db.changel
 ## Cấu trúc project
 
 ```text
-flex-database/changelog/databases/{exchange,broker,vsd}/{releases,repeatable}/
-flex-database/seed/{local,test}/
+flex-database/
+├── changelog/databases/
+│   ├── exchange/{db.changelog-master.yaml,releases/v1.0,repeatable/}
+│   ├── broker/{db.changelog-master.yaml,releases/v1.0,repeatable/}
+│   └── vsd/{db.changelog-master.yaml,releases/v1.0,repeatable/}
+├── seed/{local,test}/{exchange,broker,vsd}/
+├── environments/*-properties.example
+├── scripts/{validate-all.sh,update-sql.sh,migrate.sh,status.sh,rollback.sh}
+├── tests/{migration,constraints,upgrade,restore}/
+└── pipelines/database-ci.yml
 flex-exchange-service/src/Flex.Exchange.{Application,Infrastructure,Api}/
 flex-exchange-service/tests/Flex.Exchange.{Domain.Tests,Api.Tests}/
 ```
+
+`exchange/releases/v1.0` include lần lượt reference tables, orders, order history, trades, outbox; `v1.1` chỉ thêm trade sequence. `broker/releases/v1.0` include customers, accounts, reservations, inbox, outbox. `vsd/releases/v1.0` include journals, ledger entries, balances, obligations, statements, reconciliation, inbox, outbox và audit. `repeatable` không được tự chạy; chỉ được include qua changelog/release được review.
 
 ## Rollout & Rollback
 
