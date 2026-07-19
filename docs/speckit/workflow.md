@@ -119,6 +119,11 @@ Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa đư�
 checkbox xác nhận item đã được review, còn status ghi nhận tiêu chí không áp dụng;
 do đó item này không chặn gate.
 
+**Traceability Gate của `/speckit-analyze` và `/speckit-converge`**
+Hai command phải inventory và kiểm coverage cho `US`/`AC`, `FR`, `BR`, `SEC`,
+`NFR` và `SC` có work cần build. `MT` cũng được inventory để kiểm tra trace về
+requirement hoặc validation, nhưng KPI nghiệp vụ thuần túy không bắt buộc có code task.
+
 Artifact mới sinh bởi các lệnh Speckit dùng template canonical trong
 `.specify/templates/`. Trong `flex-workstation`, toàn bộ template Speckit được
 custom để phần người dùng đọc/review dùng tiếng Việt có dấu, còn các định danh

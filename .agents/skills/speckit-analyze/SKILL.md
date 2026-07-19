@@ -85,7 +85,11 @@ Load only the minimal necessary context from each artifact:
 **From spec.md:**
 
 - Overview/Context
+- Objectives (MT-###)
 - Functional Requirements
+- Business Rules (BR-###)
+- Security Requirements (SEC-###)
+- Non-Functional Requirements (NFR-###)
 - Success Criteria (measurable outcomes — e.g., performance, security, availability, user success, business impact)
 - User Stories
 - Edge Cases (if present)
@@ -113,7 +117,7 @@ Load only the minimal necessary context from each artifact:
 
 Create internal representations (do not include raw artifacts in output):
 
-- **Requirements inventory**: For each Functional Requirement (FR-###) and Success Criterion (SC-###), record a stable key. Use the explicit FR-/SC- identifier as the primary key when present, and optionally also derive an imperative-phrase slug for readability (e.g., "User can upload file" → `user-can-upload-file`). Include only Success Criteria items that require buildable work (e.g., load-testing infrastructure, security audit tooling), and exclude post-launch outcome metrics and business KPIs (e.g., "Reduce support tickets by 50%").
+- **Requirements inventory**: Record a stable key for every Objective (MT-###), Functional Requirement (FR-###), Business Rule (BR-###), Security Requirement (SEC-###), Non-Functional Requirement (NFR-###), and buildable Success Criterion (SC-###). Use the explicit identifier as the primary key when present, and optionally derive an imperative-phrase slug for readability (e.g., "User can upload file" → `user-can-upload-file`). Include MT-### to verify traceability to FR-/SC-/validation, but do not require a direct task for a pure business KPI. Include only SC-### items that require buildable work (e.g., load-testing infrastructure, security audit tooling), and exclude post-launch outcome metrics and business KPIs (e.g., "Reduce support tickets by 50%").
 - **User story/action inventory**: Discrete user actions with acceptance criteria
 - **Task coverage mapping**: Map each task to one or more requirements or stories (inference by keyword / explicit reference patterns like IDs or key phrases)
 - **Constitution rule set**: Extract principle names and MUST/SHOULD normative statements
@@ -146,6 +150,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 #### E. Coverage Gaps
 
 - Requirements with zero associated tasks
+- BR-/SEC-/NFR-### obligations with zero associated implementation, test, or validation task
 - Tasks with no mapped requirement/story
 - Success Criteria requiring buildable work (performance, security, availability) not reflected in tasks
 
@@ -179,7 +184,7 @@ Output a Markdown report (no file writes) with the following structure:
 
 **Coverage Summary Table:**
 
-| Requirement Key | Has Task? | Task IDs | Notes |
+| Requirement Key (`MT`/`US`/`FR`/`BR`/`SEC`/`NFR`/`SC`) | Has Task or Validation? | Task IDs | Notes |
 |-----------------|-----------|----------|-------|
 
 **Constitution Alignment Issues:** (if any)
