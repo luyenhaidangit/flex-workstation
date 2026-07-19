@@ -208,9 +208,10 @@ Output a Markdown report (no file writes) with the following structure:
 
 At end of report, output a concise Next Actions block:
 
-- If CRITICAL issues exist: Recommend resolving before `/speckit-implement`
-- If only LOW/MEDIUM: User may proceed, but provide improvement suggestions
-- Provide explicit command suggestions: e.g., "Run /speckit-specify with refinement", "Run /speckit-plan to adjust architecture", "Manually edit tasks.md to add coverage for 'performance-metrics'"
+- If CRITICAL issues exist: Recommend resolving before `/speckit-implement`; list the specific fix commands to run first (e.g., `/speckit-specify`, `/speckit-plan`, `/speckit-tasks`).
+- If only LOW/MEDIUM: User may proceed; provide improvement suggestions then explicitly state: "Next step: `/speckit-implement`".
+- If zero issues: Explicitly state: "All clear — next step: `/speckit-implement`".
+- Always end with one concrete command for the user to run next.
 
 ### 8. Offer Remediation
 

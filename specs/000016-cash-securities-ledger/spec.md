@@ -141,14 +141,14 @@ Người vận hành chọn một lệnh hoặc giao dịch và xem được cá
 ## 12. Yêu cầu phi chức năng
 
 - **NFR-001**: 100% journal được chấp nhận phải vượt kiểm tra cân bằng trước khi hiển thị là đã ghi nhận.
-- **NFR-002**: Người vận hành nhận được kết quả truy vấn số dư và trace trong vòng 3 giây ở tải demo thông thường.
+- **NFR-002**: Mỗi API truy vấn balance hoặc trace phải phản hồi trong vòng 3 giây ở tải demo thông thường.
 - **NFR-003**: Tính năng không làm mất khả năng truy vết các lệnh và giao dịch đã có từ MVP trước.
 
 ## 13. Tiêu chí thành công
 
 - **SC-001**: 100% giao dịch demo Alpha mua/Beta bán tạo journal cân bằng cho cả hai phía và các dòng phí liên quan.
 - **SC-002**: 100% event khớp gửi lặp không tạo journal hoặc biến động số dư trùng.
-- **SC-003**: Người kiểm thử truy vết từ một lệnh đến journal và số dư trong dưới 3 phút.
+- **SC-003**: Người kiểm thử hoàn tất quy trình truy vết từ một lệnh đến journal và số dư trong dưới 3 phút; đây là thời gian workflow, không phải latency của một API.
 - **SC-004**: Không có truy vấn chéo tenant nào trả về số dư hoặc dòng ledger.
 
 ## 14. Giả định & Ràng buộc
