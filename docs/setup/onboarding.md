@@ -47,7 +47,7 @@ Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, `uv`, `specify-cli` và Claude
 | Codex CLI | `.codex/config.toml` | Cấu hình model, approval policy và sandbox. |
 | Codex | `AGENTS.md`, `.agents/` | Context và resource runtime cho Codex. |
 
-Skill source dùng chung nằm trong `flex-workstation/skills/`. Bootstrap không đưa các skill local này vào runtime target; bộ skill Claude Code được cập nhật qua plugin `flex-agents@flex-agents`.
+Skill Speckit dùng chung có source runtime tại `.agents/skills/`; bootstrap chuyển các đường dẫn tương ứng trong `.claude/skills/` thành junction để Claude Code và Codex đọc cùng một bản. Bộ skill global của Claude Code tiếp tục được cập nhật qua plugin `flex-agents@flex-agents`.
 
 ## Cấu hình workstation
 

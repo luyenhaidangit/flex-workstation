@@ -16,7 +16,8 @@ Tài liệu này gộp bản đồ cấu trúc `flex-workstation` (repo, bootstr
 
 ```text
 flex-workstation/
-├── .claude/              # Cấu hình Claude Code, hooks, commands và skills runtime
+├── .claude/              # Cấu hình Claude Code; skills dùng junction tới .agents/skills
+├── .agents/              # Source runtime dùng chung cho skills Claude Code và Codex
 ├── .codex/               # Cấu hình Codex CLI
 ├── .specify/             # Spec Kit runtime, templates, scripts và workflows
 ├── .vscode/              # VS Code workspace tasks
@@ -148,6 +149,7 @@ SYNC_WORKSPACE.cmd
   → scripts\bootstrap.ps1
     → kiểm tra git, VS Code CLI code và winget
     → kiểm tra runtime config CLAUDE.md, AGENTS.md, .claude, .agents, .codex
+    → đồng bộ skill vào .agents/skills và tạo junction từ .claude/skills
     → scripts\sync-repositories.ps1 -PullExisting
       → đọc workstation.json
       → clone repo còn thiếu vào flex-workstation\

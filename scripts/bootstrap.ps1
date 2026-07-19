@@ -92,12 +92,16 @@ function Sync-AgentSkills {
             continue
         }
         $destPath = Join-Path $agentsSkillsDir $skill.Name
-        New-Item -ItemType Directory -Force -Path $destPath | Out-Null
-        Copy-Item -Recurse -Force "$($skill.FullName)\*" "$destPath\"
+        if (-not (Test-Path $destPath)) {
+            New-Item -ItemType Directory -Force -Path $destPath | Out-Null
+            Copy-Item -Recurse -Force "$($skill.FullName)\*" "$destPath\"
+        }
+        Remove-Item -LiteralPath $skill.FullName -Recurse -Force
+        New-Item -ItemType Junction -Path $skill.FullName -Target $destPath | Out-Null
         $synced++
     }
 
-    Write-Ok "Agent skills synced: $synced skills (.claude/skills -> .agents/skills)"
+    Write-Ok "Agent skills synced: $synced skills (.agents/skills source, .claude/skills junctions)"
 }
 
 function Initialize-WorkspaceProjectConfig {
@@ -221,7 +225,7 @@ Set-PowerShellUtf8Profile
 
 Initialize-WorkspaceProjectConfig
 
-Write-Step "Syncing agent skills (.claude/skills -> .agents/skills)"
+Write-Step "Syncing shared agent skills (.agents/skills source, .claude/skills junctions)"
 Sync-AgentSkills
 
 & "$PSScriptRoot\sync-repositories.ps1" -PullExisting

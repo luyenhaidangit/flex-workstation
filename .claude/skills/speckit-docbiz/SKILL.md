@@ -126,6 +126,8 @@ Report to the user:
 - Key sections included
 - Next step if applicable (e.g. `/speckit-plan` if planning has not started)
 
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-plan` or any other command. Report completion and wait for the user to explicitly invoke the next step.
+
 ## Done When
 
 - [ ] `.specify/feature.json` read and feature directory resolved
