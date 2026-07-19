@@ -4,7 +4,7 @@
 
 ## Tóm tắt
 
-Persistence được đưa vào theo thứ tự domain: order/trade → broker/account/reservation → ledger → settlement/reconciliation. `flex-database` quản lý Liquibase SQL-first; `flex-exchange-service` thay persistence in-memory bằng adapter PostgreSQL nhưng giữ các contract MVP trước tương thích.
+Persistence được chia theo tổ chức mô phỏng: Sở giao dịch quản lý order/trade, CTCK quản lý account/reservation và VSD quản lý ledger/settlement/reconciliation. Mỗi tổ chức có PostgreSQL database và Liquibase master changelog riêng; các contract giữ stable business reference xuyên tổ chức.
 
 ## Phạm vi kỹ thuật
 
@@ -18,8 +18,8 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 |---|---|
 | Runtime | C#/.NET 9, ASP.NET Core tại `flex-exchange-service` |
 | Data access | `Npgsql` + SQL transaction trực tiếp |
-| Migration | Liquibase SQL-first tại `flex-database/changelog/databases/exchange` |
-| Isolation | Database per tenant; mọi record/query vẫn có tenant/broker scope |
+| Migration | Liquibase SQL-first tại `flex-database/changelog/databases/{exchange,broker,vsd}` |
+| Ownership | `exchange` (HoSE/HNX), `broker` (CTCK), `vsd` (VSD); không shared database |
 | Tests | xUnit domain/API, PostgreSQL integration, Liquibase validate/update-sql smoke, staging restore drill |
 
 ## Kiểm tra constitution
@@ -34,19 +34,19 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 
 ## Thiết kế tổng quan
 
-1. Liquibase master changelog include các release SQL theo thứ tự reference/order/trade, broker/account/reservation, ledger, rồi settlement/reconciliation.
-2. Adapter persistence ghi event/state transactionally và rehydrate engine state theo sequence khi service khởi động.
-3. Reservation, journal và obligation chỉ nhận source order/trade/account đã tồn tại; idempotency chặn bản ghi lặp.
-4. Trace nội bộ liên kết order/trade/account/journal/obligation/reconciliation theo tenant/broker scope.
-5. Backup/restore staging được xác minh bằng rehydration, trace và reconciliation smoke.
+1. `exchange` persist reference/order/trade và công bố `TradeExecuted` với `tradeId`, order IDs, broker ID, tenant ID, sequence và correlation.
+2. `broker` persist customer/account/reservation; chỉ lưu external order/trade references, không đọc bảng `exchange`.
+3. `vsd` persist journal/obligation/statement/reconciliation; chỉ nhận clearing instruction có trade/account references, không foreign key sang `exchange`/`broker`.
+4. Mỗi database dùng outbox/inbox để xử lý lặp; trace tổng hợp theo business reference và correlation, không join xuyên database.
+5. Backup/restore staging được xác minh độc lập từng database rồi chạy trace/reconciliation end-to-end.
 
 ## Traceability từ spec sang thiết kế kỹ thuật
 
 | Spec | Hướng xử lý | Module/path | Data/contract | Kiểm thử |
 |---|---|---|---|---|
-| US-001, FR-001–003, BR-001/002, NFR-001/003 | Persist/rebuild exchange state theo sequence. | `src/Flex.Exchange.Infrastructure/Persistence`; `src/Flex.Exchange.Application` | reference, order, order history, trade | Restart/rehydration integration. |
-| US-002, FR-004–006, BR-003, NFR-002 | Persist account/reservation source-linked and idempotent. | `Application/PreTrade`, `Infrastructure/Persistence` | broker, customer, account, reservation | Duplicate/restart tests. |
-| US-003, FR-007–010, BR-004/005, NFR-004 | Ledger and T+ from persisted trade/account. | `Application/{Ledger,Settlement}` | journal, entry, balance, obligation | Balance/T+ integration. |
+| US-001, FR-001–003, BR-001/002, NFR-001/003 | Persist/rebuild exchange state theo sequence. | `Application/Exchange`, `Infrastructure/ExchangePersistence` | `exchange`: reference, order, history, trade | Restart/rehydration integration. |
+| US-002, FR-004–006, BR-003, NFR-002 | Persist account/reservation source-linked và consume exchange reference. | `Application/PreTrade`, `Infrastructure/BrokerPersistence` | `broker`: customer, account, reservation, inbox/outbox | Duplicate/restart tests. |
+| US-003, FR-007–010, BR-004/005, NFR-004 | VSD consume clearing instruction và ghi ledger/T+. | `Application/{Ledger,Settlement}`, `Infrastructure/VsdPersistence` | `vsd`: journal, entry, balance, obligation | Balance/T+ integration. |
 | US-004, FR-011–014, BR-006, NFR-006 | Statement/reconciliation and tenant restore. | `Application/Reconciliation`; `Api/Controllers` | statement, result, alert, audit | Alert/no-fix, restore drill. |
 | US-005, FR-015–018, BR-007, SEC-001–003, NFR-005 | Scope guard, audit, health/trace. | `Api/Controllers`, `Application`, `Infrastructure` | audit, inbox/outbox | Cross-tenant/security tests. |
 
@@ -54,7 +54,7 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 
 | Khu vực | Tác động | Cách kiểm tra |
 |---|---|---|
-| Database | Liquibase formatted SQL theo release; seed Alpha/Beta tách khỏi changelog production. | `liquibase validate`, `update-sql` và re-run seed smoke. |
+| Database | Ba Liquibase master độc lập theo tổ chức; seed Alpha/Beta tách khỏi changelog production. | Validate/update-sql từng database và contract trace end-to-end. |
 | Existing API | Giữ contract MVP 01–07; internal trace/health additive. | API regression/contract tests. |
 | Permission | Tenant/broker guard cho read/write/recovery. | Cross-scope denial tests. |
 | Logging/Audit | Correlation/source/action/result không chứa secret. | Audit/log assertions. |
@@ -64,20 +64,20 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 | Contract | Thay đổi | Consumer |
 |---|---|---|
 | Existing order/broker endpoints | Giữ response hiện có, đọc/ghi qua persistence. | MVP 01–07 consumers |
-| `GET /internal/persistence/trace` | Trace source từ order/trade tới hậu giao dịch. | Operator |
+| `GET /internal/persistence/trace` | Tổng hợp trace qua business reference/correlation, không join database. | Operator |
 | `GET /internal/persistence/health` | Readiness, migration, backlog, dead-letter, restore state. | Operator/monitoring |
 | Existing settlement/reconciliation/replay endpoints | Additive internal operations, scope-protected. | Operator/admin |
 
 ## Dữ liệu & Migration
 
-`changelog/databases/exchange/db.changelog-master.yaml` là điểm vào duy nhất và include release tường minh. Mỗi SQL file là Liquibase formatted SQL, có changeset bất biến và rollback khi phù hợp. Không backfill dữ liệu production vì feature chưa có persistent data; seed local/test tách khỏi changelog production. Rollback data dùng restore backup hoặc forward-fix, tuyệt đối không xóa/sửa history.
+Mỗi database có điểm vào riêng: `changelog/databases/exchange/db.changelog-master.yaml`, `broker/...` và `vsd/...`; pipeline truyền đúng master changelog mục tiêu. SQL là Liquibase formatted SQL với changeset bất biến. Không có foreign key hoặc transaction xuyên database: external IDs/correlation là contract, outbox/inbox bảo đảm xử lý lặp. Seed local/test tách khỏi changelog production; forward-fix hoặc restore backup áp dụng độc lập từng database.
 
 ## Quyết định kỹ thuật
 
 | ID | Quyết định | Lý do | Loại bỏ |
 |---|---|---|---|
 | DEC-001 | SQL trực tiếp với Npgsql | Atomicity rõ và khớp Liquibase SQL-first. | EF Core/repository generic. |
-| DEC-002 | Persist theo timeline order→post-trade | Bảo toàn nguồn dữ liệu nghiệp vụ. | Ledger độc lập. |
+| DEC-002 | Database theo ownership tổ chức | Khớp mô phỏng HoSE/HNX, CTCK và VSD. | Một shared database. |
 | DEC-003 | Rehydrate theo sequence/event history | Khôi phục deterministic MVP 01. | Snapshot-only không trace được. |
 | DEC-004 | Internal operations additive | Không phá contract cũ. | Service clearing riêng. |
 
@@ -91,7 +91,7 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 ## Cấu trúc project
 
 ```text
-flex-database/changelog/databases/exchange/{releases,repeatable}/
+flex-database/changelog/databases/{exchange,broker,vsd}/{releases,repeatable}/
 flex-database/seed/{local,test}/
 flex-exchange-service/src/Flex.Exchange.{Application,Infrastructure,Api}/
 flex-exchange-service/tests/Flex.Exchange.{Domain.Tests,Api.Tests}/
@@ -99,7 +99,7 @@ flex-exchange-service/tests/Flex.Exchange.{Domain.Tests,Api.Tests}/
 
 ## Rollout & Rollback
 
-Pull request chạy `liquibase validate` và `update-sql`; staging chạy backup → Liquibase update bởi một CI/CD pipeline hoặc Kubernetes Job → smoke → deploy ứng dụng. Seed chỉ chạy local/test. Migration không rollback bằng delete; lỗi sau rollout dùng forward-fix hoặc restore backup. Tắt persistence chỉ khi không mất dữ liệu mới cần giữ.
+Pull request chạy `liquibase validate` và `update-sql` cho cả ba master changelog. Staging backup → cập nhật `exchange`, `broker`, `vsd` bởi một CI/CD pipeline/Kubernetes Job duy nhất mỗi database → contract smoke theo thứ tự exchange→broker→vsd → deploy ứng dụng. Seed chỉ chạy local/test; lỗi dùng forward-fix hoặc restore backup cho database bị ảnh hưởng.
 
 ## Observability & Debug
 

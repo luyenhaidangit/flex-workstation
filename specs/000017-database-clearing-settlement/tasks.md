@@ -1,94 +1,91 @@
-# Tasks: Persistence foundation MVP 01–08
+# Tasks: Persistence theo tổ chức HoSE/HNX, CTCK và VSD
 
 ## Phase 1: Setup
 
-- [ ] T001 Thêm `MySqlConnector` vào `flex-exchange-service/src/Flex.Exchange.Infrastructure/Flex.Exchange.Infrastructure.csproj`.
-- [ ] T002 Thêm configuration key `Persistence:ConnectionString` không chứa secret vào `flex-exchange-service/src/Flex.Exchange.Api/appsettings.json`.
-- [ ] T003 Cập nhật prerequisite MySQL/Flyway/secret tại `specs/000017-database-clearing-settlement/quickstart.md`.
+- [ ] T001 Thêm `Npgsql` vào `flex-exchange-service/src/Flex.Exchange.Infrastructure/Flex.Exchange.Infrastructure.csproj`.
+- [ ] T002 Tạo mẫu configuration connection riêng cho `exchange`, `broker`, `vsd` trong `flex-exchange-service/src/Flex.Exchange.Api/appsettings.json`.
+- [ ] T003 Tạo `liquibase.properties.example` với master changelog chọn theo database trong `flex-database/liquibase.properties.example`.
 
-## Phase 2: Foundational
+## Phase 2: Foundational — Liquibase và contract xuyên tổ chức
 
-- [ ] T004 Tạo migration reference/order/order history/trade trong `flex-database/exchange/migrations/V1.0__create_exchange_core.sql`.
-- [ ] T005 [P] Tạo migration broker/customer/account/reservation trong `flex-database/exchange/migrations/V1.1__create_broker_accounts.sql`.
-- [ ] T006 [P] Tạo migration journal/entry/balance/inbox/outbox/audit trong `flex-database/exchange/migrations/V1.2__create_ledger.sql`.
-- [ ] T007 [P] Tạo migration obligation/statement/reconciliation/alert trong `flex-database/exchange/migrations/V1.3__create_post_trade.sql`.
-- [ ] T008 Tạo seed Alpha/Beta idempotent trong `flex-database/exchange/seeders/V1.0__seed_demo_tenants.sql` (phụ thuộc T004–T007).
-- [ ] T009 Tạo `PersistenceConnectionOptions` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/PersistenceConnectionOptions.cs`.
-- [ ] T010 Tạo `PersistenceScopeGuard` cho tenant/broker trong `flex-exchange-service/src/Flex.Exchange.Application/Persistence/PersistenceScopeGuard.cs`.
-- [ ] T011 Tạo fixture MySQL trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/MySqlPersistenceFixture.cs`.
-- [ ] T012 Tạo Flyway/seed smoke test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/PersistenceMigrationTests.cs` (phụ thuộc T008, T011).
+- [ ] T004 Tạo master changelog `exchange` trong `flex-database/changelog/databases/exchange/db.changelog-master.yaml`.
+- [ ] T005 [P] Tạo master changelog `broker` trong `flex-database/changelog/databases/broker/db.changelog-master.yaml`.
+- [ ] T006 [P] Tạo master changelog `vsd` trong `flex-database/changelog/databases/vsd/db.changelog-master.yaml`.
+- [ ] T007 Tạo contract `TradeExecuted` và `ClearingInstruction` dùng external IDs/correlation trong `specs/000017-database-clearing-settlement/contracts/persistence.md`.
+- [ ] T008 Tạo `OrganizationPersistenceOptions` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/OrganizationPersistenceOptions.cs`.
+- [ ] T009 Tạo outbox/inbox envelope chung trong `flex-exchange-service/src/Flex.Exchange.Application/Persistence/OrganizationMessage.cs`.
+- [ ] T010 Viết Liquibase validate/update-sql smoke cho ba master changelog trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/LiquibaseOrganizationTests.cs`.
 
-## Phase 3: US-001 — Khôi phục lõi giao dịch MVP 01–04
+## Phase 3: US-001 — HoSE/HNX: order và trade
 
-**Independent Test**: Tạo order/trade, restart service, xác nhận thứ tự và trạng thái được khôi phục.
+**Independent Test**: Restart `exchange` vẫn rehydrate order/trade theo sequence và công bố đúng `TradeExecuted`.
 
-- [ ] T013 [P] [US1] Viết rehydration lifecycle test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/OrderRehydrationTests.cs` cho FR-001/002.
-- [ ] T014 [P] [US1] Viết trade-to-two-orders trace test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/TradePersistenceTests.cs` cho FR-003/NFR-001.
-- [ ] T015 [US1] Tạo repository SQL order/history/trade trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/MySqlExchangeRepository.cs` (phụ thuộc T004, T009).
-- [ ] T016 [US1] Tạo `ExchangeStateRehydrator` theo sequence trong `flex-exchange-service/src/Flex.Exchange.Application/Persistence/ExchangeStateRehydrator.cs` (phụ thuộc T013, T015).
-- [ ] T017 [US1] Wire persistent exchange state vào `AddExchangeApplication` trong `flex-exchange-service/src/Flex.Exchange.Application/DependencyInjection.cs` (phụ thuộc T016).
-- [ ] T018 [US1] Viết restart integration test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/ExchangeRestartTests.cs` (phụ thuộc T014, T017).
+- [ ] T011 [P] [US1] Tạo release changelog order/trade trong `flex-database/changelog/databases/exchange/releases/v1.0/db.changelog-v1.0.yaml`.
+- [ ] T012 [P] [US1] Tạo Liquibase formatted SQL reference/order/history/trade trong `flex-database/changelog/databases/exchange/releases/v1.0/001-create-exchange-core.sql`.
+- [ ] T013 [P] [US1] Viết rehydration sequence test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/ExchangeRehydrationTests.cs` cho FR-001/002/NFR-003.
+- [ ] T014 [US1] Tạo `ExchangePersistenceRepository` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/ExchangePersistence/ExchangePersistenceRepository.cs` (phụ thuộc T011, T012, T008).
+- [ ] T015 [US1] Tạo `ExchangeStateRehydrator` trong `flex-exchange-service/src/Flex.Exchange.Application/Exchange/ExchangeStateRehydrator.cs` (phụ thuộc T013, T014).
+- [ ] T016 [US1] Ghi `TradeExecuted` vào exchange outbox trong `flex-exchange-service/src/Flex.Exchange.Application/Exchange/ExchangeTradePublisher.cs` (phụ thuộc T007, T009, T014).
+- [ ] T017 [US1] Viết restart và `TradeExecuted` contract integration test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/ExchangePersistenceTests.cs` (phụ thuộc T015, T016).
 
-## Phase 4: US-002 — Broker/account/reservation bền vững
+## Phase 4: US-002 — CTCK: account và reservation
 
-**Independent Test**: Tạo reservation từ order, restart và gửi lặp source; không có reservation/balance trùng.
+**Independent Test**: Broker consume trade/order reference, tạo reservation idempotent và không truy cập database `exchange`.
 
-- [ ] T019 [P] [US2] Viết reservation idempotency test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/ReservationPersistenceTests.cs` cho FR-005/006/NFR-002.
-- [ ] T020 [US2] Tạo repository SQL broker/customer/account/reservation trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/MySqlBrokerRepository.cs` (phụ thuộc T005, T009).
-- [ ] T021 [US2] Cập nhật `ReservationManager` dùng repository và source order trong `flex-exchange-service/src/Flex.Exchange.Application/PreTrade/ReservationManager.cs` (phụ thuộc T019, T020).
-- [ ] T022 [US2] Viết restart/duplicate integration test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/BrokerReservationTests.cs` (phụ thuộc T018, T021).
+- [ ] T018 [P] [US2] Tạo release changelog account/reservation trong `flex-database/changelog/databases/broker/releases/v1.0/db.changelog-v1.0.yaml`.
+- [ ] T019 [P] [US2] Tạo Liquibase formatted SQL customer/account/reservation/inbox/outbox trong `flex-database/changelog/databases/broker/releases/v1.0/001-create-broker-core.sql`.
+- [ ] T020 [P] [US2] Viết reservation duplicate/external-reference test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/BrokerReservationTests.cs` cho FR-004–006/NFR-002.
+- [ ] T021 [US2] Tạo `BrokerPersistenceRepository` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/BrokerPersistence/BrokerPersistenceRepository.cs` (phụ thuộc T018, T019, T008).
+- [ ] T022 [US2] Tạo `BrokerTradeConsumer` consume `TradeExecuted` qua inbox trong `flex-exchange-service/src/Flex.Exchange.Application/PreTrade/BrokerTradeConsumer.cs` (phụ thuộc T007, T009, T020, T021).
+- [ ] T023 [US2] Viết integration test broker không join `exchange` và reservation restart-safe trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/BrokerPersistenceTests.cs` (phụ thuộc T017, T022).
 
-## Phase 5: US-003 — Ledger và settlement theo trade nguồn
+## Phase 5: US-003 — VSD: ledger và settlement
 
-**Independent Test**: Trade nguồn tạo journal cân bằng, obligation T+ và trace xuyên order/account.
+**Independent Test**: VSD consume clearing instruction, tạo journal cân bằng/T+ theo external trade/account reference.
 
-- [ ] T023 [P] [US3] Viết ledger balance/T+ tests trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/LedgerSettlementPersistenceTests.cs` cho FR-007–010/NFR-004.
-- [ ] T024 [US3] Tạo repository SQL ledger/obligation trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/MySqlLedgerRepository.cs` (phụ thuộc T006, T007, T009).
-- [ ] T025 [US3] Cập nhật `ILedgerService` persistence adapter trong `flex-exchange-service/src/Flex.Exchange.Application/Ledger/ILedgerService.cs` để yêu cầu trade/account source (phụ thuộc T022, T024).
-- [ ] T026 [US3] Tạo `SettlementService` idempotent trong `flex-exchange-service/src/Flex.Exchange.Application/Settlement/SettlementService.cs` (phụ thuộc T023–T025).
-- [ ] T027 [US3] Viết integration trace order→trade→account→journal→obligation trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/LedgerSettlementTraceTests.cs` (phụ thuộc T026).
+- [ ] T024 [P] [US3] Tạo release changelog ledger/settlement trong `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml`.
+- [ ] T025 [P] [US3] Tạo Liquibase formatted SQL journal/entry/balance/inbox/outbox/audit/obligation trong `flex-database/changelog/databases/vsd/releases/v1.0/001-create-vsd-core.sql`.
+- [ ] T026 [P] [US3] Viết ledger balance/T+ external-reference test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/VsdLedgerSettlementTests.cs` cho FR-007–010/NFR-004.
+- [ ] T027 [US3] Tạo `VsdPersistenceRepository` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/VsdPersistence/VsdPersistenceRepository.cs` (phụ thuộc T024, T025, T008).
+- [ ] T028 [US3] Tạo `VsdClearingConsumer` consume `ClearingInstruction` qua inbox trong `flex-exchange-service/src/Flex.Exchange.Application/Ledger/VsdClearingConsumer.cs` (phụ thuộc T007, T009, T026, T027).
+- [ ] T029 [US3] Cập nhật `SettlementService` dùng VSD repository và cycle idempotent trong `flex-exchange-service/src/Flex.Exchange.Application/Settlement/SettlementService.cs` (phụ thuộc T027, T028).
+- [ ] T030 [US3] Viết integration trace trade reference→journal→obligation trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/VsdLedgerSettlementTests.cs` (phụ thuộc T023, T029).
 
-## Phase 6: US-004 — Reconciliation và restore tenant
+## Phase 6: US-004 — VSD reconciliation và restore
 
-**Independent Test**: Statement đúng/lệch trả matched/alert; restore tenant staging vẫn trace/reconcile được.
+**Independent Test**: Statement đúng/lệch tạo matched/alert; restore `vsd` vẫn reconcile theo reference.
 
-- [ ] T028 [P] [US4] Viết reconciliation no-auto-fix test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/ReconciliationPersistenceTests.cs` cho FR-011–013.
-- [ ] T029 [US4] Tạo repository SQL statement/result/alert trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/MySqlReconciliationRepository.cs` (phụ thuộc T007, T009).
-- [ ] T030 [US4] Tạo `ReconciliationService` append-only trong `flex-exchange-service/src/Flex.Exchange.Application/Reconciliation/ReconciliationService.cs` (phụ thuộc T028, T029).
-- [ ] T031 [US4] Viết restore/reconciliation integration test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/TenantRestoreTests.cs` (phụ thuộc T027, T030).
-- [ ] T032 [US4] Ghi staging backup/restore drill và evidence NFR-006 trong `specs/000017-database-clearing-settlement/quickstart.md` (phụ thuộc T031).
+- [ ] T031 [P] [US4] Tạo Liquibase formatted SQL statement/result/alert trong `flex-database/changelog/databases/vsd/releases/v1.0/002-create-vsd-reconciliation.sql`.
+- [ ] T032 [P] [US4] Viết reconciliation no-auto-fix test trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Persistence/VsdReconciliationTests.cs`.
+- [ ] T033 [US4] Tạo `VsdReconciliationRepository` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/VsdPersistence/VsdReconciliationRepository.cs` (phụ thuộc T031, T027).
+- [ ] T034 [US4] Cập nhật `ReconciliationService` append-only trong `flex-exchange-service/src/Flex.Exchange.Application/Reconciliation/ReconciliationService.cs` (phụ thuộc T032, T033).
+- [ ] T035 [US4] Chạy restore drill `exchange`/`broker`/`vsd` và contract smoke trong `specs/000017-database-clearing-settlement/quickstart.md` (phụ thuộc T023, T030, T034).
 
 ## Phase 7: US-005 — Scope, audit, health và trace
 
-**Independent Test**: Cross-tenant/broker bị chặn; health/trace cùng scope trả backlog và chuỗi nguồn đúng.
+**Independent Test**: Trace/health đọc từng boundary qua contract, cross-scope bị chặn và audit không lộ secret.
 
-- [ ] T033 [P] [US5] Viết cross-scope security test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/PersistenceScopeTests.cs` cho FR-015/016/SEC-001/002.
-- [ ] T034 [P] [US5] Viết audit/health test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/PersistenceOperationsTests.cs` cho FR-017/018/SEC-003/NFR-005.
-- [ ] T035 [US5] Tạo `PersistenceAuditWriter` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/PersistenceAuditWriter.cs` (phụ thuộc T006, T009).
-- [ ] T036 [US5] Tạo internal trace/health controllers trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/PersistenceController.cs` theo `contracts/persistence.md` (phụ thuộc T010, T024, T029, T035).
-- [ ] T037 [US5] Bổ sung metrics/correlation cho rehydration, duplicate, backlog, DLQ, T+ và alert trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/PersistenceTelemetry.cs` (phụ thuộc T036).
-- [ ] T038 [US5] Viết API trace/health authorization test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/PersistenceControllerTests.cs` (phụ thuộc T033, T034, T036, T037).
+- [ ] T036 [P] [US5] Viết cross-scope/cross-organization security test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/OrganizationScopeTests.cs`.
+- [ ] T037 [P] [US5] Viết trace/health contract test trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/OrganizationTraceHealthTests.cs`.
+- [ ] T038 [US5] Tạo `OrganizationAuditWriter` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/OrganizationAuditWriter.cs` (phụ thuộc T025, T027).
+- [ ] T039 [US5] Tạo internal trace/health endpoint tổng hợp contract trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/OrganizationPersistenceController.cs` (phụ thuộc T007, T036, T037, T038).
+- [ ] T040 [US5] Bổ sung metrics cho từng database, inbox/outbox và restore trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/OrganizationPersistenceTelemetry.cs` (phụ thuộc T039).
 
-## Final Phase: Polish
+## Final Phase
 
-- [ ] T039 Cập nhật API contract cuối cùng trong `specs/000017-database-clearing-settlement/contracts/persistence.md` (phụ thuộc T036).
-- [ ] T040 Chạy `dotnet test flex-exchange-service/tests/Flex.Exchange.Domain.Tests/Flex.Exchange.Domain.Tests.csproj` và `dotnet test flex-exchange-service/tests/Flex.Exchange.Api.Tests/Flex.Exchange.Api.Tests.csproj`, lưu kết quả trong `specs/000017-database-clearing-settlement/quickstart.md` (phụ thuộc T018, T022, T027, T031, T038).
+- [ ] T041 Cập nhật lệnh Liquibase ba database và kết quả validation trong `specs/000017-database-clearing-settlement/quickstart.md` (phụ thuộc T010, T035, T040).
+- [ ] T042 Chạy domain/API tests, lưu kết quả trong `specs/000017-database-clearing-settlement/quickstart.md` (phụ thuộc T017, T023, T030, T035, T040).
 
 ## Dependencies & Execution Order
 
-`Setup → Foundational → US-001 → US-002 → US-003 → US-004 → US-005 → Polish`.
+`Setup → Foundational → US-001 (exchange) → US-002 (broker) → US-003 (vsd) → US-004 → US-005 → Polish`.
 
 ## Traceability Matrix
 
 | Source | Tasks |
 |---|---|
-| US-001 / FR-001–003 / NFR-001/003 | T013–T018 |
-| US-002 / FR-004–006 / NFR-002 | T019–T022 |
-| US-003 / FR-007–010 / NFR-004 | T023–T027 |
-| US-004 / FR-011–014 / NFR-006 | T028–T032 |
-| US-005 / FR-015–018 / SEC-001–003 / NFR-005 | T033–T038 |
-
-## Checklist chất lượng
-
-- [x] 40 task tuần tự, có path và requirement/story traceability.
-- [x] Mỗi story có independent test; migration, restore, security và observability có validation task.
+| US-001 / FR-001–003 / NFR-001/003 | T011–T017 |
+| US-002 / FR-004–006 / NFR-002 | T018–T023 |
+| US-003 / FR-007–010 / NFR-004 | T024–T030 |
+| US-004 / FR-011–014 / NFR-006 | T031–T035 |
+| US-005 / FR-015–018 / SEC-001–003 / NFR-005 | T036–T040 |

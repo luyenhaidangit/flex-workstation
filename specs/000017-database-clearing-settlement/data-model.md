@@ -2,10 +2,8 @@
 
 | Domain | Entity | Quan hệ/invariant |
 |---|---|---|
-| Reference | Instrument, TradingSession | Được order/trade tham chiếu. |
-| Exchange | Order, OrderHistory, Trade | Trade tham chiếu đúng hai order và broker; history có sequence. |
-| Broker | Broker, Customer, TradingAccount, Reservation | Reservation tham chiếu account và order/trade, idempotent theo source. |
-| Ledger | Journal, Entry, Balance, Inbox, Outbox, Audit | Journal/audit append-only; entry cân bằng; balance là projection. |
-| Post-trade | SettlementObligation, EodStatement, ReconciliationResult, Alert | Obligation tham chiếu trade/account/journal; alert không sửa source. |
+| `exchange` — HoSE/HNX | Instrument, TradingSession, Order, OrderHistory, Trade, Outbox | Trade tham chiếu hai order; phát `TradeExecuted` bằng external IDs. |
+| `broker` — CTCK | Broker, Customer, TradingAccount, Reservation, Inbox, Outbox | Reservation dùng external order/trade reference; idempotent theo source. |
+| `vsd` — VSD | Journal, Entry, Balance, SettlementObligation, EodStatement, ReconciliationResult, Alert, Inbox, Audit | VSD lưu external trade/account reference; journal/audit append-only. |
 
-Mọi entity operational có tenant/broker scope, source reference, correlation khi có và timestamp UTC. Tiền/quantity dùng decimal chính xác. Migration chỉ thêm schema; không backfill dữ liệu ngoài.
+Mọi entity có scope phù hợp, source reference, correlation và timestamp UTC. Tiền/quantity dùng decimal chính xác. Foreign key chỉ tồn tại trong cùng database; liên kết xuyên tổ chức dùng external IDs và contract.
