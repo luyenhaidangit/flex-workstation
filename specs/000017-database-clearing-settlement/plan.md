@@ -4,7 +4,7 @@
 
 ## Tóm tắt
 
-Persistence được đưa vào theo thứ tự domain: order/trade → broker/account/reservation → ledger → settlement/reconciliation. `flex-database` quản lý migration/seed; `flex-exchange-service` thay persistence in-memory bằng adapter MySQL nhưng giữ các contract MVP trước tương thích.
+Persistence được đưa vào theo thứ tự domain: order/trade → broker/account/reservation → ledger → settlement/reconciliation. `flex-database` quản lý Liquibase SQL-first; `flex-exchange-service` thay persistence in-memory bằng adapter PostgreSQL nhưng giữ các contract MVP trước tương thích.
 
 ## Phạm vi kỹ thuật
 
@@ -17,10 +17,10 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 | Hạng mục | Quyết định |
 |---|---|
 | Runtime | C#/.NET 9, ASP.NET Core tại `flex-exchange-service` |
-| Data access | `MySqlConnector` + SQL transaction trực tiếp |
-| Migration | Flyway tại `flex-database/exchange` |
+| Data access | `Npgsql` + SQL transaction trực tiếp |
+| Migration | Liquibase SQL-first tại `flex-database/changelog/databases/exchange` |
 | Isolation | Database per tenant; mọi record/query vẫn có tenant/broker scope |
-| Tests | xUnit domain/API, MySQL integration, Flyway smoke, staging restore drill |
+| Tests | xUnit domain/API, PostgreSQL integration, Liquibase validate/update-sql smoke, staging restore drill |
 
 ## Kiểm tra constitution
 
@@ -34,7 +34,7 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 
 ## Thiết kế tổng quan
 
-1. Flyway tạo data foundation theo thứ tự reference/order/trade, broker/account/reservation, ledger, rồi settlement/reconciliation.
+1. Liquibase master changelog include các release SQL theo thứ tự reference/order/trade, broker/account/reservation, ledger, rồi settlement/reconciliation.
 2. Adapter persistence ghi event/state transactionally và rehydrate engine state theo sequence khi service khởi động.
 3. Reservation, journal và obligation chỉ nhận source order/trade/account đã tồn tại; idempotency chặn bản ghi lặp.
 4. Trace nội bộ liên kết order/trade/account/journal/obligation/reconciliation theo tenant/broker scope.
@@ -54,7 +54,7 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 
 | Khu vực | Tác động | Cách kiểm tra |
 |---|---|---|
-| Database | Migration bổ sung theo domain order; seed Alpha/Beta. | Flyway và re-run seed smoke. |
+| Database | Liquibase formatted SQL theo release; seed Alpha/Beta tách khỏi changelog production. | `liquibase validate`, `update-sql` và re-run seed smoke. |
 | Existing API | Giữ contract MVP 01–07; internal trace/health additive. | API regression/contract tests. |
 | Permission | Tenant/broker guard cho read/write/recovery. | Cross-scope denial tests. |
 | Logging/Audit | Correlation/source/action/result không chứa secret. | Audit/log assertions. |
@@ -70,13 +70,13 @@ Persistence được đưa vào theo thứ tự domain: order/trade → broker/a
 
 ## Dữ liệu & Migration
 
-Migration Flyway là forward-only; không backfill dữ liệu production vì feature chưa có persistent data. Re-run seed phải idempotent. Rollback data dùng restore backup hoặc forward-fix, tuyệt đối không xóa/sửa history.
+`changelog/databases/exchange/db.changelog-master.yaml` là điểm vào duy nhất và include release tường minh. Mỗi SQL file là Liquibase formatted SQL, có changeset bất biến và rollback khi phù hợp. Không backfill dữ liệu production vì feature chưa có persistent data; seed local/test tách khỏi changelog production. Rollback data dùng restore backup hoặc forward-fix, tuyệt đối không xóa/sửa history.
 
 ## Quyết định kỹ thuật
 
 | ID | Quyết định | Lý do | Loại bỏ |
 |---|---|---|---|
-| DEC-001 | SQL trực tiếp với MySqlConnector | Atomicity rõ và khớp Flyway. | EF Core/repository generic. |
+| DEC-001 | SQL trực tiếp với Npgsql | Atomicity rõ và khớp Liquibase SQL-first. | EF Core/repository generic. |
 | DEC-002 | Persist theo timeline order→post-trade | Bảo toàn nguồn dữ liệu nghiệp vụ. | Ledger độc lập. |
 | DEC-003 | Rehydrate theo sequence/event history | Khôi phục deterministic MVP 01. | Snapshot-only không trace được. |
 | DEC-004 | Internal operations additive | Không phá contract cũ. | Service clearing riêng. |
@@ -91,14 +91,15 @@ Migration Flyway là forward-only; không backfill dữ liệu production vì fe
 ## Cấu trúc project
 
 ```text
-flex-database/exchange/{migrations,seeders}/
+flex-database/changelog/databases/exchange/{releases,repeatable}/
+flex-database/seed/{local,test}/
 flex-exchange-service/src/Flex.Exchange.{Application,Infrastructure,Api}/
 flex-exchange-service/tests/Flex.Exchange.{Domain.Tests,Api.Tests}/
 ```
 
 ## Rollout & Rollback
 
-Chạy backup staging → Flyway → seed → deploy với tenant connection secret → health → order/trade restart smoke → reservation/ledger/T+/reconciliation smoke. Migration không rollback bằng delete; lỗi sau rollout dùng forward-fix hoặc restore backup. Tắt persistence chỉ khi không mất dữ liệu mới cần giữ.
+Pull request chạy `liquibase validate` và `update-sql`; staging chạy backup → Liquibase update bởi một CI/CD pipeline hoặc Kubernetes Job → smoke → deploy ứng dụng. Seed chỉ chạy local/test. Migration không rollback bằng delete; lỗi sau rollout dùng forward-fix hoặc restore backup. Tắt persistence chỉ khi không mất dữ liệu mới cần giữ.
 
 ## Observability & Debug
 

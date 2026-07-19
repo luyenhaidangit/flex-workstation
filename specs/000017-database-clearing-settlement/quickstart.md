@@ -1,7 +1,7 @@
 # Quickstart: Xác minh persistence MVP 01–08
 
-1. Khởi động MySQL staging và cấp tenant connection secret ngoài Git.
-2. Chạy Flyway migration/seed cho tenant Alpha và Beta; chạy lại seed để xác nhận không trùng.
+1. Khởi động PostgreSQL staging và cấp tenant connection secret ngoài Git.
+2. Chạy `liquibase --defaults-file=liquibase.properties validate`, kiểm tra `update-sql`, rồi để CI/CD hoặc Kubernetes Job chạy `update`; seed Alpha/Beta chỉ dùng local/test và phải chạy lại an toàn.
 3. Chạy kịch bản MVP 01 tạo order/trade, khởi động lại service và xác minh rehydration/trade trace.
 4. Tạo account/reservation, gửi lại source và xác nhận không có reservation/balance trùng.
 5. Ghi ledger từ trade, chạy T+ và kiểm tra journal cân bằng cùng obligation trace.
