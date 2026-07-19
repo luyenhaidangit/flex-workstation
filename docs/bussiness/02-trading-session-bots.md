@@ -4,7 +4,7 @@
 
 MVP này biến thị trường ảo FXS từ một bảng điện tĩnh thành một phiên giao dịch có nhịp sống. Người dùng có thể quan sát thời gian mở/đóng phiên, giá và giao dịch thay đổi liên tục, đồng thời đặt lệnh đối ứng với một nhà tạo lập thị trường mô phỏng.
 
-MVP chỉ mô phỏng khâu giao dịch và khớp lệnh. Các hoạt động sau giao dịch như thanh toán, lưu ký, đối soát và quản lý tiền/chứng khoán chưa thuộc phạm vi. Chi tiết nguồn: `specs/000013-trading-session-bots/spec.md`.
+MVP chỉ mô phỏng khâu giao dịch và khớp lệnh. Các hoạt động sau giao dịch như thanh toán, lưu ký, đối soát và quản lý tiền/chứng khoán chưa thuộc phạm vi. Chi tiết nguồn: [đặc tả MVP 04](../../specs/000013-trading-session-bots/spec.md).
 
 ## Bối cảnh nghiệp vụ
 
@@ -26,8 +26,7 @@ Người dùng demo ↔ Sổ lệnh FXS ↔ Market-maker bot
 
 ```text
 Người vận hành phiên → Sàn giao dịch → Nhà đầu tư / Market maker
-                             ↓
-                    Sổ lệnh và giao dịch FXS
+                    └──── Phạm vi MVP 04: phiên, sổ lệnh và giao dịch FXS ────┘
 ```
 
 | Vai trò | Trách nhiệm thực tế | Trong FlexSim MVP này |
@@ -40,15 +39,16 @@ Người vận hành phiên → Sàn giao dịch → Nhà đầu tư / Market ma
 
 ## Luồng nghiệp vụ đầu-cuối
 
-1. **Khởi động ngày giao dịch** — Người vận hành bắt đầu một ngày ảo. Phiên mở ở trạng thái `open`.
-2. **Giai đoạn chuẩn bị** — Trong `open`, hệ thống cho người quan sát biết phiên chưa bước vào giao dịch liên tục; lệnh mới chưa được chấp nhận.
-3. **Mở giao dịch liên tục** — Hết thời lượng chuẩn bị, phiên chuyển sang `continuous`. Đây là giai đoạn nhận lệnh và khớp lệnh chính của MVP.
-4. **Tạo thanh khoản nền** — Market-maker bot chào một giá mua và một giá bán quanh giá tham chiếu cố định. Bot được xử lý như một nhà đầu tư mô phỏng, không có quyền đặc biệt trong việc khớp lệnh.
-5. **Đặt và khớp lệnh** — Người dùng đặt lệnh đối ứng với giá bot. Nếu thỏa điều kiện, hai lệnh khớp theo ưu tiên giá rồi thời gian; giao dịch xuất hiện trên trade tape.
-6. **Lệnh chờ** — Nếu chưa có giá đối ứng, lệnh tiếp tục nằm trong sổ lệnh để chờ đối tác.
-7. **Theo dõi realtime** — Người quan sát ở nhiều tab đều thấy thay đổi của sổ lệnh, giá gần nhất, giao dịch và trạng thái phiên mà không cần tải lại trang.
-8. **Đóng phiên** — Hết thời lượng `continuous`, phiên chuyển sang `close`. Bot chủ động hủy lệnh của mình trước; sàn mô phỏng hủy các lệnh còn lại làm cơ chế an toàn.
-9. **Kết thúc và bắt đầu ngày mới** — Không có lệnh nào được giữ qua phiên đóng. Người vận hành có thể bắt đầu ngày mới với sổ lệnh và lịch sử giao dịch của ngày đó được làm sạch.
+1. **[Trong phạm vi] Khởi động ngày giao dịch** — Người vận hành bắt đầu một ngày ảo. Phiên mở ở trạng thái `open`.
+2. **[Trong phạm vi] Giai đoạn chuẩn bị** — Trong `open`, hệ thống cho người quan sát biết phiên chưa bước vào giao dịch liên tục; lệnh mới chưa được chấp nhận.
+3. **[Trong phạm vi] Mở giao dịch liên tục** — Hết thời lượng chuẩn bị, phiên chuyển sang `continuous`. Đây là giai đoạn nhận lệnh và khớp lệnh chính của MVP.
+4. **[Trong phạm vi] Tạo thanh khoản nền** — Market-maker bot chào một giá mua và một giá bán quanh giá tham chiếu cố định. Bot được xử lý như một nhà đầu tư mô phỏng, không có quyền đặc biệt trong việc khớp lệnh.
+5. **[Trong phạm vi] Đặt và khớp lệnh** — Người dùng đặt lệnh đối ứng với giá bot. Nếu thỏa điều kiện, hai lệnh khớp theo ưu tiên giá rồi thời gian; giao dịch xuất hiện trên trade tape.
+6. **[Trong phạm vi] Lệnh chờ** — Nếu chưa có giá đối ứng, lệnh tiếp tục nằm trong sổ lệnh để chờ đối tác.
+7. **[Trong phạm vi] Theo dõi realtime** — Người quan sát ở nhiều tab đều thấy thay đổi của sổ lệnh, giá gần nhất, giao dịch và trạng thái phiên mà không cần tải lại trang.
+8. **[Trong phạm vi] Đóng phiên** — Hết thời lượng `continuous`, phiên chuyển sang `close`. Bot chủ động hủy lệnh của mình trước; sàn mô phỏng hủy các lệnh còn lại làm cơ chế an toàn.
+9. **[Trong phạm vi] Kết thúc và bắt đầu ngày mới** — Không có lệnh nào được giữ qua phiên đóng. Người vận hành có thể bắt đầu ngày mới với sổ lệnh và lịch sử giao dịch của ngày đó được làm sạch.
+10. **[Ngoài phạm vi] Hoàn tất sau giao dịch** — Thanh toán, chuyển giao chứng khoán, đối soát và lưu ký chỉ bắt đầu sau khi giao dịch kết thúc, nhưng không được mô phỏng trong MVP này.
 
 ## Đối tượng nghiệp vụ và đầu ra
 
