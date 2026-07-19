@@ -1,4 +1,4 @@
-# Checklist chất lượng đặc tả: Database, clearing, settlement và đối chiếu — MVP 08
+# Checklist chất lượng đặc tả: Nền dữ liệu bền vững từ MVP 01 đến MVP 08
 
 ## Metadata
 
@@ -7,7 +7,7 @@
 **Ngày tạo**: 2026-07-19  
 **Người review**: Luyện Hải Đăng  
 **Trạng thái review**: Hoàn tất  
-**Lần review**: Lần 1  
+**Lần review**: Lần 2 — cập nhật phạm vi persistence từ MVP 01 đến MVP 08  
 **Tính năng**: [spec.md](../spec.md)  
 **Artifact chính được kiểm tra**: `spec.md`  
 **Nguồn tham chiếu**: `constitution.md`, `spec.md`
@@ -64,24 +64,24 @@
 ## Chất lượng nội dung
 
 - [x] CHK001 `[High]` `[Status: Pass]` Spec không chứa chi tiết implementation không cần thiết như ngôn ngữ, framework, API hoặc cấu trúc code. [Clarity]
-- [x] CHK002 `[High]` `[Status: Pass]` Spec tập trung vào giá trị người dùng và nhu cầu nghiệp vụ: ledger tin cậy, settlement đúng hạn và đối chiếu được. [Clarity]
+- [x] CHK002 `[High]` `[Status: Pass]` Spec tập trung vào giá trị nghiệp vụ: dữ liệu order/trade là nguồn cho broker, reservation, ledger, settlement và đối chiếu. [Clarity]
 - [x] CHK003 `[Medium]` `[Status: Pass]` Nội dung có thể hiểu bởi stakeholder không chuyên kỹ thuật; thuật ngữ nghiệp vụ được đặt trong bối cảnh vận hành. [Clarity]
 - [x] CHK004 `[Blocker]` `[Status: Pass]` Các section bắt buộc của spec đã được hoàn tất. [Completeness]
 
 ## Tính đầy đủ của requirement
 
 - [x] CHK005 `[Blocker]` `[Status: Pass]` Không còn marker `[NEEDS CLARIFICATION]` hoặc `[CẦN LÀM RÕ]` chặn lập plan. [Readiness]
-- [x] CHK006 `[High]` `[Status: Pass]` Requirement kiểm thử được, có priority và traceability từ FR-001..FR-016 tới US/AC. [Measurability]
+- [x] CHK006 `[High]` `[Status: Pass]` Requirement kiểm thử được, có priority và traceability từ FR-001..FR-018 tới US/AC. [Measurability]
 - [x] CHK007 `[High]` `[Status: Pass]` Success criteria SC-001..SC-006 đo lường được và không phụ thuộc công nghệ. [Measurability]
-- [x] CHK008 `[High]` `[Status: Pass]` User scenario và acceptance criteria bao phủ khởi tạo, ghi ledger, settlement T+, recovery, reconciliation và cách ly tenant. [Coverage]
+- [x] CHK008 `[High]` `[Status: Pass]` User scenario và acceptance criteria bao phủ khôi phục order/trade, broker/reservation, ledger/settlement, reconciliation và cách ly tenant/broker. [Coverage]
 - [x] CHK009 `[Medium]` `[Status: Pass]` Trạng thái lỗi, edge case và thao tác lặp đã được xác định tại spec §6. [Coverage]
 - [x] CHK010 `[High]` `[Status: Pass]` Scope (§3), ngoài phạm vi (§15), phụ thuộc (§17) và giả định (§14) đã rõ. [Completeness]
 
 ## Readiness và governance
 
 - [x] CHK011 `[High]` `[Status: Pass]` Functional requirement quan trọng có acceptance criteria và traceability phù hợp. [Traceability]
-- [x] CHK012 `[Medium]` `[Status: Pass]` User scenario bao phủ các luồng P1 thực tế và recovery P2. [Coverage]
-- [x] CHK013 `[High]` `[Status: Pass]` Các gate constitution về scope, data, permission, contract và security đã được đánh giá tại §8–§12 và FR-014..FR-016. [Constitution]
+- [x] CHK012 `[Medium]` `[Status: Pass]` User scenario bao phủ các luồng P1 thực tế và vận hành/khôi phục dữ liệu. [Coverage]
+- [x] CHK013 `[High]` `[Status: Pass]` Các gate constitution về scope, data, permission, contract và security đã được đánh giá tại §8–§12 và FR-001..FR-018. [Constitution]
 - [x] CHK014 `[High]` `[Status: Pass]` Không có chi tiết implementation làm sai phạm vi của spec. [Readiness]
 - [x] CHK015 `[Medium]` `[Status: Pass]` Rủi ro, audit và dữ liệu nhạy cảm được ghi nhận tại §10, §11 và §16. [Coverage]
 - [x] CHK016 `[Medium]` `[Status: Pass]` Feature có điều kiện sẵn sàng rõ ràng trước khi chuyển bước tại §19. [Readiness]
