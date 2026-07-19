@@ -1,6 +1,6 @@
 ---
 name: "speckit-docbiz"
-description: "Synthesize the current feature spec into a business narrative document in docs/bussiness/ — written for BA and non-technical stakeholders."
+description: "Synthesize the current feature spec into a business narrative document in docs/business/ — written for BA and non-technical stakeholders."
 argument-hint: "Optional notes or extra context for the business doc"
 compatibility: "Requires .specify/feature.json and a completed spec.md"
 metadata:
@@ -32,13 +32,13 @@ Load `<feature_directory>/spec.md`.
 
 ### 2. Check for an existing business doc
 
-Scan `docs/bussiness/` for any `.md` file whose content contains the feature spec number (e.g. `000013`). Also check if any file references the feature directory path.
+Scan `docs/business/` for any `.md` file whose content contains the feature spec number (e.g. `000013`). Also check if any file references the feature directory path.
 
 - **If found**: `DOC_FILE = <that file path>`, `MODE = update`
 - **If not found**: `MODE = create`
-  - Count existing `.md` files in `docs/bussiness/` to determine the next sequential number (e.g. if `01-*` and `02-*` exist, next is `03`). Zero-pad to 2 digits.
+  - Count existing `.md` files in `docs/business/` to determine the next sequential number (e.g. if `01-*` and `02-*` exist, next is `03`). Zero-pad to 2 digits.
   - Derive `DOC_SLUG` from the feature directory short name: use the portion after the numeric prefix, keep hyphens (e.g. `trading-session-bots`).
-  - `DOC_FILE = docs/bussiness/<NN>-<DOC_SLUG>.md`
+  - `DOC_FILE = docs/business/<NN>-<DOC_SLUG>.md`
 
 ### 3. Extract business content from spec.md
 
@@ -115,7 +115,7 @@ Use this document structure:
 
 ### 5. Write or update the document
 
-- **MODE = create**: Write the generated content to `DOC_FILE`. Create `docs/bussiness/` if it does not exist.
+- **MODE = create**: Write the generated content to `DOC_FILE`. Create `docs/business/` if it does not exist.
 - **MODE = update**: Overwrite the existing file at `DOC_FILE` with the newly generated content. Do not change the filename.
 
 ### 6. Completion Report
@@ -132,6 +132,6 @@ Report to the user:
 
 - [ ] `.specify/feature.json` read and feature directory resolved
 - [ ] `spec.md` loaded from the feature directory
-- [ ] `docs/bussiness/` scanned for an existing doc matching this feature
+- [ ] `docs/business/` scanned for an existing doc matching this feature
 - [ ] Business narrative document written to `DOC_FILE`
 - [ ] Completion reported to user with file path and mode
