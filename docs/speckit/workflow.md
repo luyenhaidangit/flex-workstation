@@ -103,6 +103,20 @@ flowchart TD
 - Nếu đã có một thư mục trùng, command hỏi chọn **cập nhật spec hiện có** hoặc **tạo feature mới**; không tự tăng số thứ tự để tạo bản sao.
 - Nếu có nhiều thư mục trùng, command liệt kê các thư mục và yêu cầu chọn một thư mục để cập nhật hoặc xác nhận tạo feature mới.
 
+**Chuyển feature đang làm việc**
+`feature.json` chỉ lưu một feature mặc định. Khi làm nhiều feature, đặt
+`SPECIFY_FEATURE_DIRECTORY` trong từng PowerShell session trước khi gọi command;
+biến môi trường này có ưu tiên cao hơn `feature.json`:
+
+```powershell
+$env:SPECIFY_FEATURE_DIRECTORY = 'specs/000015-single-broker-pretrade'
+```
+
+Sau đó chạy `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze` hoặc command
+cần thiết trong cùng session. Các Completion Report luôn bắt đầu bằng
+`ACTIVE_FEATURE_DIRECTORY` để xác nhận feature thực tế đã được dùng. Khi muốn trở
+lại feature mặc định trong `feature.json`, chạy `Remove-Item Env:SPECIFY_FEATURE_DIRECTORY`.
+
 **`/speckit-clarify` nên chạy trước `/speckit-plan`**
 Clarify sửa `spec.md` (chi phí thấp). Nếu chạy sau plan, phát hiện assumption sai
 sẽ phải làm lại toàn bộ `plan.md`, `data-model.md`, `contracts/`.

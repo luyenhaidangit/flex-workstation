@@ -17,6 +17,10 @@ disable-model-invocation: false
 $ARGUMENTS
 ```
 
+## Active Feature Reporting
+
+In the Completion Report, print `ACTIVE_FEATURE_DIRECTORY: <resolved SPECIFY_FEATURE_DIRECTORY>` as the first line before any other result.
+
 You **MUST** consider the user input before proceeding (if not empty).
 
 ## Pre-Execution Checks
