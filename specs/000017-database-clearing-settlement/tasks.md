@@ -11,11 +11,11 @@
 
 **Mục đích**: Chuẩn bị repository Liquibase SQL-first, cấu hình an toàn và điểm chạy migration độc lập theo database.
 
-- [ ] T001 Tạo skeleton `flex-database/README.md`, `docker-compose.yml` và `liquibase.properties.example` mô tả ba database `exchange`, `broker`, `vsd` không chứa secret.
-- [ ] T002 [P] Tạo mẫu cấu hình môi trường tại `flex-database/environments/local.properties.example`, `development.properties.example`, `staging.properties.example` và `production.properties.example`.
-- [ ] T003 [P] Tạo cấu trúc seed tách production tại `flex-database/seed/{local,test}/{exchange,broker,vsd}/` và README hướng dẫn Alpha/Beta chỉ dùng local/test.
-- [ ] T004 Tạo các script `flex-database/scripts/validate-all.sh`, `update-sql.sh`, `migrate.sh`, `status.sh` và `rollback.sh` nhận database mục tiêu, không hard-code connection string.
-- [ ] T005 Tạo pipeline validate tại `flex-database/pipelines/database-ci.yml` chạy Liquibase `validate` và `update-sql` cho cả ba master changelog.
+- [X] T001 Tạo skeleton `flex-database/README.md`, `docker-compose.yml` và `liquibase.properties.example` mô tả ba database `exchange`, `broker`, `vsd` không chứa secret.
+- [X] T002 [P] Tạo mẫu cấu hình môi trường tại `flex-database/environments/local.properties.example`, `development.properties.example`, `staging.properties.example` và `production.properties.example`.
+- [X] T003 [P] Tạo cấu trúc seed tách production tại `flex-database/seed/{local,test}/{exchange,broker,vsd}/` và README hướng dẫn Alpha/Beta chỉ dùng local/test.
+- [X] T004 Tạo các script `flex-database/scripts/validate-all.sh`, `update-sql.sh`, `migrate.sh`, `status.sh` và `rollback.sh` nhận database mục tiêu, không hard-code connection string.
+- [X] T005 Tạo pipeline validate tại `flex-database/pipelines/database-ci.yml` chạy Liquibase `validate` và `update-sql` cho cả ba master changelog.
 
 ---
 
@@ -25,16 +25,16 @@
 
 **CRITICAL**: Hoàn tất phase này trước khi bắt đầu bất kỳ user story nào.
 
-- [ ] T006 Tạo master changelog độc lập tại `flex-database/changelog/databases/{exchange,broker,vsd}/db.changelog-master.yaml`, chỉ include release được review.
-- [ ] T007 [P] Tạo release descriptor `v1.0` cho `exchange` tại `flex-database/changelog/databases/exchange/releases/v1.0/db.changelog-v1.0.yaml` và release `v1.1` tại `flex-database/changelog/databases/exchange/releases/v1.1/db.changelog-v1.1.yaml`.
-- [ ] T008 [P] Tạo release descriptor `v1.0` cho CTCK tại `flex-database/changelog/databases/broker/releases/v1.0/db.changelog-v1.0.yaml`, với giả định một database ứng với một CTCK.
-- [ ] T009 [P] Tạo release descriptor `v1.0` cho VSD tại `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml`.
-- [ ] T010 [P] Thiết lập thư mục `repeatable/views` và `repeatable/functions` cho từng database tại `flex-database/changelog/databases/{exchange,broker,vsd}/repeatable/`, kèm quy tắc không tự include file repeatable.
-- [ ] T011 Thêm options `ExchangeDatabase`, `BrokerDatabase`, `VsdDatabase` và đăng ký `NpgsqlDataSource` riêng trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/DependencyInjection.cs`.
-- [ ] T012 Tạo abstraction transaction/outbox-inbox chỉ dùng trong từng database tại `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/OrganizationDatabaseSession.cs`.
-- [ ] T013 Tạo model contract external reference/correlation không phụ thuộc bảng database khác tại `flex-exchange-service/src/Flex.Exchange.Application/Persistence/ExternalBusinessReference.cs`.
+- [X] T006 Tạo master changelog độc lập tại `flex-database/changelog/databases/{exchange,broker,vsd}/db.changelog-master.yaml`, chỉ include release được review.
+- [X] T007 [P] Tạo release descriptor `v1.0` cho `exchange` tại `flex-database/changelog/databases/exchange/releases/v1.0/db.changelog-v1.0.yaml` và release `v1.1` tại `flex-database/changelog/databases/exchange/releases/v1.1/db.changelog-v1.1.yaml`.
+- [X] T008 [P] Tạo release descriptor `v1.0` cho CTCK tại `flex-database/changelog/databases/broker/releases/v1.0/db.changelog-v1.0.yaml`, với giả định một database ứng với một CTCK.
+- [X] T009 [P] Tạo release descriptor `v1.0` cho VSD tại `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml`.
+- [X] T010 [P] Thiết lập thư mục `repeatable/views` và `repeatable/functions` cho từng database tại `flex-database/changelog/databases/{exchange,broker,vsd}/repeatable/`, kèm quy tắc không tự include file repeatable.
+- [X] T011 Thêm options `ExchangeDatabase`, `BrokerDatabase`, `VsdDatabase` và đăng ký `NpgsqlDataSource` riêng trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/DependencyInjection.cs`.
+- [X] T012 Tạo abstraction transaction/outbox-inbox chỉ dùng trong từng database tại `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/OrganizationDatabaseSession.cs`.
+- [X] T013 Tạo model contract external reference/correlation không phụ thuộc bảng database khác tại `flex-exchange-service/src/Flex.Exchange.Application/Persistence/ExternalBusinessReference.cs`.
 - [ ] T014 Tạo contract test cho các endpoint nội bộ trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/Persistence/PersistenceContractTests.cs` dựa trên `specs/000017-database-clearing-settlement/contracts/persistence.md`.
-- [ ] T015 Tạo migration smoke test chạy `validate` và `update-sql` với từng master changelog tại `flex-database/tests/migration/ValidateAllDatabasesTests.ps1`.
+- [X] T015 Tạo migration smoke test chạy `validate` và `update-sql` với từng master changelog tại `flex-database/tests/migration/ValidateAllDatabasesTests.ps1`.
 
 **Checkpoint**: Ba master changelog validate được độc lập, ứng dụng có connection factory theo tổ chức và không có cơ chế join/transaction xuyên database.
 
@@ -58,16 +58,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] T019 [P] [US1] Tạo reference tables bằng Liquibase formatted SQL tại `flex-database/changelog/databases/exchange/releases/v1.0/001-create-reference-tables.sql`.
-- [ ] T020 [P] [US1] Tạo bảng orders, tenant/broker scope, lifecycle và idempotency constraints tại `flex-database/changelog/databases/exchange/releases/v1.0/002-create-orders.sql`.
-- [ ] T021 [P] [US1] Tạo bảng order history append-only theo sequence tại `flex-database/changelog/databases/exchange/releases/v1.0/003-create-order-history.sql`.
-- [ ] T022 [P] [US1] Tạo bảng trades với hai order external/business references và trade sequence tại `flex-database/changelog/databases/exchange/releases/v1.0/004-create-trades.sql`.
-- [ ] T023 [US1] Include `001`–`004` theo thứ tự bất biến trong `flex-database/changelog/databases/exchange/releases/v1.0/db.changelog-v1.0.yaml`.
-- [ ] T024 [US1] Thêm changeset trade sequence không sửa release cũ tại `flex-database/changelog/databases/exchange/releases/v1.1/001-add-trade-sequence.sql` và include trong `db.changelog-v1.1.yaml`.
+- [X] T019 [P] [US1] Tạo reference tables bằng Liquibase formatted SQL tại `flex-database/changelog/databases/exchange/releases/v1.0/001-create-reference-tables.sql`.
+- [X] T020 [P] [US1] Tạo bảng orders, tenant/broker scope, lifecycle và idempotency constraints tại `flex-database/changelog/databases/exchange/releases/v1.0/002-create-orders.sql`.
+- [X] T021 [P] [US1] Tạo bảng order history append-only theo sequence tại `flex-database/changelog/databases/exchange/releases/v1.0/003-create-order-history.sql`.
+- [X] T022 [P] [US1] Tạo bảng trades với hai order external/business references và trade sequence tại `flex-database/changelog/databases/exchange/releases/v1.0/004-create-trades.sql`.
+- [X] T023 [US1] Include `001`–`004` theo thứ tự bất biến trong `flex-database/changelog/databases/exchange/releases/v1.0/db.changelog-v1.0.yaml`.
+- [X] T024 [US1] Thêm changeset trade sequence không sửa release cũ tại `flex-database/changelog/databases/exchange/releases/v1.1/001-add-trade-sequence.sql` và include trong `db.changelog-v1.1.yaml`.
 - [ ] T025 [US1] Implement SQL repository ghi order, history và trade atomically trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/ExchangePersistence/ExchangeOrderTradeRepository.cs`.
 - [ ] T026 [US1] Implement rehydration deterministic theo history/trade sequence trong `flex-exchange-service/src/Flex.Exchange.Application/Exchange/RehydrateExchangeStateHandler.cs`.
 - [ ] T027 [US1] Cập nhật composition root để endpoint order/trade hiện có dùng persistence mà không đổi response semantics trong `flex-exchange-service/src/Flex.Exchange.Api/Program.cs`.
-- [ ] T028 [US1] Ghi `TradeExecuted` vào outbox exchange với `tradeId`, hai order ID, `brokerId`, `tenantId`, sequence và correlation tại `flex-database/changelog/databases/exchange/releases/v1.0/005-create-outbox.sql`, rồi include changeset trong `db.changelog-v1.0.yaml`.
+- [X] T028 [US1] Ghi `TradeExecuted` vào outbox exchange với `tradeId`, hai order ID, `brokerId`, `tenantId`, sequence và correlation tại `flex-database/changelog/databases/exchange/releases/v1.0/005-create-outbox.sql`, rồi include changeset trong `db.changelog-v1.0.yaml`.
 
 **Checkpoint**: US1 hoàn chỉnh khi restart test pass và endpoint MVP 01–04 giữ nguyên semantics.
 
@@ -91,11 +91,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T032 [P] [US2] Tạo bảng customers scoped theo tenant trong `flex-database/changelog/databases/broker/releases/v1.0/001-create-customers.sql`.
-- [ ] T033 [P] [US2] Tạo bảng accounts và balance buckets nghiệp vụ trong `flex-database/changelog/databases/broker/releases/v1.0/002-create-accounts.sql`.
-- [ ] T034 [P] [US2] Tạo bảng reservations với unique source reference/correlation và external order/trade fields trong `flex-database/changelog/databases/broker/releases/v1.0/003-create-reservations.sql`.
-- [ ] T035 [P] [US2] Tạo bảng inbox idempotency và outbox CTCK trong `flex-database/changelog/databases/broker/releases/v1.0/004-create-inbox.sql` và `005-create-outbox.sql`.
-- [ ] T036 [US2] Include `001`–`005` theo thứ tự trong `flex-database/changelog/databases/broker/releases/v1.0/db.changelog-v1.0.yaml`.
+- [X] T032 [P] [US2] Tạo bảng customers scoped theo tenant trong `flex-database/changelog/databases/broker/releases/v1.0/001-create-customers.sql`.
+- [X] T033 [P] [US2] Tạo bảng accounts và balance buckets nghiệp vụ trong `flex-database/changelog/databases/broker/releases/v1.0/002-create-accounts.sql`.
+- [X] T034 [P] [US2] Tạo bảng reservations với unique source reference/correlation và external order/trade fields trong `flex-database/changelog/databases/broker/releases/v1.0/003-create-reservations.sql`.
+- [X] T035 [P] [US2] Tạo bảng inbox idempotency và outbox CTCK trong `flex-database/changelog/databases/broker/releases/v1.0/004-create-inbox.sql` và `005-create-outbox.sql`.
+- [X] T036 [US2] Include `001`–`005` theo thứ tự trong `flex-database/changelog/databases/broker/releases/v1.0/db.changelog-v1.0.yaml`.
 - [ ] T037 [US2] Implement SQL adapter customer/account/reservation, gồm transaction và idempotency check, trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/BrokerPersistence/BrokerAccountReservationRepository.cs`.
 - [ ] T038 [US2] Implement handler consume `TradeExecuted` theo inbox và tạo reservation chỉ từ external reference trong `flex-exchange-service/src/Flex.Exchange.Application/PreTrade/ApplyTradeReservationHandler.cs`.
 - [ ] T039 [US2] Cập nhật endpoint broker hiện có để read/write qua broker persistence và không join `exchange` trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/BrokerController.cs`.
@@ -122,11 +122,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T043 [P] [US3] Tạo journals và ledger entries append-only tại `flex-database/changelog/databases/vsd/releases/v1.0/001-create-journals.sql` và `002-create-ledger-entries.sql`.
-- [ ] T044 [P] [US3] Tạo balance projection buckets tại `flex-database/changelog/databases/vsd/releases/v1.0/003-create-balances.sql`.
-- [ ] T045 [P] [US3] Tạo settlement obligations có external trade/order/account references và T+ lifecycle tại `flex-database/changelog/databases/vsd/releases/v1.0/004-create-obligations.sql`.
-- [ ] T046 [P] [US3] Tạo inbox/outbox VSD xử lý lặp tại `flex-database/changelog/databases/vsd/releases/v1.0/007-create-inbox.sql` và `008-create-outbox.sql`.
-- [ ] T047 [US3] Include `001`–`004`, `007` và `008` trong `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml`, giữ chỗ include `005`, `006`, `009` cho US4/US5.
+- [X] T043 [P] [US3] Tạo journals và ledger entries append-only tại `flex-database/changelog/databases/vsd/releases/v1.0/001-create-journals.sql` và `002-create-ledger-entries.sql`.
+- [X] T044 [P] [US3] Tạo balance projection buckets tại `flex-database/changelog/databases/vsd/releases/v1.0/003-create-balances.sql`.
+- [X] T045 [P] [US3] Tạo settlement obligations có external trade/order/account references và T+ lifecycle tại `flex-database/changelog/databases/vsd/releases/v1.0/004-create-obligations.sql`.
+- [X] T046 [P] [US3] Tạo inbox/outbox VSD xử lý lặp tại `flex-database/changelog/databases/vsd/releases/v1.0/007-create-inbox.sql` và `008-create-outbox.sql`.
+- [X] T047 [US3] Include `001`–`004`, `007` và `008` trong `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml`, giữ chỗ include `005`, `006`, `009` cho US4/US5.
 - [ ] T048 [US3] Implement SQL adapter ghi journal/entry/balance/obligation bằng transaction trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/VsdPersistence/VsdLedgerSettlementRepository.cs`.
 - [ ] T049 [US3] Implement handler replay clearing source idempotent và cycle T+ trong `flex-exchange-service/src/Flex.Exchange.Application/{Ledger,Settlement}/ProcessClearingAndSettlementHandlers.cs`.
 - [ ] T050 [US3] Implement `POST /internal/ledger/replay` và `POST /internal/settlement/run` theo contract scope-protected trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/SettlementOperationsController.cs`.
@@ -153,9 +153,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T054 [P] [US4] Tạo statement storage tại `flex-database/changelog/databases/vsd/releases/v1.0/005-create-statements.sql`.
-- [ ] T055 [P] [US4] Tạo reconciliation result và immutable alert tại `flex-database/changelog/databases/vsd/releases/v1.0/006-create-reconciliation.sql`.
-- [ ] T056 [US4] Cập nhật `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml` để include `005` và `006` theo release order.
+- [X] T054 [P] [US4] Tạo statement storage tại `flex-database/changelog/databases/vsd/releases/v1.0/005-create-statements.sql`.
+- [X] T055 [P] [US4] Tạo reconciliation result và immutable alert tại `flex-database/changelog/databases/vsd/releases/v1.0/006-create-reconciliation.sql`.
+- [X] T056 [US4] Cập nhật `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml` để include `005` và `006` theo release order.
 - [ ] T057 [US4] Implement SQL adapter statement/reconciliation không tự sửa source journal/balance trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/VsdPersistence/VsdReconciliationRepository.cs`.
 - [ ] T058 [US4] Implement reconciliation operation và `POST /internal/reconciliation/run` trong `flex-exchange-service/src/Flex.Exchange.Application/Reconciliation/RunReconciliationHandler.cs` và `flex-exchange-service/src/Flex.Exchange.Api/Controllers/ReconciliationOperationsController.cs`.
 - [ ] T059 [US4] Tạo seed Alpha/Beta idempotent cho trace order→trade→account→ledger→obligation→statement tại `flex-database/seed/test/{exchange,broker,vsd}/alpha-beta.sql`.
@@ -182,8 +182,8 @@
 
 ### Implementation for User Story 5
 
-- [ ] T063 [US5] Tạo bảng audit append-only cho replay, settlement, reconciliation, alert, initialization và recovery tại `flex-database/changelog/databases/vsd/releases/v1.0/009-create-audit.sql`.
-- [ ] T064 [US5] Include `009-create-audit.sql` trong `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml` sau inbox/outbox.
+- [X] T063 [US5] Tạo bảng audit append-only cho replay, settlement, reconciliation, alert, initialization và recovery tại `flex-database/changelog/databases/vsd/releases/v1.0/009-create-audit.sql`.
+- [X] T064 [US5] Include `009-create-audit.sql` trong `flex-database/changelog/databases/vsd/releases/v1.0/db.changelog-v1.0.yaml` sau inbox/outbox.
 - [ ] T065 [US5] Implement tenant/broker scope guard dùng trước mọi persistence read/write/replay/recovery trong `flex-exchange-service/src/Flex.Exchange.Application/Persistence/PersistenceScopeGuard.cs`.
 - [ ] T066 [US5] Implement audit writer với action/result/source/correlation và redaction dữ liệu nhạy cảm trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/VsdPersistence/VsdAuditWriter.cs`.
 - [ ] T067 [US5] Implement `GET /internal/persistence/trace` tổng hợp theo external IDs/correlation, không join database, trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/PersistenceTraceController.cs`.
