@@ -10,6 +10,7 @@ Request:
 {
   "clientOrderId": "client-order-001",
   "accountId": "demo-account-1",
+  "customerId": "demo-customer-1",
   "symbol": "FXS",
   "side": "Buy",
   "price": 20000,

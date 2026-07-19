@@ -27,7 +27,7 @@ Service mặc định chạy tại `http://localhost:5266`.
 
 1. Mở Swagger hoặc `src/Flex.Exchange.Api/Flex.Exchange.http`.
 2. Gọi `GET /api/broker/accounts/demo-account-1`; xác nhận số dư available/reserved ban đầu.
-3. Gửi buy vượt tiền; xác nhận `accepted: false`, reason `InsufficientBuyingPower`, `exchangeOrderId: null`.
+3. Gửi buy vượt tiền với `customerId` đúng chủ tài khoản; xác nhận `accepted: false`, reason `InsufficientBuyingPower`, `exchangeOrderId: null`.
 4. Gửi sell vượt CK; xác nhận reason `InsufficientSecurities` và Exchange book không đổi.
 5. Gửi lệnh hợp lệ với `clientOrderId` mới; xác nhận reservation, `exchangeOrderId` và status link.
 6. Gửi lại cùng payload/id; xác nhận không tạo Exchange order thứ hai.
