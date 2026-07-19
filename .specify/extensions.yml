@@ -5,3 +5,9 @@ hooks:
       description: "Cập nhật tài liệu nghiệp vụ trong docs/business/ sau khi spec hoàn thành"
       optional: true
       enabled: true
+  after_clarify:
+    - extension: "speckit-docbiz"
+      command: "speckit-docbiz"
+      description: "Đồng bộ tài liệu nghiệp vụ trong docs/business/ sau khi clarify cập nhật spec"
+      optional: true
+      enabled: true

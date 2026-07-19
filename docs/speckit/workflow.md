@@ -107,6 +107,12 @@ flowchart TD
 Clarify sửa `spec.md` (chi phí thấp). Nếu chạy sau plan, phát hiện assumption sai
 sẽ phải làm lại toàn bộ `plan.md`, `data-model.md`, `contracts/`.
 
+**Đồng bộ tài liệu nghiệp vụ**
+`speckit-docbiz` được gợi ý qua optional hook sau `speckit-specify` và
+`speckit-clarify` để cập nhật tài liệu BA theo `spec.md` mới nhất. Không gắn hook
+sau `speckit-converge` vì command đó chỉ append `tasks.md`, không thay đổi scope
+hay `spec.md`.
+
 **`/speckit-checklist` là gate cứng của `/speckit-implement`**
 Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa được tick. Với
 `checklists/requirements.md`, item `Status: Không áp dụng` vẫn phải dùng `[x]`:
