@@ -81,6 +81,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Task có phụ thuộc rõ phải ghi dependency task ID; mỗi user story cần có `Definition of Done`, và output cuối nên có `Traceability Matrix` map `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` sang task.
 - Tasks template cần có rule riêng cho data/migration safety và API/event contract: không gộp migration schema với business handler, có backward compatibility/backfill/rollback note khi cần, và contract quan trọng có implementation/test task tương ứng.
 - Không sinh test task hình thức; test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
+- Test Gate của constitution có hiệu lực cao hơn lựa chọn tùy chọn: mọi rủi ro trong `plan.md` phải có test task theo chiến lược kiểm thử, hoặc manual/command validation cụ thể kèm lý do không áp dụng automated test.
 - Output cuối của `/speckit-tasks` chỉ sinh phase cho user story thật trong `spec.md`, không giữ placeholder, `TXXX`, `Phase N`, phase ví dụ hoặc tự tạo đủ `US1`/`US2`/`US3` khi spec không có.
 - Nếu một user story không có automated test task, tasks output phải có manual validation task hoặc command validation task để dev có task verify cụ thể.
 - `Traceability Matrix` trong tasks output phải dùng task ID thực tế, không dùng range nếu range chứa task không liên quan hoặc task optional đã bị bỏ.

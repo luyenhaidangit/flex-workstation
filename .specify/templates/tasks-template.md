@@ -8,7 +8,7 @@ description: "Template danh sách task cho triển khai feature"
 
 **Điều kiện tiên quyết**: `plan.md` (bắt buộc), `spec.md` (bắt buộc cho user stories), `research.md`, `data-model.md`, `contracts/`
 
-**Tests**: Test task là TÙY CHỌN. Chỉ sinh test task khi `spec.md`, `plan.md`, constitution hoặc convention project yêu cầu. Nếu có test task, test PHẢI được viết trước implementation và fail trước khi code.
+**Tests**: Test Gate là bắt buộc. PHẢI sinh test task cho mọi rủi ro trong `plan.md` mà chiến lược kiểm thử yêu cầu xác minh, không phụ thuộc việc `spec.md` hoặc người dùng có yêu cầu test riêng hay không. Nếu rủi ro không có automated test phù hợp, PHẢI sinh manual validation hoặc command validation cụ thể và ghi rõ lý do không áp dụng. Test tự động được sinh PHẢI được viết trước implementation và fail trước khi code.
 
 **Tổ chức**: Task được nhóm theo user story để mỗi story có thể được implement, kiểm tra và deliver độc lập.
 
@@ -34,7 +34,7 @@ Khi sinh file `tasks.md`:
 3. Đọc `plan.md` để xác định project structure, path thật, technical scope, impact, rollout, observability và test strategy.
 4. Đọc `data-model.md` để sinh task model/schema/repository/service phù hợp.
 5. Đọc `contracts/` để sinh task API/event/contract và contract test khi cần.
-6. Chỉ sinh test task nếu spec, plan, constitution hoặc convention project yêu cầu.
+6. Sinh test task cho mọi rủi ro trong `plan.md` mà chiến lược kiểm thử yêu cầu xác minh. Nếu không có automated test phù hợp, sinh manual validation hoặc command validation cụ thể và ghi rõ lý do không áp dụng.
 7. Mỗi task PHẢI có file path cụ thể hoặc command validate cụ thể.
 8. Mỗi task PHẢI có đúng một trách nhiệm chính.
 9. Không dùng placeholder như `[Entity]`, `[endpoint]`, `[file]` trong output cuối.
@@ -239,7 +239,7 @@ Ví dụ foundational tasks:
 
 Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra hoạt động đúng".
 
-### Tests for User Story 1 (OPTIONAL - chỉ thêm nếu có yêu cầu test)
+### Tests for User Story 1 (khi rủi ro hoặc chiến lược kiểm thử yêu cầu)
 
 > **NOTE**: Nếu sinh test task, viết test TRƯỚC và đảm bảo test fail trước implementation.
 
@@ -278,7 +278,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 2. [Kiểm tra response/kết quả nghiệp vụ cụ thể]
 3. [Kiểm tra dữ liệu/log/audit nếu liên quan]
 
-### Tests for User Story 2 (OPTIONAL - chỉ thêm nếu có yêu cầu test)
+### Tests for User Story 2 (khi rủi ro hoặc chiến lược kiểm thử yêu cầu)
 
 - [ ] T019 [P] [US2] Tạo integration test cho luồng `[user journey]` trong `backend/tests/Integration/[FeatureName]UpdateTests.cs`
 
@@ -310,7 +310,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 2. [Kiểm tra response/kết quả nghiệp vụ cụ thể]
 3. [Kiểm tra dữ liệu/log/audit nếu liên quan]
 
-### Tests for User Story 3 (OPTIONAL - chỉ thêm nếu có yêu cầu test)
+### Tests for User Story 3 (khi rủi ro hoặc chiến lược kiểm thử yêu cầu)
 
 - [ ] T023 [P] [US3] Tạo integration test cho luồng `[user journey]` trong `backend/tests/Integration/[FeatureName]QueryTests.cs`
 
@@ -397,7 +397,7 @@ Traceability Matrix phải dùng task ID thực tế sau khi sinh. Không dùng 
 
 ### Trong từng user story
 
-- Tests (nếu có) PHẢI được viết và fail trước implementation.
+- Test tự động được yêu cầu bởi rủi ro hoặc chiến lược kiểm thử PHẢI được viết và fail trước implementation; rủi ro không có automated test phù hợp phải có manual/command validation cùng lý do không áp dụng.
 - Models/entities trước services/handlers.
 - Services/handlers trước endpoints/UI.
 - Core implementation trước integration.
@@ -419,7 +419,7 @@ Traceability Matrix phải dùng task ID thực tế sau khi sinh. Không dùng 
 ## Parallel Example: User Story 1
 
 ```bash
-# Chạy mọi test cho User Story 1 cùng lúc nếu có yêu cầu test:
+# Chạy mọi test bắt buộc cho User Story 1 cùng lúc khi rủi ro hoặc chiến lược kiểm thử yêu cầu:
 Task: "Tạo contract test cho POST /api/[resource] trong backend/tests/Contract/[FeatureName]ContractTests.cs"
 Task: "Tạo integration test cho luồng [user journey] trong backend/tests/Integration/[FeatureName]FlowTests.cs"
 
@@ -486,7 +486,7 @@ Với nhiều developer:
 - `[P]` tasks = khác file, không phụ thuộc nhau, không liên quan tới priority `P1`/`P2`/`P3`.
 - `[Story]` label map task tới user story cụ thể để traceability.
 - Mỗi user story nên có thể hoàn tất và test/validate độc lập.
-- Nếu specification KHÔNG yêu cầu test, không sinh test task chỉ để đủ format; dùng Independent Test/manual validation cụ thể.
+- Không sinh test task hình thức. Tuy nhiên, mọi rủi ro trong `plan.md` phải có test task theo chiến lược kiểm thử, hoặc manual/command validation cụ thể kèm lý do không áp dụng automated test.
 - Test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
 - Commit sau từng task hoặc nhóm logic.
 - Dừng ở bất kỳ checkpoint nào để validate story độc lập.
