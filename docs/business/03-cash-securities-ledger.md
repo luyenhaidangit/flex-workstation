@@ -83,4 +83,4 @@ Khách hàng → Công ty chứng khoán/Broker → Sàn giao dịch → Lưu k�
 - [Đặc tả tính năng](../../specs/000016-cash-securities-ledger/spec.md): mục tiêu, user story, quy tắc và phạm vi MVP.
 - [Kế hoạch triển khai](../../specs/000016-cash-securities-ledger/plan.md): thiết kế kỹ thuật và chiến lược kiểm thử dành cho đội phát triển.
 - [MVP 06 — Multi-tenant brokers](../mvp/06-multi-tenant-brokers.md): tenant, Broker và tài khoản đầu vào của MVP 07.
-- [MVP 08 — Clearing, settlement và reconciliation](../mvp/08-clearing-settlement-reconciliation.md): các quy trình tiếp nối sau khi ledger ghi nhận giao dịch.
+- [MVP 08 — Database, pipeline, clearing, settlement và reconciliation](../mvp/08-database-pipeline-clearing-settlement-reconciliation.md): các quy trình tiếp nối sau khi ledger ghi nhận giao dịch.

@@ -11,7 +11,7 @@ Mỗi MVP là một lát cắt nghiệp vụ có thể demo độc lập. Chỉ 
 | B — CTCK | 05 | [CTCK đơn và kiểm tra trước lệnh](05-single-broker-pretrade.md) |
 | B — CTCK | 06 | [CTCK đa tenant](06-multi-tenant-brokers.md) |
 | B — CTCK | 07 | [Ledger tiền và chứng khoán](07-cash-securities-ledger.md) |
-| B — CTCK | 08 | [Clearing, settlement, đối chiếu](08-clearing-settlement-reconciliation.md) |
+| B — CTCK | 08 | [Database, pipeline, clearing, settlement, đối chiếu](08-database-pipeline-clearing-settlement-reconciliation.md) |
 | B — CTCK | 09 | [Kiểm soát CTCK nâng cao](09-broker-controls-margin.md) |
 | C — Giám sát | 10 | [Giám sát và điều tra](10-market-surveillance.md) |
 | D — Research | 11 | [Kho tri thức theo tenant](11-tenant-research-knowledge.md) |
