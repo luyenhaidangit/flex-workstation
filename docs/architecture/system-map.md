@@ -184,7 +184,7 @@ Script bỏ qua repo có local changes, origin khác cấu hình hoặc đang �
 
 - Tài liệu workstation: `README.md`, `docs/`.
 - Manifest repo con: `workstation.json`.
-- Runtime config: `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.codex/`.
+- Runtime config: `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/`.
 - Spec Kit: `.specify/`, `specs/`.
 - VS Code task shortcuts: `.vscode/tasks.json`.
 - Repo nghiệp vụ: các repo con trong `workstation.json`.
