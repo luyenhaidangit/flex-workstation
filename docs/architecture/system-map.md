@@ -65,7 +65,7 @@ Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch
 | `flex-microfrontend` | Frontend client | Angular, Node.js | `Confirmed` — xem `flex-microfrontend/README.md`, `package.json` |
 | `flex-environment` | Local/dev infrastructure stack | Docker Compose | `Confirmed` — xem `flex-environment/docker-compose*.yml` |
 | `flex-agent-service` | Nền tảng AI Agent đa tenant (control plane + runtime) | .NET 9, SignalR | `Confirmed` — xem `specs/000008-agent-platform-mvp/plan.md` |
-| `flex-database` | Migration/schema script dùng chung cho các database (MySQL tenant, PostgreSQL shared); đang thay thế dần Oracle | SQL migration scripts | `Confirmed` |
+| `flex-database` | Migration/schema script dùng chung cho các database (MySQL tenant, PostgreSQL shared); đang thay thế dần Oracle | SQL migration scripts; PostgreSQL/pgvector theo [Liquibase SQL-first](liquibase-sql-first.md) | `Confirmed` |
 
 ## 5. Data Architecture
 
