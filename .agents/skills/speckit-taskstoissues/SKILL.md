@@ -80,7 +80,29 @@ git config --get remote.origin.url
    - Derive `<owner>/<repo>` from the GitHub `origin` remote already validated above and pass it explicitly as `--repo <owner>/<repo>` to every `gh` command.
    - Run `gh issue list --repo <owner>/<repo> --state all --limit 1000 --json number,title`, then apply the same task-ID title matching. If the command fails, STOP without creating issues.
    - Report that the fallback was used. If the returned list reaches the 1000-item limit before every task ID is found, warn that historical deduplication may be incomplete and ask the user whether to continue; do not create issues until they confirm.
-1. For each task in the list, create a new issue in the repository that is representative of the Git remote. Use the GitHub MCP server when available; otherwise use `gh issue create --repo <owner>/<repo> --title "T001: <description>" --body "Generated from <FEATURE_DIR>/tasks.md."`. Task lines in `tasks.md` start with a markdown checkbox, so first strip the leading `- [ ]` (and any `[P]` / `[US#]` markers) to recover the task ID and its description. Create the issue with a single canonical title of the form `T001: <description>`, with the ID written once followed by the task description (for example, the line `- [ ] T001 Create project structure` becomes the title `T001: Create project structure`).
+1. **Build self-contained issue context** before creating any issue:
+   - Set `FEATURE_LABEL` to `feature:<basename of FEATURE_DIR>` (for example, `feature:000015-single-broker-pretrade`). Reuse that exact GitHub label if it exists; otherwise create it with a neutral color and description `Tasks for <FEATURE_DIR>`. Apply it to every issue created for this feature. When using `gh`, check/create the label with `gh label list` and `gh label create --repo <owner>/<repo>` before issue creation; do not use `--force` on an existing label.
+   - Resolve a GitHub artifact base URL from the validated `<owner>/<repo>` and the current branch from `git branch --show-current`; if detached, use the repository default branch. Use it to link the feature's `spec.md`, `plan.md` (if present), and `tasks.md`. Also include their repository paths as code literals so the context remains usable if a link is temporarily unavailable.
+   - Parse each task's markers before removing them from the title. Preserve every `[US#]` marker as traceability in the body; if no user-story marker exists, write `User story: Không áp dụng`.
+   - Construct this Markdown body for every issue, replacing placeholders with the parsed task and resolved links:
+
+     ```md
+     ## Task
+
+     <task description>
+
+     - **Task ID**: `T001`
+     - **Feature**: `FEATURE_DIR`
+     - **User story**: `[US1]` hoặc `Không áp dụng`
+
+     ## Artifacts
+
+     - [spec.md](<spec URL>) — `FEATURE_DIR/spec.md`
+     - [plan.md](<plan URL>) — `FEATURE_DIR/plan.md` (bỏ dòng này nếu file không có)
+     - [tasks.md](<tasks URL>) — `FEATURE_DIR/tasks.md`
+     ```
+
+1. For each task in the list, create a new issue in the repository that is representative of the Git remote. Use the GitHub MCP server when available and pass the canonical title, constructed body, and `FEATURE_LABEL`; otherwise use `gh issue create --repo <owner>/<repo> --title "T001: <description>" --body "$ISSUE_BODY" --label "$FEATURE_LABEL"`. Task lines in `tasks.md` start with a markdown checkbox, so first strip the leading `- [ ]` (and any `[P]` / `[US#]` markers) to recover the task ID and its description. Create the issue with a single canonical title of the form `T001: <description>`, with the ID written once followed by the task description (for example, the line `- [ ] T001 Create project structure` becomes the title `T001: Create project structure`).
    - **Skip** any task whose ID is already present in the set of existing issues from the previous step, and report it (for example, `T001 already has an issue, skipping`).
    - Only create issues for tasks that do not yet have a matching issue.
 
