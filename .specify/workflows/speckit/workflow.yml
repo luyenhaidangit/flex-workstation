@@ -1,10 +1,10 @@
 schema_version: "1.0"
 workflow:
   id: "speckit"
-  name: "Full SDD Cycle"
+  name: "Legacy SDD Shortcut (Non-canonical)"
   version: "1.0.0"
   author: "GitHub"
-  description: "Runs specify → plan → tasks → implement with review gates"
+  description: "Legacy shortcut only; use docs/speckit/workflow.md for the canonical user-gated Speckit workflow."
 
 requires:
   # 0.8.5 is the first release with engine-side resolution of the
@@ -12,6 +12,9 @@ requires:
   # as a literal integration key and fail at dispatch.
   speckit_version: ">=0.8.5"
   integrations:
+    # This legacy shortcut only invokes four core commands and deliberately does
+    # not replace the canonical workflow's optional/user-gated steps and hooks.
+    # See docs/speckit/workflow.md before running it.
     # The four commands below (specify, plan, tasks, implement) are core
     # spec-kit commands provided by every integration. The list here is an
     # advisory, non-exhaustive compatibility hint following the documented

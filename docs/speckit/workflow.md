@@ -22,6 +22,7 @@ flowchart TD
     %% ── PER FEATURE ─────────────────────────────────
     subgraph FEATURE ["🔁  Mỗi feature"]
         specify["$speckit-specify hoặc /speckit-specify\n&lt;mô tả nghiệp vụ — chỉ WHAT + WHY&gt;"]
+        docbiz["$speckit-docbiz hoặc /speckit-docbiz\nOptional hook: đồng bộ tài liệu BA"]
 
         clarify_gate{Còn mơ hồ?}
         clarify["$speckit-clarify hoặc /speckit-clarify\nTối đa 5 câu làm rõ spec"]
@@ -51,9 +52,11 @@ flowchart TD
     START --> constitution
     constitution --> specify
 
+    specify -. after_specify .-> docbiz
     specify --> clarify_gate
     clarify_gate -->|Có| clarify
     clarify_gate -->|Không| checklist_gate
+    clarify -. after_clarify .-> docbiz
     clarify --> checklist_gate
 
     checklist_gate -->|Có| checklist
@@ -84,6 +87,7 @@ flowchart TD
 | 0 | `$speckit-constitution` / `/speckit-constitution` | Core · Setup | Nguyên tắc dự án | `.specify/memory/constitution.md` |
 | 1 | `$speckit-specify` / `/speckit-specify` | Core | Mô tả nghiệp vụ (WHAT + WHY) | `specs/<id>/spec.md`, `checklists/requirements.md` |
 | 2 | `$speckit-clarify` / `/speckit-clarify` | **Optional** | — | `spec.md` cập nhật (tối đa 5 câu hỏi) |
+| 2a | `$speckit-docbiz` / `/speckit-docbiz` | **Optional hook** sau specify/clarify | `spec.md` hiện hành | `docs/business/` cập nhật cho BA/stakeholder |
 | 3 | `$speckit-checklist [domain]` / `/speckit-checklist [domain]` | **Optional** | `ux` / `security` / `api` / ... | `checklists/<domain>.md` |
 | 4 | `$speckit-plan` / `/speckit-plan` | Core | Tech stack + architecture | `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md` |
 | 5 | `$speckit-tasks` / `/speckit-tasks` | Core | — | `tasks.md` |
@@ -127,6 +131,12 @@ sẽ phải làm lại toàn bộ `plan.md`, `data-model.md`, `contracts/`.
 `speckit-clarify` để cập nhật tài liệu BA theo `spec.md` mới nhất. Không gắn hook
 sau `speckit-converge` vì command đó chỉ append `tasks.md`, không thay đổi scope
 hay `spec.md`.
+
+**Workflow engine legacy**
+`.specify/workflows/speckit/workflow.yml` là shortcut legacy, không phải luồng canonical
+và không được dùng để thay thế các gate do người dùng chủ động gọi trong tài liệu này.
+Nó không đại diện cho các bước optional/hook như clarify, checklist, analyze, converge và
+docbiz.
 
 **`/speckit-checklist` là gate cứng của `/speckit-implement`**
 Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa được tick. Với

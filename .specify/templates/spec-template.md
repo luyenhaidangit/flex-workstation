@@ -350,6 +350,21 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ---
 
+## Clarifications
+
+<!--
+  Log do /speckit-clarify quản lý, luôn nằm ngay sau §18 Câu hỏi mở và trước §19.
+  Mỗi câu trả lời được ghi theo session ngày tháng, rồi được áp dụng vào section nghiệp vụ phù hợp.
+  Khi một câu hỏi §18 đã được trả lời, xóa marker [CẦN LÀM RÕ] hoặc thay bằng
+  [ĐÃ LÀM RÕ → Clarifications / Session YYYY-MM-DD]; không để marker chưa giải quyết.
+-->
+
+### Session YYYY-MM-DD
+
+- Q: [Câu hỏi đã làm rõ] → A: [Câu trả lời đã chấp nhận]
+
+---
+
 ## 19. Điều kiện sẵn sàng để lập plan kỹ thuật
 
 <!--

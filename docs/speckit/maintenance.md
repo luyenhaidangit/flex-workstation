@@ -21,6 +21,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 - `$speckit-taskstoissues` ưu tiên GitHub MCP; khi MCP không có, dùng `gh issue list/create` với `--repo` lấy từ `origin`. Nếu không xác thực hoặc không deduplicate được issue hiện có, phải dừng trước khi tạo issue.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và rà `git diff -- .agents/skills`.
+- Khi upgrade Spec Kit, không nhận tự động file upstream mà manifest đang theo dõi. Diff từng file trong `.specify/integrations/claude.manifest.json` và `.specify/integrations/speckit.manifest.json` với custom source hiện hành; chỉ merge thay đổi được review, rồi cập nhật manifest/hash theo cơ chế chính thức của tool. `claude.manifest.json` đã tắt tracking skill custom bằng `_disabled_files`; `speckit.manifest.json` vẫn có hash upstream nên đặc biệt phải review template/script trước khi upgrade.
 
 ## Requirements Quality Gate
 
