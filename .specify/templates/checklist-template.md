@@ -80,6 +80,12 @@
 - `Pass có điều kiện`: Không có `[Blocker]` fail; các `[High]`/`[Medium]` fail còn lại đã có owner, hạn xử lý, và không chặn trực tiếp bước tiếp theo.
 - `Fail`: Có ít nhất một `[Blocker]` fail hoặc thiếu artifact chính để kiểm tra.
 
+**Quy ước checkbox và Status**:
+
+- `Status: Pass` và `Status: Không áp dụng`: dùng checkbox `[x]`.
+- `Status: Fail`: dùng checkbox `[ ]` và chặn gate.
+- `Status: Fail (ngoại lệ đã phê duyệt)`: dùng checkbox `[x]`; fail vẫn được theo dõi, nhưng ngoại lệ phải có fail evidence, owner, hạn xử lý, người phê duyệt và hạn xem lại.
+
 ---
 
 ## Quy tắc sinh checklist
@@ -117,7 +123,7 @@
 
 - Mỗi item chỉ kiểm một vấn đề.
 - Mỗi item PHẢI trả lời được bằng Pass/Fail/Không áp dụng.
-- Mỗi item sau review PHẢI có status: `Pass`, `Fail`, `Không áp dụng`, hoặc `Chưa kiểm`.
+- Mỗi item sau review PHẢI có status: `Pass`, `Fail`, `Fail (ngoại lệ đã phê duyệt)`, `Không áp dụng`, hoặc `Chưa kiểm`.
 - Không dùng item mơ hồ như "requirement đã tốt chưa?".
 - Không kiểm implementation nếu checklist là `Requirement Quality`.
 - Item `[Blocker]` fail thì KHÔNG ĐƯỢC chuyển bước tiếp theo nếu chưa có ngoại lệ được phê duyệt.
@@ -266,9 +272,9 @@ Khi một item fail hoặc cần làm rõ, ghi nhận trực tiếp bên dưới
 
 ## Ngoại lệ được phê duyệt
 
-| Item | Lý do ngoại lệ | Rủi ro chấp nhận | Người phê duyệt | Hạn xem lại |
-|------|----------------|------------------|------------------|-------------|
-| [CHK### hoặc "Không áp dụng"] | [Lý do] | [Rủi ro] | [Tên] | [Ngày] |
+| Item | Lý do ngoại lệ | Rủi ro chấp nhận | Owner | Hạn xử lý | Người phê duyệt | Hạn xem lại |
+|------|----------------|------------------|-------|------------|------------------|-------------|
+| [CHK### hoặc "Không áp dụng"] | [Lý do] | [Rủi ro] | [Tên/team] | [Ngày/mốc] | [Tên] | [Ngày] |
 
 ---
 

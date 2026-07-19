@@ -64,7 +64,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 ## Requirements Template
 
 - Requirements template là quality gate bắt buộc do `$speckit-specify` sinh tại `checklists/requirements.md`; không dùng cho checklist domain tùy biến.
-- Template cần có metadata review, artifact `spec.md`, kết quả tổng hợp, rule `Pass`/`Pass có điều kiện`/`Fail`, transition gate và bảng ngoại lệ được phê duyệt.
+- Template cần có metadata review, artifact `spec.md`, kết quả tổng hợp, rule `Pass`/`Pass có điều kiện`/`Fail`, transition gate và bảng ngoại lệ được phê duyệt. Quy ước gate: `Pass`/`Không áp dụng`/`Fail (ngoại lệ đã phê duyệt)` dùng `[x]`; chỉ `Fail` chưa được phê duyệt dùng `[ ]`.
 - Mỗi item phải có mã `CHK###`, severity, status, một tiêu chí kiểm chất lượng requirement và tham chiếu hoặc marker phù hợp; item Fail phải dùng format phát hiện, ảnh hưởng, đề xuất, tham chiếu, owner và hạn xử lý.
 - `$speckit-specify` phải resolve template này; không fallback về Markdown hard-code nếu template không có.
 

@@ -69,7 +69,7 @@ You **MUST** consider the user input before proceeding (if not empty).
      - Total items: All lines matching `- [ ]` or `- [X]` or `- [x]`
      - Completed items: Lines matching `- [X]` or `- [x]`
      - Incomplete items: Lines matching `- [ ]`
-   - A checked item with `Status: Không áp dụng` is complete and MUST NOT block this gate. The checked box records that the review is complete; the status records that the criterion does not apply. Only unchecked items are incomplete.
+   - A checked item with `Status: Không áp dụng` is complete and MUST NOT block this gate. A checked `Status: Fail (ngoại lệ đã phê duyệt)` is also complete: the status keeps the risk visible, while its approved exception records the authorization. Only unchecked items are incomplete.
    - Create a status table:
 
      ```text

@@ -62,6 +62,7 @@
 
 - `Status: Pass`: dùng checkbox `[x]`.
 - `Status: Fail`: dùng checkbox `[ ]`; item này được gate của `$speckit-implement` xem là chưa hoàn tất.
+- `Status: Fail (ngoại lệ đã phê duyệt)`: dùng checkbox `[x]`; fail vẫn hiển thị để theo dõi, nhưng ngoại lệ đã có trong bảng bên dưới với người phê duyệt, owner, hạn xử lý và hạn xem lại nên không chặn gate.
 - `Status: Không áp dụng`: dùng checkbox `[x]`. Checkbox xác nhận item đã được review, còn status nêu rõ tiêu chí không áp dụng; item này không chặn gate.
 
 ---
@@ -110,9 +111,9 @@ Khi item có `Status: Fail`, ghi trực tiếp bên dưới item:
 
 ## Ngoại lệ được phê duyệt
 
-| Item | Lý do ngoại lệ | Rủi ro chấp nhận | Người phê duyệt | Hạn xem lại |
-|------|----------------|------------------|------------------|-------------|
-| Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng |
+| Item | Lý do ngoại lệ | Rủi ro chấp nhận | Owner | Hạn xử lý | Người phê duyệt | Hạn xem lại |
+|------|----------------|------------------|-------|------------|------------------|-------------|
+| Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng | Không áp dụng |
 
 ---
 

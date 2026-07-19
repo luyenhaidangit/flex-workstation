@@ -102,6 +102,7 @@ flowchart TD
 - Trước khi tạo feature, `specify` dò các thư mục `specs/*-<short-name>`.
 - Nếu đã có một thư mục trùng, command hỏi chọn **cập nhật spec hiện có** hoặc **tạo feature mới**; không tự tăng số thứ tự để tạo bản sao.
 - Nếu có nhiều thư mục trùng, command liệt kê các thư mục và yêu cầu chọn một thư mục để cập nhật hoặc xác nhận tạo feature mới.
+- Guard này hoàn tất trước khi dispatch bất kỳ `before_specify` hook nào, nên hook tạo branch không thể chạy nhầm feature. Khi chọn cập nhật, `requirements.md` hiện có được giữ lại để re-validate thay vì bị copy đè.
 
 **Chuyển feature đang làm việc**
 `feature.json` chỉ lưu một feature mặc định. Khi làm nhiều feature, đặt
@@ -131,7 +132,9 @@ hay `spec.md`.
 Implement tự dừng và hỏi user nếu còn checklist item `[ ]` chưa được tick. Với
 `checklists/requirements.md`, item `Status: Không áp dụng` vẫn phải dùng `[x]`:
 checkbox xác nhận item đã được review, còn status ghi nhận tiêu chí không áp dụng;
-do đó item này không chặn gate.
+do đó item này không chặn gate. Một `Status: Fail (ngoại lệ đã phê duyệt)` cũng dùng
+`[x]`, nhưng phải có fail evidence cùng ngoại lệ được phê duyệt (owner, hạn xử lý,
+người phê duyệt và hạn xem lại); chỉ `Status: Fail` chưa phê duyệt dùng `[ ]` và chặn gate.
 
 **Traceability Gate của `/speckit-analyze` và `/speckit-converge`**
 Hai command phải inventory và kiểm coverage cho `US`/`AC`, `FR`, `BR`, `SEC`,

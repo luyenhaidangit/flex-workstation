@@ -26,6 +26,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Pre-Execution Checks
 
 **Check for extension hooks (before specification)**:
+- Discover and validate eligible `before_specify` hooks here, but **do not dispatch them yet**. Resolve the duplicate-short-name guard in Outline step 2 first; this prevents a hook (including one that creates a branch) from running before the user chooses update mode or a new feature.
 - Check if `.specify/extensions.yml` exists in the project root.
 - If it exists, read it and look for entries under the `hooks.before_specify` key
 - If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
@@ -34,7 +35,7 @@ You **MUST** consider the user input before proceeding (if not empty).
   - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
   - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
 - When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
+- After Outline step 2 resolves the guard, for each executable hook, output the following based on its `optional` flag:
   - **Optional hook** (`optional: true`):
     ```
     ## Extension Hooks
@@ -54,9 +55,9 @@ You **MUST** consider the user input before proceeding (if not empty).
     Executing: `/{command}`
     EXECUTE_COMMAND: {command}
 
-    Wait for the result of the hook command before proceeding to the Outline.
+    Wait for the result of the hook command before proceeding to Outline step 3.
     ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
+    After the guard resolves and after emitting the block above, you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
 - If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
 
 ## Outline
@@ -79,18 +80,18 @@ Given that feature description, do this:
 
 2. **Guard against an existing short name**:
 
-   Before invoking extension hooks or creating a branch/spec directory, scan `specs/` for directories whose name ends exactly with `-<short-name>`.
+   Before dispatching extension hooks or creating a branch/spec directory, scan `specs/` for directories whose name ends exactly with `-<short-name>`.
 
    - If no directory matches, continue normally.
    - If exactly one directory matches, ask the user: **"Đã có spec `<existing-directory>` cùng short-name `<short-name>`. Bạn muốn cập nhật spec hiện có hay tạo feature mới?"** Stop and wait for the user's answer; do not invoke hooks or create files before it.
    - If multiple directories match, list their paths and ask the user to select one directory to update or to create a feature mới. Stop and wait for the user's answer; do not invoke hooks or create files before it.
-   - If the user chooses **cập nhật spec hiện có**, set `SPECIFY_FEATURE_DIRECTORY` to the selected existing directory. Treat its `spec.md` as the document to update; do not copy the spec template over it or create a new directory. Persist that selected path to `.specify/feature.json` after the spec is updated.
+   - If the user chooses **cập nhật spec hiện có**, set `SPECIFY_FEATURE_DIRECTORY` to the selected existing directory. Treat its `spec.md` as the document to update; do not copy the spec template over it or create a new directory. Preserve an existing `checklists/requirements.md`: re-validate its items and update their statuses and summary, but never replace its review metadata, fail evidence, approved-exception table, owner/deadline, or review history with a fresh template. Persist that selected path to `.specify/feature.json` after the spec is updated.
    - If the user chooses **tạo feature mới**, continue with the normal auto-generated directory and numbering flow.
    - If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY`, treat it as their selected target and do not run this guard. If it already contains `spec.md`, update that file rather than replacing it from the template.
 
 3. **Branch creation** (optional, via hook):
 
-   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
+   After the guard in step 2 has resolved, dispatch eligible `before_specify` hooks discovered during Pre-Execution Checks. If a hook runs successfully, it may create/switch to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
 
    If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
 
@@ -166,13 +167,13 @@ Given that feature description, do this:
    a. **Create Requirements Checklist from Template**:
       - Resolve the active `requirements-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve requirements-template`).
       - If the template cannot be resolved, stop with a clear error. Do not fall back to a hard-coded checklist.
-      - Copy the resolved template to `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md`.
-      - Replace `[TÊN TÍNH NĂNG]`, `[NNNNNN]`, `[NGÀY]`, and `{{GIT_USER_NAME}}` with feature values. Use `Chưa xác định` when `git config user.name` is unavailable.
+      - For a new feature, copy the resolved template to `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md`, then replace `[TÊN TÍNH NĂNG]`, `[NNNNNN]`, `[NGÀY]`, and `{{GIT_USER_NAME}}` with feature values. Use `Chưa xác định` when `git config user.name` is unavailable.
+      - For update mode when `requirements.md` already exists, do not copy or replace it. Keep all existing review history, exception decisions, fail evidence, owner/deadline, and metadata; use that file for step b re-validation. If it lacks a canonical `CHK###` item required by the resolved template, report the gap and ask the user before adding the missing item; never regenerate the whole file.
       - Keep `requirements.md` as the mandatory quality gate for `spec.md`. It is distinct from domain checklists created by `$speckit-checklist` using `checklist-template.md`.
 
    b. **Run Validation Check**:
       - Review `spec.md` against every `CHK###` item in the generated requirements checklist.
-      - Set each item to `Status: Pass`, `Status: Fail`, or `Status: Không áp dụng`; update the checkbox consistently: `Pass` and `Không áp dụng` use `[x]`, while `Fail` uses `[ ]`. A checked `Không áp dụng` item is reviewed and complete; it does not block the implementation checklist gate.
+      - Set each item to `Status: Pass`, `Status: Fail`, or `Status: Không áp dụng`; update the checkbox consistently: `Pass` and `Không áp dụng` use `[x]`, while an unapproved `Fail` uses `[ ]`. An approved exception uses `[x]` with `Status: Fail (ngoại lệ đã phê duyệt)` so it remains visible as a fail but does not block the implementation checklist gate. A checked `Không áp dụng` item is reviewed and complete; it does not block the gate.
       - For every Fail, add `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`, `Owner`, and `Hạn xử lý` directly beneath the item.
       - Update the summary counts, review status, conclusion, and permitted next step after each review iteration.
 

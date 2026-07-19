@@ -213,18 +213,21 @@ Execution steps:
    - If it exists:
      1. Read the checklist file.
      2. Identify all GitHub task-list checkbox lines — lines matching `- [ ]`, `- [x]`, or `- [X]` (case-insensitive, tolerant of leading whitespace for nested items) outside of code fences. Ignore all other content (headings, notes, non-checkbox bullets, metadata).
-     3. For each checkbox line, record its current marker state (checked or unchecked) and item text into a before-snapshot list.
+      3. For each checkbox line, record its current marker state (checked or unchecked), inline `Status:`, and item text into a before-snapshot list.
      4. Re-evaluate each checkbox item against the **updated** spec (the version just saved in step 7).
-     5. For each checkbox item, update only if the checked/unchecked state actually changes:
-        - If the item now passes and was unchecked: change `[ ]` to `[x]`.
-        - If the item now fails and was checked: change `[x]`/`[X]` to `[ ]`.
-        - If the state is unchanged: leave the marker as-is (preserve existing case to avoid cosmetic diffs).
-     6. Save the updated checklist file. **Only toggle the `[ ]`/`[x]` marker portion of checkbox lines whose state changed.** All other file content — headings, metadata, notes, line ordering, whitespace — must remain unchanged to avoid noisy diffs.
-     7. Compare the before-snapshot with the current state to compute three lists for the Completion Report:
-        - **Newly passing**: items that changed from unchecked to checked.
-        - **Regressions**: items that changed from checked to unchecked.
-        - **Still unchecked**: items that remain unchecked.
-     8. Record the before/after pass counts as checked/total checkbox items (e.g., "12/16 → 15/16 items passing").
+      5. For each checkbox item, read and update its inline `Status:` together with its checkbox when the evaluation changes:
+         - `Status: Pass` uses `[x]`; if an item now passes, set both status and marker accordingly.
+         - An unapproved `Status: Fail` uses `[ ]`; if an item now fails without an approved exception, set both status and marker accordingly.
+         - `Status: Không áp dụng` remains `[x]` and must not be unchecked merely because it is not a pass. Change it only when the clarification makes the criterion applicable; then re-evaluate it as Pass or Fail.
+         - `Status: Fail (ngoại lệ đã phê duyệt)` remains `[x]` while its approved exception remains valid. If clarification resolves the condition, change it to `Status: Pass`; if approval is withdrawn, change it to unapproved `Status: Fail` and `[ ]`.
+         - If status and marker are already correct, leave them as-is (preserve marker case to avoid cosmetic diffs).
+      6. Save the updated checklist file. Change only the status text and `[ ]`/`[x]` marker portions needed by re-validation; preserve all other content — headings, metadata, fail evidence, approved exceptions, line ordering, and whitespace — to avoid losing review history or creating noisy diffs.
+      7. Compare the before-snapshot with the current state to compute three lists for the Completion Report:
+         - **Newly gate-complete**: items that changed from unchecked to checked.
+         - **Regressions**: items that changed from checked to unchecked.
+         - **Status changes**: items whose inline `Status:` changed even if their checkbox did not.
+         - **Still unchecked**: items that remain unchecked.
+      8. Record the before/after gate-complete counts as checked/total checkbox items (e.g., "12/16 → 15/16 items complete").
 
 Behavior rules:
 
@@ -279,7 +282,7 @@ Report completion (after questioning loop ends or early termination):
 - Number of questions asked & answered.
 - Path to updated spec.
 - Sections touched (list names).
-- Spec quality checklist status (if `FEATURE_DIR/checklists/requirements.md` was re-validated): show before/after pass counts (e.g., "Spec Quality Checklist: 12/16 → 15/16 items passing") and list any items that changed state — both newly checked (unchecked → checked) and any regressions (checked → unchecked). If any items remain unchecked, list them as areas needing attention.
+- Spec quality checklist status (if `FEATURE_DIR/checklists/requirements.md` was re-validated): show before/after gate-complete counts (e.g., "Spec Quality Checklist: 12/16 → 15/16 items complete") and list any checkbox or `Status:` changes, including newly checked, regressions, and approved exceptions. If any items remain unchecked, list them as areas needing attention.
 - Coverage summary table listing each taxonomy category with Status: Resolved (was Partial/Missing and addressed), Deferred (exceeds question quota or better suited for planning), Clear (already sufficient), Outstanding (still Partial/Missing but low impact).
 - If any Outstanding or Deferred remain, recommend whether to proceed to `/speckit-plan` or run `/speckit-clarify` again later post-plan.
 - Suggested next command.

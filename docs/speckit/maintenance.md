@@ -13,7 +13,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 - Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
 - Khi thay đổi quy tắc hành vi chung trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.
 - Khi sửa prompt hoặc skill, giữ diff tối thiểu, không lặp/mâu thuẫn và kiểm tra trực tiếp phần đã sửa.
-- `$speckit-specify` phải dò thư mục cùng short-name trước khi tạo feature; khi có kết quả trùng, phải dừng để người dùng chọn cập nhật spec hiện có hoặc tạo feature mới.
+- `$speckit-specify` phải dò thư mục cùng short-name trước khi dispatch `before_specify` hook hoặc tạo feature; khi có kết quả trùng, phải dừng để người dùng chọn cập nhật spec hiện có hoặc tạo feature mới. Update mode giữ `requirements.md` hiện có và chỉ re-validate status/tổng hợp, không copy đè lịch sử review hay ngoại lệ.
 - `$speckit-tasks` phải tuân theo Test Gate trong constitution: sinh test task cho rủi ro cần xác minh trong `plan.md`, hoặc manual/command validation kèm lý do không áp dụng automated test; không được coi test là tùy chọn chỉ vì không có yêu cầu riêng.
 - `speckit-docbiz` là optional hook sau `speckit-specify` và `speckit-clarify` để đồng bộ tài liệu BA khi `spec.md` thay đổi. Không gắn sau `speckit-converge` vì converge chỉ append `tasks.md`.
 - `$speckit-analyze` và `$speckit-converge` phải inventory `MT`/`US`/`AC`/`FR`/`BR`/`SEC`/`NFR`/`SC`; `BR`/`SEC`/`NFR` có work phải có implementation, test hoặc validation coverage theo Traceability Gate.
@@ -25,5 +25,5 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 ## Requirements Quality Gate
 
 - `checklists/requirements.md` là quality gate bắt buộc của `$speckit-specify` và phải được sinh từ `.specify/templates/requirements-template.md`.
-- Trong `checklists/requirements.md`, `Status: Pass` và `Status: Không áp dụng` dùng checkbox `[x]`; chỉ `Status: Fail` dùng `[ ]` và chặn gate `$speckit-implement`.
+- Trong `checklists/requirements.md`, `Status: Pass`, `Status: Không áp dụng` và `Status: Fail (ngoại lệ đã phê duyệt)` dùng checkbox `[x]`; chỉ `Status: Fail` chưa được phê duyệt dùng `[ ]` và chặn gate `$speckit-implement`. Ngoại lệ đã phê duyệt phải giữ fail evidence, owner, hạn xử lý và người phê duyệt/hạn xem lại.
 - `$speckit-checklist` tiếp tục dùng `.specify/templates/checklist-template.md` để tạo checklist tùy biến theo domain; không thay thế hoặc ghi đè requirements quality gate.
