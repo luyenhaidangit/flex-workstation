@@ -7,16 +7,16 @@ Không triển khai trong MVP 1: `exchange_order_history`, `exchange_outbox`, b�
 
 ## Phase 1: Setup
 
-- [ ] T001 [P] Rà soát contract FE/BE và runtime in-memory hiện tại cho `OrderBook`, `TradingSession`, `Order` và `Trade`, ghi kết quả vào `specs/000018-hnx-data-migration/research.md`.
+- [X] T001 [P] Rà soát contract FE/BE và runtime in-memory hiện tại cho `OrderBook`, `TradingSession`, `Order` và `Trade`, ghi kết quả vào `specs/000018-hnx-data-migration/research.md`.
 - [ ] T002 [P] Kiểm tra baseline bằng `dotnet test --configuration Release`, `npm test -- --watch=false` và Liquibase `validate`; ghi command/result vào `specs/000018-hnx-data-migration/quickstart.md`.
-- [ ] T003 [P] Xác định seed instrument MVP 1 (`FXS`, `HNX`, `ACTIVE`) và quy tắc tạo identity/order sequence, không ghi secret.
+- [X] T003 [P] Xác định seed instrument MVP 1 (`FXS`, `HNX`, `ACTIVE`) và quy tắc tạo identity/order sequence, không ghi secret.
 
 ## Phase 2: Database schema
 
-- [ ] T004 [P] Tạo Liquibase changeset idempotent cho `exchange_instruments` với primary key, unique `symbol`, `market`, `status`, `created_at`.
-- [ ] T005 [P] Tạo Liquibase changeset cho `exchange_sessions` với session date/type/status và thời gian mở/đóng; bảo đảm không có hai session active cùng market/date/type.
-- [ ] T006 [P] Tạo hoặc điều chỉnh Liquibase changeset cho `exchange_orders` gồm session/instrument foreign key, side, limit price, quantity, filled/remaining quantity, status và accepted time; thêm unique client order identity.
-- [ ] T007 [P] Tạo hoặc điều chỉnh Liquibase changeset cho `exchange_trades` gồm buy/sell order foreign key, instrument/session foreign key, execution price/quantity và trade sequence unique trong session.
+- [X] T004 [P] Tạo Liquibase changeset idempotent cho `exchange_instruments` với primary key, unique `symbol`, `market`, `status`, `created_at`.
+- [X] T005 [P] Tạo Liquibase changeset cho `exchange_sessions` với session date/type/status và thời gian mở/đóng; bảo đảm không có hai session active cùng market/date/type.
+- [X] T006 [P] Tạo hoặc điều chỉnh Liquibase changeset cho `exchange_orders` gồm session/instrument foreign key, side, limit price, quantity, filled/remaining quantity, status và accepted time; thêm unique client order identity.
+- [X] T007 [P] Tạo hoặc điều chỉnh Liquibase changeset cho `exchange_trades` gồm buy/sell order foreign key, instrument/session foreign key, execution price/quantity và trade sequence unique trong session.
 - [ ] T008 [US1] Seed dữ liệu instrument và một continuous session HNX theo changeset forward-only; không sửa changeset đã chạy.
 
 ## Phase 3: Persistence ports và adapters
