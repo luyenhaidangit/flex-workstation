@@ -35,7 +35,7 @@ Không triển khai trong MVP 1: `exchange_order_history`, `exchange_outbox`, b�
 - [ ] T015 [P] Viết tests cho no-match, full match, partial match, price priority, time priority và cancel order.
 - [ ] T016 [P] Viết transaction tests bảo đảm một matching operation ghi order updates và trade atomically.
 - [ ] T017 [P] Viết restart test: mở order book, restart BE, đọc lại open orders từ DB và tiếp tục matching.
-- [ ] T018 [P] Viết FE/API regression tests bảo đảm payload hiện tại của order book/trades không đổi.
+- [ ] T018 [P] Review FE exchange consumer (`exchange-api.service.ts`, models và components) và viết FE/API regression tests bảo đảm order book/trades vẫn hiển thị đúng với DB-backed BE; nếu phát hiện contract mismatch thì cập nhật consumer trong phạm vi MVP 1.
 
 ### Implementation
 
@@ -51,7 +51,7 @@ Không triển khai trong MVP 1: `exchange_order_history`, `exchange_outbox`, b�
 
 - [ ] T026 [P] Chạy Liquibase `validate` và `update-sql`, kiểm tra migration forward-only và index phục vụ order-book query.
 - [ ] T027 [P] Chạy backend unit/integration tests và kiểm tra không còn code path MVP 1 ghi order/trade vào in-memory.
-- [ ] T028 [P] Chạy FE exchange tests và smoke test order book/trades sau khi BE dùng DB.
+- [ ] T028 [P] Hoàn tất FE integration/regression cho DB-backed order book/trades, chạy Angular exchange tests và smoke test place/cancel/match; không đổi API payload nếu không có mismatch thực tế.
 - [ ] T029 Kiểm tra transaction/concurrency cho hai lệnh đối ứng đồng thời, không tạo duplicate trade hoặc âm `remaining_quantity`.
 - [ ] T030 Ghi quickstart cho seed, mở session, place/cancel order, restart và xác minh dữ liệu còn nguyên.
 - [ ] T031 Ghi rõ các hạng mục để phase sau: order history, outbox, account/balance, fee, settlement và các market khác.
@@ -78,4 +78,3 @@ Không triển khai trong MVP 1: `exchange_order_history`, `exchange_outbox`, b�
 - `liquibase --changelog-file=changelog/db.changelog-master.xml update-sql`
 - `dotnet test --configuration Release`
 - `npm test -- --watch=false`
-
