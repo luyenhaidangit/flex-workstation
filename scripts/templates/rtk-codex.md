@@ -18,6 +18,7 @@ Proxy CLI giảm token output khi chạy shell command. Quy tắc bắt buộc: 
 
 - `rtk powershell -Command "..."` — rtk không filter được lệnh bọc trong PowerShell, tiết kiệm 0 token.
 - `rtk <PowerShell cmdlet>` (ví dụ `rtk Test-Path ...`) — fail vì cmdlet không phải executable.
+- `rtk ls` / `rtk grep` / `rtk tree` từ PowerShell shell — fail vì binary Unix (`ls`, `grep`) không có trên Windows PATH; chỉ chạy được từ Bash/Git Bash context.
 - Nếu buộc phải chạy wrapper `powershell -Command` (logic nhiều bước), chạy thẳng không có `rtk`.
 
 ## Meta commands
