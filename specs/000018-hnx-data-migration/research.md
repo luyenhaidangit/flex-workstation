@@ -48,6 +48,14 @@ HNX hiện công bố vận hành các thị trường cổ phiếu niêm yết,
 
 MVP 1 chỉ mô phỏng khớp lệnh cổ phiếu niêm yết tại HNX. Vì vậy `exchange_instruments.market` và `exchange_sessions.market` chỉ nhận giá trị `HNX` trong phạm vi feature này. Các giá trị còn lại là quy ước mở rộng, không phải yêu cầu triển khai hiện tại.
 
+### TQ-007 — `correlation_id` dùng UUID thế nào?
+
+Giữ `correlation_id UUID` trong `exchange_orders` và `exchange_trades`. BE xác thực `X-Correlation-Id` là UUID tại API boundary; header không hợp lệ trả `400 Problem Details`. Nếu header không được gửi, BE tự sinh UUID hợp lệ. Quyết định này là breaking change có chủ đích đối với client đang gửi chuỗi không phải UUID, nhưng tránh phải ép UUID sang `VARCHAR` hoặc thực hiện mapping mất tính truy vết.
+
+### TQ-008 — Trạng thái order map sang DB thế nào?
+
+BE dùng `Open`, `PartiallyFilled`, `Filled`, `Cancelled`, `Rejected` làm trạng thái domain/API. Persistence adapter sẽ map chúng lần lượt sang `open`, `partially_filled`, `filled`, `cancelled`, `rejected` ở DB. `Pending` bị loại bỏ vì không có ý nghĩa riêng với `Open` trong MVP 1. Việc đổi giá trị `status` trả bởi `GET /api/orders/{id}` từ `Pending` sang `Open` là breaking change có chủ đích.
+
 ## Kết luận
 
 MVP 1 là một vertical slice DB-backed cho matching engine. Các nghiệp vụ order history, event delivery, account/balance và settlement sẽ được tách thành feature sau.

@@ -188,6 +188,7 @@ Hệ thống PHẢI ghi nhận ai khởi tạo/chạy lại/xác nhận migratio
 - `flex-database` tiếp tục là nguồn quản lý migration và schema cho database HNX.
 - Phạm vi MVP chỉ gồm dữ liệu thuộc HNX; dữ liệu broker/VSD và các market khác được xử lý ở feature riêng.
 - Các contract FE/BE hiện có được giữ tương thích trong giai đoạn chuyển đổi trừ khi có spec riêng.
+- `X-Correlation-Id` là UUID hợp lệ khi được gửi. Đây là breaking change có chủ đích để tương thích với `correlation_id UUID`; client đang gửi chuỗi khác UUID phải đổi trước khi rollout.
 
 **Ràng buộc**:
 - Changeset database đã phát hành phải được giữ bất biến; thay đổi mới phải đi qua release migration phù hợp.

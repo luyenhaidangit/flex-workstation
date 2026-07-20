@@ -30,6 +30,8 @@ Integration tests phải dùng PostgreSQL thật/containerized provider cho tran
 
 ## Smoke flow
 
+Khi gửi `X-Correlation-Id`, client phải dùng UUID hợp lệ; nếu không cần truy vết do client cung cấp thì bỏ header để BE tự sinh UUID. Header không phải UUID nhận `400 Problem Details`.
+
 1. Mở HNX continuous session.
 2. Đặt hai lệnh không đối ứng và kiểm tra order book.
 3. Đặt lệnh đối ứng để kiểm tra full/partial match và trade.
@@ -46,4 +48,3 @@ npm test -- --watch=false
 ```
 
 Public order-book/trade payload phải giữ nguyên.
-

@@ -32,7 +32,7 @@ MVP 1 chuyển trạng thái matching engine từ in-memory sang PostgreSQL, gi�
 
 ## Tương thích API
 
-Không đổi route, status code hoặc payload của các exchange endpoints hiện có. Thay đổi chỉ nằm ở persistence phía sau service.
+Không đổi route hoặc cấu trúc payload thành công của các exchange endpoints hiện có. `X-Correlation-Id` được chuẩn hóa thành UUID: header không phải UUID nhận `400 Problem Details`. Trạng thái lệnh chưa khớp trong `GET /api/orders/{id}` đổi từ `Pending` sang `Open`. Đây là các breaking change đã được chốt để map trực tiếp sang `correlation_id UUID` và status DB `open`; client phải gửi UUID hoặc bỏ header để BE tự sinh UUID.
 
 ## Kiểm thử
 

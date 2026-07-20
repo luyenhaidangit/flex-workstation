@@ -21,6 +21,7 @@ Không triển khai trong MVP 1: `exchange_order_history`, `exchange_outbox`, b�
 
 ## Phase 3: Persistence ports và adapters
 
+- [X] T009A Chuẩn hóa `X-Correlation-Id` thành UUID ở API boundary, tự sinh UUID khi không có header và đổi trạng thái order chưa khớp từ `Pending` sang `Open` để sẵn sàng map sang DB status `open`.
 - [ ] T009 Tạo application ports cho instrument, session, order và trade persistence trong `flex-exchange-service`.
 - [ ] T010 [P] Tạo canonical models và validation cho instrument, session, order, trade; giới hạn MVP 1 ở HNX, continuous session và limit order.
 - [ ] T011 [P] Tạo PostgreSQL/Npgsql adapters cho bốn bảng, dùng transaction và parameterized SQL.

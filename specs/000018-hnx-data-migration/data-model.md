@@ -9,7 +9,7 @@
 | `instrument_id` | Identity ổn định | Primary key |
 | `symbol` | Mã giao dịch | Unique, not null |
 | `market` | Thị trường | `HNX` trong MVP 1 |
-| `status` | Trạng thái | `ACTIVE` hoặc giá trị BE hỗ trợ |
+| `status` | Trạng thái | `active` hoặc giá trị BE hỗ trợ |
 | `created_at` | Thời điểm tạo | Timestamp |
 
 ### `exchange_sessions`
@@ -20,7 +20,7 @@
 | `market` | Thị trường | `HNX` |
 | `session_date` | Ngày giao dịch | Not null |
 | `session_type` | Loại phiên | `CONTINUOUS` |
-| `status` | Trạng thái | `OPEN`/`CLOSED` |
+| `status` | Trạng thái | `open`/`closed` |
 | `opened_at`, `closed_at` | Thời gian phiên | Timestamp |
 
 ### `exchange_orders`
@@ -38,8 +38,9 @@ Lưu trạng thái hiện tại của order. Order book được dựng từ ord
 | `quantity` | Khối lượng ban đầu | Positive |
 | `filled_quantity` | Đã khớp | `0..quantity` |
 | `remaining_quantity` | Còn lại | `0..quantity` |
-| `status` | Trạng thái | `OPEN`/`PARTIALLY_FILLED`/`FILLED`/`CANCELLED`/`REJECTED` |
+| `status` | Trạng thái | `open`/`partially_filled`/`filled`/`cancelled`/`rejected` |
 | `accepted_at`, `updated_at` | Thời gian xử lý | Timestamp |
+| `correlation_id` | Định danh truy vết yêu cầu | UUID hoặc `NULL` |
 
 ### `exchange_trades`
 
@@ -53,6 +54,7 @@ Trade là immutable; mỗi lần khớp tạo một record.
 | `price`, `quantity` | Giá/khối lượng khớp | Positive |
 | `trade_sequence` | Thứ tự trong session | Unique |
 | `executed_at` | Thời điểm khớp | Timestamp |
+| `correlation_id` | Định danh truy vết yêu cầu | UUID hoặc `NULL` |
 
 ## Relationships
 
@@ -70,4 +72,4 @@ exchange_sessions ─────── exchange_orders / exchange_trades
 - Trade chỉ được ghi khi cả hai order cùng instrument/session.
 - Cập nhật hai order và insert trade phải atomic.
 - Không tạo duplicate trade khi retry hoặc xử lý đồng thời.
-
+- Nếu client gửi `X-Correlation-Id`, giá trị phải là UUID hợp lệ; nếu không gửi, BE tự sinh UUID.
