@@ -1,26 +1,17 @@
-# HNX reference data read contract
+# MVP 1 Exchange persistence contract
 
-## Phạm vi
+## Public contract
 
-Phase này giữ nguyên public FE/BE contracts. Contract này mô tả behavior nội bộ cần bảo đảm khi nguồn đọc chuyển từ legacy sang PostgreSQL.
+Các exchange endpoints hiện có tiếp tục giữ route, status code và payload shape. FE không cần biết dữ liệu được đọc từ in-memory hay PostgreSQL.
 
-## Existing public contract
+## Persistence behavior
 
-- `GET /api/orderbook` và các exchange endpoints hiện có tiếp tục giữ route, status code và payload shape.
-- FE `ExchangeApiService` không cần thay đổi để reference-data cutover.
+- `exchange_orders` là nguồn trạng thái hiện tại của order.
+- `exchange_trades` là nguồn kết quả khớp bất biến.
+- Open order query dựng order book theo price-time priority.
+- Một matching operation phải atomic giữa order updates và trade insert.
+- Restart phải khôi phục open orders từ DB.
 
-## Internal port behavior
+## Scope
 
-Application-owned port dự kiến cung cấp thao tác đọc danh sách/query instrument cần cho exchange use cases. Port không được expose Npgsql types hoặc database entities ra Application/Api.
-
-## Dual-read rules
-
-1. Đọc legacy và DB cho cùng một query/snapshot.
-2. Canonicalize theo identity, symbol, market và status.
-3. Nếu khớp: trả kết quả theo nguồn được chọn và ghi metric `hnx_reference_compare_match`.
-4. Nếu lệch hoặc DB unavailable: giữ nguồn legacy nếu còn an toàn, ghi metric/log mismatch/failure và không cutover tự động.
-5. Khi config ở `Database`, lỗi DB không được âm thầm quay về legacy nếu fallback đã bị tắt; trả lỗi theo error handling hiện có và phát cảnh báo.
-
-## Compatibility
-
-Không có breaking change public trong phase này. Contract test phải chứng minh payload FE hiện tại không đổi khi chạy ở `LegacyOnly`, `DualRead` và `Database`.
+Contract này chỉ áp dụng cho HNX, `CONTINUOUS`, `LIMIT`, `BUY`/`SELL` trong MVP 1. Không bao gồm order history, outbox, account hoặc settlement.

@@ -1,202 +1,81 @@
-# Tasks: Migrate dữ liệu HNX khỏi in-memory
+# Tasks: Persistência DB cho MVP 1 — Matching rules và order book
 
-**Đầu vào**: Design documents từ `specs/000018-hnx-data-migration/`
+**Phạm vi đã chốt**: MVP 1 sử dụng PostgreSQL cho bốn bảng lõi của Exchange:
+`exchange_instruments`, `exchange_sessions`, `exchange_orders`, `exchange_trades`.
 
-**Chiến lược**: MVP là `US1` inventory + migrate HNX reference data; sau đó `US2` dual-read/cutover và `US3` reconciliation/progress.
+Không triển khai trong MVP 1: `exchange_order_history`, `exchange_outbox`, bảng migration/audit, account, balance, fee, settlement và các market khác.
 
 ## Phase 1: Setup
 
-**Mục đích**: Chuẩn bị cấu hình, inventory và baseline validation cho các repo liên quan.
+- [ ] T001 [P] Rà soát contract FE/BE và runtime in-memory hiện tại cho `OrderBook`, `TradingSession`, `Order` và `Trade`, ghi kết quả vào `specs/000018-hnx-data-migration/research.md`.
+- [ ] T002 [P] Kiểm tra baseline bằng `dotnet test --configuration Release`, `npm test -- --watch=false` và Liquibase `validate`; ghi command/result vào `specs/000018-hnx-data-migration/quickstart.md`.
+- [ ] T003 [P] Xác định seed instrument MVP 1 (`FXS`, `HNX`, `ACTIVE`) và quy tắc tạo identity/order sequence, không ghi secret.
 
-- [ ] T001 [P] Ghi inventory FE/BE/DB cho HNX reference data, nguồn hiện tại, consumer và owner trong `specs/000018-hnx-data-migration/research.md` (FR-001, FR-002, FR-003).
-- [ ] T002 [P] Kiểm tra baseline .NET/Angular/database bằng `dotnet test --configuration Release` tại `flex-exchange-service/`, `npm test -- --watch=false` tại `flex-microfrontend/` và `liquibase --changelog-file=changelog/db.changelog-master.xml validate` tại `flex-database/hnx/`; lưu command/result vào `specs/000018-hnx-data-migration/quickstart.md`.
-- [ ] T003 [P] Xác định dữ liệu seed HNX hợp lệ và stable `instrument_id` trong `flex-database/hnx/README.md` hoặc artifact seed hiện hành, không ghi secret/connection string.
+## Phase 2: Database schema
 
-## Phase 2: Foundational
+- [ ] T004 [P] Tạo Liquibase changeset idempotent cho `exchange_instruments` với primary key, unique `symbol`, `market`, `status`, `created_at`.
+- [ ] T005 [P] Tạo Liquibase changeset cho `exchange_sessions` với session date/type/status và thời gian mở/đóng; bảo đảm không có hai session active cùng market/date/type.
+- [ ] T006 [P] Tạo hoặc điều chỉnh Liquibase changeset cho `exchange_orders` gồm session/instrument foreign key, side, limit price, quantity, filled/remaining quantity, status và accepted time; thêm unique client order identity.
+- [ ] T007 [P] Tạo hoặc điều chỉnh Liquibase changeset cho `exchange_trades` gồm buy/sell order foreign key, instrument/session foreign key, execution price/quantity và trade sequence unique trong session.
+- [ ] T008 [US1] Seed dữ liệu instrument và một continuous session HNX theo changeset forward-only; không sửa changeset đã chạy.
 
-**Mục đích**: Tạo nền tảng persistence/config/telemetry dùng chung, chặn các user story phía sau.
+## Phase 3: Persistence ports và adapters
 
-- [ ] T004 Tạo application model và port đọc/upsert HNX reference data trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/IHnxReferenceDataStore.cs` (FR-003, FR-005, BR-001).
-- [ ] T005 [P] Tạo source mode enum/options `LegacyOnly`, `DualRead`, `Database` trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataOptions.cs` với validation giá trị và default `LegacyOnly` (FR-004, NFR-002).
-- [ ] T006 [P] Tạo canonical HNX instrument model và comparison result trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxInstrumentModels.cs` (FR-001, FR-008, BR-002).
-- [ ] T007 [P] Tạo Liquibase release changeset/seed forward-only cho `exchange_instruments` nếu baseline inventory xác định còn thiếu dữ liệu trong `flex-database/hnx/changelog/releases/1.0.0.0/` hoặc release mới, không sửa changeset đã chạy (FR-004, BR-001).
-- [ ] T008 Tạo PostgreSQL options/connection factory và focused adapter cho `exchange_instruments` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/Hnx/HnxReferenceDataStore.cs` (phụ thuộc T004, T006; FR-004, BR-004).
-- [ ] T009 Tích hợp Npgsql HNX adapter và source options vào DI/configuration trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/DependencyInjection.cs` và `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ServiceExtensions.cs` (phụ thuộc T005, T008).
-- [ ] T010 [P] Thêm structured telemetry fields/events cho reference match, mismatch, DB failure, duration và cutover trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataTelemetry.cs` (FR-008, SEC-002, NFR-002).
-- [ ] T011 Tạo recovery note cho Liquibase forward-fix, config rollback về `LegacyOnly` và điều kiện không được drop/recreate bảng trong `specs/000018-hnx-data-migration/rollback.md` (FR-006, FR-007).
+- [ ] T009 Tạo application ports cho instrument, session, order và trade persistence trong `flex-exchange-service`.
+- [ ] T010 [P] Tạo canonical models và validation cho instrument, session, order, trade; giới hạn MVP 1 ở HNX, continuous session và limit order.
+- [ ] T011 [P] Tạo PostgreSQL/Npgsql adapters cho bốn bảng, dùng transaction và parameterized SQL.
+- [ ] T012 Tích hợp adapters vào DI/configuration của `Flex.Exchange.Infrastructure` và `Flex.Exchange.Api`.
 
-## Phase 3: User Story 1 — Rà soát và migrate HNX reference data (P1) — MVP
+## Phase 4: US1 — Place order và matching
 
-**Goal**: Có inventory được xác nhận và dữ liệu HNX reference data tồn tại bền vững trong DB mà public exchange flow không đổi.
+### Tests trước implementation
 
-**Independent Test**:
+- [ ] T013 [P] Viết integration tests cho schema, foreign keys, unique constraints và seed của bốn bảng.
+- [ ] T014 [P] Viết tests cho order validation: symbol/session/status, BUY/SELL, limit price, quantity và duplicate client order.
+- [ ] T015 [P] Viết tests cho no-match, full match, partial match, price priority, time priority và cancel order.
+- [ ] T016 [P] Viết transaction tests bảo đảm một matching operation ghi order updates và trade atomically.
+- [ ] T017 [P] Viết restart test: mở order book, restart BE, đọc lại open orders từ DB và tiếp tục matching.
+- [ ] T018 [P] Viết FE/API regression tests bảo đảm payload hiện tại của order book/trades không đổi.
 
-1. Chạy Liquibase validate/update-sql và seed/upsert một bộ HNX instruments.
-2. Gọi exchange read flow trước/sau restart BE với mode `LegacyOnly` hoặc DB source đã được bật theo acceptance.
-3. Kiểm tra count, unique symbol, stable identity và payload FE không đổi.
+### Implementation
 
-### Tests for User Story 1
+- [ ] T019 [US1] Implement instrument/session repositories và khởi tạo active HNX continuous session.
+- [ ] T020 [US1] Implement order repository với create, open-order query theo price-time priority, update remaining/status và cancel.
+- [ ] T021 [US1] Implement trade repository với trade sequence và insert immutable trade record.
+- [ ] T022 [US1] Thay `InMemoryLedgerService` trong exchange flow bằng DB-backed order/trade persistence, giữ nguyên public contract.
+- [ ] T023 [US1] Implement matching transaction: lock các open orders cần xử lý, tạo trade, cập nhật order và commit atomically.
+- [ ] T024 [US1] Implement order-book reconstruction từ các order chưa hoàn tất; không tạo bảng `exchange_order_book`.
+- [ ] T025 [US1] Implement cancel order với điều kiện chỉ cancel order còn open/partial và thuộc session hợp lệ.
 
-- [ ] T012 [P] [US1] Viết unit tests cho canonicalization, required fields, market HNX và comparison key trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/HnxReferenceDataTests.cs` (AC-001, BR-001, BR-002).
-- [ ] T013 [P] [US1] Viết PostgreSQL integration tests cho `exchange_instruments` schema, unique symbol, stable identity và idempotent upsert trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataPersistenceTests.cs` (AC-003, AC-004, SC-004).
-- [ ] T014 [P] [US1] Viết migration validation test chạy Liquibase validate/update-sql và kiểm tra seed HNX trong `flex-database/tests/hnx-reference-data-validation.ps1` (AC-001, FR-004).
-- [ ] T015 [P] [US1] Viết FE/API regression test bảo đảm exchange payload/status hiện tại không đổi khi reference source thay đổi trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataContractTests.cs` và `flex-microfrontend/src/app/exchange/exchange-api.service.spec.ts` (AC-003, NFR-001).
+## Phase 5: Verification và vận hành
 
-### Implementation for User Story 1
+- [ ] T026 [P] Chạy Liquibase `validate` và `update-sql`, kiểm tra migration forward-only và index phục vụ order-book query.
+- [ ] T027 [P] Chạy backend unit/integration tests và kiểm tra không còn code path MVP 1 ghi order/trade vào in-memory.
+- [ ] T028 [P] Chạy FE exchange tests và smoke test order book/trades sau khi BE dùng DB.
+- [ ] T029 Kiểm tra transaction/concurrency cho hai lệnh đối ứng đồng thời, không tạo duplicate trade hoặc âm `remaining_quantity`.
+- [ ] T030 Ghi quickstart cho seed, mở session, place/cancel order, restart và xác minh dữ liệu còn nguyên.
+- [ ] T031 Ghi rõ các hạng mục để phase sau: order history, outbox, account/balance, fee, settlement và các market khác.
 
-- [ ] T016 [P] [US1] Implement HNX instrument validation và stable-identity mapping trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxInstrumentModels.cs` (phụ thuộc T006; FR-001, FR-002, BR-001).
-- [ ] T017 [US1] Implement idempotent PostgreSQL read/upsert cho `exchange_instruments` trong `flex-exchange-service/src/Flex.Exchange.Infrastructure/Persistence/Hnx/HnxReferenceDataStore.cs` (phụ thuộc T008, T013; FR-004, FR-007, SC-004).
-- [ ] T018 [US1] Wire HNX reference-data port vào exchange read use case hiện đang lấy instrument/order-book data trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T004, T009, T016; FR-003, FR-005).
-- [ ] T019 [US1] Đăng ký options, connection validation và DI lifetime an toàn cho HNX store trong `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ServiceExtensions.cs` (phụ thuộc T005, T009; SEC-001, NFR-002).
-- [ ] T020 [US1] Chạy seed/backfill HNX reference data theo quickstart và ghi số lượng trước/sau, duplicate check, restart result trong `specs/000018-hnx-data-migration/quickstart.md` (phụ thuộc T007, T014, T017; AC-003, AC-004).
+## Dependencies
 
-**Definition of Done**:
+- T001–T003 → T004–T008.
+- T004–T008 → T009–T012.
+- T009–T012 → T013–T018 và T019–T025.
+- T019–T025 → T026–T031.
 
-- Inventory HNX reference data có owner/source/consumer.
-- `exchange_instruments` seed/upsert idempotent và integration test pass.
-- Luồng FE/BE hiện tại không đổi contract và dữ liệu không mất sau restart.
+## Definition of Done
 
-## Phase 4: User Story 2 — Dual-read và cutover có kiểm soát (P1)
-
-**Goal**: Đối chiếu legacy với DB trước khi chuyển nguồn phục vụ chính sang DB, có fallback và rollback config.
-
-**Dependencies**: Phụ thuộc toàn bộ Phase 2 và US1 T016–T019.
-
-**Independent Test**:
-
-1. Chạy `DualRead` với dữ liệu khớp và xác nhận match/cùng payload.
-2. Tạo mismatch hoặc DB timeout và xác nhận không cutover, fallback đúng policy, có telemetry.
-3. Bật `Database`, restart BE và xác nhận dữ liệu HNX vẫn phục vụ; đổi lại `LegacyOnly` để rollback.
-
-### Tests for User Story 2
-
-- [ ] T021 [P] [US2] Viết unit tests cho `LegacyOnly`, `DualRead`, `Database`, mismatch và fallback policy trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/HnxReferenceDataSourcePolicyTests.cs` (AC-005, FR-006, FR-007).
-- [ ] T022 [P] [US2] Viết integration tests cho dual-read match/mismatch, bounded DB timeout và no-fallback ở `Database` mode trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataDualReadTests.cs` (AC-005, FR-005, FR-006).
-- [ ] T023 [P] [US2] Viết contract tests cho existing exchange endpoints ở cả ba source modes trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataContractTests.cs` (AC-003, NFR-001).
-- [ ] T024 [P] [US2] Viết configuration/permission negative tests cho invalid mode, unauthorized cutover và HNX scope trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataSecurityTests.cs` (SEC-001, SEC-002).
-
-### Implementation for User Story 2
-
-- [ ] T025 [US2] Implement legacy adapter và `DualRead` comparison orchestration trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataReader.cs` (phụ thuộc T004, T006, T016, T021; FR-005, FR-006).
-- [ ] T026 [US2] Implement mismatch/failure outcome và bounded timeout handling trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataReader.cs` (phụ thuộc T025; AC-005, FR-006, FR-007).
-- [ ] T027 [US2] Áp dụng source-mode policy vào exchange read path mà không đổi public DTO trong `flex-exchange-service/src/Flex.Exchange.Application/Services/ExchangeService.cs` (phụ thuộc T018, T025, T022; FR-005, NFR-001).
-- [ ] T028 [US2] Thêm config binding/validation và runtime rollback switch cho `Hnx:ReferenceDataSourceMode` trong `flex-exchange-service/src/Flex.Exchange.Api/Extensions/ServiceExtensions.cs` và `flex-exchange-service/src/Flex.Exchange.Api/appsettings.json` (phụ thuộc T005, T019, T024; FR-004, SEC-001).
-- [ ] T029 [US2] Emit match/mismatch/failure/cutover telemetry với correlation và không log secret trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataTelemetry.cs` (phụ thuộc T010, T026; FR-008, NFR-002).
-- [ ] T030 [US2] Thực hiện rollout validation `LegacyOnly → DualRead → Database` và config rollback theo `specs/000018-hnx-data-migration/quickstart.md` (phụ thuộc T022, T023, T028, T029; AC-004, AC-005).
-
-**Definition of Done**:
-
-- Dual-read mismatch không được đánh dấu thành công/cutover.
-- Contract FE/BE pass ở cả ba modes.
-- Config rollback về `LegacyOnly` phục hồi luồng an toàn.
-
-## Phase 5: User Story 3 — Đối chiếu và theo dõi tiến độ (P2)
-
-**Goal**: Reviewer xem được kết quả đối chiếu, trạng thái migration và sai lệch cần xử lý.
-
-**Dependencies**: Phụ thuộc US2 T025–T030 để có comparison result và telemetry.
-
-**Independent Test**:
-
-1. Chạy reconciliation với dữ liệu khớp và kiểm tra trạng thái `Matched`.
-2. Chạy với dữ liệu khác biệt và kiểm tra nhóm, counts, reason, correlation.
-3. Kiểm tra status không chuyển `Completed` khi còn mismatch blocker.
-
-### Tests for User Story 3
-
-- [ ] T031 [P] [US3] Viết unit tests cho comparison result counts/status transitions `Matched`, `Mismatch`, `Failed` trong `flex-exchange-service/tests/Flex.Exchange.Domain.Tests/HnxReferenceDataReconciliationTests.cs` (AC-006, AC-007, BR-002, BR-003).
-- [ ] T032 [P] [US3] Viết integration test cho audit/structured telemetry fields và correlation khi mismatch trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataObservabilityTests.cs` (FR-008, SEC-002, NFR-002).
-- [ ] T033 [P] [US3] Viết manual reconciliation validation với query count/key/attribute và status report trong `specs/000018-hnx-data-migration/quickstart.md` (AC-006, AC-007).
-
-### Implementation for User Story 3
-
-- [ ] T034 [US3] Tạo reconciliation result/status model và transition rules trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataReconciliation.cs` (phụ thuộc T006, T025, T031; FR-008, FR-009, BR-002, BR-003).
-- [ ] T035 [US3] Gắn reconciliation result vào comparison orchestration và telemetry trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/HnxReferenceDataReader.cs` (phụ thuộc T029, T034; AC-006, AC-007).
-- [ ] T036 [US3] Tạo operator diagnostic endpoint hoặc internal operation cho migration status theo permission matrix trong `flex-exchange-service/src/Flex.Exchange.Api/Controllers/HnxReferenceDataController.cs` (phụ thuộc T024, T034; FR-009, SEC-001).
-- [ ] T037 [US3] Thêm contract/documentation test cho diagnostic result và không expose secret/sensitive payload trong `flex-exchange-service/tests/Flex.Exchange.Api.Tests/HnxReferenceDataObservabilityTests.cs` (phụ thuộc T036; SEC-002).
-
-**Definition of Done**:
-
-- Reviewer phân biệt được matched/mismatch/failed và nhóm còn in-memory.
-- Mismatch blocker không thể chuyển trạng thái hoàn tất.
-- Audit/telemetry có correlation và không lộ secret.
-
-## Final Phase: Polish & Cross-Cutting Concerns
-
-- [ ] T038 [P] Chạy `liquibase validate` và `update-sql`, review changeset bất biến/forward-only trong `flex-database/hnx/changelog/db.changelog-master.xml` (BR-004, release safety).
-- [ ] T039 [P] Chạy `dotnet restore` và `dotnet test --configuration Release` cho `flex-exchange-service/`, xử lý failure thuộc feature trong test artifacts (NFR-001, Test Gate).
-- [ ] T040 [P] Chạy Angular exchange unit tests từ `flex-microfrontend/` và kiểm tra `flex-microfrontend/src/app/exchange/exchange-api.service.ts` không cần breaking change (NFR-001).
-- [ ] T041 Kiểm tra structured logs/metrics không chứa token, password, connection string hoặc payload nhạy cảm trong `flex-exchange-service/src/Flex.Exchange.Application/Hnx/ReferenceData/` (SEC-002).
-- [ ] T042 Chạy toàn bộ quickstart validation và ghi kết quả/release guardrails trong `specs/000018-hnx-data-migration/quickstart.md` (SC-001, SC-002, SC-003, SC-004, SC-005).
-- [ ] T043 Cập nhật review/convergence note nếu inventory phát hiện gap ngoài reference data trong `specs/000018-hnx-data-migration/research.md` (FR-010, scope control).
-
-## Dependencies & Execution Order
-
-### Phase Dependencies
-
-- Setup T001–T003 có thể chạy song song.
-- Foundational T004–T011 bắt đầu sau inventory/baseline phù hợp; T008 phụ thuộc T004/T006, T009 phụ thuộc T005/T008.
-- US1 bắt đầu sau T004–T011; MVP checkpoint sau T020.
-- US2 phụ thuộc US1 vì cần reference store/read path; checkpoint sau T030.
-- US3 phụ thuộc US2 vì cần comparison result/telemetry; checkpoint sau T037.
-- Polish T038–T043 sau các story liên quan hoàn tất.
-
-### Parallel Opportunities
-
-- T001, T002, T003 độc lập.
-- T005, T006, T007, T010 có thể chạy song song sau baseline; không đánh dấu các task cùng file.
-- T012–T015 là test-first, có thể chạy song song vì khác file.
-- T021–T024 là test-first, có thể chạy song song nhưng T023 cùng file với T015 nên phải tích hợp tuần tự theo file.
-- T031–T033 có thể chạy song song.
-- T038–T041 có thể chạy song song sau implementation; T042 cần các validation trước đó.
-
-## Traceability Matrix
-
-| Source | Covered by tasks |
-|---|---|
-| US-001 / FR-001..003 | T001, T004, T006, T012, T016, T018 |
-| US-001 / AC-001..002 | T001, T012, T014, T016 |
-| US-002 / FR-004..007 | T007, T008, T013, T017, T020, T021, T022, T025–T030 |
-| US-002 / AC-003..005 | T013, T015, T020, T021–T023, T030 |
-| US-003 / FR-008..009 | T010, T029, T031–T037 |
-| US-003 / AC-006..007 | T031–T037 |
-| BR-001..004 | T003, T007, T012–T014, T017, T031, T038 |
-| SEC-001..002 | T019, T024, T028–T029, T036–T037, T041 |
-| NFR-001..003 | T015, T022–T023, T030, T039–T042 |
-| Rollout/rollback/observability | T011, T028–T030, T038, T041–T042 |
+- Bốn bảng được tạo bằng Liquibase và seed idempotent.
+- Place/cancel/matching persist được vào DB.
+- Hỗ trợ no-match, full match, partial match, price-time priority và cancel.
+- Restart BE không làm mất open orders hoặc trades đã ghi nhận.
+- FE/BE public contract không đổi.
+- Không triển khai thêm bảng ngoài phạm vi bốn bảng MVP 1.
 
 ## Validation Commands
 
-- Database validation: `liquibase --changelog-file=changelog/db.changelog-master.xml validate` tại `flex-database/hnx`.
-- SQL preview: `liquibase --changelog-file=changelog/db.changelog-master.xml update-sql` tại `flex-database/hnx`.
-- Backend restore/test: `dotnet restore` và `dotnet test --configuration Release` tại `flex-exchange-service`.
-- Frontend exchange tests: `npm test -- --watch=false` tại `flex-microfrontend`.
-- Smoke: các request trong `flex-exchange-service/src/Flex.Exchange.Api/Flex.Exchange.http` và các bước `specs/000018-hnx-data-migration/quickstart.md`.
+- `liquibase --changelog-file=changelog/db.changelog-master.xml validate`
+- `liquibase --changelog-file=changelog/db.changelog-master.xml update-sql`
+- `dotnet test --configuration Release`
+- `npm test -- --watch=false`
 
-## Implementation Strategy
-
-### MVP First
-
-1. Hoàn tất T001–T011.
-2. Viết test trước T012–T015, sau đó thực hiện T016–T020.
-3. STOP và validate US1: HNX reference data bền vững, idempotent, không đổi FE/BE contract, restart không mất dữ liệu.
-
-### Incremental Delivery
-
-1. US1: reference-data persistence và inventory.
-2. US2: dual-read/cutover/rollback.
-3. US3: reconciliation/status/audit.
-4. Chỉ sau khi các checkpoint pass mới lập feature riêng cho order, trade, outbox hoặc runtime state.
-
-## Checklist chất lượng trước khi implement
-
-- [x] Không còn task ví dụ hoặc placeholder trong output cuối.
-- [x] Không còn `TXXX`, `Phase N` hoặc phase user story không tồn tại.
-- [x] Toàn bộ task được đánh số tuần tự từ `T001` đến `T043`.
-- [x] Mỗi task có path cụ thể hoặc command cụ thể.
-- [x] Task phụ thuộc task khác đã ghi rõ dependency task ID.
-- [x] Mỗi user story có Independent Test và Definition of Done.
-- [x] Test Gate phủ risks: schema/DB, duplicate, mismatch, timeout, contract, permission, telemetry, restart và rollout.
-- [x] Traceability Matrix map US/FR/AC/BR/SEC/NFR sang task IDs.
-- [x] Migration, permission, contract, observability, rollout/rollback có task.
-- [x] Không đánh dấu `[P]` cho task cùng file hoặc có dependency trực tiếp.

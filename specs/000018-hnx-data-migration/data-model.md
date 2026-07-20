@@ -1,55 +1,73 @@
-# Data model: HNX reference data migration
-
-## Phạm vi model
-
-Phase đầu chỉ chuyển HNX reference data; các bảng order, order history, trade và outbox đã tồn tại trong database nhưng chưa được cutover trong phase này.
+# Data model: MVP 1 Matching Engine
 
 ## Entities
 
-### HNX Instrument
-
-Nguồn nghiệp vụ mô tả một mã công cụ giao dịch trên HNX.
+### `exchange_instruments`
 
 | Thuộc tính | Ý nghĩa | Ràng buộc |
 |---|---|---|
-| `instrument_id` | Identity ổn định của instrument | Không đổi trong vòng đời instrument |
-| `symbol` | Mã giao dịch | Duy nhất trong HNX, không rỗng |
-| `market` | Thị trường sở hữu dữ liệu | Phải là HNX trong phase này |
-| `status` | Trạng thái sử dụng | Giá trị phải thuộc tập trạng thái được BE hỗ trợ |
-| `created_at` | Thời điểm tạo | UTC/offset-aware |
+| `instrument_id` | Identity ổn định | Primary key |
+| `symbol` | Mã giao dịch | Unique, not null |
+| `market` | Thị trường | `HNX` trong MVP 1 |
+| `status` | Trạng thái | `ACTIVE` hoặc giá trị BE hỗ trợ |
+| `created_at` | Thời điểm tạo | Timestamp |
 
-Database mapping hiện có: `exchange_instruments` trong `flex-database/hnx/changelog/releases/1.0.0.0/001-create-reference-tables.sql`.
+### `exchange_sessions`
 
-### Reference data source state
+| Thuộc tính | Ý nghĩa | Ràng buộc |
+|---|---|---|
+| `session_id` | Identity phiên | Primary key |
+| `market` | Thị trường | `HNX` |
+| `session_date` | Ngày giao dịch | Not null |
+| `session_type` | Loại phiên | `CONTINUOUS` |
+| `status` | Trạng thái | `OPEN`/`CLOSED` |
+| `opened_at`, `closed_at` | Thời gian phiên | Timestamp |
 
-Trạng thái vận hành của nguồn đọc reference data, không phải business entity:
+### `exchange_orders`
 
-- `LegacyOnly`: chỉ nguồn cũ.
-- `DualRead`: đọc và đối chiếu nguồn cũ với DB.
-- `Database`: DB là nguồn phục vụ chính.
+Lưu trạng thái hiện tại của order. Order book được dựng từ order còn khối lượng.
 
-State này phải được cấu hình có kiểm soát, ghi audit/telemetry khi thay đổi và không làm thay đổi dữ liệu nghiệp vụ.
+| Thuộc tính | Ý nghĩa | Ràng buộc |
+|---|---|---|
+| `order_id` | Identity order | Primary key |
+| `session_id`, `instrument_id` | Phiên và instrument | Foreign key |
+| `broker_id`, `client_order_id` | Chủ thể và identity phía client | Unique theo scope |
+| `side` | Mua/bán | `BUY`/`SELL` |
+| `order_type` | Loại order | `LIMIT` |
+| `price` | Giá đặt | Positive |
+| `quantity` | Khối lượng ban đầu | Positive |
+| `filled_quantity` | Đã khớp | `0..quantity` |
+| `remaining_quantity` | Còn lại | `0..quantity` |
+| `status` | Trạng thái | `OPEN`/`PARTIALLY_FILLED`/`FILLED`/`CANCELLED`/`REJECTED` |
+| `accepted_at`, `updated_at` | Thời gian xử lý | Timestamp |
 
-### Migration comparison
+### `exchange_trades`
 
-Kết quả đối chiếu cho một lần kiểm tra:
+Trade là immutable; mỗi lần khớp tạo một record.
 
-- batch/check identifier;
-- số lượng bản ghi mỗi nguồn;
-- số bản ghi khớp, thiếu, khác thuộc tính;
-- trạng thái `Matched`, `Mismatch`, `Failed`;
-- correlation/time/actor nếu thao tác được vận hành thủ công.
-
-Đây là dữ liệu vận hành/audit; cách lưu bền vững hay chỉ lưu log sẽ được quyết định trong implementation theo yêu cầu observability, nhưng kết quả phải truy nguyên được.
+| Thuộc tính | Ý nghĩa | Ràng buộc |
+|---|---|---|
+| `trade_id` | Identity trade | Primary key |
+| `session_id`, `instrument_id` | Phiên và instrument | Foreign key |
+| `buy_order_id`, `sell_order_id` | Hai order đối ứng | Foreign key, khác nhau |
+| `price`, `quantity` | Giá/khối lượng khớp | Positive |
+| `trade_sequence` | Thứ tự trong session | Unique |
+| `executed_at` | Thời điểm khớp | Timestamp |
 
 ## Relationships
 
-- Một HNX Instrument có thể được tham chiếu bởi nhiều order/trade ở phase sau qua `instrument_id`.
-- Reference data không chứa trực tiếp order, trade hoặc tenant-owned account data.
+```text
+exchange_instruments ──┬── exchange_orders ── exchange_trades
+                       └── exchange_trades
+exchange_sessions ─────── exchange_orders / exchange_trades
+```
 
 ## Invariants
 
-- Không có hai instrument cùng `symbol` trong HNX.
-- Không coi dual-read là khớp nếu identity hoặc bất kỳ thuộc tính nghiệp vụ được kiểm tra khác nhau.
-- Không cutover khi có mismatch chưa được xử lý.
-- Retry seed/backfill không tạo bản ghi trùng.
+- Không có hai instrument cùng symbol trong market.
+- `remaining_quantity = quantity - filled_quantity`.
+- Không có order âm khối lượng.
+- Trade chỉ được ghi khi cả hai order cùng instrument/session.
+- Cập nhật hai order và insert trade phải atomic.
+- Không tạo duplicate trade khi retry hoặc xử lý đồng thời.
+

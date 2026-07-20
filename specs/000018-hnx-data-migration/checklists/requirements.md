@@ -1,4 +1,4 @@
-# Checklist chất lượng đặc tả: Migrate dữ liệu HNX khỏi in-memory
+# Checklist chất lượng đặc tả: Persist MVP 1 Matching Engine bằng DB
 
 ## Metadata
 
@@ -22,7 +22,7 @@
 **Không áp dụng**: 0  
 **Blocker fail**: 0
 
-**Bước tiếp theo được phép**: `$speckit-plan`
+**Bước tiếp theo được phép**: `$speckit-analyze` hoặc `$speckit-implement` sau khi review artifacts
 
 ## Chất lượng nội dung
 
@@ -79,4 +79,4 @@
 
 **Có được chuyển bước tiếp theo không**: Có, được chuyển sang `$speckit-plan`.
 
-**Ghi chú**: Hai quyết định về nhóm migrate đầu tiên và chiến lược chuyển tiếp đã được ghi nhận trong Clarifications Session 2026-07-20.
+**Ghi chú**: Phạm vi MVP 1 là bốn bảng persistence cho matching engine; các phase order history/outbox/account/settlement được tách riêng.

@@ -1,12 +1,12 @@
-# Quickstart validation: HNX reference data migration
+# Quickstart validation: MVP 1 Matching Engine DB
 
 ## Prerequisites
 
-- .NET SDK theo `flex-exchange-service/global.json` (9.0.308 hoặc roll-forward tương thích).
-- PostgreSQL HNX database đã được tạo và Liquibase driver/config được chuẩn bị theo `flex-database/README.md`.
-- Không dùng password/connection string thật trong repository.
+- .NET SDK theo `flex-exchange-service/global.json`.
+- PostgreSQL HNX database và Liquibase theo `flex-database/README.md`.
+- Không ghi password/connection string thật vào repository.
 
-## 1. Validate database changelog
+## Database
 
 Từ `flex-database/hnx`:
 
@@ -15,9 +15,9 @@ liquibase --changelog-file=changelog/db.changelog-master.xml validate
 liquibase --changelog-file=changelog/db.changelog-master.xml update-sql
 ```
 
-Kiểm tra `exchange_instruments` tồn tại và có dữ liệu seed HNX hợp lệ.
+Kiểm tra bốn bảng và seed `FXS` + một HNX `CONTINUOUS` session.
 
-## 2. Chạy BE test
+## Backend
 
 Từ `flex-exchange-service`:
 
@@ -26,26 +26,24 @@ dotnet restore
 dotnet test --configuration Release
 ```
 
-Các test mới phải chạy qua PostgreSQL thật/containerized provider cho mapping, unique constraint, transaction và restart recovery; không dùng EF in-memory để kết luận database behavior.
+Integration tests phải dùng PostgreSQL thật/containerized provider cho transaction, constraint và restart recovery.
 
-## 3. Kiểm tra từng source mode
+## Smoke flow
 
-Chạy lần lượt `LegacyOnly`, `DualRead`, `Database` bằng cấu hình test/local:
+1. Mở HNX continuous session.
+2. Đặt hai lệnh không đối ứng và kiểm tra order book.
+3. Đặt lệnh đối ứng để kiểm tra full/partial match và trade.
+4. Hủy order còn mở.
+5. Restart BE và kiểm tra open orders/trades vẫn tồn tại.
+6. Chạy hai lệnh đối ứng đồng thời và kiểm tra không duplicate trade.
 
-1. Gọi luồng FE/API đọc dữ liệu HNX.
-2. Xác nhận payload/status hiện tại không đổi.
-3. Ở `DualRead`, tạo mismatch có kiểm soát và xác nhận không cutover, có log/metric.
-4. Ở `Database`, restart BE và xác nhận HNX reference data vẫn còn.
+## Frontend
 
-## 4. Kiểm tra retry và rollback
+Từ `flex-microfrontend`:
 
-- Chạy seed/backfill hai lần và xác nhận không duplicate.
-- Làm DB unavailable trong dual-read và xác nhận fallback/observability theo mode.
-- Đổi config về `LegacyOnly` để rollback runtime; xác nhận FE vẫn hoạt động.
+```text
+npm test -- --watch=false
+```
 
-## Expected result
+Public order-book/trade payload phải giữ nguyên.
 
-- Changelog valid, dữ liệu reference HNX đối chiếu khớp.
-- Public FE/BE contract không đổi.
-- Cutover chỉ xảy ra sau khi đối chiếu đạt.
-- Restart không làm mất reference data đã migrate.
