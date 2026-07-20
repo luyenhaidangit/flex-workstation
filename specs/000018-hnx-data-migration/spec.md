@@ -39,8 +39,9 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 - **MVP-001**: Rà soát và phân loại các dữ liệu HNX hiện diện trong FE, BE và `flex-database`, bao gồm tối thiểu reference data, order, order history, trade, outbox và các state HNX đang in-memory.
 - **MVP-002**: Xác định thứ tự migrate từng nhóm dữ liệu HNX, với tiêu chí hoàn thành, kiểm tra nhất quán và phương án quay lại cho mỗi nhóm.
-- **MVP-003**: Migrate nhóm dữ liệu HNX được chọn đầu tiên mà không làm gián đoạn các luồng FE/BE đang hỗ trợ HNX.
+- **MVP-003**: Migrate HNX reference data làm nhóm đầu tiên mà không làm gián đoạn các luồng FE/BE đang hỗ trợ HNX.
 - **MVP-004**: Ghi nhận trạng thái nguồn dữ liệu đang được sử dụng để có thể vận hành chuyển tiếp từng nhóm.
+- **MVP-005**: Với HNX reference data, hệ thống PHẢI đọc song song nguồn hiện tại và nguồn DB để đối chiếu trước khi cutover sang DB.
 
 ## 4. Người dùng & Bối cảnh
 
@@ -116,6 +117,7 @@ Reviewer cần xem kết quả đối chiếu, nhóm nào đã chuyển, nhóm n
 - **FR-003** `[P1]`: Hệ thống PHẢI xác định nhóm dữ liệu đang in-memory, nhóm đã có nguồn bền vững và nhóm còn thiếu nguồn phù hợp. Liên quan: US-001, AC-001.
 - **FR-004** `[P1]`: Hệ thống PHẢI cho phép migrate từng nhóm dữ liệu HNX theo đợt có trạng thái bắt đầu, đang xử lý, thành công hoặc thất bại. Liên quan: US-002, AC-003.
 - **FR-005** `[P1]`: Hệ thống PHẢI duy trì tính nhất quán của dữ liệu HNX trong các luồng FE/BE hiện có khi một nhóm đang được chuyển đổi. Liên quan: US-002, AC-003, AC-004.
+- **FR-005A** `[P1]`: Với HNX reference data, hệ thống PHẢI hỗ trợ giai đoạn đọc song song và đối chiếu trước khi chuyển nguồn đọc chính sang DB. Liên quan: US-002, AC-003, US-003, AC-006.
 - **FR-006** `[P1]`: Hệ thống KHÔNG ĐƯỢC đánh dấu migration thành công nếu còn sai lệch chưa được chấp nhận. Liên quan: US-002, AC-005, US-003, AC-007.
 - **FR-007** `[P1]`: Hệ thống PHẢI hỗ trợ chạy lại an toàn một đợt thất bại hoặc gián đoạn mà không tạo dữ liệu trùng. Liên quan: US-002, AC-005.
 - **FR-008** `[P2]`: Hệ thống PHẢI cung cấp kết quả đối chiếu cho từng nhóm dữ liệu sau migration. Liên quan: US-003, AC-006, AC-007.
@@ -223,10 +225,15 @@ Hệ thống PHẢI ghi nhận ai khởi tạo/chạy lại/xác nhận migratio
 
 ## 18. Câu hỏi mở
 
-- [CẦN LÀM RÕ: Nhóm dữ liệu HNX nào được chọn làm đợt migrate đầu tiên sau inventory — reference data, order/order history, trade, outbox hay runtime state?]
-- [CẦN LÀM RÕ: Trong giai đoạn chuyển tiếp, có cho phép đọc song song nguồn cũ và nguồn mới để đối chiếu hay phải chuyển hẳn từng nhóm tại thời điểm cutover?]
+- [ĐÃ LÀM RÕ → Clarifications / Session 2026-07-20: Đợt đầu tiên là HNX reference data.]
+- [ĐÃ LÀM RÕ → Clarifications / Session 2026-07-20: Đọc song song, đối chiếu, sau đó cutover sang DB.]
 
 ## Clarifications
+
+### Session 2026-07-20
+
+- Q: Nhóm dữ liệu HNX nào được chọn làm đợt migrate đầu tiên sau inventory? → A: HNX reference data.
+- Q: Trong giai đoạn chuyển tiếp, có cho phép đọc song song nguồn cũ và nguồn mới để đối chiếu hay phải chuyển hẳn từng nhóm tại thời điểm cutover? → A: Đọc song song, đối chiếu, sau đó cutover sang DB.
 
 ---
 

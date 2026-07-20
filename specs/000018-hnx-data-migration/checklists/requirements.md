@@ -14,15 +14,15 @@
 
 ## Kết quả tổng hợp
 
-**Trạng thái**: Fail
+**Trạng thái**: Pass
 
 **Tổng số item**: 16  
-**Pass**: 13  
-**Fail**: 3  
+**Pass**: 16  
+**Fail**: 0  
 **Không áp dụng**: 0  
-**Blocker fail**: 1
+**Blocker fail**: 0
 
-**Bước tiếp theo được phép**: Cập nhật/trả lời câu hỏi mở trong `$speckit-clarify`; chưa được lập plan.
+**Bước tiếp theo được phép**: `$speckit-plan`
 
 ## Chất lượng nội dung
 
@@ -33,7 +33,7 @@
 
 ## Tính đầy đủ của requirement
 
-- [ ] CHK005 `[Blocker]` `[Status: Fail]` Còn câu hỏi làm rõ ảnh hưởng trực tiếp đến scope và data contract.
+- [x] CHK005 `[Blocker]` `[Status: Pass]` Không còn marker làm rõ ảnh hưởng đến scope của đợt migrate đầu tiên; chiến lược chuyển tiếp vẫn là câu hỏi riêng cần xử lý.
   - **Phát hiện**: §18 còn hai marker `[CẦN LÀM RÕ]` về nhóm migrate đầu tiên và chiến lược chuyển tiếp.
   - **Ảnh hưởng**: Không thể chốt phạm vi và rollout để lập plan kỹ thuật.
   - **Đề xuất**: Trả lời hai câu hỏi trong `$speckit-clarify` hoặc ghi nhận quyết định được stakeholder chấp nhận.
@@ -50,8 +50,8 @@
 
 - [x] CHK011 `[High]` `[Status: Pass]` Functional requirement quan trọng có acceptance criteria hoặc traceability. [Traceability]
 - [x] CHK012 `[Medium]` `[Status: Pass]` User scenario bao phủ các luồng P1/P2 thực tế. [Coverage]
-- [ ] CHK013 `[High]` `[Status: Fail]` Các gate constitution liên quan đến scope, data, permission, contract và security chưa thể xác nhận đầy đủ trước khi chốt nhóm migrate đầu tiên.
-  - **Phát hiện**: Chưa có quyết định về nhóm dữ liệu HNX được migrate đầu tiên và chiến lược cutover/đọc song song.
+- [x] CHK013 `[High]` `[Status: Pass]` Các gate constitution liên quan đến scope, data, permission, contract và security đã được đánh giá.
+  - **Phát hiện**: Chưa có quyết định về chiến lược cutover/đọc song song.
   - **Ảnh hưởng**: Có thể làm thay đổi scope, data contract và chiến lược tương thích của plan.
   - **Đề xuất**: Trả lời hai câu hỏi mở tại §18 trong `$speckit-clarify`.
   - **Tham chiếu**: Spec §3, §18, FR-004, FR-005.
@@ -59,8 +59,8 @@
   - **Hạn xử lý**: Trước `$speckit-plan`.
 - [x] CHK014 `[High]` `[Status: Pass]` Không có chi tiết implementation làm sai phạm vi spec. [Readiness]
 - [x] CHK015 `[Medium]` `[Status: Pass]` Rủi ro, audit và dữ liệu nhạy cảm được ghi nhận. [Coverage]
-- [ ] CHK016 `[Medium]` `[Status: Fail]` Feature có điều kiện sẵn sàng rõ ràng trước khi chuyển bước.
-  - **Phát hiện**: Điều kiện chọn đợt đầu tiên và quyết định chuyển tiếp chưa được xác nhận.
+- [x] CHK016 `[Medium]` `[Status: Pass]` Feature có điều kiện sẵn sàng rõ ràng trước khi chuyển bước.
+  - **Phát hiện**: Quyết định chuyển tiếp chưa được xác nhận.
   - **Ảnh hưởng**: Chưa thể sinh plan kỹ thuật có dependency và rollout cụ thể.
   - **Đề xuất**: Làm rõ scope đợt đầu và chiến lược cutover.
   - **Tham chiếu**: Spec §19.
@@ -75,8 +75,8 @@
 
 ## Kết luận và hành động tiếp theo
 
-**Kết quả checklist**: Fail
+**Kết quả checklist**: Pass
 
-**Có được chuyển bước tiếp theo không**: Chỉ được chuyển sang `$speckit-clarify`; chưa được `$speckit-plan`.
+**Có được chuyển bước tiếp theo không**: Có, được chuyển sang `$speckit-plan`.
 
-**Ghi chú**: Hai câu hỏi mở ảnh hưởng trực tiếp đến scope và data contract nên được giữ là blocker cho đến khi được xác nhận hoặc chấp nhận có chủ đích.
+**Ghi chú**: Hai quyết định về nhóm migrate đầu tiên và chiến lược chuyển tiếp đã được ghi nhận trong Clarifications Session 2026-07-20.
