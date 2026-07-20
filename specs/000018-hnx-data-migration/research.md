@@ -3,7 +3,7 @@
 ## Phạm vi khảo sát
 
 - `flex-exchange-service`: matching rules, order book và các state hiện đang in-memory.
-- `flex-database/hnx`: Liquibase migrations hiện có cho `exchange_instruments`, `exchange_orders`, `exchange_order_history`, `exchange_trades`, `exchange_outbox`.
+- `flex-database/hnx`: Liquibase migrations cho bốn bảng MVP 1: `exchange_instruments`, `exchange_sessions`, `exchange_orders`, `exchange_trades`.
 - `flex-microfrontend`: exchange API consumers cần giữ contract.
 
 ## Quyết định
@@ -28,7 +28,26 @@ Application định nghĩa focused ports; Infrastructure dùng Npgsql. Không th
 
 Liquibase forward-only, changeset mới không sửa changeset đã chạy. Seed instrument/session idempotent. Không dùng destructive rollback.
 
+### TQ-006 — `market` biểu diễn khái niệm gì?
+
+`market` là phân đoạn giao dịch nơi lệnh và công cụ được quản lý, không phải tên tổ chức sở hữu sàn. Vì vậy không dùng `VNX` làm giá trị `market`: VNX là công ty mẹ của HOSE và HNX, không phải thị trường khớp lệnh.
+
+Các giá trị định hướng khi mở rộng gồm:
+
+| Giá trị | Phân đoạn giao dịch | Đơn vị vận hành | Sản phẩm chính |
+| --- | --- | --- | --- |
+| `HOSE` | Cổ phiếu niêm yết tại TP. Hồ Chí Minh | HOSE | Cổ phiếu, ETF, chứng quyền, quỹ niêm yết |
+| `HNX` | Cổ phiếu niêm yết tại Hà Nội | HNX | Cổ phiếu niêm yết |
+| `UPCOM` | Cổ phiếu đăng ký giao dịch | HNX | Cổ phiếu công ty đại chúng chưa niêm yết |
+| `GOV_BOND` | Trái phiếu Chính phủ | HNX | Trái phiếu Chính phủ, chính quyền địa phương, được Chính phủ bảo lãnh |
+| `CORP_BOND_LISTED` | Trái phiếu doanh nghiệp niêm yết | HNX | Trái phiếu doanh nghiệp niêm yết |
+| `CORP_BOND_PRIVATE` | Trái phiếu doanh nghiệp riêng lẻ | HNX | Trái phiếu doanh nghiệp phát hành riêng lẻ |
+| `DERIVATIVES` | Chứng khoán phái sinh | HNX | Hợp đồng tương lai và các sản phẩm phái sinh |
+
+HNX hiện công bố vận hành các thị trường cổ phiếu niêm yết, UPCoM, trái phiếu Chính phủ, trái phiếu doanh nghiệp, trái phiếu doanh nghiệp riêng lẻ và chứng khoán phái sinh. Nguồn: [HNX — Hỏi đáp](https://upcom.hnx.vn/vi-vn/hoi-dap.html).
+
+MVP 1 chỉ mô phỏng khớp lệnh cổ phiếu niêm yết tại HNX. Vì vậy `exchange_instruments.market` và `exchange_sessions.market` chỉ nhận giá trị `HNX` trong phạm vi feature này. Các giá trị còn lại là quy ước mở rộng, không phải yêu cầu triển khai hiện tại.
+
 ## Kết luận
 
 MVP 1 là một vertical slice DB-backed cho matching engine. Các nghiệp vụ order history, event delivery, account/balance và settlement sẽ được tách thành feature sau.
-

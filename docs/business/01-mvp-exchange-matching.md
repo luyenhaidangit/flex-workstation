@@ -6,6 +6,8 @@ Tài liệu này giải thích nghiệp vụ cho BA và kỹ sư trước khi đ
 
 FlexSim là **simulation only**. MVP 01 không kết nối HOSE, CTCK, VSDC, ngân hàng thanh toán, dữ liệu giá hay tiền thật. Tài liệu dùng quy tắc thị trường thực tế để giải thích mục tiêu mô phỏng, không thay thế quy định pháp lý hoặc quy trình vận hành của các tổ chức đó.
 
+Xem [cấu trúc thị trường chứng khoán Việt Nam](00-vietnamese-securities-market-structure.md) để phân biệt VNX, HOSE, HNX và các giá trị `market` được định hướng trong hệ thống.
+
 MVP 01 chỉ mô phỏng lõi của **Sở giao dịch** cho một mã cổ phiếu giả lập: nhận limit order, duy trì order book và xác định giao dịch trong một phiên `continuous`. Các quy tắc chi tiết mà hệ thống phải thực hiện nằm trong [Quy tắc khớp lệnh MVP 01](../mvp/01-matching-rules.md); bề mặt kỹ thuật nằm trong [đặc tả lõi khớp lệnh](../../specs/000010-matching-engine-core/spec.md).
 
 ## Bản chất công việc của HOSE

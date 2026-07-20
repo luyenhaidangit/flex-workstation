@@ -6,6 +6,8 @@ Tạo lõi Exchange có kết quả khớp xác định được: cùng tập l�
 
 Xem [tài liệu nghiệp vụ MVP 01](../business/01-mvp-exchange-matching.md) để hiểu luồng thị trường thực tế, vai trò CTCK/Sở giao dịch/VSDC và ranh giới mô phỏng.
 
+Xem [cấu trúc thị trường chứng khoán Việt Nam](../business/00-vietnamese-securities-market-structure.md) để phân biệt VNX, HOSE, HNX và quy ước trường `market`.
+
 ## Actor và phạm vi
 
 - Người gửi lệnh là `DemoBroker`; chưa có người dùng hay CTCK thật.
