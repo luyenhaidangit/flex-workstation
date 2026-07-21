@@ -127,7 +127,81 @@ site:gumroad.com "<keyword>"
 - **AppSumo active deals**: SaaS nào đang tìm khách để validate
 - **Product Hunt**: sản phẩm mới nào đang hot → niche nào đang tăng trưởng
 
-### 1.6 Freshness Validation — Lọc trước khi đọc sâu
+### 1.6 Ad Intelligence — Đọc quảng cáo đang chạy
+
+**Logic**: Ai đang bỏ tiền chạy paid ads cho một method/product thì chắc chắn đang có lợi nhuận đủ để cover chi phí ads. Đây là tín hiệu xác nhận mạnh nhất rằng cái đó đang work.
+
+Tìm kiếm trên Facebook Ads Library (miễn phí, không cần đăng nhập):
+```
+site:facebook.com/ads/library "<keyword>"
+"<keyword>" facebook ads library active
+```
+
+Hoặc truy cập trực tiếp:
+```
+https://www.facebook.com/ads/library/?active_status=active&ad_type=all&q=<keyword>
+```
+
+Tìm thêm trên TikTok Creative Center:
+```
+site:ads.tiktok.com "<keyword>" top ads
+"<keyword>" tiktok ads creative center 2025
+```
+
+Với mỗi ad tìm được, trích xuất:
+- **Landing page** — họ đang drive traffic về đâu? (Shopify, Gumroad, Telegram, trang riêng?)
+- **Offer** — họ đang bán gì, ở mức giá nào?
+- **Copy angle** — hook họ dùng là gì? (pain point nào, promise gì?)
+- **Thời gian chạy** — ad chạy bao lâu rồi? Chạy lâu = profitable
+
+### 1.7 Affiliate Network Scanning — Quét mạng lưới affiliate
+
+**Logic**: Sản phẩm có Gravity cao trên ClickBank = nhiều affiliate đang kiếm được tiền từ nó trong 12 tuần gần đây. EPC cao = mỗi click ra tiền tốt. Đây là proof rằng có người đang mua.
+
+Tìm kiếm trending offers:
+```
+site:clickbank.com/marketplace "<keyword>"
+clickbank "<keyword>" gravity high 2025
+digistore24 "<keyword>" top products
+```
+
+Chỉ số cần đọc:
+| Chỉ số | Ý nghĩa |
+|--------|---------|
+| **Gravity > 20** | Nhiều affiliate đang active bán được |
+| **EPC ($/click) cao** | Traffic convert tốt → offer đang work |
+| **Commission %** | Margin gốc của vendor ít nhất là phần còn lại |
+| **Avg $/sale** | Giá bán thực tế sau upsell |
+
+Ngoài ClickBank, tìm thêm trên:
+- **Digistore24** — nhiều product số
+- **JVZoo** — software, tools, AI products
+- **MaxBounty / CPA networks** — lead generation offers
+
+### 1.8 Telegram / Discord Mining — Đào kênh private
+
+**Logic**: Method thường được share trong Telegram/Discord trước khi lên forum public. Kênh private = mới hơn, chưa bão hòa, ít người biết hơn.
+
+Tìm kênh Telegram liên quan:
+```
+site:t.me "<keyword>"
+telegram "<keyword>" method channel 2025
+t.me "<keyword>" free
+```
+
+Tìm Discord communities:
+```
+site:disboard.org "<keyword>" make money
+discord "<keyword>" MMO server invite
+```
+
+Tín hiệu đáng chú ý trong kênh:
+- **Forward count cao** — message được forward nhiều = đang viral trong cộng đồng
+- **Pin message** — admin pin gì thường là method đang được dùng
+- **File/document share** — PDF, guide, script được share = có nội dung cụ thể
+- **Thành viên đang hỏi về tool/step cụ thể** — chứng tỏ họ đang thực hành
+
+### 1.9 Freshness Validation — Lọc trước khi đọc sâu
 
 Trước khi bước vào Phase 2, chạy nhanh validation query cho từng method/source tìm được:
 
@@ -298,21 +372,27 @@ Nội dung file theo thứ tự:
 **Keyword/Niche**: <keyword đã nghiên cứu>
 
 ## 1. Tóm tắt nguồn
-<đã tìm & đọc bao nhiêu nguồn, từ đâu>
+<đã tìm & đọc bao nhiêu nguồn, từ đâu: Reddit / YouTube / Forum VN / Ads / Affiliate / Telegram>
 
 ## 2. Bản đồ phương pháp
 <Phase 3.1>
 
 ## 3. Bảng đánh giá
-<Phase 3.2 — bao gồm Time to First $>
+<Phase 3.2 — bao gồm Freshness và Time to First $>
 
 ## 4. Reverse Engineering
 <Phase 2.5 — phân tích sản phẩm thành công nhất>
 
-## 5. Deep-dive
+## 5. Ad Intelligence
+<Các ad đang chạy tìm được, offer và landing page>
+
+## 6. Affiliate Signals
+<Sản phẩm có gravity/EPC cao tìm được>
+
+## 7. Deep-dive
 <Phase 3.3 — bao gồm kiểm thử vốn tối thiểu>
 
-## 6. Gợi ý tiếp theo
+## 8. Gợi ý tiếp theo
 <Phase 3.4>
 ```
 
