@@ -216,12 +216,13 @@ Ví dụ cluster:
 
 ### 3.2 Bảng đánh giá
 
-| Phương pháp | Vốn ban đầu | Time to First $ | Thời gian ROI | Rủi ro | Scalable? | Kỹ năng cần | Khả thi 2025? |
-|-------------|-------------|-----------------|---------------|--------|-----------|-------------|---------------|
+| Phương pháp | Freshness | Vốn ban đầu | Time to First $ | Thời gian ROI | Rủi ro | Scalable? | Kỹ năng cần |
+|-------------|-----------|-------------|-----------------|---------------|--------|-----------|-------------|
 | ... | ... | ... | ... | ... | ... | ... | ... |
 
 Rating rủi ro: 🟢 Thấp / 🟡 Trung bình / 🔴 Cao
 
+**Freshness**: Bằng chứng gần nhất method còn sống — ghi dạng `"còn active, seen YYYY-MM"` hoặc `"last seen YYYY-MM, chưa rõ"`.  
 **Time to First $**: Số ngày ước tính từ khi bắt đầu đến khi có doanh thu đầu tiên (dù nhỏ).
 
 ### 3.3 Deep-dive phương pháp nổi bật nhất
