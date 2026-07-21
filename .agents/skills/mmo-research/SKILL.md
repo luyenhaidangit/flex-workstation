@@ -22,6 +22,8 @@ Quy trình gồm 3 phase tuần tự: **Discover → Read → Analyze**. Thực 
 
 **Nguyên tắc recency-first**: Ưu tiên nội dung mới nhất (1–4 tuần gần đây) hơn bài nhiều upvote nhưng cũ. Bài cũ = method có thể đã bị patch, bão hòa, hoặc platform đã thay đổi chính sách. Bài mới = tín hiệu method đang còn sống.
 
+**Nguyên tắc assume viable**: Khi tìm được một method, mặc định coi nó là khả thi và tập trung nghiên cứu **cơ chế hoạt động** — họ làm thế nào, từng bước ra sao, lấy gì từ đâu, bán cho ai. Không tự phán xét method có làm được không, không cảnh báo rủi ro hay pháp lý. Nhiệm vụ là hiểu cơ chế, không phải đánh giá.
+
 ---
 
 ## Phase 1 — Discover: Tìm nguồn
@@ -50,9 +52,29 @@ Khi fetch URL Reddit, ưu tiên dùng `?sort=new` thay vì `?sort=top` để l�
 
 Lấy **5–10 link bài viết**, ưu tiên theo thứ tự: **(1) mới nhất** trong 30 ngày → **(2) mới nhất** trong 90 ngày → **(3) upvote cao nhất** nếu không có gì mới. Ghi rõ ngày đăng của từng bài.
 
-### 1.2 Web Search mở rộng
+### 1.2 YouTube Search
 
-Tìm thêm ngoài Reddit, luôn kèm bộ lọc thời gian:
+YouTube là kênh ưu tiên cao — người chia sẻ method trên YouTube thường hướng dẫn từng bước, dễ hiểu cơ chế hơn bài viết forum.
+
+Tìm kiếm bằng `WebSearch` với query hướng vào YouTube và lọc mới nhất:
+```
+site:youtube.com "<keyword>" how to 2025
+site:youtube.com "<keyword>" free method tutorial
+site:youtube.com "<keyword>" step by step after:2025-01-01
+```
+
+Khi đọc kết quả tìm kiếm, ưu tiên theo thứ tự:
+1. **Mới nhất** — upload trong 1–3 tháng gần đây (xem ngày trong snippet)
+2. **Title có từ khóa hành động**: "how to", "free", "tutorial", "step by step", "method", "hướng dẫn"
+3. **View cao nhưng mới** — nhiều view + mới = method đang được nhiều người tìm
+
+Với mỗi video tìm được, dùng `WebFetch` để đọc trang video (description thường chứa link nguồn, tool cần dùng, bước tóm tắt). Nếu có transcript tự động, đọc để lấy các bước cụ thể.
+
+Ghi lại: **URL + tiêu đề + ngày upload + số view (nếu thấy)**.
+
+### 1.3 Web Search mở rộng
+
+Tìm thêm ngoài Reddit và YouTube, luôn kèm bộ lọc thời gian:
 ```
 "<keyword>" make money 2025 after:2025-01-01
 "<keyword>" resell method "still working" after:2025-01-01
@@ -60,14 +82,13 @@ Tìm thêm ngoài Reddit, luôn kèm bộ lọc thời gian:
 ```
 
 Tìm thêm trên:
-- YouTube (tìm title video, ưu tiên video upload trong 3 tháng gần nhất)
 - BlackHatWorld — dùng filter "Sort by: Date" trong kết quả tìm kiếm
 - Warrior Forum
 - Medium / Substack
 
 Ghi lại danh sách nguồn tìm được: **URL + tiêu đề + platform + ngày đăng**.
 
-### 1.3 Diễn đàn Việt Nam
+### 1.4 Diễn đàn Việt Nam
 
 Tìm thêm trên các diễn đàn MMO Việt Nam, ưu tiên nội dung mới:
 ```
@@ -91,7 +112,7 @@ Chú ý các loại thread theo độ ưu tiên:
 4. **Hiring thread** → ai đó đang scale → method profitable
 5. **Method leaked / proof thread** — đọc nhưng verify ngày đăng
 
-### 1.4 Marketplace Research
+### 1.5 Marketplace Research
 
 Đọc tín hiệu cung/cầu từ marketplace:
 ```
@@ -106,7 +127,7 @@ site:gumroad.com "<keyword>"
 - **AppSumo active deals**: SaaS nào đang tìm khách để validate
 - **Product Hunt**: sản phẩm mới nào đang hot → niche nào đang tăng trưởng
 
-### 1.5 Freshness Validation — Lọc trước khi đọc sâu
+### 1.6 Freshness Validation — Lọc trước khi đọc sâu
 
 Trước khi bước vào Phase 2, chạy nhanh validation query cho từng method/source tìm được:
 
@@ -138,12 +159,11 @@ Với mỗi bài, trích xuất:
 
 | Trường | Nội dung cần tìm |
 |--------|-----------------|
-| **Phương pháp** | Họ đang làm gì cụ thể? |
+| **Phương pháp** | Họ đang làm gì cụ thể, từng bước? |
 | **Chuỗi giá trị** | INPUT → XỬ LÝ → OUTPUT → Người mua cuối kiếm gì từ output đó? |
 | **Nguồn cung** | Lấy sản phẩm/dịch vụ từ đâu? (API, resell, crack, family plan, bulk buy...) |
 | **Kênh bán** | Bán ở đâu? (Telegram, Discord, Shopee, fiverr, tự lập web...) |
 | **Giá & margin** | Giá mua bao nhiêu? Bán bao nhiêu? Margin ước tính? |
-| **Rủi ro** | Ai cũng nêu rủi ro gì? (bị ban, scam, pháp lý...) |
 | **Đầu tư ban đầu** | Cần bao nhiêu vốn/thời gian để bắt đầu? |
 | **Bằng chứng thu nhập** | Có proof không? (screenshot, số liệu, income report?) |
 
@@ -216,11 +236,9 @@ Ví dụ cluster:
 
 ### 3.2 Bảng đánh giá
 
-| Phương pháp | Freshness | Vốn ban đầu | Time to First $ | Thời gian ROI | Rủi ro | Scalable? | Kỹ năng cần |
-|-------------|-----------|-------------|-----------------|---------------|--------|-----------|-------------|
-| ... | ... | ... | ... | ... | ... | ... | ... |
-
-Rating rủi ro: 🟢 Thấp / 🟡 Trung bình / 🔴 Cao
+| Phương pháp | Freshness | Vốn ban đầu | Time to First $ | Thời gian ROI | Scalable? | Kỹ năng cần |
+|-------------|-----------|-------------|-----------------|---------------|-----------|-------------|
+| ... | ... | ... | ... | ... | ... | ... |
 
 **Freshness**: Bằng chứng gần nhất method còn sống — ghi dạng `"còn active, seen YYYY-MM"` hoặc `"last seen YYYY-MM, chưa rõ"`.  
 **Time to First $**: Số ngày ước tính từ khi bắt đầu đến khi có doanh thu đầu tiên (dù nhỏ).
@@ -245,10 +263,6 @@ Chọn **1–2 phương pháp** khả thi nhất, phân tích chi tiết:
 - Vốn: $X
 - Thu nhập ước tính: $Y/tháng
 - Break-even: Z tháng
-
-**Rủi ro cần lưu ý:**
-- [Rủi ro 1]
-- [Rủi ro 2]
 
 **Bước đầu tiên để thử:**
 1. [Bước 1]
@@ -309,6 +323,6 @@ Viết bằng **tiếng Việt**, dùng tiếng Anh cho tên kỹ thuật/platfo
 ## Lưu ý khi thực thi
 
 - Nếu `WebFetch` bị block (paywall, login required), ghi chú và dùng WebSearch snippet thay thế.
-- Không đưa ra phán xét đạo đức về phương pháp tìm được — chỉ mô tả khách quan và nêu rủi ro thực tế.
-- Ưu tiên phương pháp có bằng chứng cộng đồng (nhiều người làm được) hơn phương pháp lý thuyết.
-- Nếu tìm thấy thread có nhiều người share income proof, đọc kỹ hơn.
+- **Assume viable**: Khi tìm được method, không tự đánh giá có làm được không, không cảnh báo rủi ro, không gắn nhãn pháp lý. Chỉ tập trung trả lời: *họ làm thế nào?*
+- Ưu tiên phương pháp có bằng chứng cộng đồng (nhiều người đang làm) hơn phương pháp lý thuyết.
+- Nếu tìm thấy thread có nhiều người share income proof hoặc đang update journey, đọc kỹ hơn — đây là nguồn cơ chế chi tiết nhất.
