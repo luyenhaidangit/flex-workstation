@@ -20,18 +20,20 @@ Nghiên cứu các phương pháp kiếm tiền online (MMO) liên quan đến t
 
 Quy trình gồm 3 phase tuần tự: **Discover → Read → Analyze**. Thực hiện từng bước, không bỏ qua.
 
+**Nguyên tắc recency-first**: Ưu tiên nội dung mới nhất (1–4 tuần gần đây) hơn bài nhiều upvote nhưng cũ. Bài cũ = method có thể đã bị patch, bão hòa, hoặc platform đã thay đổi chính sách. Bài mới = tín hiệu method đang còn sống.
+
 ---
 
 ## Phase 1 — Discover: Tìm nguồn
 
 ### 1.1 Reddit Search
 
-Với mỗi từ khóa dưới đây, dùng `WebSearch` để tìm kiếm trên Reddit:
+Với mỗi từ khóa dưới đây, dùng `WebSearch` để tìm kiếm trên Reddit. Luôn thêm bộ lọc thời gian vào query:
 
 ```
-site:reddit.com "<keyword>"
-site:reddit.com "<keyword>" how to make money
-site:reddit.com "<keyword>" selling resell arbitrage
+site:reddit.com "<keyword>" after:2025-06-01
+site:reddit.com "<keyword>" "still working" OR "just started" after:2025-01-01
+site:reddit.com "<keyword>" selling resell arbitrage after:2025-01-01
 ```
 
 Ưu tiên các subreddit MMO phổ biến:
@@ -44,32 +46,34 @@ site:reddit.com "<keyword>" selling resell arbitrage
 - r/digitalmarketing — bán dịch vụ digital
 - r/dropship, r/ecommerce — nếu liên quan thương mại
 
-Lấy **5–10 link bài viết** có nhiều comment nhất, ưu tiên post có upvote cao.
+Khi fetch URL Reddit, ưu tiên dùng `?sort=new` thay vì `?sort=top` để lấy thread mới nhất trong subreddit. Ví dụ: `reddit.com/r/beermoney/new/`
+
+Lấy **5–10 link bài viết**, ưu tiên theo thứ tự: **(1) mới nhất** trong 30 ngày → **(2) mới nhất** trong 90 ngày → **(3) upvote cao nhất** nếu không có gì mới. Ghi rõ ngày đăng của từng bài.
 
 ### 1.2 Web Search mở rộng
 
-Tìm thêm ngoài Reddit:
+Tìm thêm ngoài Reddit, luôn kèm bộ lọc thời gian:
 ```
-"<keyword>" make money online 2024 OR 2025
-"<keyword>" resell method tutorial
-"<keyword>" arbitrage how it works
+"<keyword>" make money 2025 after:2025-01-01
+"<keyword>" resell method "still working" after:2025-01-01
+"<keyword>" arbitrage guide after:2025-04-01
 ```
 
 Tìm thêm trên:
-- YouTube (tìm title video, không cần xem)
-- BlackHatWorld forum
+- YouTube (tìm title video, ưu tiên video upload trong 3 tháng gần nhất)
+- BlackHatWorld — dùng filter "Sort by: Date" trong kết quả tìm kiếm
 - Warrior Forum
 - Medium / Substack
 
-Ghi lại danh sách nguồn tìm được (URL + tiêu đề + platform).
+Ghi lại danh sách nguồn tìm được: **URL + tiêu đề + platform + ngày đăng**.
 
 ### 1.3 Diễn đàn Việt Nam
 
-Tìm thêm trên các diễn đàn MMO Việt Nam:
+Tìm thêm trên các diễn đàn MMO Việt Nam, ưu tiên nội dung mới:
 ```
-site:mmo4me.com "<keyword>"
-site:voz.vn "<keyword>" kiếm tiền
-site:mmovn.com "<keyword>"
+site:mmo4me.com "<keyword>" after:2025-01-01
+site:voz.vn "<keyword>" kiếm tiền after:2025-01-01
+site:mmovn.com "<keyword>" after:2025-01-01
 ```
 
 Ưu tiên:
@@ -78,7 +82,14 @@ site:mmovn.com "<keyword>"
 - **VietAff** (vietaff.com) — affiliate marketing Việt Nam
 - **MMOVN** (mmovn.com) — affiliate, crypto, airdrop
 
-Chú ý các loại thread: bán/mua (tín hiệu cầu), journey (proof), method leaked, hiring.
+Khi truy cập forum, nếu có tùy chọn sort, chọn **"Mới nhất" / "Latest" / "Sort by Date"** thay vì "Hot" hay "Top".
+
+Chú ý các loại thread theo độ ưu tiên:
+1. **Journey thread mới** (ai đó vừa bắt đầu trong 2–4 tuần) → method đang sống
+2. **Bán/mua thread gần đây** → tín hiệu cầu hiện tại
+3. **"Còn hoạt động không?" / "Is this still working?"** → community tự verify
+4. **Hiring thread** → ai đó đang scale → method profitable
+5. **Method leaked / proof thread** — đọc nhưng verify ngày đăng
 
 ### 1.4 Marketplace Research
 
@@ -94,6 +105,28 @@ site:gumroad.com "<keyword>"
 - **Gumroad/Lemon Squeezy bestsellers**: digital product nào đang bán chạy
 - **AppSumo active deals**: SaaS nào đang tìm khách để validate
 - **Product Hunt**: sản phẩm mới nào đang hot → niche nào đang tăng trưởng
+
+### 1.5 Freshness Validation — Lọc trước khi đọc sâu
+
+Trước khi bước vào Phase 2, chạy nhanh validation query cho từng method/source tìm được:
+
+```
+"<method name>" "still working" 2025
+"<method name>" "not working" OR "patched" OR "banned" 2025
+"<method name>" site:reddit.com after:2025-03-01
+```
+
+Phân loại kết quả:
+
+| Tín hiệu | Đánh giá |
+|----------|----------|
+| Có người hỏi "còn hoạt động không?" trong tháng này và nhận reply tích cực | ✅ Đang sống |
+| Có journey thread mới (< 4 tuần) với update | ✅ Đang sống |
+| Nhiều comment "đã die", "bị patch", "không còn" | ❌ Đã chết |
+| Không có mention nào sau 6 tháng | ⚠️ Không rõ — ghi chú khi đọc |
+| Có thread mua/bán active với reply gần đây | ✅ Đang sống |
+
+Chỉ đưa vào Phase 2 các source đánh giá ✅ hoặc ⚠️. Bỏ qua ❌.
 
 ---
 
