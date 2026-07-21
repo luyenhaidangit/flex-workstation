@@ -46,6 +46,7 @@ Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào ph
 | Có spec, cần breakdown task | `planning-and-task-breakdown` |
 | Viết code / implement (có hoặc không có plan) | `incremental-implementation` |
 | Fix bug, lỗi runtime, test thất bại | `debugging-and-error-recovery` |
+| Nghiên cứu phương pháp kiếm tiền online (MMO) | `mmo-research` |
 
 Xem danh sách đầy đủ và cách phối hợp nhiều skill: `using-agent-skills`.
 
