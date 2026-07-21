@@ -30,35 +30,27 @@ Quy trình gồm 3 phase tuần tự: **Discover → Read → Analyze**. Thực 
 
 ### 1.1 Reddit Search
 
-**Lưu ý quan trọng**: `WebSearch` **không hỗ trợ toán tử `site:`** — query `site:reddit.com ...` trả về 0 kết quả. Dùng `WebFetch` trực tiếp trên old Reddit thay thế.
+**Giới hạn cứng**: Claude Code **block toàn bộ reddit.com và old.reddit.com** ở cấp WebFetch — mọi `WebFetch` trên domain này đều fail. `WebSearch` với `site:reddit.com` cũng trả về rỗng. **Không thử cả hai cách đó.**
 
-**Bước 1 — Tìm bài qua search Reddit:**
+**Cách duy nhất hoạt động — `WebSearch` với "reddit" làm keyword:**
 
-Dùng `WebFetch` với các URL sau (thay `<keyword>` bằng từ khóa thực, encode space thành `+`):
-
-```
-https://old.reddit.com/search?q=<keyword>&sort=new&t=month
-https://old.reddit.com/search?q=<keyword>+make+money&sort=new&t=year
-https://www.reddit.com/search.json?q=<keyword>&sort=new&t=year&limit=10
-```
-
-**Bước 2 — Fetch thẳng subreddit mới nhất:**
-
-Dùng `WebFetch` trên trang `/new` của các subreddit phù hợp:
+Google index Reddit rất tốt. Bỏ `site:` và thêm "reddit" vào query thường, kết quả vẫn trả về thread Reddit qua snippet:
 
 ```
-https://old.reddit.com/r/beermoney/new/
-https://old.reddit.com/r/WorkOnline/new/
-https://old.reddit.com/r/entrepreneur/new/
-https://old.reddit.com/r/ChatGPT/new/       ← nếu keyword liên quan AI
-https://old.reddit.com/r/digitalmarketing/new/
+"<keyword>" make money reddit 2026
+"<keyword>" method reddit "still working" 2025 OR 2026
+"<keyword>" reddit r/beermoney OR r/WorkOnline 2026
+"<keyword>" how to reddit step by step resell
+"<keyword>" reddit journey income proof 2025
 ```
 
-**Bước 3 — Đọc thread cụ thể:**
+**Đọc dữ liệu từ snippet:** Snippet trong kết quả WebSearch thường chứa tóm tắt nội dung thread, giá, method — đây là data Reddit khả dụng duy nhất. Ghi lại **URL + tiêu đề + nội dung snippet** cho từng thread.
 
-Khi tìm được thread có vẻ liên quan, dùng `WebFetch` trên URL thread đó để đọc nội dung đầy đủ. Dùng định dạng `old.reddit.com` thay vì `reddit.com` — old Reddit render HTML tĩnh, dễ đọc hơn.
+**Thử WebFetch trên URL thread cụ thể (optional, có thể fail):**
 
-Lấy **5–10 link bài viết**, ưu tiên theo thứ tự: **(1) mới nhất** trong 30 ngày → **(2) mới nhất** trong 90 ngày → **(3) upvote cao nhất** nếu không có gì mới. Ghi rõ ngày đăng của từng bài.
+Nếu snippet chứa URL Reddit cụ thể (ví dụ `reddit.com/r/beermoney/comments/...`), thử `WebFetch` — đôi khi thread riêng lẻ không bị block. Nếu fail, dùng snippet đã có, không retry.
+
+Lấy **5–10 thread** từ snippet, ưu tiên: **(1) mới nhất** trong 30 ngày → **(2) mới nhất** trong 90 ngày → **(3) nhiều upvote nhất** nếu không có gì mới. Ghi rõ ngày đăng.
 
 ### 1.2 YouTube Search
 
@@ -442,11 +434,10 @@ Viết bằng **tiếng Việt**, dùng tiếng Anh cho tên kỹ thuật/platfo
 
 | Source | Vấn đề | Giải pháp đúng |
 |--------|---------|----------------|
-| Reddit | `WebSearch` với `site:reddit.com` trả về 0 kết quả | Dùng `WebFetch` trên `old.reddit.com/search?q=...` |
+| Reddit | Claude Code block toàn bộ `reddit.com` và `old.reddit.com` ở WebFetch; `site:` không hoạt động trong WebSearch | Dùng `WebSearch` với "reddit" làm keyword thường — đọc từ snippet |
 | YouTube transcript | `WebFetch` trang video chỉ trả về JavaScript shell | Đọc description qua meta, tìm review/summary qua WebSearch |
 | Facebook Ads Library | Không render được — cần JS + login | Dùng phương án A/B/C trong mục 1.6 |
 | Fiverr | `WebFetch` bị 403 | Chỉ đọc snippet từ WebSearch |
-| Reddit dạng API JSON | `WebFetch` trên `reddit.com/search.json?...` có thể hoạt động | Thử trước khi fallback sang old Reddit |
 
 - Nếu `WebFetch` bị block (paywall, login required), ghi chú và dùng WebSearch snippet thay thế.
 - **Assume viable**: Khi tìm được method, không tự đánh giá có làm được không, không cảnh báo rủi ro, không gắn nhãn pháp lý. Chỉ tập trung trả lời: *họ làm thế nào?*
