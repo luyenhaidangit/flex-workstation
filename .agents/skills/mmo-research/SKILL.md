@@ -235,14 +235,38 @@ Sau khi phân tích, đề xuất thêm **3–5 niche/keyword liên quan** đán
 
 ## Output Format
 
-Trình bày kết quả theo thứ tự:
+Sau khi hoàn thành tất cả các phase, lưu toàn bộ kết quả vào file:
 
-1. **Tóm tắt nguồn** — đã tìm & đọc bao nhiêu nguồn, từ đâu (Reddit/VN forum/marketplace/web)
-2. **Bản đồ phương pháp** (Phase 3.1)
-3. **Bảng đánh giá** (Phase 3.2) — bao gồm Time to First $
-4. **Reverse Engineering** (Phase 2.5) — phân tích sản phẩm thành công nhất tìm được
-5. **Deep-dive** (Phase 3.3) — bao gồm kiểm thử vốn tối thiểu
-6. **Gợi ý tiếp theo** (Phase 3.4)
+```
+C:\Workspace\Project\flex-workstation\docs\ideas\mmo-YYYY-MM-DD.md
+```
+
+Nếu trong ngày đã có file cùng tên, append thêm vào cuối file (không ghi đè).
+
+Nội dung file theo thứ tự:
+
+```markdown
+# MMO Research — YYYY-MM-DD
+**Keyword/Niche**: <keyword đã nghiên cứu>
+
+## 1. Tóm tắt nguồn
+<đã tìm & đọc bao nhiêu nguồn, từ đâu>
+
+## 2. Bản đồ phương pháp
+<Phase 3.1>
+
+## 3. Bảng đánh giá
+<Phase 3.2 — bao gồm Time to First $>
+
+## 4. Reverse Engineering
+<Phase 2.5 — phân tích sản phẩm thành công nhất>
+
+## 5. Deep-dive
+<Phase 3.3 — bao gồm kiểm thử vốn tối thiểu>
+
+## 6. Gợi ý tiếp theo
+<Phase 3.4>
+```
 
 Viết bằng **tiếng Việt**, dùng tiếng Anh cho tên kỹ thuật/platform. Không bịa số liệu — nếu không tìm được data thực, ghi rõ "chưa có dữ liệu xác nhận".
 
