@@ -63,6 +63,38 @@ Tìm thêm trên:
 
 Ghi lại danh sách nguồn tìm được (URL + tiêu đề + platform).
 
+### 1.3 Diễn đàn Việt Nam
+
+Tìm thêm trên các diễn đàn MMO Việt Nam:
+```
+site:mmo4me.com "<keyword>"
+site:voz.vn "<keyword>" kiếm tiền
+site:mmovn.com "<keyword>"
+```
+
+Ưu tiên:
+- **MMO4ME** (mmo4me.com) — tổng hợp method, giao dịch account/tool
+- **VOZ MMO** (voz.vn/f/make-money-online.93) — kinh nghiệm thực tế cộng đồng
+- **VietAff** (vietaff.com) — affiliate marketing Việt Nam
+- **MMOVN** (mmovn.com) — affiliate, crypto, airdrop
+
+Chú ý các loại thread: bán/mua (tín hiệu cầu), journey (proof), method leaked, hiring.
+
+### 1.4 Marketplace Research
+
+Đọc tín hiệu cung/cầu từ marketplace:
+```
+site:fiverr.com "<keyword>" best selling
+site:gumroad.com "<keyword>"
+"<keyword>" appsumo deal
+"<keyword>" product hunt
+```
+
+- **Fiverr trending gigs**: gig nhiều đơn → dịch vụ đang được mua nhiều
+- **Gumroad/Lemon Squeezy bestsellers**: digital product nào đang bán chạy
+- **AppSumo active deals**: SaaS nào đang tìm khách để validate
+- **Product Hunt**: sản phẩm mới nào đang hot → niche nào đang tăng trưởng
+
 ---
 
 ## Phase 2 — Read: Đọc và trích xuất
@@ -74,12 +106,59 @@ Với mỗi bài, trích xuất:
 | Trường | Nội dung cần tìm |
 |--------|-----------------|
 | **Phương pháp** | Họ đang làm gì cụ thể? |
+| **Chuỗi giá trị** | INPUT → XỬ LÝ → OUTPUT → Người mua cuối kiếm gì từ output đó? |
 | **Nguồn cung** | Lấy sản phẩm/dịch vụ từ đâu? (API, resell, crack, family plan, bulk buy...) |
 | **Kênh bán** | Bán ở đâu? (Telegram, Discord, Shopee, fiverr, tự lập web...) |
 | **Giá & margin** | Giá mua bao nhiêu? Bán bao nhiêu? Margin ước tính? |
 | **Rủi ro** | Ai cũng nêu rủi ro gì? (bị ban, scam, pháp lý...) |
 | **Đầu tư ban đầu** | Cần bao nhiêu vốn/thời gian để bắt đầu? |
 | **Bằng chứng thu nhập** | Có proof không? (screenshot, số liệu, income report?) |
+
+---
+
+## Phase 2.5 — Reverse Engineering: Phân tích ngược sản phẩm thành công
+
+Với **1–2 seller/product nổi bật nhất** tìm được từ Phase 1 & 2, thực hiện phân tích ngược từ bên ngoài để hiểu cơ chế vận hành mà không cần mua hay tham gia.
+
+### Nguồn để Reverse Engineer
+
+| Nguồn | Thông tin khai thác |
+|-------|---------------------|
+| **Landing page / Pricing page** | Pricing model, target audience, USP, tier structure |
+| **BuiltWith / Wappalyzer** | Tech stack → ước tính chi phí infra/dev |
+| **SimilarWeb** | Traffic volume, traffic source (SEO/paid/social) |
+| **Job listings** (Indeed, LinkedIn) | Scale thực sự, công nghệ đang dùng, đội ngũ |
+| **G2 / Trustpilot / AppSumo reviews** | Pain point khách hàng, gap chưa được giải quyết |
+| **Wayback Machine** | Lịch sử pricing, feature, pivot — thấy được cả thất bại |
+| **Affiliate program page** | Commission rate → ước tính margin gốc |
+| **Social media (Twitter/X, TikTok)** | Growth strategy, viral angle, community size |
+
+### Template Reverse Engineering
+
+```
+## [Tên seller/product]
+
+**Quan sát từ bên ngoài:**
+- Pricing: [tier, giá, model]
+- Traffic ước tính: [nguồn, volume]
+- Tech stack: [nếu tìm được]
+- Review pattern: [điểm mạnh/yếu theo khách hàng]
+
+**Tái dựng chuỗi giá trị:**
+INPUT:  [nguyên liệu họ cần, chi phí ước tính]
+PROCESS: [họ làm gì để tạo ra giá trị]
+OUTPUT: [sản phẩm/dịch vụ cuối]
+MARGIN ước tính: [dựa trên giá bán và chi phí đoán được]
+
+**Gap phát hiện được:**
+- [Segment nào chưa được phục vụ?]
+- [Pain point nào khách hàng hay complain?]
+- [Giá có thể thấp hơn / chất lượng có thể cao hơn ở điểm nào?]
+
+**Angle khai thác:**
+- [Cách vào thị trường khác biệt]
+- [Có thể white-label / wrap lại không?]
+```
 
 ---
 
@@ -104,11 +183,13 @@ Ví dụ cluster:
 
 ### 3.2 Bảng đánh giá
 
-| Phương pháp | Vốn ban đầu | Thời gian ROI | Rủi ro | Scalable? | Khả thi 2025? |
-|-------------|-------------|---------------|--------|-----------|---------------|
-| ... | ... | ... | ... | ... | ... |
+| Phương pháp | Vốn ban đầu | Time to First $ | Thời gian ROI | Rủi ro | Scalable? | Kỹ năng cần | Khả thi 2025? |
+|-------------|-------------|-----------------|---------------|--------|-----------|-------------|---------------|
+| ... | ... | ... | ... | ... | ... | ... | ... |
 
 Rating rủi ro: 🟢 Thấp / 🟡 Trung bình / 🔴 Cao
+
+**Time to First $**: Số ngày ước tính từ khi bắt đầu đến khi có doanh thu đầu tiên (dù nhỏ).
 
 ### 3.3 Deep-dive phương pháp nổi bật nhất
 
@@ -139,6 +220,11 @@ Chọn **1–2 phương pháp** khả thi nhất, phân tích chi tiết:
 1. [Bước 1]
 2. [Bước 2]
 3. [Bước 3]
+
+**Kiểm thử với vốn tối thiểu:**
+- Có thể test với $0–$20 không? Nếu có, cách nào?
+- Mất bao lâu để có kết quả đầu tiên (dù nhỏ)?
+- Dấu hiệu nào cho thấy đáng scale tiếp?
 ```
 
 ### 3.4 Gợi ý mở rộng
@@ -151,11 +237,12 @@ Sau khi phân tích, đề xuất thêm **3–5 niche/keyword liên quan** đán
 
 Trình bày kết quả theo thứ tự:
 
-1. **Tóm tắt nguồn** — đã tìm & đọc bao nhiêu nguồn, từ đâu
+1. **Tóm tắt nguồn** — đã tìm & đọc bao nhiêu nguồn, từ đâu (Reddit/VN forum/marketplace/web)
 2. **Bản đồ phương pháp** (Phase 3.1)
-3. **Bảng đánh giá** (Phase 3.2)
-4. **Deep-dive** (Phase 3.3)
-5. **Gợi ý tiếp theo** (Phase 3.4)
+3. **Bảng đánh giá** (Phase 3.2) — bao gồm Time to First $
+4. **Reverse Engineering** (Phase 2.5) — phân tích sản phẩm thành công nhất tìm được
+5. **Deep-dive** (Phase 3.3) — bao gồm kiểm thử vốn tối thiểu
+6. **Gợi ý tiếp theo** (Phase 3.4)
 
 Viết bằng **tiếng Việt**, dùng tiếng Anh cho tên kỹ thuật/platform. Không bịa số liệu — nếu không tìm được data thực, ghi rõ "chưa có dữ liệu xác nhận".
 
