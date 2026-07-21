@@ -30,25 +30,33 @@ Quy trình gồm 3 phase tuần tự: **Discover → Read → Analyze**. Thực 
 
 ### 1.1 Reddit Search
 
-Với mỗi từ khóa dưới đây, dùng `WebSearch` để tìm kiếm trên Reddit. Luôn thêm bộ lọc thời gian vào query:
+**Lưu ý quan trọng**: `WebSearch` **không hỗ trợ toán tử `site:`** — query `site:reddit.com ...` trả về 0 kết quả. Dùng `WebFetch` trực tiếp trên old Reddit thay thế.
+
+**Bước 1 — Tìm bài qua search Reddit:**
+
+Dùng `WebFetch` với các URL sau (thay `<keyword>` bằng từ khóa thực, encode space thành `+`):
 
 ```
-site:reddit.com "<keyword>" after:2025-06-01
-site:reddit.com "<keyword>" "still working" OR "just started" after:2025-01-01
-site:reddit.com "<keyword>" selling resell arbitrage after:2025-01-01
+https://old.reddit.com/search?q=<keyword>&sort=new&t=month
+https://old.reddit.com/search?q=<keyword>+make+money&sort=new&t=year
+https://www.reddit.com/search.json?q=<keyword>&sort=new&t=year&limit=10
 ```
 
-Ưu tiên các subreddit MMO phổ biến:
-- r/beermoney — micro-tasks, passive income
-- r/entrepreneur — business models
-- r/Flipping — mua rẻ bán đắt
-- r/slavelabour — freelance giá thấp
-- r/WorkOnline — remote work & side hustles
-- r/ChatGPT, r/AItools — nếu keyword liên quan AI
-- r/digitalmarketing — bán dịch vụ digital
-- r/dropship, r/ecommerce — nếu liên quan thương mại
+**Bước 2 — Fetch thẳng subreddit mới nhất:**
 
-Khi fetch URL Reddit, ưu tiên dùng `?sort=new` thay vì `?sort=top` để lấy thread mới nhất trong subreddit. Ví dụ: `reddit.com/r/beermoney/new/`
+Dùng `WebFetch` trên trang `/new` của các subreddit phù hợp:
+
+```
+https://old.reddit.com/r/beermoney/new/
+https://old.reddit.com/r/WorkOnline/new/
+https://old.reddit.com/r/entrepreneur/new/
+https://old.reddit.com/r/ChatGPT/new/       ← nếu keyword liên quan AI
+https://old.reddit.com/r/digitalmarketing/new/
+```
+
+**Bước 3 — Đọc thread cụ thể:**
+
+Khi tìm được thread có vẻ liên quan, dùng `WebFetch` trên URL thread đó để đọc nội dung đầy đủ. Dùng định dạng `old.reddit.com` thay vì `reddit.com` — old Reddit render HTML tĩnh, dễ đọc hơn.
 
 Lấy **5–10 link bài viết**, ưu tiên theo thứ tự: **(1) mới nhất** trong 30 ngày → **(2) mới nhất** trong 90 ngày → **(3) upvote cao nhất** nếu không có gì mới. Ghi rõ ngày đăng của từng bài.
 
@@ -56,19 +64,31 @@ Lấy **5–10 link bài viết**, ưu tiên theo thứ tự: **(1) mới nhất
 
 YouTube là kênh ưu tiên cao — người chia sẻ method trên YouTube thường hướng dẫn từng bước, dễ hiểu cơ chế hơn bài viết forum.
 
-Tìm kiếm bằng `WebSearch` với query hướng vào YouTube và lọc mới nhất:
+**Lưu ý quan trọng**: `WebFetch` trên trang video YouTube **không lấy được transcript** (trang render bằng JavaScript, chỉ trả về shell/footer rỗng). Dùng quy trình sau thay thế:
+
+**Bước 1 — Tìm video qua WebSearch:**
+
 ```
-site:youtube.com "<keyword>" how to 2025
-site:youtube.com "<keyword>" free method tutorial
-site:youtube.com "<keyword>" step by step after:2025-01-01
+"<keyword>" how to youtube 2025
+"<keyword>" tutorial youtube step by step
+"<keyword>" free method youtube hướng dẫn
 ```
 
-Khi đọc kết quả tìm kiếm, ưu tiên theo thứ tự:
-1. **Mới nhất** — upload trong 1–3 tháng gần đây (xem ngày trong snippet)
-2. **Title có từ khóa hành động**: "how to", "free", "tutorial", "step by step", "method", "hướng dẫn"
-3. **View cao nhưng mới** — nhiều view + mới = method đang được nhiều người tìm
+Đọc **snippet** trong kết quả tìm kiếm — thường chứa tiêu đề, mô tả ngắn, và ngày upload. Chọn video mới nhất.
 
-Với mỗi video tìm được, dùng `WebFetch` để đọc trang video (description thường chứa link nguồn, tool cần dùng, bước tóm tắt). Nếu có transcript tự động, đọc để lấy các bước cụ thể.
+**Bước 2 — Fetch trang kết quả tìm kiếm YouTube (sort by date):**
+
+Dùng `WebFetch` trên URL search YouTube với param sắp xếp theo ngày mới nhất:
+
+```
+https://www.youtube.com/results?search_query=<keyword>+2025&sp=CAI%3D
+```
+
+(`sp=CAI%3D` = sort by upload date, mới nhất trước)
+
+**Bước 3 — Đọc mô tả video:**
+
+Với video nổi bật, dùng `WebFetch` trên trang video để đọc meta description (thường chứa link tool, bước tóm tắt, nguồn). Transcript sẽ không có — bù lại bằng cách tìm blog/post review video đó qua WebSearch: `"<tên video>" transcript OR summary OR review`.
 
 Ghi lại: **URL + tiêu đề + ngày upload + số view (nếu thấy)**.
 
@@ -122,37 +142,53 @@ site:gumroad.com "<keyword>"
 "<keyword>" product hunt
 ```
 
-- **Fiverr trending gigs**: gig nhiều đơn → dịch vụ đang được mua nhiều
-- **Gumroad/Lemon Squeezy bestsellers**: digital product nào đang bán chạy
-- **AppSumo active deals**: SaaS nào đang tìm khách để validate
+- **Fiverr trending gigs**: Fiverr **chặn direct WebFetch (403)**. Chỉ dùng `WebSearch` với query `fiverr "<keyword>"` và đọc từ **snippet** (tiêu đề gig, giá, số review hiển thị trong kết quả Google). Không fetch trực tiếp trang fiverr.com.
+- **Gumroad/Lemon Squeezy bestsellers**: dùng `WebFetch` trên trang tìm kiếm Gumroad hoặc WebSearch snippet
+- **AppSumo active deals**: dùng `WebFetch` trên `appsumo.com/search?query=<keyword>` hoặc WebSearch snippet
 - **Product Hunt**: sản phẩm mới nào đang hot → niche nào đang tăng trưởng
 
 ### 1.6 Ad Intelligence — Đọc quảng cáo đang chạy
 
 **Logic**: Ai đang bỏ tiền chạy paid ads cho một method/product thì chắc chắn đang có lợi nhuận đủ để cover chi phí ads. Đây là tín hiệu xác nhận mạnh nhất rằng cái đó đang work.
 
-Tìm kiếm trên Facebook Ads Library (miễn phí, không cần đăng nhập):
+**Lưu ý quan trọng**: Facebook Ads Library **không accessible qua WebSearch hay WebFetch** (cần JavaScript + login). Dùng các phương án thay thế sau:
+
+**Phương án A — Tìm landing page của advertiser qua Google:**
+
 ```
-site:facebook.com/ads/library "<keyword>"
-"<keyword>" facebook ads library active
+"<keyword>" "buy now" OR "get started" OR "sign up" -reddit -youtube 2025
+"<keyword>" checkout OR "add to cart" OR gumroad OR stripe 2025
 ```
 
-Hoặc truy cập trực tiếp:
+Các trang này thường là landing page của người đang chạy ads — nếu họ có trang bán hàng được index, họ có ads.
+
+**Phương án B — Tìm ad creative được share lại:**
+
 ```
-https://www.facebook.com/ads/library/?active_status=active&ad_type=all&q=<keyword>
+"<keyword>" "facebook ad" OR "fb ad" creative 2025
+"<keyword>" "tiktok ad" winning creative 2025
+"<keyword>" ad spy screenshot twitter OR reddit
 ```
 
-Tìm thêm trên TikTok Creative Center:
+Người làm affiliate thường screenshot winning ads và post lên Twitter/forum để thảo luận.
+
+**Phương án C — TikTok Creative Center (accessible):**
+
+Dùng `WebFetch` trực tiếp:
 ```
-site:ads.tiktok.com "<keyword>" top ads
-"<keyword>" tiktok ads creative center 2025
+https://ads.tiktok.com/business/creativecenter/inspiration/topads/pc/en
 ```
 
-Với mỗi ad tìm được, trích xuất:
+Hoặc WebSearch:
+```
+tiktok creative center "<keyword>" top ads 2025
+```
+
+Với mỗi ad/landing page tìm được, trích xuất:
 - **Landing page** — họ đang drive traffic về đâu? (Shopify, Gumroad, Telegram, trang riêng?)
 - **Offer** — họ đang bán gì, ở mức giá nào?
 - **Copy angle** — hook họ dùng là gì? (pain point nào, promise gì?)
-- **Thời gian chạy** — ad chạy bao lâu rồi? Chạy lâu = profitable
+- **Nguồn tìm thấy** — ad creative thật hay suy luận từ landing page?
 
 ### 1.7 Affiliate Network Scanning — Quét mạng lưới affiliate
 
@@ -401,6 +437,16 @@ Viết bằng **tiếng Việt**, dùng tiếng Anh cho tên kỹ thuật/platfo
 ---
 
 ## Lưu ý khi thực thi
+
+**Giới hạn đã biết của tool — không retry những cách đã fail:**
+
+| Source | Vấn đề | Giải pháp đúng |
+|--------|---------|----------------|
+| Reddit | `WebSearch` với `site:reddit.com` trả về 0 kết quả | Dùng `WebFetch` trên `old.reddit.com/search?q=...` |
+| YouTube transcript | `WebFetch` trang video chỉ trả về JavaScript shell | Đọc description qua meta, tìm review/summary qua WebSearch |
+| Facebook Ads Library | Không render được — cần JS + login | Dùng phương án A/B/C trong mục 1.6 |
+| Fiverr | `WebFetch` bị 403 | Chỉ đọc snippet từ WebSearch |
+| Reddit dạng API JSON | `WebFetch` trên `reddit.com/search.json?...` có thể hoạt động | Thử trước khi fallback sang old Reddit |
 
 - Nếu `WebFetch` bị block (paywall, login required), ghi chú và dùng WebSearch snippet thay thế.
 - **Assume viable**: Khi tìm được method, không tự đánh giá có làm được không, không cảnh báo rủi ro, không gắn nhãn pháp lý. Chỉ tập trung trả lời: *họ làm thế nào?*
