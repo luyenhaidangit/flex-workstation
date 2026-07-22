@@ -113,9 +113,9 @@ Nhà đầu tư đã chọn xem mã chứng khoán (ví dụ `VND`), khi F5 / l�
   **Liên quan**: US-001, AC-001
 - **FR-003** `[P1]`: Hệ thống PHẢI đính kèm đúng mã chứng khoán đang được chọn khi người dùng đặt lệnh mới.  
   **Liên quan**: US-001, AC-002
-- **FR-004** `[P1]`: Hệ thống PHẢI tự động ghi nhớ mã chứng khoán được người dùng chọn gần nhất vào bộ nhớ cục bộ trên thiết bị/trình duyệt của người dùng.  
+- **FR-004** `[P1]`: Hệ thống PHẢI tự động đọc và ưu tiên áp dụng mã chứng khoán từ đường dẫn URL query parameter (ví dụ: `?symbol=HNX`), nếu không có trên URL thì mới khôi phục mã chứng khoán từ bộ nhớ cục bộ (`localStorage`) của trình duyệt.  
   **Liên quan**: US-002, AC-003
-- **FR-005** `[P1]`: Hệ thống PHẢI tự động đọc và khôi phục mã chứng khoán đã lưu khi khởi tạo giao diện Market Board.  
+- **FR-005** `[P1]`: Hệ thống PHẢI tự động đồng bộ mã chứng khoán mới vào cả URL query parameter và bộ nhớ cục bộ `localStorage` bất cứ khi nào người dùng chuyển đổi mã chứng khoán trên giao diện.  
   **Liên quan**: US-002, AC-003, AC-004
 - **FR-006** `[P2]`: Hệ thống PHẢI có cơ chế xử lý dự phòng quay về mã mặc định nếu mã đã lưu không hợp lệ hoặc không tìm thấy.  
   **Liên quan**: US-002, AC-004
@@ -125,7 +125,7 @@ Nhà đầu tư đã chọn xem mã chứng khoán (ví dụ `VND`), khi F5 / l�
 ## 8. Quy tắc nghiệp vụ
 
 - **BR-001**: Lệnh đặt phải gắn đúng mã chứng khoán đang chọn và thuộc về một mã chứng khoán đang ở trạng thái hoạt động (`ACTIVE`).
-- **BR-002**: Việc lưu trữ lựa chọn mã chứng khoán của người dùng mang tính cá nhân hóa trên từng trình duyệt/thiết bị.
+- **BR-002**: Thứ tự ưu tiên xác định mã chứng khoán khi khởi tạo giao diện: (1) URL Query Parameter -> (2) `localStorage` trình duyệt -> (3) Mã mặc định hợp lệ đầu tiên trong danh sách.
 - **BR-003**: Khi đổi mã chứng khoán, toàn bộ dữ liệu Sổ lệnh và Lịch sử giao dịch hiển thị trên giao diện phải làm sạch và nạp lại theo mã mới.
 
 ---
@@ -213,6 +213,10 @@ Nhà đầu tư đã chọn xem mã chứng khoán (ví dụ `VND`), khi F5 / l�
 ---
 
 ## Clarifications
+
+### Session 2026-07-21
+
+- Q: Phương thức lưu trữ trạng thái lựa chọn mã chứng khoán? → A: Option C (Kết hợp cả URL Parameter và localStorage: Ưu tiên đọc mã từ URL query parameter trước, nếu không có mới đọc từ localStorage).
 
 ---
 
