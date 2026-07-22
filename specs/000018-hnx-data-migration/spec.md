@@ -120,13 +120,15 @@ Reviewer cần xem kết quả đối chiếu, nhóm nào đã chuyển, nhóm n
 - **FR-007** `[P1]`: Hệ thống PHẢI khôi phục open order book từ DB sau khi BE restart.
 - **FR-008** `[P1]`: Hệ thống KHÔNG ĐƯỢC tạo duplicate trade hoặc remaining quantity âm khi retry/concurrent requests.
 - **FR-009** `[P1]`: Hệ thống PHẢI giữ nguyên public FE/BE contract hiện tại.
+- **FR-010** `[P1]`: Hệ thống KHÔNG ĐƯỢC nhận order mới cho một session không ở trạng thái `open`.
 
 ## 8. Quy tắc nghiệp vụ
 
-- **BR-001**: Order và trade phải thuộc cùng instrument/session hợp lệ.
+- **BR-001**: Order và trade phải thuộc cùng instrument/session hợp lệ; "hợp lệ" nghĩa là session đang ở trạng thái `open` tại thời điểm nhận order. Liên quan: FR-010.
 - **BR-002**: `remaining_quantity = quantity - filled_quantity` và luôn nằm trong khoảng hợp lệ.
 - **BR-003**: Giá khớp là giá của order đang chờ trong order book.
 - **BR-004**: Mỗi matching operation phải atomic và không được tạo duplicate trade.
+- **BR-005**: Session là phạm vi phân vùng order book và đánh số trade: order book chỉ dựng trong một session, `trade_sequence` là duy nhất trong session đó.
 
 **Luồng trạng thái order**:
 
@@ -139,7 +141,7 @@ Reviewer cần xem kết quả đối chiếu, nhóm nào đã chuyển, nhóm n
 ## 9. Thực thể dữ liệu
 
 - **HNX instrument**: Instrument được phép giao dịch.
-- **HNX session**: Phiên `CONTINUOUS` của HNX.
+- **HNX session**: Phiên `CONTINUOUS` của HNX. Vừa là cổng nhận lệnh (chỉ session `open` mới nhận order mới, BR-001/FR-010) vừa là phạm vi phân vùng order book và `trade_sequence` (BR-005).
 - **HNX order**: Lệnh limit BUY/SELL và trạng thái hiện tại.
 - **HNX trade**: Kết quả khớp bất biến.
 - **Order book**: Dữ liệu dẫn xuất từ các order còn `remaining_quantity > 0`, không có bảng riêng.

@@ -14,6 +14,8 @@
 
 ### `exchange_sessions`
 
+Cổng nhận lệnh (chỉ session `open` mới nhận order mới) và phạm vi phân vùng order book + `trade_sequence`.
+
 | Thuộc tính | Ý nghĩa | Ràng buộc |
 |---|---|---|
 | `session_id` | Identity phiên | Primary key |
