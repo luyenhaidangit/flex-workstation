@@ -34,6 +34,7 @@
 - Khi thay đổi hành vi Speckit/template/runtime, cập nhật tài liệu tương ứng trong `docs/speckit/`.
 - Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
 - Với API service, `postman/` là nơi duy trì collection và luồng gọi API; chỉ cập nhật Swashbuckle/OpenAPI source khi phạm vi yêu cầu là Swagger UI hoặc OpenAPI document.
+- Khi sửa nội dung skill (SKILL.md, template, script...): luôn tìm bản có git trước — `.agents/skills/<skill-name>/` (skill dùng chung của workstation) hoặc `<repo-con>/skills/<skill-name>/` nếu skill đó thuộc về một repo con cụ thể (vd. `dotnet-conventions` thuộc `flex-agents/skills/dotnet-conventions/`). KHÔNG sửa trực tiếp bản cài local tại `~/.claude/skills/` hay `~/.codex/skills/` — các thư mục này không được git track, thay đổi sẽ không review/commit được và biến mất khi resync. Nếu không chắc skill đó có nguồn ở repo nào, dùng Glob/Grep tìm trong toàn bộ `flex-workstation/` trước khi kết luận chỉ có bản local.
 
 ## Skills
 
@@ -77,11 +78,13 @@ flex-workstation/
 | --- | --- |
 | Tài liệu workstation | `docs/` |
 | Skill dùng chung | `.agents/skills/<skill-name>/SKILL.md` (`.claude/skills` là junction) |
+| Skill thuộc repo con (vd. `dotnet-conventions`) | `<repo-con>/skills/<skill-name>/` (vd. `flex-agents/skills/dotnet-conventions/`) — không sửa `~/.claude/skills/` hay `~/.codex/skills/` |
 | Runtime config | `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/` |
 
 ## Tài liệu
 
 - Index đầy đủ: `README.md`
+- Bài học/quyết định tích lũy qua các phiên (chia sẻ cả team, khác `MEMORY.md` cá nhân của từng agent): `MEMORY.md`
 - Onboarding/bootstrap: `docs/setup/onboarding.md`
 - Bản đồ hệ thống & kiến trúc: `docs/architecture/system-map.md`
 - Workflow Speckit: `docs/speckit/workflow.md`
