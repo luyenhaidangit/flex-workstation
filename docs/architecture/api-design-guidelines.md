@@ -28,12 +28,28 @@ if (string.IsNullOrWhiteSpace(market))
 
 ---
 
-## 3. Định tuyến chuẩn cho `201 CreatedAtAction`
+## 3. Khả năng đọc hiểu và Debug (Explicit Variables & Early Return)
 
-- Khi tạo mới tài nguyên và trả về `201 CreatedAtAction(...)`, bắt buộc truyền route values object khớp với tham số của Action đích (ví dụ `new { market }`) để Header `Location` sinh đúng URL query string:
+- **Tránh lạm dụng toán tử 3 ngôi (`?:`) để trả về HTTP Result**: Toán tử 3 ngôi khiến code khó đặt breakpoint khi debug và khó theo dõi dòng chảy (control flow).
+- **Khuyên dùng Guard Clause & biến tường minh**: Tách biệt luồng thất bại (`if (!success) return ...`) trước, sau đó lưu kết quả thành công vào biến riêng trước khi trả về.
 
 ```csharp
-return service.TryStart(market, out var session)
-    ? CreatedAtAction(nameof(Get), new { market }, Result.Success(session))
-    : Conflict(Result.Failure(session, errorCode: ResponseCode.Conflict));
+var success = service.TryStart(market, out var session);
+if (!success)
+{
+    var failureResult = Result.Failure(session, message: $"Phiên giao dịch cho thị trường '{market}' đang hoạt động hoặc không thể khởi động.", errorCode: ResponseCode.Conflict);
+    return Conflict(failureResult);
+}
+
+var successResult = Result.Success(session);
+return Ok(successResult);
 ```
+
+---
+
+## 4. Phản hồi thành công nhất quán (`Ok(successResult)`)
+
+- **Ưu tiên trả về `Ok(successResult)` cho các API POST/Action**: Tránh lạm dụng các helper method sinh Header không cần thiết như `CreatedAtAction(...)` (trừ khi có yêu cầu kiến trúc đặc thù).
+- **Tối ưu cho Frontend**: Trả về `200 OK` chứa đối tượng envelope `Result.Success(...)` giúp Client dễ dàng đọc trực tiếp `data` trong JSON body, giữ cho mã nguồn Controller đơn giản, nhất quán 100% với toàn bộ các API POST khác trong hệ thống.
+
+
