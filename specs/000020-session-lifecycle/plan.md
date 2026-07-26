@@ -8,7 +8,7 @@
 
 ## Tóm tắt
 
-**Yêu cầu chính từ spec**: Mở rộng máy trạng thái phiên từ 3 phase (`Open`/`Continuous`/`Close`) sang 7 phase (`PreOpen`, `ATO`, `Continuous`, `Intermission`, `ATC`, `PLO`, `Close`) cho 4 market (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`); chặn hủy lệnh trong `ATO`/`ATC` (MVP-002/FR-002); kiểm soát loại lệnh `LO`/`ATO`/`ATC` theo phase (MVP-004/FR-003); cấu hình lịch phiên riêng theo market (MVP-003/FR-004); đảm bảo ghi CSDL trước khi transition (BR-007).
+**Yêu cầu chính từ spec**: Mở rộng máy trạng thái phiên từ 3 phase (`Open`/`Continuous`/`Close`) sang 7 phase (`PreOpen`, `ATO`, `Continuous`, `Intermission`, `ATC`, `PLO`, `Close`) cho 4 market (`HOSE`, `HNX`, `UPCOM`, `DERIVATIVES`); chặn hủy lệnh trong `ATO`/`ATC` (MVP-002/FR-002); kiểm soát loại lệnh `LO`/`ATO`/`ATC` theo phase (MVP-004/FR-003); cấu hình lịch phiên riêng theo market (MVP-003/FR-004); đảm bảo ghi CSDL trước khi transition (BR-007).
 
 **Hướng tiếp cận kỹ thuật dự kiến**: Mở rộng enum/state hiện có trong `Flex.Exchange.Domain`/`Flex.Exchange.Application` của `flex-exchange-service`, tái dùng pattern van chặn (`IsAcceptingOrders`) và cấu trúc worker (`SessionWorker`) đã có, không cần migration DB (cột đã đủ rộng).
 

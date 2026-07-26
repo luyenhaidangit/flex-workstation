@@ -82,12 +82,12 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 
 **Liên quan yêu cầu**: FR-001, FR-004
 
-**Test độc lập**: Kiểm tra luồng chuyển phiên của Worker cho từng sàn `HOSE`, `HNX`, `UPCoM`, `Phái sinh`.
+**Test độc lập**: Kiểm tra luồng chuyển phiên của Worker cho từng sàn `HOSE`, `HNX`, `UPCOM`, `Phái sinh`.
 
 **Acceptance Criteria**:
 
-1. **AC-003**: **Cho trước** thị trường Phái sinh (`HNX-Derivatives`), **Khi** đến 08:45, **Thì** phiên giao dịch chuyển sang `ATO`.
-2. **AC-004**: **Cho trước** thị trường `UPCoM`, **Khi** đến 09:00, **Thì** phiên giao dịch chuyển thẳng sang `Continuous` (không qua `ATO`).
+1. **AC-003**: **Cho trước** thị trường Phái sinh (`DERIVATIVES`), **Khi** đến 08:45, **Thì** phiên giao dịch chuyển sang `ATO`.
+2. **AC-004**: **Cho trước** thị trường `UPCOM`, **Khi** đến 09:00, **Thì** phiên giao dịch chuyển thẳng sang `Continuous` (không qua `ATO`).
 
 ---
 
@@ -110,7 +110,7 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
   **Liên quan**: US-001, AC-001
 - **FR-003** `[P1]`: Hệ thống PHẢI cho phép đặt lệnh `LO` và lệnh định kỳ tương ứng (`ATO`/`ATC`) trong phiên `ATO`/`ATC`, và PHẢI từ chối đặt lệnh `ATO`/`ATC` ngoài phiên định kỳ của chúng.  
   **Liên quan**: US-001, AC-001, MVP-004
-- **FR-004** `[P1]`: Hệ thống PHẢI áp dụng đúng sơ đồ thời gian phiên riêng biệt cho từng thị trường (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`).  
+- **FR-004** `[P1]`: Hệ thống PHẢI áp dụng đúng sơ đồ thời gian phiên riêng biệt cho từng thị trường (`HOSE`, `HNX`, `UPCOM`, `DERIVATIVES`).  
   **Liên quan**: US-002, AC-003, AC-004
 - **FR-005** `[P2]`: Dịch vụ `ISessionService` PHẢI cung cấp phương thức `IsAllowingCancel(market)` để kiểm tra quyền hủy lệnh.  
   **Liên quan**: US-001, AC-001, AC-002
@@ -167,7 +167,7 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 ## 12. Tiêu chí thành công *(bắt buộc)*
 
 - **SC-001**: 100% các yêu cầu hủy lệnh trong phiên ATO và ATC bị hệ thống từ chối thành công.
-- **SC-002**: Tất cả 4 thị trường (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`) hoạt động đúng sơ đồ chuyển phiên tương ứng.
+- **SC-002**: Tất cả 4 thị trường (`HOSE`, `HNX`, `UPCOM`, `DERIVATIVES`) hoạt động đúng sơ đồ chuyển phiên tương ứng.
 - **SC-003**: 100% lệnh sai loại (ví dụ lệnh `LO` thường trong phiên định kỳ, hoặc lệnh `ATO`/`ATC` ngoài phiên định kỳ) bị hệ thống từ chối thành công.
 
 ---

@@ -33,7 +33,7 @@ Với market không có `ATC`/`PLO` (UPCoM — BR-002): `Continuous`(chiều) ch
 | Field | Type | Ghi chú |
 |---|---|---|
 | `SessionId` | `Guid` | Không đổi |
-| `Market` | `string` | Không đổi (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`) |
+| `Market` | `string` | Không đổi (`HOSE`, `HNX`, `UPCOM`, `DERIVATIVES`) |
 | `SessionDate` | `DateOnly` | Không đổi |
 | `Phase` | `TradingSessionPhase` | Mở rộng 7 giá trị |
 | `StartedAt` | `DateTimeOffset` | Không đổi |
@@ -87,8 +87,8 @@ Từ cấu hình phẳng hiện có (`OpenDurationSeconds`, `ContinuousDurationS
   "Markets": {
     "HOSE":            { "HasAto": true,  "HasPlo": false, "PreOpenSeconds": 5, "AtoSeconds": 15, "ContinuousMorningSeconds": 30, "IntermissionSeconds": 10, "ContinuousAfternoonSeconds": 30, "AtcSeconds": 15 },
     "HNX":              { "HasAto": false, "HasPlo": true,  "PreOpenSeconds": 5, "ContinuousMorningSeconds": 30, "IntermissionSeconds": 10, "ContinuousAfternoonSeconds": 30, "AtcSeconds": 15, "PloSeconds": 15 },
-    "UPCoM":            { "HasAto": false, "HasPlo": false, "PreOpenSeconds": 5, "ContinuousMorningSeconds": 30, "IntermissionSeconds": 10, "ContinuousAfternoonSeconds": 30 },
-    "HNX-Derivatives":  { "HasAto": true,  "HasPlo": false, "PreOpenSeconds": 5, "AtoSeconds": 15, "ContinuousMorningSeconds": 30, "IntermissionSeconds": 10, "ContinuousAfternoonSeconds": 30, "AtcSeconds": 15 }
+    "UPCOM":            { "HasAto": false, "HasPlo": false, "PreOpenSeconds": 5, "ContinuousMorningSeconds": 30, "IntermissionSeconds": 10, "ContinuousAfternoonSeconds": 30 },
+    "DERIVATIVES":      { "HasAto": true,  "HasPlo": false, "PreOpenSeconds": 5, "AtoSeconds": 15, "ContinuousMorningSeconds": 30, "IntermissionSeconds": 10, "ContinuousAfternoonSeconds": 30, "AtcSeconds": 15 }
   }
 }
 ```

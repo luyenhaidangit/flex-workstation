@@ -15,15 +15,15 @@ Dùng `src/Flex.Exchange.Api/Flex.Exchange.http` hoặc `curl` cho các bước 
 
 ## Kịch bản 1 — US-002: Chuyển phiên đúng lịch trình từng sàn (AC-003, AC-004)
 
-1. Khởi động phiên cho `HNX-Derivatives` (có ATO): `POST /api/session/start?market=HNX-Derivatives`
-2. Gọi `GET /api/session?market=HNX-Derivatives` ngay sau đó — kỳ vọng `state = "preopen"`.
+1. Khởi động phiên cho `DERIVATIVES` (có ATO): `POST /api/session/start?market=DERIVATIVES`
+2. Gọi `GET /api/session?market=DERIVATIVES` ngay sau đó — kỳ vọng `state = "preopen"`.
 3. Chờ hết `PreOpenSeconds` — gọi lại `GET` — kỳ vọng `state = "ato"` (AC-003).
-4. Khởi động phiên cho `UPCoM` (không ATO): `POST /api/session/start?market=UPCoM`
+4. Khởi động phiên cho `UPCOM` (không ATO): `POST /api/session/start?market=UPCOM`
 5. Chờ hết `PreOpenSeconds` — gọi `GET` — kỳ vọng `state = "continuous"` ngay, **không** qua `ato` (AC-004).
 
 ## Kịch bản 2 — US-001: Chặn hủy lệnh và sai loại lệnh trong ATO/ATC (AC-001, AC-002, AC-005)
 
-1. Với phiên `HNX-Derivatives` đang ở `ato` (từ kịch bản 1):
+1. Với phiên `DERIVATIVES` đang ở `ato` (từ kịch bản 1):
    - `POST /api/orders` với `orderType: "LO"` — kỳ vọng `accepted = true` (BR-001 cho phép `LO` trong ATO).
    - `POST /api/orders` với `orderType: "ATC"` — kỳ vọng bị từ chối, `reason = "OrderTypeNotAllowedInCurrentSession"` (AC-005).
    - `DELETE /api/orders/{orderId}` với `orderId` của lệnh `LO` vừa đặt — kỳ vọng bị từ chối, `reason = "CancelNotAllowedInCurrentSession"` (AC-001).
