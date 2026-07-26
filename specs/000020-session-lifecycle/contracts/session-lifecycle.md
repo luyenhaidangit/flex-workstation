@@ -10,7 +10,7 @@ Không đổi shape, chỉ đổi tập giá trị hợp lệ của `state`.
 
 **Response `state`**: một trong `preopen`, `ato`, `continuous`, `intermission`, `atc`, `plo`, `close` (trước đây chỉ `open`, `continuous`, `close`).
 
-**Breaking change**: Có, đối với consumer đang hardcode 3 giá trị cũ (`open`/`continuous`/`close`). `flex-microfrontend` (bảng điện) là consumer chính — cần review khi hiển thị trạng thái phiên, nhưng **nằm ngoài phạm vi kỹ thuật của phase này** (xem plan.md § Phạm vi kỹ thuật).
+**Breaking change**: Có, đối với consumer đang hardcode 3 giá trị cũ (`open`/`continuous`/`close`). `flex-microfrontend` (`market-board.component.ts`) là consumer duy nhất trong workspace hiện hardcode `state === 'open' || 'continuous'` để gate đặt/hủy lệnh — đây là phần **trong phạm vi kỹ thuật của phase này** (xem plan.md § Phạm vi kỹ thuật), chỉ sửa gate, không mở rộng UI hiển thị đầy đủ nhãn/màu cho 7 trạng thái (vẫn ngoài phạm vi).
 
 ---
 
@@ -52,7 +52,7 @@ Không đổi shape, chỉ đổi tập giá trị hợp lệ của `state`.
 
 **Payload** (`TradingSessionView`): không đổi field, chỉ đổi tập giá trị `state` giống mục 1 (7 giá trị thay vì 3).
 
-**Breaking change**: Có, đối với consumer WebSocket đang hardcode 3 giá trị cũ — cùng lưu ý như mục 1.
+**Breaking change**: Có, đối với consumer WebSocket đang hardcode 3 giá trị cũ — cùng lưu ý như mục 1 (`market-board.component.ts` nhận `state` qua cả REST polling lẫn `applyRealtimeEvent`, cả 2 đường đều dùng chung 3 getter đã sửa).
 
 ---
 
@@ -60,7 +60,7 @@ Không đổi shape, chỉ đổi tập giá trị hợp lệ của `state`.
 
 | Contract | Breaking? | Consumer bị ảnh hưởng | Cách xử lý |
 |---|---|---|---|
-| `state`/`SESSION_STATE_CHANGED.state` (3→7 giá trị) | Có | `flex-microfrontend` (bảng điện), mọi client WebSocket đang switch theo 3 giá trị cũ | Ngoài phạm vi phase này — flag riêng cho `flex-microfrontend` khi UI cần hiển thị 7 trạng thái |
+| `state`/`SESSION_STATE_CHANGED.state` (3→7 giá trị) | Có | `flex-microfrontend` (`market-board.component.ts`), mọi client WebSocket đang switch theo 3 giá trị cũ | **Trong phạm vi phase này** — sửa 3 getter gate (`canStartSession`/`canPlaceOrder`/`canCancelOrder`) trong `market-board.component.ts`; hiển thị nhãn/UI đầy đủ cho 7 trạng thái vẫn ngoài phạm vi |
 | `PlaceOrderRequest.orderType` (field mới, optional) | Không | — | Mặc định `LO` giữ nguyên hành vi cũ |
 | `CancelOrderResponse.reason` (thêm giá trị) | Không | — | Giá trị enum mới, consumer switch theo `reason` không vỡ nếu có default case |
 | `PlaceOrderResponse.reason` (thêm giá trị) | Không | — | Tương tự |

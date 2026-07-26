@@ -21,9 +21,12 @@
 - `flex-exchange-service/src/Flex.Exchange.Application`: `SessionService` (van chặn cancel + order type, ghi CSDL trước transition), `TradingSessionOptions` (cấu hình per-market), `ISessionService` (thêm method), `ExchangeService` (gọi van chặn cancel, resolve market cho cancel, truyền `OrderType`).
 - `flex-exchange-service/src/Flex.Exchange.Api`: `SessionWorker` (chạy lifecycle 7-phase per-market), `OrdersController`/`PlaceOrderRequest` (field `orderType` mới), `appsettings.json` (cấu hình `TradingSession:Markets`).
 - `flex-exchange-service/tests`: unit test cho `TradingSessionState`, `SessionService`; test cho `OrdersController`/`SessionController`.
+- `flex-microfrontend/src/app/exchange`: `market-board.component.ts` (tách `isTradingActive` hiện tại thành 2 gate riêng — đặt lệnh vs hủy lệnh — theo `state` mới, sửa gate "hiện nút khởi động phiên"), `exchange.models.ts` (`SessionView.state` vẫn là `string` nhưng nhận 7 giá trị mới, không cần đổi type).
+
+  *Lý do đưa vào scope*: `market-board.component.ts:215-216` hiện hardcode `state === 'open' || state === 'continuous'` để bật form đặt lệnh/nút hủy. Sau khi backend không còn trả `'open'` (thay bằng `preopen`/`ato`/.../`close`), điều kiện này sẽ luôn `false` ngoài `continuous` — khóa hẳn khả năng đặt lệnh hợp lệ trong `ato`/`atc` dù backend cho phép (FR-003/BR-001), khiến tính năng chính của feature này không demo được qua UI. Đây là phần code FE phụ thuộc trực tiếp vào contract đang đổi, không phải mở rộng UI mới.
 
 **Ngoài phạm vi kỹ thuật** (khớp mục 13 spec.md):
-- `flex-microfrontend` (bảng điện) — không đổi UI hiển thị 7 trạng thái trong phase này (breaking change được ghi nhận, xử lý ở phase riêng).
+- `flex-microfrontend`: UI hiển thị đầy đủ nhãn tiếng Việt cho 7 trạng thái, bộ chọn `orderType` (`LO`/`ATO`/`ATC`) trên form đặt lệnh, hỗ trợ chọn nhiều market — **không** trong phạm vi phase này. FE chỉ sửa tối thiểu để không bị khóa sai chức năng (xem trên); mặc định `orderType` gửi lên vẫn là `LO` (được BR-001 cho phép trong cả `ATO`/`ATC`), nên không cần UI chọn loại lệnh để hoạt động đúng.
 - DB migration cho `flex-database` — không cần, `exchange_sessions.status` và `exchange_orders.order_type` đã là `VARCHAR` không ràng buộc `CHECK`.
 - Thuật toán đấu giá định kỳ (uniform-price call auction), cơ chế khớp PLO thực sự, loại lệnh `MP`/`MTL`/`MOK`/`MAK`, chặn sửa lệnh (amend) — như đã nêu ở spec.md mục 13.
 
@@ -31,7 +34,7 @@
 
 **Ngôn ngữ/Phiên bản**: .NET 9 / C# (Nullable, ImplicitUsings enable)
 
-**Service/App liên quan**: `flex-exchange-service` — `Flex.Exchange.Domain`, `Flex.Exchange.Application`, `Flex.Exchange.Infrastructure`, `Flex.Exchange.Api`
+**Service/App liên quan**: `flex-exchange-service` (`Flex.Exchange.Domain`, `Flex.Exchange.Application`, `Flex.Exchange.Infrastructure`, `Flex.Exchange.Api`); `flex-microfrontend` (Angular, module `src/app/exchange` — sửa tối thiểu để không vỡ theo contract mới)
 
 **Phụ thuộc chính**: ASP.NET Core Web API + SignalR (`MarketHub`), Npgsql (raw ADO.NET, không ORM), Serilog, `Microsoft.Extensions.Options`
 
@@ -121,6 +124,7 @@
 | BR-006 | P1 | Đủ rõ | `IsAcceptingOrders` trả `SessionClosed` cho `PLO` | `Flex.Exchange.Application/TradingSession/SessionService.cs` | `POST /api/orders` — `reason: SessionClosed` | Không áp dụng | Integration: quickstart Kịch bản 3 |
 | BR-007 / NFR-002 | P1 | Đủ rõ | Đảo thứ tự ghi CSDL trước khi mutate in-memory, retry + log `Critical` | `Flex.Exchange.Application/TradingSession/SessionService.cs`, `Flex.Exchange.Api/HostedServices/SessionWorker.cs` | Không áp dụng (internal) | `SessionDto` | Integration: quickstart Kịch bản 5 (giả lập DB lỗi) |
 | SEC-001 | P1 | Đủ rõ | Kế thừa — mọi endpoint đặt/hủy lệnh đã gọi qua `SessionService` trước khi xử lý | `ExchangeService.cs` | Không áp dụng | Không áp dụng | Bao phủ bởi test FR-002/FR-003 |
+| US-001/US-002 (hệ quả FE) | P1 | Đủ rõ | Tách `isTradingActive` thành `canStartSession` (state ∈ preopen — hoặc chưa có phiên), `canPlaceOrder` (state ∈ {ato, continuous, atc}), `canCancelOrder` (state === continuous) | `flex-microfrontend/src/app/exchange/market-board.component.ts`, `market-board.component.html` | `GET /api/session`, `SESSION_STATE_CHANGED` (đọc `state` mới) | `SessionView.state` (đã là `string`, không đổi type) | Unit: `market-board.component.spec.ts` mở rộng case cho `preopen`/`ato`/`atc`/`intermission`/`plo` |
 
 ## Phân tích tác động
 
@@ -130,7 +134,7 @@
 | API/Contract | `state` (7 giá trị), `orderType` (field mới, optional), `reason` (2 giá trị mới) | `state` là breaking cho consumer cũ; `orderType`/`reason` backward-compatible | Xem [contracts/session-lifecycle.md](./contracts/session-lifecycle.md) |
 | Permission/Security | Không đổi — không có role/tenant mới | Không áp dụng | Không áp dụng |
 | Logging/Audit | Thêm log `Critical` khi retry ghi CSDL thất bại (NFR-002) | Thiếu log này sẽ khiến phiên "treo" âm thầm | Kiểm tra log field `sessionId`, `market`, `attemptCount` khi giả lập DB lỗi (quickstart Kịch bản 5) |
-| UI/UX | `flex-microfrontend` hiển thị `state` cũ (3 giá trị) sẽ không nhận diện được 4 giá trị mới | Rủi ro hiển thị sai/không rõ ràng trên bảng điện — **ngoài phạm vi phase này**, cần task riêng cho `flex-microfrontend` | Không áp dụng trong phase này — ghi nhận như rủi ro bàn giao |
+| UI/UX | `market-board.component.ts` hardcode `state === 'open' \|\| 'continuous'` để gate đặt/hủy lệnh và nút khởi động phiên — vỡ hoàn toàn với `state` mới (`'open'` không còn tồn tại) | Nếu không sửa: form đặt lệnh bị khóa ngoài `continuous`, chặn demo đúng luồng ATO/ATC dù backend đã đúng | Sửa 3 getter riêng (`canStartSession`/`canPlaceOrder`/`canCancelOrder`) theo `state` mới — xem dòng traceability US-001/US-002 (hệ quả FE); nhãn hiển thị 7 trạng thái đầy đủ (i18n, market selector) vẫn ngoài phạm vi |
 | Job/Worker/Integration | `SessionWorker` đổi từ loop 3-phase sang loop 7-phase per-market, có retry ghi CSDL | Retry vô hạn (theo BR-007, không có upper bound) có thể khiến worker "treo" ở 1 phase nếu DB down lâu — được ghi nhận là hành vi **chủ đích** (đánh đổi lấy nhất quán) | Integration test giả lập DB lỗi tạm thời (quickstart Kịch bản 5) |
 
 ## API/Contract Detail
@@ -170,6 +174,7 @@ Không áp dụng — tính năng không thêm role/tenant/scope mới; mọi ac
 | DEC-003 | Van chặn cancel/order-type đặt tại `SessionService`/`ExchangeService` (Application), không đụng `MatchingEngine` (Domain) | `MatchingEngine` không biết khái niệm phiên multi-market | Đặt van chặn trong `MatchingEngine` | `MatchingEngine` chỉ biết 1 symbol, không có tham chiếu `ISessionService` |
 | DEC-004 | Ghi CSDL trước khi mutate in-memory + retry có log Critical (BR-007) | Đáp ứng yêu cầu nhất quán đã chốt ở Clarifications; không cần đổi cơ chế lock hiện có | Rollback in-memory nếu ghi CSDL thất bại sau khi đã mutate | Phức tạp hơn (cần snapshot để revert) so với việc chỉ trì hoãn mutate |
 | DEC-005 | `PlaceOrderRequest.orderType` optional, mặc định `LO` | Giữ backward compatible cho client/bot hiện có chỉ hoạt động trong `Continuous` | `orderType` bắt buộc | Sẽ buộc mọi client hiện có phải sửa dù chỉ dùng `LO` |
+| DEC-006 | FE (`market-board.component.ts`) chỉ sửa gate `isTradingActive` (tách 3 getter theo `state` mới), không thêm UI chọn `orderType`/market | `orderType` mặc định `LO` đã được BR-001 cho phép trong `ATO`/`ATC`, đủ để không bị chặn sai; thêm UI chọn loại lệnh là mở rộng UX, không phải sửa lỗi vỡ do contract đổi | Làm đầy đủ UI 7 trạng thái + chọn `orderType` + multi-market trong cùng phase này | Mở rộng scope UI vượt quá lý do bắt buộc (tránh vỡ chức năng), nên để phase riêng nếu cần |
 
 ## Chiến lược kiểm thử
 
@@ -180,6 +185,7 @@ Không áp dụng — tính năng không thêm role/tenant/scope mới; mọi ac
 **Integration test**:
 - `OrdersController`: đặt lệnh sai loại trong `ATO`/`ATC`/`PreOpen`/`PLO` bị từ chối đúng `reason`; hủy lệnh trong `ATO`/`ATC` bị từ chối; hủy lệnh trong `Continuous` thành công.
 - `SessionController`: `GET`/`POST /start` trả đúng `state` theo lifecycle mới cho từng market.
+- `market-board.component.spec.ts` (Angular/Jasmine, đã có sẵn file test): mở rộng case cho `canStartSession`/`canPlaceOrder`/`canCancelOrder` theo từng giá trị `state` mới (`preopen`, `ato`, `continuous`, `intermission`, `atc`, `plo`, `close`).
 
 **Contract test**: Không áp dụng — không có consumer ngoài `flex-exchange-service` tự động verify contract (chỉ có `flex-microfrontend`, xử lý thủ công/ngoài phạm vi phase này).
 
@@ -228,13 +234,18 @@ flex-exchange-service/
 └── tests/
     ├── Flex.Exchange.Domain.Tests/TradingSessionStateTests.cs   # Mở rộng
     └── Flex.Exchange.Api.Tests/                                  # Thêm test controller
+
+flex-microfrontend/
+└── src/app/exchange/
+    ├── market-board.component.ts        # Tách isTradingActive → canStartSession/canPlaceOrder/canCancelOrder
+    └── market-board.component.spec.ts   # Mở rộng test case theo state mới
 ```
 
 ## Rollout & Rollback
 
 **Kế hoạch rollout**: Deploy `flex-exchange-service` mới; không cần bước migration/backfill trước hay sau (không đổi schema). Cấu hình `appsettings.json` mặc định phải set `HasAto`/`HasPlo` đúng cho từng market trước khi bật.
 
-**Tương thích ngược**: `orderType` optional giữ nguyên hành vi cho client cũ; `state` 7 giá trị là breaking cho `flex-microfrontend` — cần deploy đồng thời hoặc chấp nhận UI hiển thị "trạng thái lạ" tạm thời cho tới khi `flex-microfrontend` được cập nhật (task riêng, ngoài phạm vi phase này).
+**Tương thích ngược**: `orderType` optional giữ nguyên hành vi cho client cũ. `state` 7 giá trị là breaking cho FE — xử lý trong cùng phase này (`market-board.component.ts`), nên `flex-exchange-service` và `flex-microfrontend` PHẢI deploy đồng thời (hoặc FE deploy trước, vì code FE mới vẫn tương thích ngược với `state` cũ trong lúc chuyển tiếp — 3 getter mới không còn nhánh nào khớp `'open'` cũ nhưng cũng không lỗi, chỉ coi như "chưa sẵn sàng").
 
 **Feature flag/config**: `TradingSession:Enabled` (đã có) tiếp tục dùng làm flag bật/tắt toàn bộ tính năng phiên; không cần flag mới vì đây là thay thế trực tiếp cơ chế cũ.
 

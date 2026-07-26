@@ -49,7 +49,16 @@ Dùng `src/Flex.Exchange.Api/Flex.Exchange.http` hoặc `curl` cho các bước 
 2. Quan sát log — kỳ vọng thấy log mức `Critical` lặp lại theo từng lần retry thất bại (NFR-002), và `GET /api/session` **vẫn giữ nguyên** `state` cũ (chưa chuyển) cho đến khi CSDL ghi được.
 3. Khôi phục kết nối PostgreSQL — kỳ vọng transition tiếp tục và `state` cập nhật đúng phase kế tiếp.
 
+## Kịch bản 6 — FE không bị khóa sai khi state đổi (market-board.component.ts)
+
+1. `cd flex-microfrontend && npm start`, mở bảng điện với `market=HNX`.
+2. Khởi động phiên — quan sát: khi `state = preopen`, nút "Khởi động phiên" ẩn (đã có phiên), form đặt lệnh bị khóa (đúng, vì `PreOpen` không nhận lệnh — BR-005).
+3. Chờ sang `continuous` — form đặt lệnh và nút hủy đều bật.
+4. Chờ sang `atc` — form đặt lệnh vẫn bật (BR-001 cho phép `LO` trong `ATC`), nhưng nút hủy lệnh đang chờ bị khóa hoặc bấm vào nhận lỗi `CancelNotAllowedInCurrentSession` rõ ràng (không phải lỗi im lặng).
+5. Chờ sang `plo`/`close` — form đặt lệnh khóa lại, nút "Khởi động phiên" hiện lại sau `close`.
+
 ## Test tự động tương ứng
 
 - `Flex.Exchange.Domain.Tests/TradingSessionStateTests.cs` — mở rộng cho lifecycle 7-phase và market không có ATO/PLO.
 - `Flex.Exchange.Api.Tests` — thêm test cho `SessionController`, `OrdersController` (order type + cancel gate).
+- `flex-microfrontend/src/app/exchange/market-board.component.spec.ts` — mở rộng test cho `canStartSession`/`canPlaceOrder`/`canCancelOrder` theo từng giá trị `state` mới.
