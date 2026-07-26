@@ -96,6 +96,9 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 - **Hủy lệnh trong phiên định kỳ**: Trả về lỗi `CancelNotAllowedInCurrentSession`.
 - **Đặt lệnh sai loại trong phiên**: Trả về lỗi `OrderTypeNotAllowedInCurrentSession`.
 - **Hệ thống nghỉ trưa**: Chấp nhận lệnh chờ (Queue) nhưng không khớp lệnh cho đến phiên chiều.
+- **Đặt lệnh trong `PreOpen`**: Hệ thống từ chối mọi lệnh gửi vào (trả lỗi `SessionNotOpen`), không giữ hàng đợi chờ như `Intermission`.
+- **Đặt lệnh trong `PLO`**: Hệ thống từ chối mọi lệnh gửi vào (trả lỗi `SessionClosed`), vì cơ chế khớp lệnh PLO chưa được triển khai trong MVP này (xem mục 13).
+- **Ghi CSDL thất bại khi chuyển phiên**: Hệ thống PHẢI thử lại việc ghi trạng thái phiên; trạng thái phiên KHÔNG được coi là đã chuyển (kể cả in-memory và phát sự kiện WebSocket) cho đến khi ghi CSDL thành công.
 
 ---
 
@@ -105,7 +108,7 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
   **Liên quan**: US-002, AC-003, AC-004
 - **FR-002** `[P1]`: Hệ thống KHÔNG ĐƯỢC cho phép hủy lệnh khi phiên đang ở trạng thái `ATO` hoặc `ATC`. (Chặn sửa lệnh nằm ngoài phạm vi MVP này — xem mục 13, vì hệ thống hiện chưa có chức năng sửa lệnh.)  
   **Liên quan**: US-001, AC-001
-- **FR-003** `[P1]`: Hệ thống PHẢI từ chối đặt lệnh `LO` trong phiên `ATO`/`ATC` nếu không đi kèm loại lệnh định kỳ tương ứng, và từ chối đặt lệnh `ATO`/`ATC` ngoài phiên định kỳ của chúng.  
+- **FR-003** `[P1]`: Hệ thống PHẢI cho phép đặt lệnh `LO` và lệnh định kỳ tương ứng (`ATO`/`ATC`) trong phiên `ATO`/`ATC`, và PHẢI từ chối đặt lệnh `ATO`/`ATC` ngoài phiên định kỳ của chúng.  
   **Liên quan**: US-001, AC-001, MVP-004
 - **FR-004** `[P1]`: Hệ thống PHẢI áp dụng đúng sơ đồ thời gian phiên riêng biệt cho từng thị trường (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`).  
   **Liên quan**: US-002, AC-003, AC-004
@@ -122,6 +125,9 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 - **BR-002**: Sàn `UPCoM` không có phiên `ATO` và `ATC`, chỉ có phiên `Continuous` từ 09:00 đến 15:00 (nghỉ trưa 11:30 - 13:00).
 - **BR-003**: Sàn `HNX` cơ sở không có phiên `ATO` (bắt đầu 09:00 Continuous), có phiên `ATC` (14:30-14:45) và phiên `PLO` (14:45-15:00).
 - **BR-004**: Khi phiên chuyển sang `Close` (từ `ATC` trực tiếp hoặc sau `PLO`), hệ thống PHẢI hủy toàn bộ lệnh trong ngày chưa khớp còn lại trong sổ lệnh (kế thừa quy tắc cuối ngày hiện có của `flex-exchange-service`). Không có lệnh nào được tồn tại qua trạng thái `Close`.
+- **BR-005**: Trong trạng thái `PreOpen`, hệ thống KHÔNG được nhận bất kỳ lệnh nào (kể cả vào hàng đợi chờ) — mọi lệnh gửi vào bị từ chối với lý do `SessionNotOpen`, khác với `Intermission` (vẫn nhận lệnh chờ).
+- **BR-006**: Trong trạng thái `PLO`, hệ thống KHÔNG được nhận bất kỳ lệnh nào — mọi lệnh gửi vào bị từ chối với lý do `SessionClosed`, vì cơ chế khớp lệnh sau giờ (PLO) chưa được triển khai trong MVP này.
+- **BR-007**: Khi chuyển trạng thái phiên, hệ thống PHẢI ghi nhận trạng thái mới vào CSDL thành công trước khi coi transition là hoàn tất (cập nhật in-memory và phát `SESSION_STATE_CHANGED`). Nếu ghi CSDL thất bại, hệ thống PHẢI thử lại thay vì tiếp tục với trạng thái chỉ tồn tại in-memory — đây là thay đổi so với hành vi hiện tại của `flex-exchange-service` (chỉ log lỗi rồi vẫn tiếp tục). Chính sách thử lại/timeout cụ thể sẽ được quyết định ở bước lập plan kỹ thuật.
 
 **Luồng trạng thái phiên chuẩn**:
 
@@ -129,11 +135,11 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 |---|---|---|---|
 | `PreOpen` | Đến giờ mở cửa ATO | `ATO` | HOSE (09:00), Phái sinh (08:45) |
 | `PreOpen` | Đến giờ mở cửa Continuous | `Continuous` | HNX (09:00), UPCoM (09:00) |
-| `ATO` | Khớp lệnh ATO thành công | `Continuous` | 09:15 HOSE / 09:00 Phái sinh |
+| `ATO` | Hết thời lượng phiên ATO (timer) | `Continuous` | 09:15 HOSE / 09:00 Phái sinh — chuyển theo thời gian cấu hình, không tính giá khớp duy nhất trong MVP này |
 | `Continuous` (Sáng) | Đến giờ nghỉ trưa | `Intermission` | 11:30 |
 | `Intermission` | Đến giờ chiều | `Continuous` | 13:00 |
 | `Continuous` (Chiều) | Đến phiên đóng cửa | `ATC` | 14:30 (HOSE, HNX, Phái sinh) |
-| `ATC` | Khớp lệnh ATC thành công | `PLO` / `Close` | 14:45 (HNX sang PLO, HOSE sang Close) |
+| `ATC` | Hết thời lượng phiên ATC (timer) | `PLO` / `Close` | 14:45 (HNX sang PLO, HOSE sang Close) — chuyển theo thời gian cấu hình, không tính giá khớp duy nhất trong MVP này |
 | `PLO` | Hết giờ giao dịch sau giờ | `Close` | 15:00 |
 
 ---
@@ -154,6 +160,7 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 ## 11. Yêu cầu phi chức năng
 
 - **NFR-001**: Thời gian kiểm tra van chặn trạng thái phiên phải đạt dưới 1ms để không ảnh hưởng tới hiệu năng đặt/hủy lệnh.
+- **NFR-002**: Nếu việc ghi CSDL khi chuyển phiên (BR-007) thất bại liên tục, hệ thống PHẢI ghi log cảnh báo mức độ nghiêm trọng cao sau mỗi lần thử lại thất bại, để người vận hành phát hiện và can thiệp kịp thời (tránh phiên bị treo vô thời hạn mà không ai biết).
 
 ---
 
@@ -171,3 +178,15 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 - Chặn/hỗ trợ sửa lệnh (amend order): hệ thống hiện chưa có chức năng sửa lệnh, nên quy tắc cấm sửa lệnh trong ATO/ATC sẽ được bổ sung khi tính năng sửa lệnh được xây dựng.
 - Cơ chế khớp lệnh thực sự trong phiên `PLO` (khớp liên tục tại giá đóng cửa ATC, ưu tiên thời gian): MVP này chỉ triển khai `PLO` như một trạng thái chuyển tiếp trong máy trạng thái, chưa triển khai logic khớp lệnh riêng cho PLO.
 - Các loại lệnh `MP`, `MTL`, `MOK`, `MAK`: hệ thống hiện chưa có khái niệm `OrderType` mở rộng này; MVP chỉ kiểm soát `LO`, `ATO`, `ATC`.
+- Thuật toán đấu giá định kỳ (uniform-price call auction) xác định giá khớp duy nhất cho ATO/ATC: chuyển trạng thái `ATO`→`Continuous` và `ATC`→`PLO`/`Close` chỉ dựa trên thời lượng cấu hình (timer), không tính toán giá khớp lệnh thực sự trong MVP này.
+
+---
+
+## Clarifications
+
+### Session 2026-07-26
+
+- Q: Chuyển trạng thái `ATO`→`Continuous` và `ATC`→`PLO`/`Close` có cần thuật toán đấu giá định kỳ thực sự (tìm giá khớp duy nhất) hay chỉ là chuyển theo thời gian (timer)? → A: Chuyển theo thời gian (timer) thuần túy — không xây thuật toán đấu giá thực sự trong MVP này, giá ATO/ATC nằm ngoài phạm vi.
+- Q: Trong trạng thái `PreOpen`, lệnh gửi vào có được nhận vào hàng đợi chờ hay bị từ chối hoàn toàn? → A: Từ chối tất cả lệnh trong `PreOpen` (giống hành vi `Open` hiện tại), không giữ hàng đợi chờ.
+- Q: Trong trạng thái `PLO`, hệ thống xử lý lệnh gửi vào như thế nào? → A: Từ chối tất cả lệnh trong `PLO` (trả lỗi `SessionClosed`) — coi như chưa hỗ trợ giao dịch sau giờ trong MVP.
+- Q: Khi lưu trạng thái phiên vào CSDL thất bại lúc chuyển phase, hệ thống có nên tiếp tục chuyển trạng thái in-memory hay dừng/rollback? → A: Chặn transition, giữ nguyên trạng thái cũ cho đến khi ghi CSDL thành công (đảm bảo nhất quán tuyệt đối) — khác với hành vi best-effort hiện tại.

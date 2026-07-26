@@ -20,4 +20,4 @@
 ---
 
 ## Kết luận
-Spec đã được cập nhật (bổ sung MVP-004 kiểm soát loại lệnh theo phiên, thu hẹp phạm vi sửa lệnh/PLO matching/OrderType mở rộng vào mục "Ngoài phạm vi", thêm BR-004 về hủy lệnh khi Close) và tiếp tục đáp ứng đầy đủ tiêu chuẩn chất lượng. Sẵn sàng cho bước tiếp theo (`$speckit-plan`).
+Đã hoàn tất phiên `/speckit-clarify` ngày 2026-07-26 (4 câu hỏi được trả lời: cơ chế chuyển ATO/ATC theo timer thay vì đấu giá thực sự, hành vi từ chối lệnh trong `PreOpen`, hành vi từ chối lệnh trong `PLO`, và yêu cầu ghi CSDL thành công trước khi hoàn tất transition). Spec tiếp tục đáp ứng đầy đủ tiêu chuẩn chất lượng, không có mục nào chuyển từ Pass sang Fail. Sẵn sàng cho bước tiếp theo (`$speckit-plan`).
