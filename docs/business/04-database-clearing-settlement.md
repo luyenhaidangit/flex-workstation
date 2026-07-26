@@ -92,6 +92,7 @@ Phạm vi MVP 08: từ giao dịch đã khớp tại Broker đến nghĩa vụ, 
 
 ## Truy vết và nguồn tham khảo
 
+- [Cấu trúc thị trường chứng khoán Việt Nam](00-vietnamese-securities-market-structure.md): thuật ngữ và phân biệt VNX/HOSE/HNX/market dùng chung.
 - [Đặc tả MVP 08](../../specs/000017-database-clearing-settlement/spec.md): user stories, acceptance criteria, phân quyền, rủi ro và điều kiện chấp nhận.
 - [MVP 08 gốc](../mvp/08-database-pipeline-clearing-settlement-reconciliation.md): mô tả phạm vi, luồng demo và điều kiện hoàn thành ban đầu.
 - MVP 07: nguồn quy tắc ledger cho opening, reserve, fill, fee và cancel.

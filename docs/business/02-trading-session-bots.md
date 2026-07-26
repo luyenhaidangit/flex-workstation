@@ -98,6 +98,8 @@ Người vận hành phiên → Sàn giao dịch → Nhà đầu tư / Market ma
 
 ## Truy vết và nguồn tham khảo
 
+- [Cấu trúc thị trường chứng khoán Việt Nam](00-vietnamese-securities-market-structure.md): thuật ngữ và phân biệt VNX/HOSE/HNX/market dùng chung.
 - [Đặc tả tính năng](../../specs/000013-trading-session-bots/spec.md): mục tiêu, phạm vi, user story và quy tắc nghiệp vụ.
 - [Tài liệu MVP 04](../mvp/04-trading-session-bots.md): định hướng nghiệp vụ trong roadmap FlexSim.
 - [Roadmap FlexSim](../mvp/flexsim-roadmap.md): vị trí của MVP 04 trong lộ trình thị trường ảo.
+- [Vòng đời state machine phiên giao dịch và giao tiếp Sở-Broker](05-trading-session-state-machine-exchange-communication.md): chi tiết kỹ thuật đầy đủ 7-phase (PreOpen/ATO/Continuous/Intermission/ATC/PLO/Close) và cơ chế broadcast trạng thái phiên mà tài liệu này chỉ giới thiệu ở mức tổng quan.

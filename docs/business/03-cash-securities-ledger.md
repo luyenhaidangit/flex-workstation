@@ -80,6 +80,7 @@ Khách hàng → Công ty chứng khoán/Broker → Sàn giao dịch → Lưu k�
 
 ## Truy vết và nguồn tham khảo
 
+- [Cấu trúc thị trường chứng khoán Việt Nam](00-vietnamese-securities-market-structure.md): thuật ngữ và phân biệt VNX/HOSE/HNX/market dùng chung.
 - [Đặc tả tính năng](../../specs/000016-cash-securities-ledger/spec.md): mục tiêu, user story, quy tắc và phạm vi MVP.
 - [Kế hoạch triển khai](../../specs/000016-cash-securities-ledger/plan.md): thiết kế kỹ thuật và chiến lược kiểm thử dành cho đội phát triển.
 - [MVP 06 — Multi-tenant brokers](../mvp/06-multi-tenant-brokers.md): tenant, Broker và tài khoản đầu vào của MVP 07.
