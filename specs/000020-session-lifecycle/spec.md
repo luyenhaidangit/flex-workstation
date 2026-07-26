@@ -40,6 +40,7 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 - **MVP-001**: Mở rộng Enum trạng thái phiên hỗ trợ: `PreOpen`, `ATO`, `Continuous`, `Intermission`, `ATC`, `PLO`, `Close`.
 - **MVP-002**: Ràng buộc cấm hủy lệnh khi phiên đang ở trạng thái `ATO` hoặc `ATC` (Trả về lỗi `CancelNotAllowedInCurrentSession`).
 - **MVP-003**: Cấu hình thời biểu phiên riêng biệt cho từng thị trường (`HOSE`, `HNX`, `UPCoM`, `Phái sinh`).
+- **MVP-004**: Kiểm soát loại lệnh (`LO`, `ATO`, `ATC`) được phép đặt theo từng trạng thái phiên hiện tại (Trả về lỗi `OrderTypeNotAllowedInCurrentSession` nếu sai).
 
 ---
 
@@ -61,14 +62,15 @@ Nhà đầu tư gửi yêu cầu hủy lệnh trong phiên ATO hoặc ATC ➔ H�
 
 **Lý do ưu tiên**: Đây là quy định pháp lý bắt buộc của Sở Giao dịch Chứng khoán, vi phạm sẽ bị Sở từ chối và phạt.
 
-**Liên quan yêu cầu**: FR-002, BR-001
+**Liên quan yêu cầu**: FR-002, FR-003, BR-001
 
-**Test độc lập**: Đưa phiên về `ATO` hoặc `ATC`, gửi lệnh `DELETE /api/orders/{orderId}`, kiểm tra hệ thống trả về lỗi từ chối hủy lệnh.
+**Test độc lập**: Đưa phiên về `ATO` hoặc `ATC`, gửi lệnh `DELETE /api/orders/{orderId}`, kiểm tra hệ thống trả về lỗi từ chối hủy lệnh; gửi lệnh `LO` thường trong phiên `ATO`/`ATC`, kiểm tra hệ thống từ chối với lý do sai loại lệnh.
 
 **Acceptance Criteria**:
 
 1. **AC-001**: **Cho trước** phiên giao dịch đang ở trạng thái `ATO` hoặc `ATC`, **Khi** nhà đầu tư gửi yêu cầu hủy lệnh, **Thì** hệ thống trả về phản hồi thất bại kèm lý do `CancelNotAllowedInCurrentSession`.
 2. **AC-002**: **Cho trước** phiên giao dịch đang ở trạng thái `Continuous` (Liên tục), **Khi** nhà đầu tư gửi yêu cầu hủy lệnh hợp lệ, **Thì** hệ thống cho phép hủy lệnh bình thường.
+3. **AC-005**: **Cho trước** phiên giao dịch đang ở trạng thái `ATO`, **Khi** nhà đầu tư gửi lệnh loại `ATC`, **Thì** hệ thống trả về phản hồi thất bại kèm lý do `OrderTypeNotAllowedInCurrentSession`.
 
 ---
 
@@ -101,22 +103,25 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 
 - **FR-001** `[P1]`: Hệ thống PHẢI hỗ trợ máy trạng thái phiên đầy đủ: `PreOpen`, `ATO`, `Continuous`, `Intermission`, `ATC`, `PLO`, `Close`.  
   **Liên quan**: US-002, AC-003, AC-004
-- **FR-002** `[P1]`: Hệ thống KHÔNG ĐƯỢC cho phép hủy lệnh hoặc sửa lệnh khi phiên đang ở trạng thái `ATO` hoặc `ATC`.  
+- **FR-002** `[P1]`: Hệ thống KHÔNG ĐƯỢC cho phép hủy lệnh khi phiên đang ở trạng thái `ATO` hoặc `ATC`. (Chặn sửa lệnh nằm ngoài phạm vi MVP này — xem mục 13, vì hệ thống hiện chưa có chức năng sửa lệnh.)  
   **Liên quan**: US-001, AC-001
-- **FR-003** `[P1]`: Hệ thống PHẢI từ chối loại lệnh không được phép trong phiên hiện tại.  
-  **Liên quan**: US-001, AC-001
+- **FR-003** `[P1]`: Hệ thống PHẢI từ chối đặt lệnh `LO` trong phiên `ATO`/`ATC` nếu không đi kèm loại lệnh định kỳ tương ứng, và từ chối đặt lệnh `ATO`/`ATC` ngoài phiên định kỳ của chúng.  
+  **Liên quan**: US-001, AC-001, MVP-004
 - **FR-004** `[P1]`: Hệ thống PHẢI áp dụng đúng sơ đồ thời gian phiên riêng biệt cho từng thị trường (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`).  
   **Liên quan**: US-002, AC-003, AC-004
 - **FR-005** `[P2]`: Dịch vụ `ISessionService` PHẢI cung cấp phương thức `IsAllowingCancel(market)` để kiểm tra quyền hủy lệnh.  
   **Liên quan**: US-001, AC-001, AC-002
+- **FR-006** `[P2]`: Dịch vụ `ISessionService` PHẢI cung cấp phương thức kiểm tra loại lệnh được phép theo phiên hiện tại (ví dụ `IsOrderTypeAllowed(market, orderType)`).  
+  **Liên quan**: US-001, MVP-004
 
 ---
 
 ## 8. Quy tắc nghiệp vụ
 
-- **BR-001**: Trong các phiên định kỳ `ATO` (09:00-09:15 HOSE / 08:45-09:00 Phái sinh) và `ATC` (14:30-14:45 HOSE, HNX, Phái sinh), **CẤM SỬA VÀ CẤM HỦY LỆNH**.
+- **BR-001**: Trong các phiên định kỳ `ATO` (09:00-09:15 HOSE / 08:45-09:00 Phái sinh) và `ATC` (14:30-14:45 HOSE, HNX, Phái sinh), **CẤM HỦY LỆNH**. Chỉ được đặt lệnh `LO` và lệnh định kỳ tương ứng (`ATO` trong phiên ATO, `ATC` trong phiên ATC).
 - **BR-002**: Sàn `UPCoM` không có phiên `ATO` và `ATC`, chỉ có phiên `Continuous` từ 09:00 đến 15:00 (nghỉ trưa 11:30 - 13:00).
 - **BR-003**: Sàn `HNX` cơ sở không có phiên `ATO` (bắt đầu 09:00 Continuous), có phiên `ATC` (14:30-14:45) và phiên `PLO` (14:45-15:00).
+- **BR-004**: Khi phiên chuyển sang `Close` (từ `ATC` trực tiếp hoặc sau `PLO`), hệ thống PHẢI hủy toàn bộ lệnh trong ngày chưa khớp còn lại trong sổ lệnh (kế thừa quy tắc cuối ngày hiện có của `flex-exchange-service`). Không có lệnh nào được tồn tại qua trạng thái `Close`.
 
 **Luồng trạng thái phiên chuẩn**:
 
@@ -136,6 +141,7 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 ## 9. Thực thể dữ liệu
 
 - **SessionDto**: Đại diện cho phiên giao dịch của một thị trường (`sessionId`, `market`, `sessionDate`, `status`, `openedAt`, `closedAt`).
+- **SessionOrderTypeRule**: Quy tắc ánh xạ trạng thái phiên → loại lệnh được phép cho từng thị trường (`market`, `sessionPhase`, `allowedOrderTypes`), dùng để phục vụ FR-003/FR-006.
 
 ---
 
@@ -155,9 +161,13 @@ Hệ thống tự động chuyển phiên theo lịch trình từng thị trư�
 
 - **SC-001**: 100% các yêu cầu hủy lệnh trong phiên ATO và ATC bị hệ thống từ chối thành công.
 - **SC-002**: Tất cả 4 thị trường (`HOSE`, `HNX`, `UPCoM`, `HNX-Derivatives`) hoạt động đúng sơ đồ chuyển phiên tương ứng.
+- **SC-003**: 100% lệnh sai loại (ví dụ lệnh `LO` thường trong phiên định kỳ, hoặc lệnh `ATO`/`ATC` ngoài phiên định kỳ) bị hệ thống từ chối thành công.
 
 ---
 
 ## 13. Ngoài phạm vi
 
 - Tích hợp kết nối trực tiếp gateway vật lý với Sở Giao dịch Chứng khoán (ngoài phạm vi Simulator/MVP).
+- Chặn/hỗ trợ sửa lệnh (amend order): hệ thống hiện chưa có chức năng sửa lệnh, nên quy tắc cấm sửa lệnh trong ATO/ATC sẽ được bổ sung khi tính năng sửa lệnh được xây dựng.
+- Cơ chế khớp lệnh thực sự trong phiên `PLO` (khớp liên tục tại giá đóng cửa ATC, ưu tiên thời gian): MVP này chỉ triển khai `PLO` như một trạng thái chuyển tiếp trong máy trạng thái, chưa triển khai logic khớp lệnh riêng cho PLO.
+- Các loại lệnh `MP`, `MTL`, `MOK`, `MAK`: hệ thống hiện chưa có khái niệm `OrderType` mở rộng này; MVP chỉ kiểm soát `LO`, `ATO`, `ATC`.
