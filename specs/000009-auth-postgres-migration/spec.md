@@ -1,6 +1,6 @@
 # Đặc tả tính năng: Migrate datastore flex-auth-service từ Oracle sang PostgreSQL
 
-**Branch**: `000009-auth-multi-tenant-postgres`
+**Branch**: `000009-auth-postgres-migration`
 **Ngày tạo**: 2026-07-13
 **Cập nhật**: 2026-07-27 — thu hẹp phạm vi (bỏ multi-tenant, chỉ giữ phần migrate datastore); bổ sung ràng buộc dùng chung quy ước migration PostgreSQL + Liquibase như database `hnx`
 **Trạng thái**: Bản nháp

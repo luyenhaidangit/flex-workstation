@@ -72,9 +72,10 @@ Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch
 | Data store | Vai trò | Trạng thái | Evidence / ghi chú |
 | --- | --- | --- | --- |
 | Oracle Cloud Database | Primary database lịch sử của hệ thống. | `Confirmed by user` | User xác nhận ngày 2026-06-18: "hiện tại DB đang sử dụng oracle cloud". |
-| — Lộ trình thay thế Oracle | Hệ thống Flex đang bỏ Oracle dần, refactor từng repo phụ thuộc sang PostgreSQL/MySQL. | `Confirmed by user` (2026-07-12) | Xem `specs/000005-mysql-tenant-db` (MySQL database-per-tenant), `specs/000008-agent-platform-mvp` (PostgreSQL control plane), `specs/000009-auth-multi-tenant-postgres` (migrate `flex-auth-service` khỏi Oracle), repo `flex-database` (kho migration script dùng chung). |
+| — Lộ trình thay thế Oracle | Hệ thống Flex đang bỏ Oracle dần, refactor từng repo phụ thuộc sang PostgreSQL/MySQL. | `Confirmed by user` (2026-07-12) | Xem `specs/000005-mysql-tenant-db` (MySQL database-per-tenant), `specs/000008-agent-platform-mvp` (PostgreSQL control plane), `specs/000009-auth-postgres-migration` (migrate `flex-auth-service` khỏi Oracle), repo `flex-database` (kho migration script dùng chung). |
 | Oracle local container | Local Oracle DB từng được khai báo trong `flex-environment` nhưng hiện đang comment out. | `Confirmed` | `flex-environment/docker-compose.yml`, `docker-compose.override.yml` có `securitiesdb` bị comment. |
-| PostgreSQL `flexdb` | Control plane dùng chung (tenant registry, agent platform, identity sau khi multi-tenant hoá). | `Confirmed` | `specs/000005-mysql-tenant-db`, `specs/000008-agent-platform-mvp`, `specs/000009-auth-multi-tenant-postgres`. |
+| PostgreSQL `flexdb` | Control plane dùng chung (tenant registry, agent platform). | `Confirmed` | `specs/000005-mysql-tenant-db`, `specs/000008-agent-platform-mvp`. |
+| PostgreSQL (database riêng của `flex-auth-service`) | Datastore identity của `flex-auth-service` sau khi bỏ Oracle — database độc lập, không thuộc `flexdb` control plane. | `Confirmed` | `specs/000009-auth-postgres-migration`. |
 | MySQL (database-per-tenant) | Dữ liệu vận hành riêng theo tenant. | `Confirmed` | `specs/000005-mysql-tenant-db`. |
 | Qdrant | Vector search cho tri thức agent, filter theo `tenant_id`. | `Confirmed` | `specs/000008-agent-platform-mvp/plan.md`. |
 | Redis | Cache/local infrastructure. | `Confirmed` | `flex-environment/docker-compose.yml` khai báo `redisdb`. |
@@ -84,7 +85,7 @@ Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch
 
 ## 6. System Context
 
-> Sơ đồ dưới đây mô tả topology tại thời điểm ghi nhận ban đầu (trước `000008-agent-platform-mvp`/`000009-auth-multi-tenant-postgres`) và chưa vẽ lại `flex-agent-service`/`flex-database`. Cập nhật sơ đồ khi các feature đó implement xong và edge thực tế được xác nhận.
+> Sơ đồ dưới đây mô tả topology tại thời điểm ghi nhận ban đầu (trước `000008-agent-platform-mvp`/`000009-auth-postgres-migration`) và chưa vẽ lại `flex-agent-service`/`flex-database`. Cập nhật sơ đồ khi các feature đó implement xong và edge thực tế được xác nhận.
 
 ```mermaid
 flowchart LR
@@ -195,7 +196,7 @@ Khi cập nhật hành vi chung trong `CLAUDE.md`, rà lại `AGENTS.md` để C
 
 | Priority | Vấn đề | Tác động | Khuyến nghị |
 | --- | --- | --- | --- |
-| High | Chi tiết kết nối Oracle Cloud chưa được tài liệu hóa ở mức architecture. | DevOps/security khó xác minh wallet, secret, network access và rotation trong lúc Oracle vẫn còn dùng ở một số repo. | Bổ sung tài liệu riêng về Oracle Cloud connectivity, không ghi secret vào repo; ưu tiên hoàn tất migration theo `specs/000009-auth-multi-tenant-postgres`. |
+| High | Chi tiết kết nối Oracle Cloud chưa được tài liệu hóa ở mức architecture. | DevOps/security khó xác minh wallet, secret, network access và rotation trong lúc Oracle vẫn còn dùng ở một số repo. | Bổ sung tài liệu riêng về Oracle Cloud connectivity, không ghi secret vào repo; ưu tiên hoàn tất migration theo `specs/000009-auth-postgres-migration`. |
 | Low | Danh sách repo cần được giữ đồng bộ khi thêm/bớt project trong workstation. | AI agent hoặc developer mới có thể hiểu thiếu thành phần nếu tài liệu cũ. | Cập nhật file này (mục 3, 4) khi thay đổi repo trong `workstation.json`; xem checklist `docs/checklists/new-service-checklist.md`. |
 | Medium | Quan hệ runtime giữa `flex-api-gateway`, `flex-auth-service` và Oracle Cloud mới ở mức inferred/user-confirmed. | Dễ nhầm giữa ý định kiến trúc và cấu hình triển khai thực tế. | Bổ sung evidence từ app config, connection factory hoặc deployment config của từng service. |
 | Medium | Sơ đồ System Context/Deployment (mục 6, 7) chưa vẽ `flex-agent-service`, `flex-database` và các datastore mới (PostgreSQL, MySQL tenant, Qdrant). | Sơ đồ không phản ánh đúng topology sau khi `000008`/`000009` implement xong. | Vẽ lại sau khi các feature đó có deployment thật; đối chiếu `specs/000008-agent-platform-mvp/plan.md` mục "Cấu trúc project". |
@@ -214,4 +215,4 @@ Khi cập nhật hành vi chung trong `CLAUDE.md`, rà lại `AGENTS.md` để C
 | ADR | Decision | Why it matters | Status |
 | --- | --- | --- | --- |
 | ADR-001 | Dùng Oracle Cloud Database làm primary database (lịch sử) | Ảnh hưởng connection, wallet/secret, backup, migration và local development strategy trước khi bỏ Oracle. | `Superseded` — xem lộ trình thay thế ở mục 5 |
-| ADR-002 | Bỏ Oracle dần, chuyển sang PostgreSQL (control plane/shared) + MySQL (database-per-tenant) | Đồng bộ hạ tầng dữ liệu cho các feature multi-tenant mới; loại phụ thuộc Oracle Cloud khỏi toàn hệ thống. | `Proposed` — đang triển khai qua `specs/000005-mysql-tenant-db`, `specs/000008-agent-platform-mvp`, `specs/000009-auth-multi-tenant-postgres` |
+| ADR-002 | Bỏ Oracle dần, chuyển sang PostgreSQL (control plane/shared) + MySQL (database-per-tenant) | Đồng bộ hạ tầng dữ liệu cho các feature multi-tenant mới; loại phụ thuộc Oracle Cloud khỏi toàn hệ thống. | `Proposed` — đang triển khai qua `specs/000005-mysql-tenant-db`, `specs/000008-agent-platform-mvp`, `specs/000009-auth-postgres-migration` |
