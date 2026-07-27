@@ -42,7 +42,7 @@ Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào ph
 
 | Context | Skill |
 | --- | --- |
-| Viết, review hoặc generate C#/.NET code | `dotnet-conventions` |
+| Viết, review hoặc generate C#/.NET code | `flex-dotnet-conventions` |
 | Tính năng mới chưa có spec | `spec-driven-development` |
 | Có spec, cần breakdown task | `planning-and-task-breakdown` |
 | Viết code / implement (có hoặc không có plan) | `incremental-implementation` |
@@ -78,7 +78,7 @@ flex-workstation/
 | --- | --- |
 | Tài liệu workstation | `docs/` |
 | Skill dùng chung | `.agents/skills/<skill-name>/SKILL.md` (`.claude/skills` là junction) |
-| Skill thuộc repo con (vd. `dotnet-conventions`) | `<repo-con>/skills/<skill-name>/` (vd. `flex-agents/skills/dotnet-conventions/`) — không sửa `~/.claude/skills/` hay `~/.codex/skills/` |
+| Skill thuộc repo con (vd. `flex-dotnet-conventions`) | `<repo-con>/skills/<skill-name>/` (vd. `flex-agents/skills/flex-dotnet-conventions/`) — không sửa `~/.claude/skills/` hay `~/.codex/skills/` |
 | Runtime config | `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/` |
 
 ## Tài liệu
