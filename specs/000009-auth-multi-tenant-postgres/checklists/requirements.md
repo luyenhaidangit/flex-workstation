@@ -1,4 +1,4 @@
-# Checklist chất lượng đặc tả: Multi-tenant hoá flex-auth-service + migrate PostgreSQL
+# Checklist chất lượng đặc tả: Migrate datastore flex-auth-service từ Oracle sang PostgreSQL
 
 ## Metadata
 
@@ -72,9 +72,9 @@
 - [x] CHK005 `[Blocker]` `[Status: Pass]` Không còn marker `[NEEDS CLARIFICATION]` hoặc `[CẦN LÀM RÕ]` chặn lập plan — hai điểm quan trọng nhất (dữ liệu thật, consumer hiện có) đã được stakeholder xác nhận trực tiếp trước khi viết spec. [Readiness]
 - [x] CHK006 `[High]` `[Status: Pass]` Requirement kiểm thử được, không mơ hồ và có priority/traceability khi áp dụng. [Measurability]
 - [x] CHK007 `[High]` `[Status: Pass]` Success criteria đo lường được và không phụ thuộc công nghệ. [Measurability]
-- [x] CHK008 `[High]` `[Status: Pass]` User scenario và acceptance criteria đã bao phủ luồng chính (khởi tạo tenant, quản lý thành viên, đăng nhập/xác minh JWT, vận hành không Oracle). [Coverage]
-- [x] CHK009 `[Medium]` `[Status: Pass]` Trạng thái lỗi, edge case (tenant không còn owner) và thao tác lặp liên quan đã được xác định. [Coverage]
-- [x] CHK010 `[High]` `[Status: Pass]` Scope, ngoài phạm vi, phụ thuộc và giả định đã rõ, gồm cả ranh giới với `000008-agent-platform-mvp`. [Completeness]
+- [x] CHK008 `[High]` `[Status: Pass]` User scenario và acceptance criteria đã bao phủ luồng chính (tạo database PostgreSQL mới, vận hành hoàn toàn không còn Oracle). [Coverage]
+- [x] CHK009 `[Medium]` `[Status: Pass]` Trạng thái lỗi và thao tác lặp liên quan đã được xác định. [Coverage]
+- [x] CHK010 `[High]` `[Status: Pass]` Scope, ngoài phạm vi (đặc biệt việc loại trừ multi-tenant/tenant/role/JWT), phụ thuộc và giả định đã rõ. [Completeness]
 
 ## Readiness và governance
 
@@ -82,7 +82,7 @@
 - [x] CHK012 `[Medium]` `[Status: Pass]` User scenario bao phủ các luồng P1 thực tế. [Coverage]
 - [x] CHK013 `[High]` `[Status: Pass]` Các gate constitution liên quan đến scope, data, permission, contract và security đã được đánh giá (nguyên tắc I — code trong repo con — ghi ở mục Ràng buộc). [Constitution]
 - [x] CHK014 `[High]` `[Status: Pass]` Không có chi tiết implementation làm sai phạm vi của spec. [Readiness]
-- [x] CHK015 `[Medium]` `[Status: Pass]` Rủi ro (đặc biệt rủi ro hợp nhất `tenant_id` với `000005`/`000008`), audit và dữ liệu nhạy cảm được ghi nhận. [Coverage]
+- [x] CHK015 `[Medium]` `[Status: Pass]` Rủi ro (đặc biệt rủi ro sai lệch schema Oracle/PostgreSQL) và dữ liệu nhạy cảm được ghi nhận. [Coverage]
 - [x] CHK016 `[Medium]` `[Status: Pass]` Feature có điều kiện sẵn sàng rõ ràng trước khi chuyển bước. [Readiness]
 
 ---
@@ -116,7 +116,7 @@ Khi item có `Status: Fail`, ghi trực tiếp bên dưới item:
 
 **Có được chuyển bước tiếp theo không**: Có
 
-**Bước tiếp theo được đề xuất**: `$speckit-plan` (sau khi thống nhất thứ tự rollout với `000008-agent-platform-mvp`)
+**Bước tiếp theo được đề xuất**: `$speckit-plan`
 
 **Điều kiện để được chuyển bước**:
 
