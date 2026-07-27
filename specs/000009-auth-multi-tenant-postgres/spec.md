@@ -2,7 +2,7 @@
 
 **Branch**: `000009-auth-multi-tenant-postgres`
 **Ngày tạo**: 2026-07-13
-**Cập nhật**: 2026-07-27 — thu hẹp phạm vi, bỏ multi-tenant, chỉ giữ phần migrate datastore
+**Cập nhật**: 2026-07-27 — thu hẹp phạm vi (bỏ multi-tenant, chỉ giữ phần migrate datastore); bổ sung ràng buộc dùng chung quy ước migration PostgreSQL + Liquibase như database `hnx`
 **Trạng thái**: Bản nháp
 **Người phụ trách**: Luyện Hải Đăng
 **Stakeholder xác nhận**: Luyện Hải Đăng
@@ -173,6 +173,7 @@ Quản trị viên/kỹ sư vận hành triển khai `flex-auth-service` phiên 
 **Ràng buộc**:
 - PHẢI tuân theo lộ trình bỏ Oracle của hệ thống Flex: sau khi hoàn tất, `flex-auth-service` không còn phụ thuộc Oracle ở bất kỳ hình thức nào.
 - Code sản phẩm PHẢI nằm trong repo con `flex-auth-service` (theo nguyên tắc I của constitution); workstation chỉ chứa spec/plan/tài liệu.
+- Migration schema của database PostgreSQL mới PHẢI tuân theo quy ước migration PostgreSQL + Liquibase SQL-first đã áp dụng cho database `hnx` trong repo `flex-database` (xem `flex-database/docs/convention.md`), để đảm bảo nhất quán cách quản lý migration giữa các database trong hệ thống Flex. Database mới là một database riêng biệt (thay thế `aspnetidentity` hiện có), không lưu chung trong database `hnx`.
 
 ---
 
@@ -199,6 +200,7 @@ Quản trị viên/kỹ sư vận hành triển khai `flex-auth-service` phiên 
 ## 16. Phụ thuộc
 
 - Môi trường hạ tầng phát triển hiện có của workspace Flex (`flex-environment`) — cần PostgreSQL sẵn sàng cho `flex-auth-service`.
+- Quy ước migration PostgreSQL + Liquibase SQL-first của repo `flex-database` (đã áp dụng cho database `hnx`, xem `flex-database/docs/convention.md`) — database mới của `flex-auth-service` phải tuân theo cùng quy ước này.
 
 ---
 
