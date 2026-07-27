@@ -4,5 +4,29 @@
     "allow": [
       "Bash(claude --version)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/skill-format-guard.js\"",
+            "if": "Write(flex-agents/skills/**/SKILL.md)"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/skill-format-guard.js\"",
+            "if": "Edit(flex-agents/skills/**/SKILL.md)"
+          }
+        ]
+      }
+    ]
   }
 }
