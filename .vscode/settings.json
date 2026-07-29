@@ -6,6 +6,7 @@
   "scm.alwaysShowRepositories": true,
   "typescript.tsdk": "flex-microfrontend/node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  // Cấu hình full quyền cho antigravity
   "antigravity.agent.approvalPolicy": "never",
   "antigravity.terminal.autoApprove": true,
   "antigravity.permissions.mode": "auto"
