@@ -28,6 +28,7 @@ flex-workstation/
 
 Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sẽ:
 
+- Cấu hình mã hóa UTF-8 cho PowerShell và tự động thiết lập toàn cục `%USERPROFILE%\.wslconfig` (`localhostForwarding=false`) cho WSL2 trên Windows.
 - Đọc `workstation.json` và clone repo còn thiếu vào `flex-workstation/`.
 - Cập nhật repo đã có bằng `git fetch --prune` + `git pull --ff-only`.
 - Kiểm tra và cài Claude Code, `ccusage`, `rtk` nếu thiếu.

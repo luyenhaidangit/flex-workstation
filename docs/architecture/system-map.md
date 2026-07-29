@@ -149,6 +149,8 @@ flowchart TB
 SYNC_WORKSPACE.cmd
   → scripts\bootstrap.ps1
     → kiểm tra git, VS Code CLI code và winget
+    → cấu hình mã hóa UTF-8 cho PowerShell profile
+    → cấu hình toàn cục WSL2 (.wslconfig) set localhostForwarding=false
     → kiểm tra runtime config CLAUDE.md, AGENTS.md, .claude, .agents, .codex
     → tạo junction .claude/skills → .agents/skills (source dùng chung, được git track)
     → scripts\sync-repositories.ps1 -PullExisting

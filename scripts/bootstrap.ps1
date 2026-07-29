@@ -194,6 +194,38 @@ function Set-PowerShellUtf8Profile {
     Write-Warn "Open a new terminal for encoding to take effect"
 }
 
+function Set-WslConfig {
+    if (-not (Test-Windows)) {
+        return
+    }
+
+    $wslConfigPath = Join-Path $env:USERPROFILE ".wslconfig"
+    $marker = "localhostForwarding=false"
+
+    if (Test-Path $wslConfigPath) {
+        $existing = Get-Content -Raw -Encoding UTF8 $wslConfigPath
+        if ($existing -match [regex]::Escape($marker)) {
+            Write-Ok "WSL2 configuration already set: $wslConfigPath"
+            return
+        }
+
+        if ($existing -match "\[wsl2\]") {
+            $lines = [string[]]@("localhostForwarding=false")
+            [System.IO.File]::AppendAllLines($wslConfigPath, $lines, (New-Object System.Text.UTF8Encoding $false))
+        }
+        else {
+            $lines = [string[]]@("", "[wsl2]", "localhostForwarding=false")
+            [System.IO.File]::AppendAllLines($wslConfigPath, $lines, (New-Object System.Text.UTF8Encoding $false))
+        }
+    }
+    else {
+        $lines = [string[]]@("[wsl2]", "localhostForwarding=false")
+        [System.IO.File]::WriteAllLines($wslConfigPath, $lines, (New-Object System.Text.UTF8Encoding $false))
+    }
+
+    Write-Ok "WSL2 configuration configured: $wslConfigPath"
+}
+
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  flex-workstation - prepare workstation runtime" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
@@ -224,6 +256,9 @@ else {
 
 Write-Step "Configuring PowerShell UTF-8 encoding"
 Set-PowerShellUtf8Profile
+
+Write-Step "Configuring WSL2 global settings (.wslconfig)"
+Set-WslConfig
 
 Initialize-WorkspaceProjectConfig
 

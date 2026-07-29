@@ -30,7 +30,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\scripts\bootstrap.ps1
 ```
 
-Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; sau đó clone sub-repos và cài tool:
+Bootstrap kiểm tra `git`, VS Code CLI `code` và `winget`; tự động cấu hình UTF-8 cho PowerShell profile và tệp toàn cục `%USERPROFILE%\.wslconfig` (`localhostForwarding=false`) trên Windows; sau đó clone sub-repos và cài tool:
 
 Bootstrap đọc `workstation.json`, clone các repo còn thiếu vào workstation root, và cập nhật repo đã tồn tại bằng `git fetch --prune` + `git pull --ff-only`. Nếu repo có local changes, origin khác cấu hình hoặc đang ở detached HEAD, bootstrap cảnh báo và bỏ qua repo đó để tránh ghi đè thay đổi cục bộ.
 
