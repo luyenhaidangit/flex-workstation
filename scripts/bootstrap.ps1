@@ -199,6 +199,12 @@ function Set-WslConfig {
         return
     }
 
+    $templatePath = Join-Path $PSScriptRoot "templates\wslconfig"
+    if (-not (Test-Path $templatePath)) {
+        Write-Warn "WSL2 template file missing: $templatePath"
+        return
+    }
+
     $wslConfigPath = Join-Path $env:USERPROFILE ".wslconfig"
     $marker = "localhostForwarding=false"
 
@@ -209,21 +215,15 @@ function Set-WslConfig {
             return
         }
 
-        if ($existing -match "\[wsl2\]") {
-            $lines = [string[]]@("localhostForwarding=false")
-            [System.IO.File]::AppendAllLines($wslConfigPath, $lines, (New-Object System.Text.UTF8Encoding $false))
-        }
-        else {
-            $lines = [string[]]@("", "[wsl2]", "localhostForwarding=false")
-            [System.IO.File]::AppendAllLines($wslConfigPath, $lines, (New-Object System.Text.UTF8Encoding $false))
-        }
+        $templateContent = Get-Content -Raw -Encoding UTF8 $templatePath
+        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+        [System.IO.File]::AppendAllText($wslConfigPath, "`r`n" + $templateContent.Trim(), $utf8NoBom)
     }
     else {
-        $lines = [string[]]@("[wsl2]", "localhostForwarding=false")
-        [System.IO.File]::WriteAllLines($wslConfigPath, $lines, (New-Object System.Text.UTF8Encoding $false))
+        Copy-Item -LiteralPath $templatePath -Destination $wslConfigPath -Force
     }
 
-    Write-Ok "WSL2 configuration configured: $wslConfigPath"
+    Write-Ok "WSL2 configuration applied from template ($templatePath): $wslConfigPath"
 }
 
 Write-Host "============================================================" -ForegroundColor Cyan
