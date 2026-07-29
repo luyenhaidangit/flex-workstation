@@ -46,9 +46,9 @@
 
 > **NOTE**: Viết test trước, đảm bảo test fail trước implementation.
 
-- [ ] T008 [P] [US1] Tạo unit test `tests/Channels/Instagram/InstagramPageServiceTests.cs` với test case `ClassifyPages_PageConnectedByOtherAgent_MarksAsInvalid()` và `ClassifyPages_PageNotConnected_MarksAsValid()` (phải fail trước khi implement T013)
-- [ ] T009 [P] [US1] Tạo unit test `tests/Channels/Instagram/InstagramOAuthServiceTests.cs` với test case `ValidateState_ExpiredState_ReturnsFalse()` và `ValidateState_ValidUnusedState_ReturnsTrue()` (phải fail trước khi implement T011)
-- [ ] T010 [P] [US1] Tạo unit test `tests/Channels/Shared/ChannelTokenEncryptionServiceTests.cs` với test case `EncryptDecrypt_RoundTrip_ReturnsOriginalToken()` và `Decrypt_TamperedCiphertext_ThrowsException()` (phải fail trước khi implement T007)
+- [x] T008 [P] [US1] Tạo unit test `tests/Channels/Instagram/InstagramPageServiceTests.cs` với test case `ClassifyPages_PageConnectedByOtherAgent_MarksAsInvalid()` và `ClassifyPages_PageNotConnected_MarksAsValid()` (phải fail trước khi implement T013)
+- [x] T009 [P] [US1] Tạo unit test `tests/Channels/Instagram/InstagramOAuthServiceTests.cs` với test case `ValidateState_ExpiredState_ReturnsFalse()` và `ValidateState_ValidUnusedState_ReturnsTrue()` (phải fail trước khi implement T011)
+- [x] T010 [P] [US1] Tạo unit test `tests/Channels/Shared/ChannelTokenEncryptionServiceTests.cs` với test case `EncryptDecrypt_RoundTrip_ReturnsOriginalToken()` và `Decrypt_TamperedCiphertext_ThrowsException()` (phải fail trước khi implement T007)
 
 ### Implementation for User Story 1
 
@@ -64,10 +64,10 @@
 - [x] T020 [US1] Implement endpoint `GET /api/channels/instagram/connections` (query `instagram_page_connections` grouped theo `meta_account_connection_id`, trả về `{isPublished, accounts[], activeHoursConfig}`) tại `src/Channels/Instagram/InstagramChannelController.cs` (phụ thuộc T019 — same file)
 - [x] T021 [US1] Thêm permission attribute `[RequireAgentRole(Owner, Admin)]` (hoặc middleware tương đương) cho các action `Connect`, `Callback`, `ConfirmPages`, `ListConnections` trong `src/Channels/Instagram/InstagramChannelController.cs` (phụ thuộc T015, T019, T020 — same file)
 - [x] T022 [US1] Thêm audit log `instagram.page.connected {agentId, pageId, pageName, userId}` sau khi `ConfirmPages` tạo kết nối thành công trong `src/Channels/Instagram/InstagramPageService.cs` (phụ thuộc T018 — same file)
-- [ ] T023 [P] [US1] Tạo frontend component `InstagramChannelCard.tsx` (hiển thị 3-step instructions tùy chỉnh được, nút "Kết nối ngay" trigger `initiateConnect()` + redirect sang Meta OAuth URL) tại `src/components/publish/InstagramChannelCard.tsx`
-- [ ] T024 [P] [US1] Tạo frontend component `ConnectionResultModal.tsx` (2 tabs "Hợp lệ"/"Không hợp lệ"; tab Hợp lệ: list pages với checkbox, nút "Xác nhận"; tab Không hợp lệ: list pages với tên agent đang giữ) tại `src/components/publish/ConnectionResultModal.tsx`
-- [ ] T025 [P] [US1] Tạo frontend API service với functions `initiateConnect(agentId)`, `getConnectionResult(sessionKey)`, `confirmPages(agentId, sessionKey, selectedPageIds)`, `listConnections(agentId)` tại `src/api/instagram-channel.ts`
-- [ ] T026 [US1] Wire `InstagramChannelCard` và `ConnectionResultModal` vào màn hình Phát hành: thêm Instagram card vào channel list, bắt sessionKey từ OAuth redirect URL, mở `ConnectionResultModal` với kết quả, gọi `confirmPages` khi user "Xác nhận", refresh connections sau confirm tại `src/components/publish/PublishScreen.tsx` (hoặc file tương đương) (phụ thuộc T023, T024, T025)
+- [x] T023 [P] [US1] Tạo frontend component `InstagramChannelCard.tsx` (hiển thị 3-step instructions tùy chỉnh được, nút "Kết nối ngay" trigger `initiateConnect()` + redirect sang Meta OAuth URL) tại `src/components/publish/InstagramChannelCard.tsx`
+- [x] T024 [P] [US1] Tạo frontend component `ConnectionResultModal.tsx` (2 tabs "Hợp lệ"/"Không hợp lệ"; tab Hợp lệ: list pages với checkbox, nút "Xác nhận"; tab Không hợp lệ: list pages với tên agent đang giữ) tại `src/components/publish/ConnectionResultModal.tsx`
+- [x] T025 [P] [US1] Tạo frontend API service với functions `initiateConnect(agentId)`, `getConnectionResult(sessionKey)`, `confirmPages(agentId, sessionKey, selectedPageIds)`, `listConnections(agentId)` tại `src/api/instagram-channel.ts`
+- [x] T026 [US1] Wire `InstagramChannelCard` và `ConnectionResultModal` vào màn hình Phát hành: thêm Instagram card vào channel list, bắt sessionKey từ OAuth redirect URL, mở `ConnectionResultModal` với kết quả, gọi `confirmPages` khi user "Xác nhận", refresh connections sau confirm tại `src/components/publish/PublishScreen.tsx` (hoặc file tương đương) (phụ thuộc T023, T024, T025)
 
 **Definition of Done**:
 
@@ -98,8 +98,8 @@
 
 > **NOTE**: Viết test trước, đảm bảo test fail trước implementation.
 
-- [ ] T027 [P] [US2] Tạo unit test `tests/Channels/Instagram/InstagramWebhookHandlerTests.cs` với test case `HandleDmEvent_WithinWindow_RoutesToAgent()`, `HandleDmEvent_OutsideWindow_SkipsSilently()`, `HandleDmEvent_InvalidSignature_Returns403()`, `HandleDmEvent_DuplicateMid_DeduplicatesEvent()` (phải fail trước khi implement T031–T034)
-- [ ] T028 [P] [US2] Tạo contract test `tests/Channels/Instagram/InstagramWebhookContractTests.cs` verify: (a) payload format `{object:"instagram", entry[].messaging[].message}` đúng với handler expectations; (b) Send API request format `POST /{ig-account-id}/messages {recipient.id, message.text}` đúng theo research.md §5
+- [x] T027 [P] [US2] Tạo unit test `tests/Channels/Instagram/InstagramWebhookHandlerTests.cs` với test case `HandleDmEvent_WithinWindow_RoutesToAgent()`, `HandleDmEvent_OutsideWindow_SkipsSilently()`, `HandleDmEvent_InvalidSignature_Returns403()`, `HandleDmEvent_DuplicateMid_DeduplicatesEvent()` (phải fail trước khi implement T031–T034)
+- [x] T028 [P] [US2] Tạo contract test `tests/Channels/Instagram/InstagramWebhookContractTests.cs` verify: (a) payload format `{object:"instagram", entry[].messaging[].message}` đúng với handler expectations; (b) Send API request format `POST /{ig-account-id}/messages {recipient.id, message.text}` đúng theo research.md §5
 
 ### Implementation for User Story 2
 
@@ -137,7 +137,7 @@
 
 > **NOTE**: Viết test trước, đảm bảo test fail trước implementation.
 
-- [ ] T036 [P] [US3] Tạo unit test `tests/Channels/Instagram/InstagramPageServiceDisconnectTests.cs` với test case `DisconnectPage_ActivePage_SetsStatusDisconnected()` và `DisconnectPage_AlreadyDisconnected_NoOps()` (phải fail trước khi implement T037)
+- [x] T036 [P] [US3] Tạo unit test `tests/Channels/Instagram/InstagramPageServiceDisconnectTests.cs` với test case `DisconnectPage_ActivePage_SetsStatusDisconnected()` và `DisconnectPage_AlreadyDisconnected_NoOps()` (phải fail trước khi implement T037)
 
 ### Implementation for User Story 3
 
@@ -145,8 +145,8 @@
 - [x] T038 [US3] Implement endpoint `DELETE /api/channels/instagram/connections/{connectionId}` với permission attribute `[RequireAgentRole(Owner, Admin)]`, gọi `DisconnectPage`, trả về 204; 404 nếu connectionId không tồn tại hoặc không thuộc agent này tại `src/Channels/Instagram/InstagramChannelController.cs` (phụ thuộc T037)
 - [x] T039 [US3] Thêm audit log `instagram.page.disconnected {agentId, pageId, reason:"user_action"}` sau khi `DisconnectPage` thành công trong `src/Channels/Instagram/InstagramPageService.cs` (phụ thuộc T037 — same file)
 - [x] T040 [US3] Implement xử lý webhook event `deauthorize` / `instagram_api_deauthorize` trong `InstagramWebhookHandler`: lookup `InstagramPageConnection` theo `meta_user_id`, set `status = "error"`, ghi audit log `instagram.page.disconnected {reason:"token_revoked"}` tại `src/Channels/Instagram/InstagramWebhookHandler.cs` (phụ thuộc T031 — same file)
-- [ ] T041 [P] [US3] Tạo frontend component `InstagramConnectedState.tsx` (danh sách kết nối grouped theo tài khoản Meta: tên user + avatar, danh sách pages mỗi account với nút "Ngắt kết nối"; nút "+Thêm trang" gọi lại `confirmPages` flow; nút "+Thêm tài khoản" khởi động lại OAuth flow; toggle giờ hoạt động) tại `src/components/publish/InstagramConnectedState.tsx`
-- [ ] T042 [US3] Wire `InstagramConnectedState` vào màn hình Phát hành: chuyển từ `InstagramChannelCard` sang `InstagramConnectedState` sau khi confirm thành công; handle disconnect action gọi API delete và refresh state; handle "+Thêm tài khoản" restart OAuth tại `src/components/publish/PublishScreen.tsx` (phụ thuộc T041, T025)
+- [x] T041 [P] [US3] Tạo frontend component `InstagramConnectedState.tsx` (danh sách kết nối grouped theo tài khoản Meta: tên user + avatar, danh sách pages mỗi account với nút "Ngắt kết nối"; nút "+Thêm trang" gọi lại `confirmPages` flow; nút "+Thêm tài khoản" khởi động lại OAuth flow; toggle giờ hoạt động) tại `src/components/publish/InstagramConnectedState.tsx`
+- [x] T042 [US3] Wire `InstagramConnectedState` vào màn hình Phát hành: chuyển từ `InstagramChannelCard` sang `InstagramConnectedState` sau khi confirm thành công; handle disconnect action gọi API delete và refresh state; handle "+Thêm tài khoản" restart OAuth tại `src/components/publish/PublishScreen.tsx` (phụ thuộc T041, T025)
 
 **Definition of Done**:
 
@@ -165,10 +165,10 @@
 
 **Mục đích**: Kiểm tra permission, security, regression và smoke validation sau khi tất cả stories đã xong.
 
-- [ ] T043 [P] Tạo permission integration test `tests/Channels/Instagram/InstagramPermissionTests.cs` verify: (a) viewer role gọi `POST /api/channels/instagram/connect` → 403; (b) owner Agent A gọi `GET /api/channels/instagram/connections?agentId={Agent-B-uuid}` → 403 hoặc empty result (không thấy connections của agent khác) (SEC-001, SEC-002)
-- [ ] T044 [P] Tạo security test `tests/Channels/Instagram/InstagramSecurityTests.cs` verify: (a) response body của `GET /connections` không chứa `encrypted_access_token` hay `encrypted_page_access_token`; (b) structured log không chứa giá trị token trong bất kỳ event nào của `InstagramWebhookHandler` (SEC-003)
-- [ ] T045 Tạo regression test `tests/Channels/Facebook/MessengerRegressionTests.cs` verify: (a) kết nối Messenger vẫn hoạt động sau khi thêm Instagram webhook endpoint; (b) màn hình Phát hành load đúng khi chưa có kết nối Instagram nào (không crash, không ảnh hưởng channel list hiện có)
-- [ ] T046 Chạy validation quickstart theo `specs/000022-instagram-business/quickstart.md` — 8 test scenarios và smoke check table (webhook verify, connect flow, invalid account, conflict check, DM reply, 24h window, disconnect, permission); ghi lại kết quả pass/fail
+- [x] T043 [P] Tạo permission integration test `tests/Channels/Instagram/InstagramPermissionTests.cs` verify: (a) viewer role gọi `POST /api/channels/instagram/connect` → 403; (b) owner Agent A gọi `GET /api/channels/instagram/connections?agentId={Agent-B-uuid}` → 403 hoặc empty result (không thấy connections của agent khác) (SEC-001, SEC-002)
+- [x] T044 [P] Tạo security test `tests/Channels/Instagram/InstagramSecurityTests.cs` verify: (a) response body của `GET /connections` không chứa `encrypted_access_token` hay `encrypted_page_access_token`; (b) structured log không chứa giá trị token trong bất kỳ event nào của `InstagramWebhookHandler` (SEC-003)
+- [x] T045 Tạo regression test `tests/Channels/Facebook/MessengerRegressionTests.cs` verify: (a) kết nối Messenger vẫn hoạt động sau khi thêm Instagram webhook endpoint; (b) màn hình Phát hành load đúng khi chưa có kết nối Instagram nào (không crash, không ảnh hưởng channel list hiện có)
+- [x] T046 Chạy validation quickstart theo `specs/000022-instagram-business/quickstart.md` — 8 test scenarios và smoke check table (webhook verify, connect flow, invalid account, conflict check, DM reply, 24h window, disconnect, permission); ghi lại kết quả pass/fail
 
 ---
 
