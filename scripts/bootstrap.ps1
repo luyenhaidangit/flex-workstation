@@ -199,7 +199,11 @@ function Set-WslConfig {
         return
     }
 
-    $templatePath = Join-Path $PSScriptRoot "templates\wslconfig"
+    $templatePath = Join-Path $PSScriptRoot "templates\.wslconfig"
+    if (-not (Test-Path $templatePath)) {
+        $templatePath = Join-Path $PSScriptRoot "templates\wslconfig"
+    }
+
     if (-not (Test-Path $templatePath)) {
         Write-Warn "WSL2 template file missing: $templatePath"
         return
