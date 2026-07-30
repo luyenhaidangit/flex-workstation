@@ -7,10 +7,10 @@
 **Ngày tạo**: 2026-07-29
 **Người review**: Luyện Hải Đăng
 **Trạng thái review**: Hoàn tất
-**Lần review**: Lần 1
+**Lần review**: Lần 2 (re-validate sau `$speckit-clarify`, Session 2026-07-30)
 **Tính năng**: [spec.md](../spec.md)
 **Artifact chính được kiểm tra**: `spec.md`
-**Nguồn tham chiếu**: `constitution.md`, `spec.md`
+**Nguồn tham chiếu**: `constitution.md` (v1.2.0), `spec.md`
 
 ---
 
@@ -32,25 +32,25 @@
 | Artifact | Đường dẫn/Link | Trạng thái | Ghi chú |
 |----------|----------------|------------|---------|
 | `spec.md` | [spec.md](../spec.md) | Đã kiểm | Artifact nguồn của quality gate |
-| `constitution.md` | [constitution.md](../../../.specify/memory/constitution.md) | Không áp dụng | Không tìm thấy constitution được thiết lập cho project này |
+| `constitution.md` | [constitution.md](../../../.specify/memory/constitution.md) | Đã kiểm | Đối chiếu spec với các nguyên tắc cốt lõi (v1.2.0) |
 
 ---
 
 ## Kết quả tổng hợp
 
-**Trạng thái**: Fail
+**Trạng thái**: Pass
 
 **Tổng số item**: 16
 
-**Pass**: 15
+**Pass**: 16
 
-**Fail**: 1
+**Fail**: 0
 
 **Không áp dụng**: 0
 
-**Blocker fail**: 1
+**Blocker fail**: 0
 
-**Bước tiếp theo được phép**: Không — cần xử lý §18 Câu hỏi mở qua `$speckit-clarify` trước khi chuyển `$speckit-plan`
+**Bước tiếp theo được phép**: Có — sẵn sàng chuyển `$speckit-plan`
 
 **Quy tắc kết luận**:
 
@@ -76,13 +76,7 @@
 
 ## Tính đầy đủ của requirement
 
-- [ ] CHK005 `[Blocker]` `[Status: Fail]` Không còn marker `[NEEDS CLARIFICATION]` hoặc `[CẦN LÀM RÕ]` chặn lập plan. [Readiness]
-  - **Phát hiện**: §18 còn 3 marker `[CẦN LÀM RÕ]` chưa trả lời: danh sách domain whitelist CORS chính thức, giải pháp secret management hiện có cho JWT key, và deadline ưu tiên cho các hạng mục ngoài MVP.
-  - **Ảnh hưởng**: Nếu không làm rõ, MVP-002 (CORS whitelist) và MVP-003 (JWT secret store) không thể lập plan kỹ thuật chính xác; roadmap ngoài MVP thiếu cơ sở ưu tiên.
-  - **Đề xuất**: Chạy `$speckit-clarify` để thu thập câu trả lời từ stakeholder trước khi chuyển `$speckit-plan`.
-  - **Tham chiếu**: Spec §18, MVP-002, MVP-003, FR-003, FR-004, FR-007
-  - **Owner**: Luyện Hải Đăng
-  - **Hạn xử lý**: Trước khi chạy `$speckit-plan`
+- [x] CHK005 `[Blocker]` `[Status: Pass]` Không còn marker `[NEEDS CLARIFICATION]` hoặc `[CẦN LÀM RÕ]` chặn lập plan. [Readiness]
 - [x] CHK006 `[High]` `[Status: Pass]` Requirement kiểm thử được, không mơ hồ và có priority/traceability khi áp dụng. [Measurability]
 - [x] CHK007 `[High]` `[Status: Pass]` Success criteria đo lường được và không phụ thuộc công nghệ. [Measurability]
 - [x] CHK008 `[High]` `[Status: Pass]` User scenario và acceptance criteria đã bao phủ luồng chính. [Coverage]
@@ -93,7 +87,7 @@
 
 - [x] CHK011 `[High]` `[Status: Pass]` Functional requirement quan trọng có acceptance criteria hoặc traceability phù hợp. [Traceability]
 - [x] CHK012 `[Medium]` `[Status: Pass]` User scenario bao phủ các luồng P1/P2 thực tế. [Coverage]
-- [x] CHK013 `[High]` `[Status: Không áp dụng]` Không tìm thấy `.specify/memory/constitution.md` trong project — không có gate constitution để đối chiếu. [Constitution]
+- [x] CHK013 `[High]` `[Status: Pass]` Spec tuân thủ constitution v1.2.0: chỉ mô tả WHY/WHAT (Nguyên tắc II), có đủ vấn đề/MVP/user scenario/AC/FR/BR/ngoài phạm vi và dùng ID traceable US/AC/FR/BR/SEC/NFR/SC (§6 `spec.md`), không sửa source code sub-repo (Nguyên tắc I). [Constitution]
 - [x] CHK014 `[High]` `[Status: Pass]` Không có chi tiết implementation làm sai phạm vi của spec. [Readiness]
 - [x] CHK015 `[Medium]` `[Status: Pass]` Rủi ro, audit và dữ liệu nhạy cảm được ghi nhận khi áp dụng. [Coverage]
 - [x] CHK016 `[Medium]` `[Status: Pass]` Feature có điều kiện sẵn sàng rõ ràng trước khi chuyển bước. [Readiness]
@@ -125,11 +119,11 @@ Khi item có `Status: Fail`, ghi trực tiếp bên dưới item:
 
 ## Kết luận và hành động tiếp theo
 
-**Kết quả checklist**: Fail
+**Kết quả checklist**: Pass
 
-**Có được chuyển bước tiếp theo không**: Không — cần xử lý CHK005 trước
+**Có được chuyển bước tiếp theo không**: Có — CHK005 đã pass sau khi 3 câu hỏi ở §18 được làm rõ qua `$speckit-clarify` (Session 2026-07-30)
 
-**Bước tiếp theo được đề xuất**: `$speckit-clarify` để làm rõ 3 câu hỏi ở §18, sau đó re-run validation
+**Bước tiếp theo được đề xuất**: `$speckit-plan`
 
 **Điều kiện để được chuyển bước**:
 

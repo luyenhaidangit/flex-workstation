@@ -29,7 +29,7 @@ Thực hiện review toàn diện gateway hiện tại đối chiếu với chec
 
 ## 2. Mục tiêu
 
-- **MT-001**: Đóng các khoảng trống bảo mật nghiêm trọng (CORS mở, khóa JWT không an toàn) trước khi gateway được xem là sẵn sàng production.
+- **MT-001**: Đóng khoảng trống bảo mật nghiêm trọng ở cấu hình CORS (mở mọi origin) trước khi gateway được xem là sẵn sàng production. Khoảng trống khóa JWT plaintext được ghi nhận là rủi ro chấp nhận tạm thời, xử lý ở lộ trình sau MVP (xem §15, §16).
 - **MT-002**: Đảm bảo khả năng chịu lỗi và tính sẵn sàng cao (failover, health check) hoạt động thực sự ở production, không chỉ tồn tại trong cấu hình dev.
 - **MT-003**: Có báo cáo rõ ràng, có ưu tiên về toàn bộ khoảng trống so với best practices để lập kế hoạch xử lý tiếp theo.
 - **MT-004**: Tài liệu kỹ thuật của gateway phản ánh đúng trạng thái triển khai thực tế, tránh gây hiểu lầm khi ra quyết định vận hành.
@@ -41,8 +41,8 @@ Thực hiện review toàn diện gateway hiện tại đối chiếu với chec
 Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 - **MVP-001**: Báo cáo gap analysis đầy đủ cho toàn bộ 11 hạng mục best practices, có mức ưu tiên (P0/P1/P2) và chỉ rõ điểm sai lệch giữa tài liệu và triển khai thực tế.
-- **MVP-002**: Chính sách CORS ở production được giới hạn theo danh sách domain được phép, thay vì cho phép mọi origin.
-- **MVP-003**: Khóa ký JWT không còn được lưu dưới dạng plaintext trong file cấu hình được commit vào source.
+- **MVP-002**: Chính sách CORS ở production được giới hạn theo danh sách domain được phép — lấy baseline là các domain production hiện tại của frontend/service đang gọi qua gateway (ví dụ `flex-microfrontend`) — thay vì cho phép mọi origin.
+- ~~**MVP-003**: Khóa ký JWT không còn được lưu dưới dạng plaintext trong file cấu hình được commit vào source.~~ Đã rút khỏi phạm vi MVP theo quyết định stakeholder (2026-07-30) — chuyển sang lộ trình sau MVP, xem §15 Ngoài phạm vi và §16 Rủi ro.
 - **MVP-004**: Cấu hình cluster/destination/health-check/load-balancing được kích hoạt ở production tương đương với cấu hình đã có ở dev.
 - **MVP-005**: Gateway có endpoint kiểm tra tình trạng (health/readiness) riêng, độc lập với health check của các cluster downstream.
 - **MVP-006**: Tài liệu kỹ thuật của gateway được cập nhật để phản ánh đúng trạng thái sau khi các mục MVP hoàn tất.
@@ -80,20 +80,19 @@ Platform team thực hiện review gateway hiện tại đối chiếu checklist
 
 ---
 
-### US-002 — Khắc phục khoảng trống bảo mật nghiêm trọng (Ưu tiên: P1)
+### US-002 — Khắc phục khoảng trống bảo mật CORS nghiêm trọng (Ưu tiên: P1)
 
-DevOps/Security xử lý các khoảng trống bảo mật mức độ cao (CORS mở, khóa JWT không an toàn) để gateway an toàn trước khi được xem là sẵn sàng production.
+DevOps/Security xử lý khoảng trống bảo mật CORS (mở mọi origin) để gateway an toàn trước khi được xem là sẵn sàng production. Khoảng trống khóa JWT plaintext không thuộc MVP này (xem §15 Ngoài phạm vi).
 
 **Lý do ưu tiên**: Rủi ro bảo mật ảnh hưởng trực tiếp tới toàn bộ hệ thống phía sau gateway; cần xử lý trước các cải tiến khác.
 
-**Liên quan yêu cầu**: FR-003, FR-004
+**Liên quan yêu cầu**: FR-003
 
-**Test độc lập**: Có thể test độc lập bằng cách kiểm tra cấu hình CORS chỉ chấp nhận domain trong whitelist, và xác nhận không còn khóa JWT dạng plaintext trong source được commit.
+**Test độc lập**: Có thể test độc lập bằng cách kiểm tra cấu hình CORS chỉ chấp nhận domain trong whitelist.
 
 **Acceptance Criteria**:
 
 1. **AC-003**: **Cho trước** cấu hình CORS hiện tại cho phép mọi origin, **Khi** cải tiến được áp dụng, **Thì** chỉ các domain trong danh sách được duyệt mới truy cập được gateway ở production; request từ origin khác bị từ chối.
-2. **AC-004**: **Cho trước** khóa ký JWT đang lưu plaintext trong file cấu hình, **Khi** cải tiến được áp dụng, **Thì** khóa được lấy từ nơi lưu trữ an toàn (secret store/biến môi trường) và không còn xuất hiện dạng plaintext trong mã nguồn được commit.
 
 ---
 
@@ -133,10 +132,9 @@ Vận hành cần gateway có khả năng failover và health check hoạt độ
   **Liên quan**: US-001, AC-001
 - **FR-002** `[P1]`: Báo cáo PHẢI chỉ rõ các điểm sai lệch giữa tài liệu kỹ thuật hiện có và triển khai thực tế của gateway.
   **Liên quan**: US-001, AC-002
-- **FR-003** `[P1]`: Hệ thống PHẢI giới hạn CORS ở production theo danh sách domain được duyệt, không sử dụng cấu hình cho phép mọi origin.
+- **FR-003** `[P1]`: Hệ thống PHẢI giới hạn CORS ở production theo danh sách domain được duyệt — baseline là các domain production hiện tại của frontend/service đang gọi qua gateway — không sử dụng cấu hình cho phép mọi origin.
   **Liên quan**: US-002, AC-003
-- **FR-004** `[P1]`: Hệ thống KHÔNG ĐƯỢC lưu trữ khóa ký xác thực (JWT signing key) dưới dạng plaintext trong file cấu hình được commit vào source.
-  **Liên quan**: US-002, AC-004
+- ~~**FR-004** `[P1]`: Hệ thống KHÔNG ĐƯỢC lưu trữ khóa ký xác thực (JWT signing key) dưới dạng plaintext trong file cấu hình được commit vào source.~~ Đã rút khỏi phạm vi MVP (xem §15 Ngoài phạm vi) — đưa vào đề xuất lộ trình ở FR-007.
 - **FR-005** `[P2]`: Hệ thống PHẢI kích hoạt cấu hình cluster/destination/health-check/load-balancing ở production tương đương với cấu hình đã có ở môi trường dev.
   **Liên quan**: US-003, AC-005
 - **FR-006** `[P2]`: Hệ thống PHẢI cung cấp endpoint kiểm tra tình trạng gateway (health/readiness) độc lập, phục vụ giám sát và load balancer.
@@ -204,7 +202,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 ## 13. Tiêu chí thành công *(bắt buộc)*
 
 - **SC-001**: 100% các hạng mục trong checklist best practices xuất hiện trong báo cáo với trạng thái và mức ưu tiên rõ ràng.
-- **SC-002**: Toàn bộ khoảng trống mức P0 (bảo mật, khả năng chịu lỗi production) được khắc phục trước khi gateway được công bố là sẵn sàng production.
+- **SC-002**: Khoảng trống CORS mở và khoảng trống chịu lỗi production (cluster/health-check) được khắc phục trước khi gateway được công bố là sẵn sàng production. Khoảng trống JWT secret plaintext được ghi nhận là rủi ro chấp nhận, không chặn công bố production trong MVP này (xem §15, §16).
 - **SC-003**: Không còn điểm sai lệch giữa tài liệu kỹ thuật của gateway và triển khai thực tế đối với các hạng mục đã được review.
 
 ---
@@ -215,6 +213,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 - Checklist tại `docs/architecture/api-gateway-best-practices.md` là nguồn tham chiếu chính cho review.
 - Hệ thống gateway hiện tại (`flex-api-gateway`) tiếp tục là nền tảng, không thay đổi sang công nghệ gateway khác.
 - Platform team có đủ nguồn lực để xử lý các mục MVP sau khi có báo cáo gap.
+- Các hạng mục ngoài MVP không có deadline cụ thể từ stakeholder; platform team tự sắp xếp lộ trình theo mức ưu tiên trong báo cáo gap (P0/P1/P2).
 
 **Ràng buộc**:
 - PHẢI tương thích ngược với các client/service đang gọi qua gateway hiện tại — không được phá vỡ hợp đồng API hiện có.
@@ -226,6 +225,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 - Thiết kế lại kiến trúc gateway từ đầu hoặc chuyển sang công nghệ gateway khác (Kong, Envoy, Apigee...).
 - Triển khai đầy đủ các hạng mục nâng cao ngoài MVP: caching, API versioning, distributed tracing, metrics/dashboard, developer portal — các mục này chỉ được đưa vào đề xuất lộ trình (FR-007), không implement trong spec này.
+- Xử lý khóa ký JWT lưu plaintext trong file cấu hình (MVP-003/FR-004 cũ) — dù là khoảng trống bảo mật mức P0 theo BR-001, stakeholder quyết định (2026-07-30) rút khỏi phạm vi MVP và chuyển sang lộ trình sau MVP (đề xuất ưu tiên trong báo cáo gap qua FR-007). Rủi ro liên quan xem §16.
 - Thay đổi luồng nghiệp vụ hoặc hợp đồng API của các service downstream.
 
 ---
@@ -234,7 +234,8 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 | Rủi ro | Khả năng | Tác động | Biện pháp |
 |--------|----------|----------|-----------|
-| CORS mở và khóa JWT plaintext bị khai thác trước khi kịp khắc phục | Trung | Cao | Ưu tiên xử lý MVP-002/MVP-003 sớm nhất; giới hạn truy cập tạm thời nếu cần trong lúc chờ fix. |
+| CORS mở bị khai thác trước khi kịp khắc phục | Trung | Cao | Ưu tiên xử lý MVP-002 sớm nhất; giới hạn truy cập tạm thời nếu cần trong lúc chờ fix. |
+| Khóa JWT plaintext trong source bị khai thác trong thời gian bị hoãn xử lý (ngoài phạm vi MVP) | Trung | Cao | Rủi ro được stakeholder chấp nhận có ý thức (2026-07-30); đề xuất ưu tiên cao nhất trong lộ trình sau MVP (FR-007); hạn chế quyền truy cập repo chứa file cấu hình trong lúc chờ xử lý. |
 | Bật cấu hình cluster/health-check ở production bị cấu hình sai, gây gián đoạn traffic | Trung | Cao | Test kỹ ở staging trước khi áp dụng production; chuẩn bị rollback plan. |
 | Team thiếu nguồn lực để xử lý hết lộ trình ngoài MVP | Trung | Trung | Ưu tiên theo mức độ rủi ro trong báo cáo, cho phép triển khai theo giai đoạn tiếp theo. |
 
@@ -242,20 +243,26 @@ Nếu có, hệ thống PHẢI ghi nhận:
 
 ## 17. Phụ thuộc
 
-- Phụ thuộc vào giải pháp secret management hiện có của tổ chức (hoặc quyết định chọn mới) để lưu khóa ký JWT an toàn.
-- Cần xác nhận danh sách domain whitelist chính thức cho CORS từ team frontend/product trước khi áp dụng.
+- Danh sách domain whitelist CORS lấy baseline từ domain production hiện tại của frontend/service đang gọi gateway; xác nhận lại với team frontend/product nếu có domain mới phát sinh sau MVP.
+- Việc xử lý khóa ký JWT plaintext (ngoài phạm vi MVP) phụ thuộc vào giải pháp secret management được chọn ở lộ trình sau MVP; không phải phụ thuộc chặn MVP này.
 
 ---
 
 ## 18. Câu hỏi mở
 
-- [CẦN LÀM RÕ: Danh sách domain chính thức cần whitelist cho CORS ở production là gì?]
-- [CẦN LÀM RÕ: Tổ chức đã có giải pháp secret management (Vault, Azure Key Vault, AWS Secrets Manager...) sẵn dùng chưa, hay cần chọn mới cho khóa JWT?]
-- [CẦN LÀM RÕ: Các hạng mục ngoài MVP (caching, versioning, tracing, metrics) có deadline ưu tiên cụ thể từ stakeholder không, hay để platform team tự sắp xếp lộ trình?]
+- [ĐÃ LÀM RÕ → Clarifications / Session 2026-07-30]
+- [ĐÃ LÀM RÕ → Clarifications / Session 2026-07-30]
+- [ĐÃ LÀM RÕ → Clarifications / Session 2026-07-30]
 
 ---
 
 ## Clarifications
+
+### Session 2026-07-30
+
+- Q: Danh sách domain chính thức cần whitelist cho CORS ở production là gì? → A: Dùng domain production hiện tại của các frontend/service đang gọi qua gateway (ví dụ `flex-microfrontend`) làm baseline whitelist.
+- Q: Tổ chức đã có giải pháp secret management sẵn dùng cho khóa JWT chưa, hay cần chọn mới? → A: Không xử lý trong MVP này — khoảng trống JWT secret plaintext bị rút khỏi phạm vi MVP, chuyển sang lộ trình sau MVP (xem §15 Ngoài phạm vi, §16 Rủi ro).
+- Q: Các hạng mục ngoài MVP (caching, versioning, tracing, metrics) có deadline ưu tiên cụ thể từ stakeholder không? → A: Không có deadline cụ thể — platform team tự sắp xếp lộ trình theo mức ưu tiên trong báo cáo gap (P0/P1/P2).
 
 ---
 
@@ -268,4 +275,4 @@ Nếu có, hệ thống PHẢI ghi nhận:
 - [x] Quy tắc nghiệp vụ quan trọng đã được ghi nhận.
 - [x] Phân quyền/bảo mật đã rõ hoặc được đánh dấu là câu hỏi mở.
 - [x] Ngoài phạm vi đã rõ.
-- [ ] Các câu hỏi mở quan trọng đã được trả lời hoặc được chấp nhận là rủi ro.
+- [x] Các câu hỏi mở quan trọng đã được trả lời hoặc được chấp nhận là rủi ro.
