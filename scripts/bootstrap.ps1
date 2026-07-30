@@ -210,24 +210,22 @@ function Set-WslConfig {
     }
 
     $wslConfigPath = Join-Path $env:USERPROFILE ".wslconfig"
-    $marker = "localhostForwarding=false"
+    $templateContent = Get-Content -Raw -Encoding UTF8 $templatePath
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 
     if (Test-Path $wslConfigPath) {
         $existing = Get-Content -Raw -Encoding UTF8 $wslConfigPath
-        if ($existing -match [regex]::Escape($marker)) {
-            Write-Ok "WSL2 configuration already set: $wslConfigPath"
+        if ($existing.Trim() -eq $templateContent.Trim()) {
+            Write-Ok "WSL2 configuration already up to date: $wslConfigPath"
             return
         }
-
-        $templateContent = Get-Content -Raw -Encoding UTF8 $templatePath
-        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-        [System.IO.File]::AppendAllText($wslConfigPath, "`r`n" + $templateContent.Trim(), $utf8NoBom)
+        [System.IO.File]::WriteAllText($wslConfigPath, $templateContent, $utf8NoBom)
+        Write-Ok "WSL2 configuration updated from template ($templatePath): $wslConfigPath"
     }
     else {
-        Copy-Item -LiteralPath $templatePath -Destination $wslConfigPath -Force
+        [System.IO.File]::WriteAllText($wslConfigPath, $templateContent, $utf8NoBom)
+        Write-Ok "WSL2 configuration applied from template ($templatePath): $wslConfigPath"
     }
-
-    Write-Ok "WSL2 configuration applied from template ($templatePath): $wslConfigPath"
 }
 
 Write-Host "============================================================" -ForegroundColor Cyan
