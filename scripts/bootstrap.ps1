@@ -221,10 +221,12 @@ function Set-WslConfig {
         }
         [System.IO.File]::WriteAllText($wslConfigPath, $templateContent, $utf8NoBom)
         Write-Ok "WSL2 configuration updated from template ($templatePath): $wslConfigPath"
+        Write-Warn "Run 'wsl --shutdown' then 'wsl -d Ubuntu' in PowerShell for .wslconfig changes to take effect"
     }
     else {
         [System.IO.File]::WriteAllText($wslConfigPath, $templateContent, $utf8NoBom)
         Write-Ok "WSL2 configuration applied from template ($templatePath): $wslConfigPath"
+        Write-Warn "Run 'wsl --shutdown' then 'wsl -d Ubuntu' in PowerShell for .wslconfig changes to take effect"
     }
 }
 
