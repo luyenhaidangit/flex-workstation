@@ -8,7 +8,7 @@
 
 ## Tóm tắt
 
-**Yêu cầu chính từ spec**: MVP-001–005, FR-001–007 — tách `flex-agent-service` (hiện là 1 project `FlexAgentService.csproj` phẳng) thành 3 project theo layer (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent`), theo đúng khuôn mẫu `flex-auth-service` (`Flex.Domain` / `Flex.Infrastructures` / `Flex.Auth`), không đổi API contract, schema DB, hay hành vi nghiệp vụ Instagram Business hiện có (US-001, US-002).
+**Yêu cầu chính từ spec**: MVP-001–005, FR-001–007 — tách `flex-agent-service` (hiện là 1 project `FlexAgentService.csproj` phẳng) thành 3 project theo layer (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent.Api`), theo đúng khuôn mẫu `flex-auth-service` (`Flex.Domain` / `Flex.Infrastructures` / `Flex.Auth`), không đổi API contract, schema DB, hay hành vi nghiệp vụ Instagram Business hiện có (US-001, US-002).
 
 **Hướng tiếp cận kỹ thuật dự kiến**: Di chuyển từng file/thư mục hiện có sang project mới theo đúng vai trò layer (xem research.md), tạo `Flex.Agent.sln`, tạo project test mới `Flex.Agent.Tests` để chạy các test hiện có (hiện chưa có project test khả thi), build + test sau mỗi bước di chuyển nhỏ để giảm rủi ro.
 
@@ -17,9 +17,9 @@
 ## Phạm vi kỹ thuật
 
 **Trong phạm vi**:
-- `flex-agent-service`: tạo `Flex.Agent.sln` và 3 project chính (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent`), di chuyển toàn bộ code hiện có (`Channels/`, `Data/`, `Shared/`, `Program.cs`, `appsettings.*`) vào đúng project theo layer.
+- `flex-agent-service`: tạo `Flex.Agent.sln` và 3 project chính (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent.Api`), di chuyển toàn bộ code hiện có (`Channels/`, `Data/`, `Shared/`, `Program.cs`, `appsettings.*`) vào đúng project theo layer.
 - Tạo project test `Flex.Agent.Tests`, di chuyển các file test hiện có từ `tests/Channels/*` vào đó và đảm bảo chạy được.
-- Cập nhật namespace từ `FlexAgentService.*` sang `Flex.Agent.*` (Domain/Infrastructures) và `Flex.Agent` (API) tương ứng.
+- Cập nhật namespace từ `FlexAgentService.*` sang `Flex.Agent.*` (Domain/Infrastructures) và `Flex.Agent.Api` (API) tương ứng.
 
 **Ngoài phạm vi kỹ thuật**:
 - Không thêm channel mới (Facebook Messenger, Zalo...).

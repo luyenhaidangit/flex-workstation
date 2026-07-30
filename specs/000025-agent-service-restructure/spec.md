@@ -46,7 +46,7 @@ Tái cấu trúc mã nguồn `flex-agent-service` thành nhiều project theo m�
 
 Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
-- **MVP-001**: Tách `flex-agent-service` thành đúng 3 project theo layer kiến trúc, đặt tên theo namespace `Flex.Agent.*` (nhất quán với `Flex.Auth.*`): `Flex.Agent.Domain` (entity, enum nghiệp vụ như `ChannelType`), `Flex.Agent.Infrastructures` (EF Core `AppDbContext`, migrations, các dịch vụ hạ tầng như mã hoá token), và `Flex.Agent` (API host: controllers, DI, `Program.cs`). Không tách thêm project riêng theo từng channel (Instagram, Facebook...) — các channel nằm trong thư mục con của project theo layer tương ứng.
+- **MVP-001**: Tách `flex-agent-service` thành đúng 3 project theo layer kiến trúc, đặt tên theo namespace `Flex.Agent.*` (nhất quán với `Flex.Auth.*`): `Flex.Agent.Domain` (entity, enum nghiệp vụ như `ChannelType`), `Flex.Agent.Infrastructures` (EF Core `AppDbContext`, migrations, các dịch vụ hạ tầng như mã hoá token), và `Flex.Agent.Api` (API host: controllers, DI, `Program.cs`). Không tách thêm project riêng theo từng channel (Instagram, Facebook...) — các channel nằm trong thư mục con của project theo layer tương ứng.
 - **MVP-002**: Toàn bộ tính năng Instagram Business hiện có (`Channels/Instagram/*`) được di chuyển vào cấu trúc project mới mà không đổi hành vi, route, hay contract API.
 - **MVP-003**: Solution file (`.sln`) được tạo để build toàn bộ các project cùng lúc, thay cho project đơn `FlexAgentService.csproj`.
 - **MVP-004**: Toàn bộ test hiện có (`tests/Channels/*`) tiếp tục pass sau khi tái cấu trúc, được cập nhật theo namespace/project mới nếu cần.
@@ -119,7 +119,7 @@ Là một backend engineer/QA, tôi muốn toàn bộ API và luồng nghiệp v
   **Liên quan**: US-001, AC-001
 - **FR-002** `[P1]`: Solution PHẢI có project riêng `Flex.Agent.Infrastructures` cho tầng infrastructure (EF Core `DbContext`, migrations, dịch vụ hạ tầng như mã hoá token) tách khỏi project API.
   **Liên quan**: US-001, AC-001
-- **FR-003** `[P1]`: Solution PHẢI có project API host `Flex.Agent` (controllers, DI, entrypoint) sử dụng project domain và infrastructure. Đúng 3 project theo layer (Domain/Infrastructures/API); KHÔNG tách thêm project riêng theo từng channel.
+- **FR-003** `[P1]`: Solution PHẢI có project API host `Flex.Agent.Api` (controllers, DI, entrypoint) sử dụng project domain và infrastructure. Đúng 3 project theo layer (Domain/Infrastructures/API); KHÔNG tách thêm project riêng theo từng channel.
   **Liên quan**: US-001, AC-002
 - **FR-004** `[P1]`: Toàn bộ endpoint API, luồng OAuth và webhook Instagram Business hiện có PHẢI giữ nguyên route và hành vi sau khi tái cấu trúc.
   **Liên quan**: US-002, AC-004
@@ -136,7 +136,7 @@ Là một backend engineer/QA, tôi muốn toàn bộ API và luồng nghiệp v
 
 - **BR-001**: Project domain KHÔNG ĐƯỢC phụ thuộc vào project infrastructure hoặc API (tuân theo nguyên tắc Clean Architecture đã áp dụng ở `flex-auth-service`).
 - **BR-002**: Mọi logic nghiệp vụ (business rule) hiện có trong `Channels/Instagram/*` PHẢI được giữ nguyên hành vi khi di chuyển sang cấu trúc mới, không âm thầm thay đổi rule.
-- **BR-003**: Cấu trúc thư mục và quy ước đặt tên project mới PHẢI dùng tiền tố `Flex.Agent.*`, phân chia đúng 3 project `Flex.Agent.Domain` / `Flex.Agent.Infrastructures` / `Flex.Agent` (API), tham chiếu trực tiếp theo `flex-auth-service`.
+- **BR-003**: Cấu trúc thư mục và quy ước đặt tên project mới PHẢI dùng tiền tố `Flex.Agent.*`, phân chia đúng 3 project `Flex.Agent.Domain` / `Flex.Agent.Infrastructures` / `Flex.Agent.Api` (API), tham chiếu trực tiếp theo `flex-auth-service`.
 
 **Luồng trạng thái nếu có**: Không áp dụng.
 

@@ -26,7 +26,7 @@ Mirror cấu trúc của service .NET hiện có (`flex-auth-service`) trừ khi
 - [ ] `.gitignore`, `.gitattributes`, `.dockerignore` theo chuẩn .NET/Visual Studio.
 - [ ] `.env.example` — liệt kê biến môi trường bắt buộc, không chứa giá trị thật.
 - [ ] `Dockerfile` + `Jenkinsfile` nếu service có CI/CD pipeline riêng.
-- [ ] Solution `.sln` + layering tương tự `Flex.Auth`/`Flex.Domain`/`Flex.Infrastructures` (đổi tên theo domain của service mới).
+- [ ] Solution `.sln` + layering tương tự `Flex.Agent.Api` / `Flex.Agent.Domain` / `Flex.Agent.Infrastructures` (dùng hậu tố `.Api` cho project API host).
 - [ ] `secrets/` (nếu cần credential dạng file, ví dụ Oracle Wallet) — phải nằm trong `.gitignore`, không commit.
 
 ## 3. Hạ tầng (nếu service cần datastore/dịch vụ mới)
