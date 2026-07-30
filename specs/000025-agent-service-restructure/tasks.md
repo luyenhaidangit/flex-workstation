@@ -20,7 +20,7 @@ description: "Danh sách task triển khai: Tái cấu trúc Flex Agent Service 
 
 **Mục đích**: Khởi tạo solution file rỗng làm khung cho các project sẽ thêm ở Phase 2.
 
-- [ ] T001 Tạo file solution rỗng `Flex.Agent.sln` tại root `flex-agent-service/` bằng `dotnet new sln -n Flex.Agent`
+- [x] T001 Tạo file solution rỗng `Flex.Agent.sln` tại root `flex-agent-service/` bằng `dotnet new sln -n Flex.Agent`
 
 ---
 
@@ -30,10 +30,10 @@ description: "Danh sách task triển khai: Tái cấu trúc Flex Agent Service 
 
 **CRITICAL**: Không bắt đầu di chuyển code (Phase 3/4) tới khi phase này hoàn tất.
 
-- [ ] T002 Tạo project `Flex.Agent.Domain` (SDK `Microsoft.NET.Sdk`, `TargetFramework=net9.0`, `Nullable`/`ImplicitUsings=enable`, KHÔNG có `ProjectReference` nào) tại `src/Flex.Agent.Domain/Flex.Agent.Domain.csproj`
-- [ ] T003 Tạo project `Flex.Agent.Infrastructures` (SDK `Microsoft.NET.Sdk`, `net9.0`) với `ProjectReference` tới `Flex.Agent.Domain` và `PackageReference`: `Microsoft.EntityFrameworkCore` 9.0.11, `Npgsql.EntityFrameworkCore.PostgreSQL` 9.0.3, `Microsoft.EntityFrameworkCore.Design` 9.0.11 tại `src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj` (phụ thuộc T002)
-- [ ] T004 Tạo project API host `Flex.Agent` (SDK `Microsoft.NET.Sdk.Web`, `net9.0`, `AssemblyName=Flex.Agent`, `RootNamespace=Flex.Agent`) với `ProjectReference` tới `Flex.Agent.Infrastructures` và `PackageReference` `Microsoft.Extensions.Caching.Memory` 9.0.11 tại `src/Flex.Agent/Flex.Agent.csproj` (phụ thuộc T003)
-- [ ] T005 Thêm 3 project (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent`) vào `Flex.Agent.sln` bằng `dotnet sln Flex.Agent.sln add src/Flex.Agent.Domain/Flex.Agent.Domain.csproj src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj src/Flex.Agent/Flex.Agent.csproj` (phụ thuộc T001, T002, T003, T004)
+- [x] T002 Tạo project `Flex.Agent.Domain` (SDK `Microsoft.NET.Sdk`, `TargetFramework=net9.0`, `Nullable`/`ImplicitUsings=enable`, KHÔNG có `ProjectReference` nào) tại `src/Flex.Agent.Domain/Flex.Agent.Domain.csproj`
+- [x] T003 Tạo project `Flex.Agent.Infrastructures` (SDK `Microsoft.NET.Sdk`, `net9.0`) với `ProjectReference` tới `Flex.Agent.Domain` và `PackageReference`: `Microsoft.EntityFrameworkCore` 9.0.11, `Npgsql.EntityFrameworkCore.PostgreSQL` 9.0.3, `Microsoft.EntityFrameworkCore.Design` 9.0.11 tại `src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj` (phụ thuộc T002)
+- [x] T004 Tạo project API host `Flex.Agent` (SDK `Microsoft.NET.Sdk.Web`, `net9.0`, `AssemblyName=Flex.Agent`, `RootNamespace=Flex.Agent`) với `ProjectReference` tới `Flex.Agent.Infrastructures` và `PackageReference` `Microsoft.Extensions.Caching.Memory` 9.0.11 tại `src/Flex.Agent/Flex.Agent.csproj` (phụ thuộc T003)
+- [x] T005 Thêm 3 project (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent`) vào `Flex.Agent.sln` bằng `dotnet sln Flex.Agent.sln add src/Flex.Agent.Domain/Flex.Agent.Domain.csproj src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj src/Flex.Agent/Flex.Agent.csproj` (phụ thuộc T001, T002, T003, T004)
 
 **Checkpoint**: Khung 3 project + solution đã sẵn sàng, có thể bắt đầu di chuyển code cho US1.
 
@@ -51,15 +51,15 @@ description: "Danh sách task triển khai: Tái cấu trúc Flex Agent Service 
 
 ### Implementation for User Story 1
 
-- [ ] T006 [P] [US1] Di chuyển enum `ChannelType` từ `Channels/ChannelType.cs` sang `src/Flex.Agent.Domain/ChannelType.cs`, đổi namespace thành `Flex.Agent.Domain`
-- [ ] T007 [P] [US1] Di chuyển entity `MetaAccountConnection` từ `Channels/Instagram/MetaAccountConnection.cs` sang `src/Flex.Agent.Domain/Channels/Instagram/MetaAccountConnection.cs`, đổi namespace thành `Flex.Agent.Domain.Channels.Instagram`
-- [ ] T008 [P] [US1] Di chuyển entity `InstagramPageConnection` từ `Channels/Instagram/InstagramPageConnection.cs` sang `src/Flex.Agent.Domain/Channels/Instagram/InstagramPageConnection.cs`, đổi namespace thành `Flex.Agent.Domain.Channels.Instagram`
-- [ ] T009 [US1] Di chuyển `AppDbContext` từ `Data/AppDbContext.cs` sang `src/Flex.Agent.Infrastructures/Persistence/AppDbContext.cs`, đổi namespace thành `Flex.Agent.Infrastructures.Persistence`, cập nhật `using` trỏ tới `Flex.Agent.Domain` và `Flex.Agent.Domain.Channels.Instagram` (phụ thuộc T006, T007, T008)
-- [ ] T010 [US1] Di chuyển nguyên văn file SQL thủ công `Data/Migrations/AddInstagramTables.sql` sang `src/Flex.Agent.Infrastructures/Persistence/Migrations/AddInstagramTables.sql`; xác nhận `git diff --no-index Data/Migrations/AddInstagramTables.sql src/Flex.Agent.Infrastructures/Persistence/Migrations/AddInstagramTables.sql` trả về rỗng (FR-007, research.md TQ-001)
-- [ ] T011 [P] [US1] Di chuyển `ChannelTokenEncryptionService` từ `Shared/ChannelTokenEncryptionService.cs` sang `src/Flex.Agent.Infrastructures/Security/ChannelTokenEncryptionService.cs`, đổi namespace thành `Flex.Agent.Infrastructures.Security`
-- [ ] T012 [US1] Validation: chạy `dotnet build src/Flex.Agent.Domain/Flex.Agent.Domain.csproj`, xác nhận build thành công 0 lỗi (phụ thuộc T006, T007, T008)
-- [ ] T013 [US1] Validation: chạy `dotnet build src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj`, xác nhận build thành công 0 lỗi (phụ thuộc T009, T010, T011)
-- [ ] T014 [US1] Validation (BR-001): mở `src/Flex.Agent.Domain/Flex.Agent.Domain.csproj`, xác nhận không có phần tử `<ProjectReference>` nào (phụ thuộc T002)
+- [x] T006 [P] [US1] Di chuyển enum `ChannelType` từ `Channels/ChannelType.cs` sang `src/Flex.Agent.Domain/ChannelType.cs`, đổi namespace thành `Flex.Agent.Domain`
+- [x] T007 [P] [US1] Di chuyển entity `MetaAccountConnection` từ `Channels/Instagram/MetaAccountConnection.cs` sang `src/Flex.Agent.Domain/Channels/Instagram/MetaAccountConnection.cs`, đổi namespace thành `Flex.Agent.Domain.Channels.Instagram`
+- [x] T008 [P] [US1] Di chuyển entity `InstagramPageConnection` từ `Channels/Instagram/InstagramPageConnection.cs` sang `src/Flex.Agent.Domain/Channels/Instagram/InstagramPageConnection.cs`, đổi namespace thành `Flex.Agent.Domain.Channels.Instagram`
+- [x] T009 [US1] Di chuyển `AppDbContext` từ `Data/AppDbContext.cs` sang `src/Flex.Agent.Infrastructures/Persistence/AppDbContext.cs`, đổi namespace thành `Flex.Agent.Infrastructures.Persistence`, cập nhật `using` trỏ tới `Flex.Agent.Domain` và `Flex.Agent.Domain.Channels.Instagram` (phụ thuộc T006, T007, T008)
+- [x] T010 [US1] Di chuyển nguyên văn file SQL thủ công `Data/Migrations/AddInstagramTables.sql` sang `src/Flex.Agent.Infrastructures/Persistence/Migrations/AddInstagramTables.sql`; xác nhận `git diff --no-index Data/Migrations/AddInstagramTables.sql src/Flex.Agent.Infrastructures/Persistence/Migrations/AddInstagramTables.sql` trả về rỗng (FR-007, research.md TQ-001)
+- [x] T011 [P] [US1] Di chuyển `ChannelTokenEncryptionService` từ `Shared/ChannelTokenEncryptionService.cs` sang `src/Flex.Agent.Infrastructures/Security/ChannelTokenEncryptionService.cs`, đổi namespace thành `Flex.Agent.Infrastructures.Security`
+- [x] T012 [US1] Validation: chạy `dotnet build src/Flex.Agent.Domain/Flex.Agent.Domain.csproj`, xác nhận build thành công 0 lỗi (phụ thuộc T006, T007, T008)
+- [x] T013 [US1] Validation: chạy `dotnet build src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj`, xác nhận build thành công 0 lỗi (phụ thuộc T009, T010, T011)
+- [x] T014 [US1] Validation (BR-001): mở `src/Flex.Agent.Domain/Flex.Agent.Domain.csproj`, xác nhận không có phần tử `<ProjectReference>` nào (phụ thuộc T002)
 
 **Definition of Done**:
 
@@ -83,30 +83,30 @@ description: "Danh sách task triển khai: Tái cấu trúc Flex Agent Service 
 
 ### Implementation for User Story 2
 
-- [ ] T015 [P] [US2] Di chuyển `InstagramChannelController` từ `Channels/Instagram/InstagramChannelController.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramChannelController.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Domain.Channels.Instagram`/`Flex.Agent.Infrastructures.Persistence` (phụ thuộc T007, T008, T009)
-- [ ] T016 [P] [US2] Di chuyển `InstagramWebhookController` từ `Channels/Instagram/InstagramWebhookController.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramWebhookController.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram` (phụ thuộc T009)
-- [ ] T017 [P] [US2] Di chuyển `InstagramOAuthService` từ `Channels/Instagram/InstagramOAuthService.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramOAuthService.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Security` (phụ thuộc T011)
-- [ ] T018 [P] [US2] Di chuyển `InstagramPageService` từ `Channels/Instagram/InstagramPageService.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramPageService.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Persistence`/`Flex.Agent.Infrastructures.Security` (phụ thuộc T009, T011)
-- [ ] T019 [P] [US2] Di chuyển `InstagramWebhookHandler` từ `Channels/Instagram/InstagramWebhookHandler.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramWebhookHandler.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Persistence` (phụ thuộc T009)
-- [ ] T020 [P] [US2] Di chuyển `Dtos/ConnectDtos.cs` từ `Channels/Instagram/Dtos/ConnectDtos.cs` sang `src/Flex.Agent/Channels/Instagram/Dtos/ConnectDtos.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram.Dtos`
-- [ ] T021 [US2] Di chuyển `DependencyInjection.cs` (`AddInstagramChannel`) từ `Channels/Instagram/DependencyInjection.cs` sang `src/Flex.Agent/Channels/Instagram/DependencyInjection.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Security.ChannelTokenEncryptionService` (phụ thuộc T011, T015–T020)
-- [ ] T022 [US2] Di chuyển `Program.cs` từ root sang `src/Flex.Agent/Program.cs`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Persistence` (cho `AppDbContext`) và `Flex.Agent.Channels.Instagram` (cho `AddInstagramChannel`) (phụ thuộc T009, T021)
-- [ ] T023 [P] [US2] Di chuyển `appsettings.Example.json` từ root sang `src/Flex.Agent/appsettings.Example.json`, nội dung giữ nguyên
-- [ ] T024 [US2] Tạo project test `Flex.Agent.Tests` (SDK `Microsoft.NET.Sdk`, `net9.0`) với `ProjectReference` tới `Flex.Agent` và `PackageReference`: `Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio` tại `tests/Flex.Agent.Tests/Flex.Agent.Tests.csproj` (phụ thuộc T022)
-- [ ] T025 [US2] Thêm `Flex.Agent.Tests` vào `Flex.Agent.sln` bằng `dotnet sln Flex.Agent.sln add tests/Flex.Agent.Tests/Flex.Agent.Tests.csproj` (phụ thuộc T024)
-- [ ] T026 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramOAuthServiceTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramOAuthServiceTests.cs`, cập nhật `using FlexAgentService.Channels.Instagram` → `using Flex.Agent.Channels.Instagram` (phụ thuộc T017, T025)
-- [ ] T027 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramPageServiceTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramPageServiceTests.cs`, cập nhật `using` sang `Flex.Agent.Channels.Instagram`, `Flex.Agent.Channels.Instagram.Dtos`, và sửa `using FlexAgentService.Channels.Shared` (namespace sai lệch — xem research.md) thành `using Flex.Agent.Infrastructures.Security`, cùng `using Flex.Agent.Infrastructures.Persistence` (phụ thuộc T018, T025)
-- [ ] T028 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramPageServiceDisconnectTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramPageServiceDisconnectTests.cs`, cập nhật `using` sang `Flex.Agent.Channels.Instagram`, `Flex.Agent.Infrastructures.Persistence` (phụ thuộc T018, T025)
-- [ ] T029 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramPermissionTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramPermissionTests.cs` (phụ thuộc T025)
-- [ ] T030 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramSecurityTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramSecurityTests.cs`, cập nhật `using FlexAgentService.Channels.Instagram.Dtos` → `using Flex.Agent.Channels.Instagram.Dtos` (phụ thuộc T020, T025)
-- [ ] T031 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramWebhookContractTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramWebhookContractTests.cs` (phụ thuộc T025)
-- [ ] T032 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramWebhookHandlerTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramWebhookHandlerTests.cs`, cập nhật `using` sang `Flex.Agent.Channels.Instagram`, `Flex.Agent.Infrastructures.Persistence` (phụ thuộc T019, T025)
-- [ ] T033 [P] [US2] Di chuyển `tests/Channels/Shared/ChannelTokenEncryptionServiceTests.cs` sang `tests/Flex.Agent.Tests/Security/ChannelTokenEncryptionServiceTests.cs`, sửa `using FlexAgentService.Channels.Shared` (namespace sai lệch — xem research.md) thành `using Flex.Agent.Infrastructures.Security` (phụ thuộc T011, T025)
-- [ ] T034 [P] [US2] Di chuyển `tests/Channels/Facebook/MessengerRegressionTests.cs` sang `tests/Flex.Agent.Tests/Channels/Facebook/MessengerRegressionTests.cs`, cập nhật `using FlexAgentService.Channels` → `using Flex.Agent.Domain` (phụ thuộc T006, T025)
-- [ ] T035 [US2] Validation: chạy `dotnet build Flex.Agent.sln`, xác nhận cả 4 project build thành công 0 lỗi (phụ thuộc T015–T034)
-- [ ] T036 [US2] Validation (FR-005, AC-003): chạy `dotnet test Flex.Agent.sln`, xác nhận toàn bộ test trong `Flex.Agent.Tests` pass (phụ thuộc T035)
-- [ ] T037 [US2] Validation (FR-004, AC-004): chạy `dotnet run --project src/Flex.Agent`, gọi thủ công 8 endpoint trong `contracts/existing-api-contracts.md`, xác nhận route/status/response khớp baseline trước khi tái cấu trúc (phụ thuộc T035)
-- [ ] T038 [US2] Xoá cấu trúc phẳng cũ: `FlexAgentService.csproj`, `Program.cs` (root), `Channels/`, `Data/`, `Shared/`, `tests/Channels/` sau khi T036 và T037 pass (phụ thuộc T036, T037)
+- [x] T015 [P] [US2] Di chuyển `InstagramChannelController` từ `Channels/Instagram/InstagramChannelController.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramChannelController.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Domain.Channels.Instagram`/`Flex.Agent.Infrastructures.Persistence` (phụ thuộc T007, T008, T009)
+- [x] T016 [P] [US2] Di chuyển `InstagramWebhookController` từ `Channels/Instagram/InstagramWebhookController.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramWebhookController.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram` (phụ thuộc T009)
+- [x] T017 [P] [US2] Di chuyển `InstagramOAuthService` từ `Channels/Instagram/InstagramOAuthService.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramOAuthService.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Security` (phụ thuộc T011)
+- [x] T018 [P] [US2] Di chuyển `InstagramPageService` từ `Channels/Instagram/InstagramPageService.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramPageService.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Persistence`/`Flex.Agent.Infrastructures.Security` (phụ thuộc T009, T011)
+- [x] T019 [P] [US2] Di chuyển `InstagramWebhookHandler` từ `Channels/Instagram/InstagramWebhookHandler.cs` sang `src/Flex.Agent/Channels/Instagram/InstagramWebhookHandler.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Persistence` (phụ thuộc T009)
+- [x] T020 [P] [US2] Di chuyển `Dtos/ConnectDtos.cs` từ `Channels/Instagram/Dtos/ConnectDtos.cs` sang `src/Flex.Agent/Channels/Instagram/Dtos/ConnectDtos.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram.Dtos`
+- [x] T021 [US2] Di chuyển `DependencyInjection.cs` (`AddInstagramChannel`) từ `Channels/Instagram/DependencyInjection.cs` sang `src/Flex.Agent/Channels/Instagram/DependencyInjection.cs`, đổi namespace thành `Flex.Agent.Channels.Instagram`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Security.ChannelTokenEncryptionService` (phụ thuộc T011, T015–T020)
+- [x] T022 [US2] Di chuyển `Program.cs` từ root sang `src/Flex.Agent/Program.cs`, cập nhật `using` trỏ tới `Flex.Agent.Infrastructures.Persistence` (cho `AppDbContext`) và `Flex.Agent.Channels.Instagram` (cho `AddInstagramChannel`) (phụ thuộc T009, T021)
+- [x] T023 [P] [US2] Di chuyển `appsettings.Example.json` từ root sang `src/Flex.Agent/appsettings.Example.json`, nội dung giữ nguyên
+- [x] T024 [US2] Tạo project test `Flex.Agent.Tests` (SDK `Microsoft.NET.Sdk`, `net9.0`) với `ProjectReference` tới `Flex.Agent` và `PackageReference`: `Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio` tại `tests/Flex.Agent.Tests/Flex.Agent.Tests.csproj` (phụ thuộc T022)
+- [x] T025 [US2] Thêm `Flex.Agent.Tests` vào `Flex.Agent.sln` bằng `dotnet sln Flex.Agent.sln add tests/Flex.Agent.Tests/Flex.Agent.Tests.csproj` (phụ thuộc T024)
+- [x] T026 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramOAuthServiceTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramOAuthServiceTests.cs`, cập nhật `using FlexAgentService.Channels.Instagram` → `using Flex.Agent.Channels.Instagram` (phụ thuộc T017, T025)
+- [x] T027 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramPageServiceTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramPageServiceTests.cs`, cập nhật `using` sang `Flex.Agent.Channels.Instagram`, `Flex.Agent.Channels.Instagram.Dtos`, và sửa `using FlexAgentService.Channels.Shared` (namespace sai lệch — xem research.md) thành `using Flex.Agent.Infrastructures.Security`, cùng `using Flex.Agent.Infrastructures.Persistence` (phụ thuộc T018, T025)
+- [x] T028 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramPageServiceDisconnectTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramPageServiceDisconnectTests.cs`, cập nhật `using` sang `Flex.Agent.Channels.Instagram`, `Flex.Agent.Infrastructures.Persistence` (phụ thuộc T018, T025)
+- [x] T029 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramPermissionTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramPermissionTests.cs` (phụ thuộc T025)
+- [x] T030 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramSecurityTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramSecurityTests.cs`, cập nhật `using FlexAgentService.Channels.Instagram.Dtos` → `using Flex.Agent.Channels.Instagram.Dtos` (phụ thuộc T020, T025)
+- [x] T031 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramWebhookContractTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramWebhookContractTests.cs` (phụ thuộc T025)
+- [x] T032 [P] [US2] Di chuyển `tests/Channels/Instagram/InstagramWebhookHandlerTests.cs` sang `tests/Flex.Agent.Tests/Channels/Instagram/InstagramWebhookHandlerTests.cs`, cập nhật `using` sang `Flex.Agent.Channels.Instagram`, `Flex.Agent.Infrastructures.Persistence` (phụ thuộc T019, T025)
+- [x] T033 [P] [US2] Di chuyển `tests/Channels/Shared/ChannelTokenEncryptionServiceTests.cs` sang `tests/Flex.Agent.Tests/Security/ChannelTokenEncryptionServiceTests.cs`, sửa `using FlexAgentService.Channels.Shared` (namespace sai lệch — xem research.md) thành `using Flex.Agent.Infrastructures.Security` (phụ thuộc T011, T025)
+- [x] T034 [P] [US2] Di chuyển `tests/Channels/Facebook/MessengerRegressionTests.cs` sang `tests/Flex.Agent.Tests/Channels/Facebook/MessengerRegressionTests.cs`, cập nhật `using FlexAgentService.Channels` → `using Flex.Agent.Domain` (phụ thuộc T006, T025)
+- [x] T035 [US2] Validation: chạy `dotnet build Flex.Agent.sln`, xác nhận cả 4 project build thành công 0 lỗi (phụ thuộc T015–T034)
+- [x] T036 [US2] Validation (FR-005, AC-003): chạy `dotnet test Flex.Agent.sln`, xác nhận toàn bộ test trong `Flex.Agent.Tests` pass (phụ thuộc T035)
+- [x] T037 [US2] Validation (FR-004, AC-004): chạy `dotnet run --project src/Flex.Agent`, gọi thủ công 8 endpoint trong `contracts/existing-api-contracts.md`, xác nhận route/status/response khớp baseline trước khi tái cấu trúc (phụ thuộc T035)
+- [x] T038 [US2] Xoá cấu trúc phẳng cũ: `FlexAgentService.csproj`, `Program.cs` (root), `Channels/`, `Data/`, `Shared/`, `tests/Channels/` sau khi T036 và T037 pass (phụ thuộc T036, T037)
 
 **Definition of Done**:
 
@@ -123,9 +123,9 @@ description: "Danh sách task triển khai: Tái cấu trúc Flex Agent Service 
 
 **Mục đích**: Xác nhận không còn sót namespace cũ, và chạy toàn bộ quickstart như validation cuối trước khi coi feature hoàn tất.
 
-- [ ] T039 [P] Grep toàn bộ `src/` và `tests/` để xác nhận không còn `FlexAgentService` sót lại — chạy `grep -rn "FlexAgentService" src/ tests/`, kết quả PHẢI rỗng
-- [ ] T040 Chạy toàn bộ 5 bước trong `specs/000025-agent-service-restructure/quickstart.md` end-to-end như validation cuối cùng
-- [ ] T041 Manual review (SC-003): nhờ 1 kỹ sư backend khác (ngoài người thực hiện tái cấu trúc) xác nhận có thể xác định đúng project (`Flex.Agent.Domain`/`Flex.Agent.Infrastructures`/`Flex.Agent`) cho một thay đổi giả định (ví dụ "thêm entity mới") mà không cần hỏi lại
+- [x] T039 [P] Grep toàn bộ `src/` and `tests/` để xác nhận không còn `FlexAgentService` sót lại — chạy `grep -rn "FlexAgentService" src/ tests/`, kết quả PHẢI rỗng
+- [x] T040 Chạy toàn bộ 5 bước trong `specs/000025-agent-service-restructure/quickstart.md` end-to-end như validation cuối cùng
+- [x] T041 Manual review (SC-003): nhờ 1 kỹ sư backend khác (ngoài người thực hiện tái cấu trúc) xác nhận có thể xác định đúng project (`Flex.Agent.Domain`/`Flex.Agent.Infrastructures`/`Flex.Agent`) cho một thay đổi giả định (ví dụ "thêm entity mới") mà không cần hỏi lại
 
 ---
 
