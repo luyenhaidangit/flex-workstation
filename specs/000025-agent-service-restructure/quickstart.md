@@ -19,13 +19,13 @@ dotnet build Flex.Agent.sln
 
 **Kỳ vọng**: build thành công cho cả 3 project (`Flex.Agent.Domain`, `Flex.Agent.Infrastructures`, `Flex.Agent`) và project test mới (`Flex.Agent.Tests`), không có lỗi/warning mới liên quan tới namespace bị thiếu.
 
-## 2. Xác nhận migration không đổi (TQ-001)
+## 2. Xác nhận migration SQL không đổi (TQ-001)
 
 ```powershell
-dotnet ef migrations list --project src/Flex.Agent.Infrastructures --startup-project src/Flex.Agent
+git diff --no-index Data/Migrations/AddInstagramTables.sql src/Flex.Agent.Infrastructures/Persistence/Migrations/AddInstagramTables.sql
 ```
 
-**Kỳ vọng**: danh sách migration trả về giống hệt danh sách trước khi tái cấu trúc (cùng tên, cùng thứ tự). Không có migration mới nào được tự sinh.
+**Kỳ vọng**: diff rỗng — nội dung file SQL thủ công (`Data/Migrations/AddInstagramTables.sql`, không phải EF Core code-first migration) được copy nguyên văn sang vị trí mới, không có thay đổi Up/Down.
 
 ## 3. Chạy test hiện có (AC-003, FR-005)
 

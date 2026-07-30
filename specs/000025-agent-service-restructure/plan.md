@@ -105,14 +105,14 @@
 | US-002 / FR-004 | P1 | Đủ rõ | Di chuyển controller nguyên trạng, không đổi route/attribute | `src/Flex.Agent/Controllers/` | `api/channels/instagram/*`, `api/webhooks/instagram` (xem contracts/existing-api-contracts.md) | Không áp dụng | Manual/regression test theo AC-004 |
 | US-002 / FR-005 | P1 | Đủ rõ | Tạo `Flex.Agent.Tests`, di chuyển 9 file test hiện có, đảm bảo build+run | `tests/Flex.Agent.Tests/` | Không áp dụng | Không áp dụng | `dotnet test Flex.Agent.sln` — toàn bộ pass |
 | — / FR-006 | P2 | Đủ rõ | Tạo `Flex.Agent.sln` liệt kê cả 4 project (3 src + test) | `Flex.Agent.sln` | Không áp dụng | Không áp dụng | `dotnet build Flex.Agent.sln` thành công |
-| — / FR-007 | P1 | Đủ rõ | Copy migration nguyên trạng, không sinh migration mới | `src/Flex.Agent.Infrastructures/Migrations/` (hoặc `Persistence/Migrations/`) | Không áp dụng | Toàn bộ bảng/cột/index hiện có | `dotnet ef migrations list` đối chiếu danh sách trước/sau |
+| — / FR-007 | P1 | Đủ rõ | Copy file SQL thủ công `AddInstagramTables.sql` nguyên văn (không phải EF Core migration) | `src/Flex.Agent.Infrastructures/Persistence/Migrations/AddInstagramTables.sql` | Không áp dụng | Toàn bộ bảng/cột/index hiện có | `git diff --no-index` giữa file gốc và file mới phải rỗng |
 | BR-001 | P1 | Đủ rõ | `Flex.Agent.Domain.csproj` không có `ProjectReference` nào | `src/Flex.Agent.Domain/Flex.Agent.Domain.csproj` | Không áp dụng | Không áp dụng | Review `.csproj`, build riêng project Domain |
 
 ## Phân tích tác động
 
 | Khu vực | Tác động dự kiến | Tương thích ngược/Rủi ro | Cách kiểm tra |
 |---------|------------------|--------------------------|---------------|
-| Database/Migration | Không đổi schema; chỉ đổi assembly chứa migration | Rủi ro: EF Core không tìm thấy migration nếu quên cấu hình đúng project/namespace | `dotnet ef migrations list` phải khớp danh sách cũ (xem research.md TQ-001) |
+| Database/Migration | Không đổi schema; chỉ di chuyển file SQL thủ công `AddInstagramTables.sql` sang project mới | Rủi ro thấp — không phải EF Core migration nên không có rủi ro `ModelSnapshot`/`MigrationsAssembly`; chỉ cần copy đúng nội dung | `git diff --no-index` giữa file gốc và file mới phải rỗng (xem research.md TQ-001) |
 | API/Contract | Không đổi route/payload | Không có breaking change nếu di chuyển đúng controller nguyên trạng | So khớp với `contracts/existing-api-contracts.md`, gọi thử từng endpoint |
 | Permission/Security | Không đổi — không có thay đổi phân quyền người dùng cuối trong phạm vi này | Không áp dụng | Không áp dụng |
 | Logging/Audit | Không áp dụng — spec §11 xác định không cần audit | Không áp dụng | Không áp dụng |
@@ -137,7 +137,7 @@
 **Có thay đổi dữ liệu/schema không**: Không áp dụng.
 
 **Migration**:
-- Copy nguyên trạng `Data/Migrations/*` sang `Flex.Agent.Infrastructures`, không sửa nội dung Up/Down.
+- Copy nguyên văn `Data/Migrations/AddInstagramTables.sql` (file SQL thủ công, không phải EF Core code-first migration) sang `Flex.Agent.Infrastructures/Persistence/Migrations/`, không sửa nội dung.
 
 **Backfill/Cleanup**:
 - Không áp dụng.
@@ -146,10 +146,10 @@
 - Database hiện có không cần thay đổi; kết nối qua cùng connection string/schema.
 
 **Rủi ro dữ liệu**:
-- Rủi ro duy nhất là EF Core migration history table (`__EFMigrationsHistory`) không khớp nếu assembly name migration đổi theo cách ảnh hưởng tới `MigrationId`/`ModelSnapshot` — cần verify bằng `dotnet ef migrations list` trước khi merge (không phải rủi ro mất dữ liệu, mà là rủi ro build/tooling).
+- Không đáng kể — vì `Data/Migrations/AddInstagramTables.sql` là file SQL thủ công (không phải EF Core migration có `ModelSnapshot`/history table), rủi ro duy nhất là copy sai/thiếu nội dung file khi di chuyển.
 
 **Cách xác minh**:
-- `dotnet ef migrations list --project src/Flex.Agent.Infrastructures --startup-project src/Flex.Agent` (xem quickstart.md bước 2).
+- `git diff --no-index` giữa file SQL gốc và file mới phải rỗng (xem quickstart.md bước 2).
 
 ## Quyết định kỹ thuật
 
@@ -158,7 +158,7 @@
 | DEC-001 | Tách đúng 3 project theo layer (`Flex.Agent.Domain`/`Flex.Agent.Infrastructures`/`Flex.Agent`) | Khớp Clarifications Session 2026-07-30 và khuôn mẫu `flex-auth-service` đã ổn định | Tách thêm project theo từng channel | Bị loại rõ ràng trong Clarifications — tăng phức tạp không cần thiết ở giai đoạn hiện tại |
 | DEC-002 | Đổi namespace/project name sang `Flex.Agent.*` | Khớp Clarifications Session 2026-07-30, nhất quán toàn hệ Flex | Giữ tiền tố `FlexAgentService` | Bị loại rõ ràng trong Clarifications — ưu tiên nhất quán chuẩn đặt tên hơn giảm thiểu diff |
 | DEC-003 | Tạo mới project `Flex.Agent.Tests` (chưa từng tồn tại) thay vì để test không chạy được | FR-005 yêu cầu test hiện có PHẢI pass — không thể verify nếu không có project test build được | Bỏ qua việc thiếu test project, chỉ di chuyển source | Sẽ khiến AC-003 không thể kiểm chứng, vi phạm Test Gate của constitution |
-| DEC-004 | Copy migration nguyên trạng, không sinh migration mới | Tránh rủi ro breaking schema (FR-007) | Regenerate migration sau khi đổi namespace | Không cần thiết và tăng rủi ro drift schema không lý do |
+| DEC-004 | Copy nguyên văn file SQL thủ công `AddInstagramTables.sql`, không chuyển sang EF Core code-first migration | Tránh rủi ro breaking schema (FR-007); đổi cách quản lý migration nằm ngoài phạm vi spec | Chuyển sang `dotnet ef migrations add` trong lúc tái cấu trúc | Ngoài phạm vi (Ngoài phạm vi §15), tăng rủi ro và effort không cần thiết |
 
 ## Chiến lược kiểm thử
 
@@ -211,7 +211,8 @@ flex-agent-service/
 │   │   ├── Flex.Agent.Infrastructures.csproj
 │   │   ├── Persistence/
 │   │   │   ├── AppDbContext.cs
-│   │   │   └── Migrations/           # di chuyển nguyên trạng từ Data/Migrations
+│   │   │   └── Migrations/
+│   │   │       └── AddInstagramTables.sql   # file SQL thủ công, di chuyển nguyên văn từ Data/Migrations
 │   │   └── Security/
 │   │       └── ChannelTokenEncryptionService.cs
 │   └── Flex.Agent/
@@ -265,7 +266,7 @@ flex-agent-service/
 
 **Cách kiểm tra sau release**: Build pipeline pass (nếu có), `dotnet test` pass, gọi thử endpoint theo quickstart.md.
 
-**Tình huống debug chính**: Nếu build lỗi sau khi merge — kiểm tra `ProjectReference` giữa 3 project và namespace đã đổi đúng theo research.md chưa; nếu migration không tìm thấy — kiểm tra `--project`/`--startup-project` khi chạy `dotnet ef`.
+**Tình huống debug chính**: Nếu build lỗi sau khi merge — kiểm tra `ProjectReference` giữa 3 project và namespace đã đổi đúng theo research.md chưa; nếu schema DB không khớp — đối chiếu `AppDbContext.OnModelCreating` với nội dung `AddInstagramTables.sql` đã di chuyển.
 
 ## Theo dõi độ phức tạp
 

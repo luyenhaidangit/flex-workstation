@@ -4,10 +4,11 @@
 
 ## TQ-001: Có cần migration/backfill dữ liệu không?
 
-- **Decision**: Không. Schema PostgreSQL hiện có (`meta_account_connections`, `instagram_page_connections`) giữ nguyên tên bảng/cột/index. Việc di chuyển `AppDbContext` sang project `Flex.Agent.Infrastructures` không phát sinh migration mới — migration hiện có trong `Data/Migrations` được copy nguyên trạng sang project mới, namespace cập nhật nhưng nội dung migration (Up/Down) không đổi.
-- **Rationale**: FR-007 (KHÔNG ĐƯỢC thay đổi schema) và BR không cho phép breaking migration. EF Core migration chỉ phụ thuộc vào `ModelSnapshot` và các file migration, không phụ thuộc project chứa chúng.
-- **Alternatives considered**: Tạo migration "reset" mới sau khi đổi namespace — bị loại vì rủi ro drift schema và không cần thiết khi assembly chứa migration không ảnh hưởng đến SQL sinh ra.
-- **Rủi ro còn lại**: Nếu đổi `RootNamespace`/`AssemblyName` mà không cập nhật đúng `migrationsAssembly` (nếu có cấu hình `MigrationsAssembly`), EF Core có thể không tìm thấy migration. Cần verify bằng `dotnet ef migrations list` sau khi tái cấu trúc (xem quickstart.md).
+- **Decision**: Không. Schema PostgreSQL hiện có (`meta_account_connections`, `instagram_page_connections`) giữ nguyên tên bảng/cột/index.
+- **Phát hiện quan trọng (điều chỉnh giả định ban đầu)**: `Data/Migrations` **không phải** EF Core code-first migration (không có file `*.Designer.cs` hay `ModelSnapshot.cs`) — nó chỉ chứa một file SQL thủ công `AddInstagramTables.sql` áp dụng schema trực tiếp bằng tay. `AppDbContext` không dùng `dotnet ef migrations` trong dự án hiện tại (dù package `Microsoft.EntityFrameworkCore.Design` có được reference, nó chưa được dùng để tạo migration thật nào). Vì vậy việc di chuyển sang `Flex.Agent.Infrastructures` chỉ là di chuyển file SQL nguyên trạng, không có rủi ro `MigrationsAssembly`/`ModelSnapshot`.
+- **Rationale**: FR-007 (KHÔNG ĐƯỢC thay đổi schema) — chỉ cần đảm bảo file SQL được copy nguyên văn và `AppDbContext.OnModelCreating` (fluent mapping) tiếp tục khớp đúng schema đã tạo bằng SQL đó.
+- **Alternatives considered**: Chuyển sang EF Core code-first migration thật (`dotnet ef migrations add`) trong lúc tái cấu trúc — bị loại vì ngoài phạm vi (spec không yêu cầu đổi cách quản lý migration, chỉ tái cấu trúc project).
+- **Rủi ro còn lại**: Không đáng kể — xác minh bằng cách so khớp nội dung `AddInstagramTables.sql` trước/sau di chuyển (diff phải rỗng) và chạy `dotnet build` + start service để `AppDbContext` map đúng lên schema đã có (xem quickstart.md).
 
 ## TQ-002: Dùng flow/module hiện có hay tạo extension point mới?
 
@@ -23,13 +24,14 @@
 
 ## Phát hiện bổ sung (không phải NEEDS CLARIFICATION nhưng ảnh hưởng plan)
 
-- **Chưa có test project khả thi**: Thư mục `tests/Channels/{Facebook,Instagram,Shared}` chứa các file `.cs` test nhưng **không có `.csproj`** nào trong toàn bộ repo ngoài `FlexAgentService.csproj` (project Web SDK, không phải test SDK). Nghĩa là bộ test hiện tại không chạy được (`dotnet test` sẽ không tìm thấy project nào). Để FR-005 ("test hiện có PHẢI pass") có ý nghĩa thực thi được, plan PHẢI tạo một test project mới (`Flex.Agent.Tests`) tham chiếu `Flex.Agent`, di chuyển các file test hiện có vào đó, và xác nhận chúng build + chạy được — đây là điều kiện tiên quyết để verify AC-003, không phải mở rộng scope ngoài spec (spec MVP-004 giả định trước có test project hoạt động).
+- **Chưa có test project khả thi**: Thư mục `tests/Channels/{Facebook,Instagram,Shared}` chứa các file `.cs` test nhưng **không có `.csproj`** nào trong toàn bộ repo ngoài `FlexAgentService.csproj` (project Web SDK, không phải test SDK). Nghĩa là bộ test hiện tại không chạy được (`dotnet test` sẽ không tìm thấy project nào). Framework dùng trong các file là **xUnit** (`using Xunit;`). Để FR-005 ("test hiện có PHẢI pass") có ý nghĩa thực thi được, plan PHẢI tạo một test project mới (`Flex.Agent.Tests`) tham chiếu `Flex.Agent`, di chuyển các file test hiện có vào đó, và xác nhận chúng build + chạy được — đây là điều kiện tiên quyết để verify AC-003, không phải mở rộng scope ngoài spec (spec MVP-004 giả định trước có test project hoạt động).
+- **Namespace test đã sai lệch với source hiện tại**: `tests/Channels/Shared/ChannelTokenEncryptionServiceTests.cs` và `tests/Channels/Instagram/InstagramPageServiceTests.cs` import `FlexAgentService.Channels.Shared`, nhưng file nguồn thật khai báo `namespace FlexAgentService.Shared` (`Shared/ChannelTokenEncryptionService.cs`) — hai namespace không khớp. Đây là bằng chứng thêm rằng bộ test chưa từng build được. Khi di chuyển sang `Flex.Agent.Infrastructures.Security` (namespace mới), PHẢI sửa `using` trong các file test này cho khớp, không chỉ đổi tiền tố `FlexAgentService` → `Flex.Agent`.
 - **Naming convention project**: theo Clarifications, dùng `Flex.Agent` (API host, giữ `Program.cs`/`AssemblyName=Flex.Agent`), `Flex.Agent.Domain`, `Flex.Agent.Infrastructures` — đúng mẫu `Flex.Auth` / `Flex.Domain` / `Flex.Infrastructures` của auth-service.
 - **Project reference graph tham chiếu từ auth-service**: `Flex.Agent.Infrastructures` → `Flex.Agent.Domain`; `Flex.Agent` (API) → `Flex.Agent.Infrastructures` (transitively kéo theo Domain). Không có tham chiếu ngược.
 - **Phân loại thư mục hiện có theo layer**:
   - `Channels/ChannelType.cs` (enum nghiệp vụ) → `Flex.Agent.Domain`.
   - `Channels/Instagram/{InstagramPageConnection.cs, MetaAccountConnection.cs}` (entity persist) → `Flex.Agent.Domain`.
-  - `Data/AppDbContext.cs`, `Data/Migrations/*` → `Flex.Agent.Infrastructures`.
+  - `Data/AppDbContext.cs`, `Data/Migrations/AddInstagramTables.sql` (file SQL thủ công, không phải EF Core code-first migration) → `Flex.Agent.Infrastructures`.
   - `Shared/ChannelTokenEncryptionService.cs` (dịch vụ hạ tầng mã hoá) → `Flex.Agent.Infrastructures`.
   - `Channels/Instagram/{InstagramChannelController.cs, InstagramWebhookController.cs}` (HTTP entrypoint), `DependencyInjection.cs`, `InstagramOAuthService.cs`, `InstagramPageService.cs`, `InstagramWebhookHandler.cs`, `Dtos/*` (application/service logic + API) → `Flex.Agent` (API host), theo đúng cách `flex-auth-service` đặt `Controllers/`, `Services/` trong project `Flex.Auth` chứ không phải `Flex.Infrastructures`.
   - `Program.cs`, `appsettings.*.json` → `Flex.Agent` (API host).

@@ -26,8 +26,8 @@
 ### `AppDbContext`
 - **Project nguồn**: `FlexAgentService.Data` (`Data/AppDbContext.cs`)
 - **Project đích**: `Flex.Agent.Infrastructures`
-- **Migrations**: `Data/Migrations/*` di chuyển nguyên trạng sang `Flex.Agent.Infrastructures/Persistence/Migrations` (hoặc thư mục tương đương); nội dung Up/Down KHÔNG đổi (xem research.md TQ-001).
+- **Migrations**: `Data/Migrations/AddInstagramTables.sql` — đây là file SQL thủ công (không phải EF Core code-first migration, không có `ModelSnapshot`), di chuyển nguyên văn sang `Flex.Agent.Infrastructures/Persistence/Migrations/` (xem research.md TQ-001).
 
 ## Migration/backfill
 
-**Không áp dụng** — không có thay đổi schema. Chỉ cần xác nhận `dotnet ef migrations list` trên project mới trả về đúng danh sách migration hiện có (xem [quickstart.md](quickstart.md)).
+**Không áp dụng** — không có thay đổi schema. Chỉ cần xác nhận nội dung `AddInstagramTables.sql` không đổi sau khi di chuyển (diff rỗng) và `AppDbContext.OnModelCreating` tiếp tục map đúng lên schema đã tạo bằng file SQL đó (xem [quickstart.md](quickstart.md)).
