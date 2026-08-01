@@ -66,3 +66,22 @@ if ($addedCount -gt 0) {
 } else {
     Write-Host "[OK] Tat ca domain trong template da co san trong file hosts." -ForegroundColor Yellow
 }
+
+# ========== DONG BO QUY TAC FIREWALL ==========
+Write-Host "`n========== DONG BO QUY TAC FIREWALL ==========" -ForegroundColor Green
+$rules = @(
+    @{ Name = "Allow Flex Auth Service 5050"; Port = 5050 },
+    @{ Name = "Allow Flex Branch Service 5001"; Port = 5001 }
+)
+
+foreach ($r in $rules) {
+    $existing = Get-NetFirewallRule -DisplayName $r.Name -ErrorAction SilentlyContinue
+    if (-not $existing) {
+        New-NetFirewallRule -DisplayName $r.Name -Direction Inbound -Protocol TCP -LocalPort $r.Port -Action Allow | Out-Null
+        Write-Host "[+] Da tao quy tac Firewall: $($r.Name) (Port $($r.Port))" -ForegroundColor Cyan
+    } else {
+        Write-Host "[=] Quy tac Firewall da ton tai: $($r.Name)" -ForegroundColor Gray
+    }
+}
+Write-Host "==============================================="
+
