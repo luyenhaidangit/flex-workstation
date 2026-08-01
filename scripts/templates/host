@@ -26,11 +26,12 @@
 # End of section
 #
 # Flex
-172.27.61.35 portainer.local
-172.27.61.35 jenkins.local
-172.27.61.35 ai.local
-172.27.61.35 qdrant.local
-172.27.61.35 ollama.local
-172.27.61.35 prometheus.local
-172.27.61.35 grafana.local
+127.0.0.1 portainer.local
+127.0.0.1 jenkins.local
+127.0.0.1 ai.local
+127.0.0.1 qdrant.local
+127.0.0.1 ollama.local
+127.0.0.1 prometheus.local
+127.0.0.1 grafana.local
+127.0.0.1 api.flex.internal
 127.0.0.1 view-localhost # view localhost server
