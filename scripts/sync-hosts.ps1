@@ -71,7 +71,8 @@ if ($addedCount -gt 0) {
 Write-Host "`n========== DONG BO QUY TAC FIREWALL ==========" -ForegroundColor Green
 $rules = @(
     @{ Name = "Allow Flex Auth Service 5050"; Port = 5050 },
-    @{ Name = "Allow Flex Branch Service 5001"; Port = 5001 }
+    @{ Name = "Allow Flex Branch Service 5001"; Port = 5001 },
+    @{ Name = "Allow Flex Agent Service 59338"; Port = 59338 }
 )
 
 foreach ($r in $rules) {
