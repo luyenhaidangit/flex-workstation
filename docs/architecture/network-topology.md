@@ -48,6 +48,14 @@ flowchart TB
 ### 🔴 Bản chất vấn đề 3: Windows Firewall
 - Tường lửa Windows (Windows Defender Firewall) mặc định chặn các kết nối đến từ adapter mạng ảo WSL2 vào các port chưa được mở (inbound rule).
 
+### 🔴 Bản chất vấn đề 4: `host.docker.internal` sai nghĩa khi KHÔNG dùng Docker Desktop
+Môi trường thực tế của `flex-environment` chạy **dockerd native bên trong distro Ubuntu của WSL2** (distro `docker-desktop` không được dùng/đang Stopped), kết hợp `.wslconfig` có `networkingMode=mirrored`.
+
+- Trên **Docker Desktop**, `host.docker.internal` được vpnkit bắc cầu thật sang Windows host — đây là cơ chế mà tài liệu này (bản trước) ngầm giả định.
+- Trên **dockerd native trong WSL2** (như ở đây), `extra_hosts: ["host.docker.internal:host-gateway"]` chỉ resolve về **gateway của bridge `docker0` bên trong chính VM WSL2** (ví dụ `172.17.0.1`) — đây là địa chỉ nội bộ của VM, **không hề định tuyến ra Windows**.
+- Vì `networkingMode=mirrored`, việc gọi `http://localhost:59338` **từ shell của VM WSL2** (`wsl <cmd>`) thành công (mirrored mode có cơ chế forward loopback đặc biệt cho `127.0.0.1`/`localhost`). Nhưng một **container** có network namespace riêng (`flex_net` bridge) — `localhost` bên trong container là chính nó, không kế thừa cơ chế mirrored loopback của VM, và `host.docker.internal` cũng không được vpnkit xử lý vì không có Docker Desktop.
+- **Kết luận**: với setup này, cách duy nhất để container chạm được service trên Windows là gọi thẳng vào **IP LAN thật của máy Windows** (địa chỉ mà `ipconfig` trên Windows và `ip addr` trong WSL2 VM cùng chia sẻ do mirrored mode), chứ không phải qua tên `host.docker.internal` mặc định.
+
 ---
 
 ## 3. Các Phương án Xử lý (Solution Options)
@@ -78,6 +86,20 @@ Mở PowerShell (Run as Administrator) trên Windows và chạy lệnh cho phép
 ```powershell
 New-NetFirewallRule -DisplayName "Allow Agent Service for WSL" -Direction Inbound -LocalPort 59338 -Protocol TCP -Action Allow
 ```
+
+> Bước này bắt buộc phải do người dùng tự chạy (thay đổi cấu hình bảo mật hệ thống) — AI agent không tự thực hiện.
+
+#### Bước 3: Trỏ đúng địa chỉ đích trong cấu hình YARP (bắt buộc khi KHÔNG dùng Docker Desktop)
+Với dockerd native trong WSL2 + `networkingMode=mirrored` (xem mục 2, vấn đề 4), `host.docker.internal` **không** trỏ về Windows. Phải override resolve của tên này về IP LAN thật của Windows trong `docker-compose.app.yml`:
+
+```yaml
+services:
+  flex-api-gateway:
+    extra_hosts:
+      - "host.docker.internal:192.168.28.241"   # IP LAN thật của Windows host (mirrored mode) — xem `ipconfig` nếu đổi
+```
+
+Giữ nguyên tên `host.docker.internal` trong `yarp.json` (destination `agent-service`) để dễ đọc; chỉ cần sửa nơi resolve tên này ở compose. IP này do DHCP cấp nên **có thể đổi** khi đổi mạng/router cấp lại lease — nếu gateway báo lỗi kết nối agent-service trở lại, kiểm tra lại `ipconfig` trên Windows và cập nhật IP tại đây (cân nhắc đặt DHCP reservation cho máy Windows để cố định IP).
 
 ---
 
