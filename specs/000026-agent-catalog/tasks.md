@@ -10,8 +10,8 @@
 
 **Mục đích**: Khởi tạo vị trí thư mục và cấu hình hạ tầng cho Agent Catalog.
 
-- [ ] T001 Khởi tạo thư mục feature Angular `flex-microfrontend/src/app/features/agent-catalog/`
-- [ ] T002 [P] Khai báo OpenAPI Contract cho Agent Catalog API trong `specs/000026-agent-catalog/contracts/agent-catalog-api.yaml`
+- [X] T001 Khởi tạo thư mục feature Angular `flex-microfrontend/src/app/features/agent-catalog/`
+- [X] T002 [P] Khai báo OpenAPI Contract cho Agent Catalog API trong `specs/000026-agent-catalog/contracts/agent-catalog-api.yaml`
 
 ---
 
@@ -21,11 +21,11 @@
 
 **CRITICAL**: Không bắt đầu triển khai các User Story cho đến khi phase này hoàn tất.
 
-- [ ] T003 Tạo DB Migration `20260801_AddAgentCatalogTable` cho bảng `agents` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/Migrations/20260801_AddAgentCatalogTable.cs`
-- [ ] T004 [P] Implement entity `Agent` với các thuộc tính `Id`, `Name`, `Description`, `Status`, `CreatedAt`, `UpdatedAt` trong `flex-agent-service/src/Flex.Agent.Domain/Entities/Agent.cs`
-- [ ] T005 [P] Interface repository `IAgentRepository` khai báo các phương thức CRUD cho Agent trong `flex-agent-service/src/Flex.Agent.Domain/Repositories/IAgentRepository.cs`
-- [ ] T006 Implement EF Core repository `AgentRepository` kết nối PostgreSQL `flexdb` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/AgentRepository.cs` (phụ thuộc T003, T004, T005)
-- [ ] T007 Cấu hình Dependency Injection cho `IAgentRepository` và JWT Bearer Authentication cho API endpoints trong `flex-agent-service/src/Flex.Agent.Api/Program.cs` (phụ thuộc T006)
+- [X] T003 Tạo DB Migration `20260801_AddAgentCatalogTable` cho bảng `agents` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/Migrations/20260801_AddAgentCatalogTable.cs`
+- [X] T004 [P] Implement entity `Agent` với các thuộc tính `Id`, `Name`, `Description`, `Status`, `CreatedAt`, `UpdatedAt` trong `flex-agent-service/src/Flex.Agent.Domain/Entities/Agent.cs`
+- [X] T005 [P] Interface repository `IAgentRepository` khai báo các phương thức CRUD cho Agent trong `flex-agent-service/src/Flex.Agent.Domain/Repositories/IAgentRepository.cs`
+- [X] T006 Implement EF Core repository `AgentRepository` kết nối PostgreSQL `flexdb` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/AgentRepository.cs` (phụ thuộc T003, T004, T005)
+- [X] T007 Cấu hình Dependency Injection cho `IAgentRepository` và JWT Bearer Authentication cho API endpoints trong `flex-agent-service/src/Flex.Agent.Api/Program.cs` (phụ thuộc T006)
 
 **Checkpoint**: Hạ tầng lõi backend (Database, Repository, Entity, Auth) đã sẵn sàng.
 
@@ -43,15 +43,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Tạo integration test `CreateAgentIntegrationTests` kiểm tra tạo agent thành công (201), validate tên trống/dài (400), tên trùng (409) và thiếu JWT Token (401) trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/CreateAgentIntegrationTests.cs`
+- [X] T008 [P] [US1] Tạo integration test `CreateAgentIntegrationTests` kiểm tra tạo agent thành công (201), validate tên trống/dài (400), tên trùng (409) và thiếu JWT Token (401) trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/CreateAgentIntegrationTests.cs`
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Tạo DTOs `CreateAgentRequestDto` và `AgentResponseDto` với Data Annotations validation cho Name (Required, StringLength 1..100) và Description (StringLength 500) trong `flex-agent-service/src/Flex.Agent.Api/DTOs/CreateAgentRequestDto.cs` và `flex-agent-service/src/Flex.Agent.Api/DTOs/AgentResponseDto.cs`
-- [ ] T010 [US1] Implement controller action `POST /api/v1/agents` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` kiểm tra trùng tên và lưu DB (phụ thuộc T006, T007, T009)
-- [ ] T011 [P] [US1] Tạo TypeScript interface `Agent` và `CreateAgentRequest` trong `flex-microfrontend/src/app/features/agent-catalog/models/agent.model.ts`
-- [ ] T012 [P] [US1] Implement service method `createAgent` trong Angular service `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
-- [ ] T013 [US1] Implement Angular component `AgentFormModalComponent` hỗ trợ tạo agent mới với client-side validation trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-form-modal/agent-form-modal.component.ts` (phụ thuộc T011, T012)
+- [X] T009 [P] [US1] Tạo DTOs `CreateAgentRequestDto` và `AgentResponseDto` với Data Annotations validation cho Name (Required, StringLength 1..100) và Description (StringLength 500) trong `flex-agent-service/src/Flex.Agent.Api/DTOs/CreateAgentRequestDto.cs` và `flex-agent-service/src/Flex.Agent.Api/DTOs/AgentResponseDto.cs`
+- [X] T010 [US1] Implement controller action `POST /api/v1/agents` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` kiểm tra trùng tên và lưu DB (phụ thuộc T006, T007, T009)
+- [X] T011 [P] [US1] Tạo TypeScript interface `Agent` và `CreateAgentRequest` trong `flex-microfrontend/src/app/features/agent-catalog/models/agent.model.ts`
+- [X] T012 [P] [US1] Implement service method `createAgent` trong Angular service `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
+- [X] T013 [US1] Implement Angular component `AgentFormModalComponent` hỗ trợ tạo agent mới với client-side validation trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-form-modal/agent-form-modal.component.ts` (phụ thuộc T011, T012)
 
 **Definition of Done**:
 - Tạo mới Agent thành công từ cả API và Form Angular UI.
@@ -71,13 +71,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [P] [US2] Tạo integration test `GetAgentsIntegrationTests` kiểm tra lấy danh sách agent (200), lấy chi tiết agent (200/404) và danh sách rỗng trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/GetAgentsIntegrationTests.cs`
+- [X] T014 [P] [US2] Tạo integration test `GetAgentsIntegrationTests` kiểm tra lấy danh sách agent (200), lấy chi tiết agent (200/404) và danh sách rỗng trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/GetAgentsIntegrationTests.cs`
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement controller actions `GET /api/v1/agents` và `GET /api/v1/agents/{id}` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` (phụ thuộc T010)
-- [ ] T016 [P] [US2] Bổ sung service methods `getAgents` và `getAgentById` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
-- [ ] T017 [US2] Implement Angular component `AgentListComponent` hiển thị danh sách agent và trạng thái rỗng trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-list/agent-list.component.ts` (phụ thuộc T016)
+- [X] T015 [US2] Implement controller actions `GET /api/v1/agents` và `GET /api/v1/agents/{id}` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` (phụ thuộc T010)
+- [X] T016 [P] [US2] Bổ sung service methods `getAgents` và `getAgentById` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
+- [X] T017 [US2] Implement Angular component `AgentListComponent` hiển thị danh sách agent và trạng thái rỗng trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-list/agent-list.component.ts` (phụ thuộc T016)
 
 **Definition of Done**:
 - Hiển thị đầy đủ danh sách agent và xem chi tiết thành công.
@@ -96,14 +96,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T018 [P] [US3] Tạo integration test `UpdateAgentIntegrationTests` kiểm tra cập nhật tên/mô tả thành công (200), trùng tên agent khác (409) trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/UpdateAgentIntegrationTests.cs`
+- [X] T018 [P] [US3] Tạo integration test `UpdateAgentIntegrationTests` kiểm tra cập nhật tên/mô tả thành công (200), trùng tên agent khác (409) trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/UpdateAgentIntegrationTests.cs`
 
 ### Implementation for User Story 3
 
-- [ ] T019 [P] [US3] Tạo DTO `UpdateAgentRequestDto` với Data Annotations validation trong `flex-agent-service/src/Flex.Agent.Api/DTOs/UpdateAgentRequestDto.cs`
-- [ ] T020 [US3] Implement controller action `PUT /api/v1/agents/{id}` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` (phụ thuộc T015, T019)
-- [ ] T021 [P] [US3] Bổ sung service method `updateAgent` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
-- [ ] T022 [US3] Cập nhật `AgentFormModalComponent` để hỗ trợ chế độ Edit agent trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-form-modal/agent-form-modal.component.ts` (phụ thuộc T013, T021)
+- [X] T019 [P] [US3] Tạo DTO `UpdateAgentRequestDto` với Data Annotations validation trong `flex-agent-service/src/Flex.Agent.Api/DTOs/UpdateAgentRequestDto.cs`
+- [X] T020 [US3] Implement controller action `PUT /api/v1/agents/{id}` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` (phụ thuộc T015, T019)
+- [X] T021 [P] [US3] Bổ sung service method `updateAgent` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
+- [X] T022 [US3] Cập nhật `AgentFormModalComponent` để hỗ trợ chế độ Edit agent trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-form-modal/agent-form-modal.component.ts` (phụ thuộc T013, T021)
 
 **Definition of Done**:
 - Cập nhật thông tin agent thành công từ UI và API.
@@ -123,13 +123,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T023 [P] [US4] Tạo integration test `DeleteAgentIntegrationTests` kiểm tra xóa agent thành công (204) và 404 Not Found trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/DeleteAgentIntegrationTests.cs`
+- [X] T023 [P] [US4] Tạo integration test `DeleteAgentIntegrationTests` kiểm tra xóa agent thành công (204) và 404 Not Found trong `flex-agent-service/tests/Flex.Agent.IntegrationTests/DeleteAgentIntegrationTests.cs`
 
 ### Implementation for User Story 4
 
-- [ ] T024 [US4] Implement controller action `DELETE /api/v1/agents/{id}` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` (phụ thuộc T020)
-- [ ] T025 [P] [US4] Bổ sung service method `deleteAgent` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
-- [ ] T026 [US4] Implement Angular component `AgentDeleteConfirmModalComponent` và tích hợp vào `AgentListComponent` trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-delete-confirm-modal/agent-delete-confirm-modal.component.ts` (phụ thuộc T017, T025)
+- [X] T024 [US4] Implement controller action `DELETE /api/v1/agents/{id}` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AgentsController.cs` (phụ thuộc T020)
+- [X] T025 [P] [US4] Bổ sung service method `deleteAgent` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent.service.ts`
+- [X] T026 [US4] Implement Angular component `AgentDeleteConfirmModalComponent` và tích hợp vào `AgentListComponent` trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-delete-confirm-modal/agent-delete-confirm-modal.component.ts` (phụ thuộc T017, T025)
 
 **Definition of Done**:
 - Xóa agent thành công sau khi xác nhận trên UI modal.
@@ -141,9 +141,9 @@
 
 **Mục đích**: Đảm bảo bảo mật auth route, logging và chạy lại toàn bộ test suite.
 
-- [ ] T027 [P] Cấu hình Sidebar menu cha "Quản lý Agent" với menu con "Danh mục Agent" trong `flex-microfrontend/src/app/layouts/sidebar/menu.ts` và gắn `AuthGuard` cho route `/agents` trong `flex-microfrontend/src/app/app-routing.module.ts`
-- [ ] T028 Thêm cấu hình Exception Handling Middleware không rò rỉ stack trace trong `flex-agent-service/src/Flex.Agent.Api/Program.cs`
-- [ ] T029 Chạy toàn bộ các câu lệnh kiểm thử và xác minh trong `specs/000026-agent-catalog/quickstart.md`
+- [X] T027 [P] Cấu hình Sidebar menu cha "Quản lý Agent" với menu con "Danh mục Agent" trong `flex-microfrontend/src/app/layouts/sidebar/menu.ts` và gắn `AuthGuard` cho route `/agents` trong `flex-microfrontend/src/app/app-routing.module.ts`
+- [X] T028 Thêm cấu hình Exception Handling Middleware không rò rỉ stack trace trong `flex-agent-service/src/Flex.Agent.Api/Program.cs`
+- [X] T029 Chạy toàn bộ các câu lệnh kiểm thử và xác minh trong `specs/000026-agent-catalog/quickstart.md`
 
 ---
 
