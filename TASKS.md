@@ -15,7 +15,7 @@ Theo dõi các spec đang chạy song song trong `flex-workstation`, khi có nhi
 
 | Spec | Repo | Trạng thái | Người phụ trách | Cập nhật | Ghi chú |
 | --- | --- | --- | --- | --- | --- |
-| _(chưa có)_ | | | | | |
+| [specs/000026-agent-catalog](specs/000026-agent-catalog/spec.md) | flex-agent-service (giả định) | Nháp | Luyện Hải Đăng | 2026-08-01 | CRUD cơ bản cho danh mục agent; chờ `/speckit-plan` |
 
 <!--
 Ví dụ một dòng:
