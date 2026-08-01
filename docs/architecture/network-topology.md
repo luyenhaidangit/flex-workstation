@@ -4,37 +4,32 @@ Tài liệu này mô tả chi tiết sơ đồ mạng, ranh giới giao tiếp v
 
 ---
 
-## 1. Sơ đồ Topology Tổng quan
+## 1. Sơ đồ Topology Chi tiết (3 Tầng Mạng)
 
 ```mermaid
 flowchart TB
     subgraph WindowsHost ["Windows Host (Máy vật lý của người dùng)"]
-        Browser["Trình duyệt Web (Chrome)\nhttp://localhost:4200"]
-        AgentService["flex-agent-service (.NET 9.0)\nhttp://localhost:59338\n(Mặc định chỉ bind 127.0.0.1)"]
-        WinFirewall["Windows Firewall / Subnet Routing"]
+        Browser["Trình duyệt Web / Client\nhttps://api.flex.internal/api/v1/agents"]
+        AgentService["flex-agent-service (.NET 9.0)\nhttp://localhost:59338\n(Microservice C# nghiệp vụ)"]
+        WinFirewall["Windows Firewall (Kiểm soát cổng Inbound 59338)"]
     end
 
-    subgraph WSL2 ["WSL2 Linux Virtual Machine (Môi trường ảo hóa)"]
-        subgraph DockerNet ["Docker Network (flex_net)"]
-            Gateway["flex-api-gateway (YARP / HAProxy)\nhttps://api.flex.internal\nCổng 7000/8080"]
-        end
-        WSL_IP["WSL Virtual Interface IP\n(e.g., 172.x.x.x / 192.168.x.x)"]
+    subgraph WSL2 ["WSL2 Linux Virtual Machine / Docker Network (flex_net)"]
+        HAProxy["1️⃣ HAProxy (Edge Reverse Proxy / SSL Termination)\nCổng 80/443 (bắt domain api.flex.internal)"]
+        Gateway["2️⃣ flex-api-gateway (YARP / Application Gateway)\nCổng 8080 (Định tuyến / Auth / Rate Limit)"]
     end
 
-    %% Flow of Browser Request
-    Browser -->|"1. Gọi HTTPS GET https://api.flex.internal/api/v1/agents"| Gateway
-    
-    %% Gateway trying to forward downstream
-    Gateway -->|"2. YARP forward qua host.docker.internal:59338\n(IP Windows 192.168.x.x)"| WinFirewall
-    WinFirewall -.->|"❌ 3. TIMEOUT / 502 BAD GATEWAY\n(Do Windows Firewall chặn hoặc Kestrel chỉ nghe 127.0.0.1)"| AgentService
+    %% Luồng đi
+    Browser -->|"Tầng 1: Đăng nhập HTTPS Port 443"| HAProxy
+    HAProxy -->|"Forward internal (flex_net)"| Gateway
+    Gateway -->|"Tầng 2: YARP Routing sang host.docker.internal:59338"| WinFirewall
+    WinFirewall -->|"Tầng 3: Nhận HTTP Request"| AgentService
 
     classDef hostStyle fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
     classDef wslStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
-    classDef errStyle fill:#ffebee,stroke:#c62828,stroke-width:2px;
 
     class WindowsHost hostStyle;
     class WSL2 wslStyle;
-    class AgentService errStyle;
 ```
 
 ---
