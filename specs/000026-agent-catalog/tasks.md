@@ -141,7 +141,7 @@
 
 **Mục đích**: Đảm bảo bảo mật auth route, logging và chạy lại toàn bộ test suite.
 
-- [ ] T027 [P] Bổ sung `AuthGuard` cho route `/agents` trong Angular routing `flex-microfrontend/src/app/app-routing.module.ts`
+- [ ] T027 [P] Cấu hình Sidebar menu cha "Quản lý Agent" với menu con "Danh mục Agent" trong `flex-microfrontend/src/app/layouts/sidebar/menu.ts` và gắn `AuthGuard` cho route `/agents` trong `flex-microfrontend/src/app/app-routing.module.ts`
 - [ ] T028 Thêm cấu hình Exception Handling Middleware không rò rỉ stack trace trong `flex-agent-service/src/Flex.Agent.Api/Program.cs`
 - [ ] T029 Chạy toàn bộ các câu lệnh kiểm thử và xác minh trong `specs/000026-agent-catalog/quickstart.md`
 

@@ -145,7 +145,7 @@
 | Database/Migration | Thêm mới bảng `agents` trong PostgreSQL `flexdb` | Không tác động tới các bảng hiện có | Run `dotnet ef database update` |
 | API/Contract | Thêm mới REST endpoints `/api/v1/agents` | Endpoint mới, không ảnh hưởng API cũ | Swagger UI & OpenAPI contract check |
 | Permission/Security | Áp dụng `[Authorize]` trên `AgentsController` | Ngăn chặn truy cập chưa xác thực | Integration Test với/không có Token |
-| UI/UX | Thêm menu/screen Danh mục Agent trong `flex-microfrontend` | Không làm gián đoạn luồng UI khác | Visual & Manual E2E Check |
+| UI/UX | Thêm menu cha "Quản lý Agent" với menu con "Danh mục Agent" (`/agents`) trong `flex-microfrontend` (`menu.ts`) | Không làm gián đoạn luồng UI khác | Visual & Manual E2E Check |
 
 ---
 
