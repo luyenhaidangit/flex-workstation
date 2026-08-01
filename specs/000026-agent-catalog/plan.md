@@ -16,12 +16,12 @@
 - Xóa Agent phải có popup yêu cầu xác nhận trước khi thực hiện (AC-009, BR-003).
 
 **Hướng tiếp cận kỹ thuật dự kiến**:
-- Backend: REST API trong sub-repo `flex-agent-service` (.NET 9.0 Web API, EF Core 9 với PostgreSQL `flexdb`).
+- Backend: REST API trong sub-repo `flex-agent-service` (.NET 9.0 Web API, EF Core 9 với PostgreSQL `agentdb`; EF Core chỉ mapping tới schema có sẵn, không sinh Migration).
 - Frontend: Module Angular trong sub-repo `flex-microfrontend` (giao diện quản trị, form validation, modal xác nhận).
 - Authentication: JWT Bearer authentication tích hợp với `flex-auth-service`.
 
 **Kết quả sau research**:
-- Đã hoàn thành Phase 0 Research và ghi nhận trong [research.md](file:///C:/Workspace/Project/flex-workstation/specs/000026-agent-catalog/research.md). Các quyết định kỹ thuật chính bao gồm: dùng PostgreSQL `flexdb` lưu bảng `agents`, dùng `Flex.Agent.Api` cho Backend REST API và Angular cho Frontend.
+- Đã hoàn thành Phase 0 Research và ghi nhận trong [research.md](file:///C:/Workspace/Project/flex-workstation/specs/000026-agent-catalog/research.md). Các quyết định kỹ thuật chính bao gồm: dùng PostgreSQL `agentdb` (database riêng cho Agent Platform, tách khỏi `flexdb` control plane — xem [system-map.md](file:///C:/Workspace/Project/flex-workstation/docs/architecture/system-map.md)) lưu bảng `agents`, dùng `Flex.Agent.Api` cho Backend REST API và Angular cho Frontend.
 
 ---
 
@@ -30,7 +30,7 @@
 **Trong phạm vi**:
 - **Backend (`flex-agent-service`)**:
   - Domain Entity `Agent` trong `Flex.Agent.Domain`.
-  - DbContext mapping & EF Core Migration `AddAgentCatalogTable` trong `Flex.Agent.Infrastructures`.
+  - DbContext mapping (Fluent API, không sinh EF Core Migration) tới bảng `agents` có sẵn trong `Flex.Agent.Infrastructures`; schema được tạo bởi migration SQL trong `flex-database/agentdb/`.
   - AgentRepository implementation trong `Flex.Agent.Infrastructures`.
   - `AgentsController` REST endpoints (GET list/detail, POST create, PUT update, DELETE) với JWT Auth Attribute trong `Flex.Agent.Api`.
   - Request DTOs & Response DTOs với Data Annotations Validation.
@@ -56,7 +56,7 @@
 
 **Phụ thuộc chính**: ASP.NET Core 9 Web API, Entity Framework Core 9.0 (`Npgsql.EntityFrameworkCore.PostgreSQL`), Angular HTTP Client
 
-**Lưu trữ**: PostgreSQL (`flexdb`), bảng `agents`
+**Lưu trữ**: PostgreSQL (`agentdb`), bảng `agents` — database riêng của Agent Platform trong repo `flex-database` (không dùng chung `flexdb`)
 
 **Kiểm thử**: xUnit cho Backend Unit/Integration tests
 
@@ -91,7 +91,7 @@
 ## Câu hỏi kỹ thuật cần research
 
 - **TQ-001**: Model lưu trữ DB ở v1 nên nằm ở PostgreSQL hay MySQL per-tenant?
-  - **Kết quả**: PostgreSQL `flexdb` (Control Plane) là nơi tối ưu cho v1 để quản lý metadata danh mục agent tập trung trước khi mở rộng multi-tenant.
+  - **Kết quả**: PostgreSQL, database riêng `agentdb` (tách khỏi `flexdb` control plane dùng chung) là nơi tối ưu cho v1 để quản lý metadata danh mục agent tập trung trước khi mở rộng multi-tenant. Migration schema thuộc repo `flex-database/agentdb/` theo Constitution VI, không phải EF Core Migration trong `flex-agent-service`.
 - **TQ-002**: So khớp trùng tên Agent thực hiện như thế nào để đảm bảo phân biệt chữ hoa/thường theo BR-001?
   - **Kết quả**: UNIQUE constraint trên PostgreSQL mặc định so sánh binary exact match (case-sensitive) cho kiểu `VARCHAR`, đảm bảo `"Agent A"` và `"agent a"` không trùng nhau.
 - **TQ-003**: Cấu trúc API endpoint RESTful thế nào?
@@ -105,7 +105,7 @@
 1. Admin truy cập màn hình Danh mục Agent trên Frontend (`flex-microfrontend`).
 2. Auth Guard kiểm tra JWT Bearer Token. Nếu chưa đăng nhập, chuyển hướng Login.
 3. Frontend gọi `GET /api/v1/agents` có kèm JWT header.
-4. Backend `Flex.Agent.Api` xác thực token, gọi `AgentRepository` truy vấn PostgreSQL `agents` table và trả về JSON list.
+4. Backend `Flex.Agent.Api` xác thực token, gọi `AgentRepository` truy vấn bảng `agents` trong PostgreSQL `agentdb` và trả về JSON list.
 5. Admin thực hiện Tạo/Sửa/Xóa:
    - Form validate dữ liệu ở client (Tên length 1..100, Mô tả max 500).
    - Backend validate lại DTO & check unique name. Nếu vi phạm, trả 400 hoặc 409 Conflict.
@@ -142,7 +142,7 @@
 
 | Khu vực | Tác động dự kiến | Tương thích ngược/Rủi ro | Cách kiểm tra |
 |---------|------------------|--------------------------|---------------|
-| Database/Migration | Thêm mới bảng `agents` trong PostgreSQL `flexdb` | Không tác động tới các bảng hiện có | Run `dotnet ef database update` |
+| Database/Migration | Thêm mới bảng `agents` trong PostgreSQL `agentdb` (database riêng, repo `flex-database/agentdb/`) | Không tác động tới các bảng hiện có | Chạy migration script SQL trong `flex-database/agentdb/` theo quy ước repo (`migrate-*` script), verify bằng `psql \d agents` |
 | API/Contract | Thêm mới REST endpoints `/api/v1/agents` | Endpoint mới, không ảnh hưởng API cũ | Swagger UI & OpenAPI contract check |
 | Permission/Security | Áp dụng `[Authorize]` trên `AgentsController` | Ngăn chặn truy cập chưa xác thực | Integration Test với/không có Token |
 | UI/UX | Thêm menu cha "Quản lý Agent" với menu con "Danh mục Agent" (`/agents`) trong `flex-microfrontend` (`menu.ts`) | Không làm gián đoạn luồng UI khác | Visual & Manual E2E Check |
@@ -170,9 +170,13 @@ Chi tiết OpenAPI specification được định nghĩa tại: [contracts/agent
 
 **Có thay đổi dữ liệu/schema không**: Có (Thêm bảng `agents` mới).
 
+**Database đích**: PostgreSQL `agentdb` — database riêng cho Agent Platform/Agent Catalog, tách khỏi `flexdb` control plane dùng chung. Xác nhận bởi user (2026-08-01), ghi nhận tại [system-map.md](file:///C:/Workspace/Project/flex-workstation/docs/architecture/system-map.md).
+
+**Repo chứa migration**: `flex-database/agentdb/` — theo quy ước versioned SQL hiện có của repo `flex-database` (`migrations/V<major>.<minor>__mo-ta.sql`, `seeders/`), giống `investordb`/`systemdb`/`notification`/`securities`. KHÔNG dùng EF Core Migration trong `flex-agent-service`.
+
 **Migration**:
-- Migration name: `20260801_AddAgentCatalogTable`
-- Script EF Core migration chèn bảng `agents` vào PostgreSQL.
+- Script: `flex-database/agentdb/migrations/V1.1__create_table_agents.sql` — tạo bảng `agents` (đúng convention `CREATE TABLE IF NOT EXISTS`, `uq_agents_name` case-sensitive unique index theo BR-001).
+- `Flex.Agent.Infrastructures` chỉ cấu hình Fluent API mapping tới bảng `agents` có sẵn, không sinh EF Core Migration để tránh 2 nguồn quản lý schema song song.
 
 **Backfill/Cleanup**: Không áp dụng (Tính năng mới, database trống ban đầu).
 
@@ -183,7 +187,7 @@ Chi tiết OpenAPI specification được định nghĩa tại: [contracts/agent
 | Quyết định | Lựa chọn | Lý do chọn | Phương án đã loại | Lý do loại |
 |------------|----------|------------|-------------------|------------|
 | DEC-001 | ASP.NET Core 9 Web API (`flex-agent-service`) | Đã có sẵn repo `flex-agent-service` | Service NodeJS mới | Thừa thãi, không đồng bộ kiến trúc |
-| DEC-002 | PostgreSQL `flexdb` (`agents` table) | Nền tảng Control Plane metadata | MySQL DB per tenant ở v1 | Đổi lại độ phức tạp chưa cần thiết ở v1 |
+| DEC-002 | PostgreSQL `agentdb` (`agents` table), migration quản lý tại `flex-database/agentdb/` | Tách database riêng cho Agent Platform, tránh gộp schema dùng chung vào `flexdb` hoặc migration vào repo service (Constitution VI) | MySQL DB per tenant ở v1; EF Core Migration trong `flex-agent-service` | MySQL: đổi lại độ phức tạp chưa cần thiết ở v1. EF Core Migration trong service: phân mảnh nguồn sự thật schema, sai quy ước migration dùng chung của workstation |
 | DEC-003 | Bearer JWT Auth middleware | Đảm bảo an toàn SEC-003 | Allow Anonymous | Vi phạm quy tắc bảo mật |
 | DEC-004 | Case-sensitive unique index | Chuẩn BR-001 & PostgreSQL default | Case-insensitive index | Vi phạm BR-001 |
 
@@ -231,8 +235,7 @@ flex-agent-service/
 │   │       └── Agent.cs
 │   ├── Flex.Agent.Infrastructures/
 │   │   ├── Persistence/
-│   │   │   ├── AgentDbContext.cs
-│   │   │   └── Migrations/
+│   │   │   └── AgentDbContext.cs   # Fluent API mapping, KHÔNG có Migrations/ (schema quản lý ở flex-database/agentdb/)
 │   │   └── Repositories/
 │   │       └── AgentRepository.cs
 │   └── Flex.Agent.Api/
@@ -246,6 +249,15 @@ flex-agent-service/
 └── tests/
     ├── Flex.Agent.UnitTests/
     └── Flex.Agent.IntegrationTests/
+```
+
+#### Database: `flex-database/agentdb/`
+```text
+flex-database/
+└── agentdb/
+    ├── migrations/
+    │   └── V1.1__create_table_agents.sql
+    └── seeders/          # Chỉ dùng nếu cần seed dữ liệu mẫu, hiện "Không áp dụng"
 ```
 
 #### Frontend: `flex-microfrontend/`
@@ -270,13 +282,13 @@ flex-microfrontend/
 ## Rollout & Rollback
 
 **Kế hoạch rollout**:
-1. Chạy EF Core DB Migration trên môi trường Staging/Production.
+1. Chạy migration script `flex-database/agentdb/migrations/V1.1__create_table_agents.sql` trên môi trường Staging/Production (theo script migrate của repo `flex-database`).
 2. Deploy backend service `flex-agent-service`.
 3. Deploy frontend bundle `flex-microfrontend`.
 
 **Rollback code/config**:
 1. Revert commit frontend & backend.
-2. Revert DB migration bằng `dotnet ef database update <PreviousMigration>`.
+2. Rollback dữ liệu/migration: ưu tiên forward-fix theo quy ước `flex-database` (không rollback tự động); nếu bắt buộc gỡ bảng, thêm script rollback riêng trong `flex-database/agentdb/`.
 
 ---
 

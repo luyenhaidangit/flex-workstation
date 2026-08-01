@@ -21,10 +21,10 @@
 
 **CRITICAL**: Không bắt đầu triển khai các User Story cho đến khi phase này hoàn tất.
 
-- [X] T003 Tạo DB Migration `20260801_AddAgentCatalogTable` cho bảng `agents` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/Migrations/20260801_AddAgentCatalogTable.cs`
+- [ ] T003 **CẦN LÀM LẠI** — Tạo migration SQL `V1.1__create_table_agents.sql` cho bảng `agents` trong `flex-database/agentdb/migrations/` (theo quy ước versioned SQL của repo `flex-database`, KHÔNG dùng EF Core Migration). Task này trước đó đã tạo nhầm `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/Migrations/AddAgentCatalogTable.sql` — cần xóa file đó sau khi migration đúng vị trí đã chạy được, và cấu hình `Flex.Agent.Infrastructures` chỉ Fluent API mapping tới bảng có sẵn (không giữ thư mục `Migrations/` trong service).
 - [X] T004 [P] Implement entity `Agent` với các thuộc tính `Id`, `Name`, `Description`, `Status`, `CreatedAt`, `UpdatedAt` trong `flex-agent-service/src/Flex.Agent.Domain/Entities/Agent.cs`
 - [X] T005 [P] Interface repository `IAgentRepository` khai báo các phương thức CRUD cho Agent trong `flex-agent-service/src/Flex.Agent.Domain/Repositories/IAgentRepository.cs`
-- [X] T006 Implement EF Core repository `AgentRepository` kết nối PostgreSQL `flexdb` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/AgentRepository.cs` (phụ thuộc T003, T004, T005)
+- [X] T006 Implement EF Core repository `AgentRepository` kết nối PostgreSQL `agentdb` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/AgentRepository.cs` (phụ thuộc T003, T004, T005)
 - [X] T007 Cấu hình Dependency Injection cho `IAgentRepository` và JWT Bearer Authentication cho API endpoints trong `flex-agent-service/src/Flex.Agent.Api/Program.cs` (phụ thuộc T006)
 
 **Checkpoint**: Hạ tầng lõi backend (Database, Repository, Entity, Auth) đã sẵn sàng.
@@ -151,7 +151,7 @@
 
 - **Backend Build**: `cd flex-agent-service && dotnet build`
 - **Backend Tests**: `cd flex-agent-service && dotnet test`
-- **Database Migration**: `cd flex-agent-service && dotnet ef database update --project src/Flex.Agent.Infrastructures --startup-project src/Flex.Agent.Api`
+- **Database Migration**: chạy script migrate của repo `flex-database` trỏ vào `agentdb/migrations/V1.1__create_table_agents.sql` (theo quy ước migrate hiện có của `flex-database`, không dùng `dotnet ef database update`)
 - **Frontend Build/Start**: `cd flex-microfrontend && npm run build`
 
 ---
