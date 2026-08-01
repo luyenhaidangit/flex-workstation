@@ -191,6 +191,22 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 **Ngoại lệ**:
 - Refactor nhỏ được phép nếu là điều kiện trực tiếp để thay đổi hiện tại chạy đúng và được nêu rõ trong task/PR.
 
+### VI. Xác định vị trí cross-repo/database trước khi code
+
+**Quy định**: Trước khi tạo migration, schema hoặc bất kỳ thay đổi database nào, PHẢI phân tích và ghi rõ trong `plan.md`: (a) dữ liệu thuộc database/instance nào (database dùng chung hiện có, database riêng của service, hoặc cần tạo database mới), (b) repo chứa migration/schema tương ứng. Quyết định PHẢI đối chiếu `docs/architecture/system-map.md` (mục Projects, Data Architecture) và tiền lệ trong spec trước đó. Nếu không có tiền lệ rõ ràng hoặc `system-map.md` mâu thuẫn với thực tế, PHẢI ghi thành câu hỏi cần làm rõ (`TQ`) và xử lý trong Phase 0 research trước khi sinh tasks — KHÔNG ĐƯỢC tự chọn vị trí theo thói quen (ví dụ mặc định gộp migration dùng chung vào repo service đang implement).
+
+**Lý do**: `flex-workstation` điều phối nhiều sub-repo độc lập; chọn sai vị trí migration (ví dụ đặt schema dùng chung vào repo service thay vì repo/DB đúng vai trò) gây phân mảnh nguồn sự thật và khó rollback tập trung.
+
+**Áp dụng cho**: `plan.md` (mục "Dữ liệu & Migration", "Cấu trúc project"), `docs/architecture/system-map.md`, mọi feature có thay đổi database/schema/migration.
+
+**Cách kiểm tra**:
+- Mục "Dữ liệu & Migration" trong `plan.md` nêu rõ database đích và repo chứa migration, kèm dẫn chứng (`system-map.md` hoặc spec tiền lệ cụ thể).
+- Nếu feature tạo bảng/schema mới, plan PHẢI trả lời: dữ liệu thuộc database dùng chung hiện có, database riêng của service đang implement, hay cần database mới — không được mặc định chọn mà không phân tích.
+- `system-map.md` được cập nhật nếu quyết định tạo tiền lệ mới hoặc phát hiện tài liệu cũ sai/mâu thuẫn.
+
+**Ngoại lệ**:
+- Feature không tạo/thay đổi schema hoặc migration ghi "Không áp dụng" ở mục kiểm tra này.
+
 ---
 
 ## 6. Tiêu chuẩn cho artifact Speckit

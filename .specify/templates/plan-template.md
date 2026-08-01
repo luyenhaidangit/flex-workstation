@@ -169,6 +169,10 @@
 
 **Có thay đổi dữ liệu/schema không**: [Có/Không áp dụng]
 
+**Database đích**: [Database/schema cụ thể dữ liệu này thuộc về — dùng chung hiện có / riêng của service / cần tạo mới. Đối chiếu `docs/architecture/system-map.md` (mục Projects, Data Architecture) và spec tiền lệ, không mặc định chọn theo thói quen. Hoặc "Không áp dụng"]
+
+**Repo chứa migration**: [Repo thực thi migration này kèm dẫn chứng (system-map.md hoặc spec tiền lệ cụ thể) hoặc "Không áp dụng"]
+
 **Migration**:
 - [Mô tả migration hoặc "Không áp dụng"]
 
@@ -350,6 +354,7 @@ tests/
 - [ ] Tác động tới database, API contract, permission, logging/audit và integration đã được đánh giá hoặc ghi `Không áp dụng`.
 - [ ] Các contract/API/event thay đổi đã có consumer bị ảnh hưởng và cách kiểm tra compatibility.
 - [ ] Dữ liệu/migration/backfill/compatibility đã rõ hoặc ghi `Không áp dụng`.
+- [ ] Database đích và repo chứa migration đã được xác định, đối chiếu `docs/architecture/system-map.md`, hoặc ghi `Không áp dụng` (Constitution VI).
 - [ ] Quyết định kỹ thuật chính đã có lý do chọn và phương án bị loại.
 - [ ] Chiến lược kiểm thử đã bao phủ unit, integration, contract, permission/security, E2E/manual và regression khi liên quan.
 - [ ] Rollout, rollback code/config, rollback dữ liệu/migration, feature flag/config và backward compatibility đã rõ hoặc ghi `Không áp dụng`.
