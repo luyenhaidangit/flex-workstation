@@ -64,6 +64,7 @@ Khai báo repo cần có trong workspace tại `workstation.json`:
 ## Tài liệu
 
 - [CLAUDE.md](CLAUDE.md): quy ước khi làm việc trong `flex-workstation`.
+- [TASKS.md](TASKS.md): theo dõi spec Speckit đang chạy song song.
 - [SPEC.md](SPEC.md): quy ước đặt tên thư mục, file, skill và namespace.
 - [docs/setup/onboarding.md](docs/setup/onboarding.md): bootstrap máy mới và cách mở workspace.
 - [docs/architecture/system-map.md](docs/architecture/system-map.md): bản đồ workspace, runtime AI tooling và tổng quan kiến trúc hệ thống.

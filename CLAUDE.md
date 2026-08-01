@@ -85,6 +85,7 @@ flex-workstation/
 
 - Index đầy đủ: `README.md`
 - Bài học/quyết định tích lũy qua các phiên (chia sẻ cả team, khác `MEMORY.md` cá nhân của từng agent): `MEMORY.md`
+- Theo dõi spec Speckit đang chạy song song: `TASKS.md`
 - Onboarding/bootstrap: `docs/setup/onboarding.md`
 - Bản đồ hệ thống & kiến trúc: `docs/architecture/system-map.md`
 - Workflow Speckit: `docs/speckit/workflow.md`
