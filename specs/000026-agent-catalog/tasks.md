@@ -21,7 +21,7 @@
 
 **CRITICAL**: Không bắt đầu triển khai các User Story cho đến khi phase này hoàn tất.
 
-- [ ] T003 **CẦN LÀM LẠI** — Tạo migration SQL `V1.1__create_table_agents.sql` cho bảng `agents` trong `flex-database/agentdb/migrations/` (theo quy ước versioned SQL của repo `flex-database`, KHÔNG dùng EF Core Migration). Task này trước đó đã tạo nhầm `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/Migrations/AddAgentCatalogTable.sql` — cần xóa file đó sau khi migration đúng vị trí đã chạy được, và cấu hình `Flex.Agent.Infrastructures` chỉ Fluent API mapping tới bảng có sẵn (không giữ thư mục `Migrations/` trong service).
+- [X] T003 Tạo migration SQL `V1.1__create_table_agents.sql` cho bảng `agents` trong `flex-database/agentdb/migrations/` (theo quy ước versioned SQL của repo `flex-database`, KHÔNG dùng EF Core Migration). Đã xóa file `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/Migrations/AddAgentCatalogTable.sql` thừa và cấu hình `Flex.Agent.Infrastructures` chỉ Fluent API mapping tới bảng có sẵn.
 - [X] T004 [P] Implement entity `Agent` với các thuộc tính `Id`, `Name`, `Description`, `Status`, `CreatedAt`, `UpdatedAt` trong `flex-agent-service/src/Flex.Agent.Domain/Entities/Agent.cs`
 - [X] T005 [P] Interface repository `IAgentRepository` khai báo các phương thức CRUD cho Agent trong `flex-agent-service/src/Flex.Agent.Domain/Repositories/IAgentRepository.cs`
 - [X] T006 Implement EF Core repository `AgentRepository` kết nối PostgreSQL `agentdb` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/AgentRepository.cs` (phụ thuộc T003, T004, T005)
