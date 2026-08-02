@@ -1,133 +1,143 @@
 # Kiến trúc Mạng & Topology: Windows Host vs WSL2 / Docker
 
-Tài liệu này mô tả chi tiết sơ đồ mạng, ranh giới giao tiếp và cách giải quyết xung đột kết nối giữa **Windows Host** và **WSL2 / Docker Container**.
+Tài liệu này mô tả chi tiết sơ đồ mạng, ranh giới giao tiếp và giải pháp kết nối giữa **Windows Host** (ứng dụng .NET) và **WSL2 / Docker Container** trong môi trường `networkingMode=mirrored`.
 
 ---
 
-## 1. Sơ đồ Topology Chi tiết (3 Tầng Mạng)
+## 1. Sơ đồ Topology Chi tiết (3 Tầng Mạng qua Socat Proxy)
 
 ```mermaid
 flowchart TB
-    subgraph WindowsHost ["Windows Host (Máy vật lý của người dùng)"]
-        Browser["Trình duyệt Web / Client\nhttps://api.flex.internal/api/v1/agents"]
-        AgentService["flex-agent-service (.NET 9.0)\nhttp://localhost:59338\n(Microservice C# nghiệp vụ)"]
-        WinFirewall["Windows Firewall (Kiểm soát cổng Inbound 59338)"]
+    subgraph WindowsHost ["Windows Host (Máy vật lý)"]
+        AgentService["flex-agent-service (.NET 9.0)\nhttp://127.0.0.1:59338\n(Microservice C# nghiệp vụ)"]
     end
 
-    subgraph WSL2 ["WSL2 Linux Virtual Machine / Docker Network (flex_net)"]
-        HAProxy["1️⃣ HAProxy (Edge Reverse Proxy / SSL Termination)\nCổng 80/443 (bắt domain api.flex.internal)"]
-        Gateway["2️⃣ flex-api-gateway (YARP / Application Gateway)\nCổng 8080 (Định tuyến / Auth / Rate Limit)"]
+    subgraph WSL2 ["WSL2 Linux Virtual Machine"]
+        SocatProxy["⚡ Socat User-Space Proxy\nLắng nghe: 0.0.0.0:59339\nForward sang: 127.0.0.1:59338"]
+        
+        subgraph DockerNet ["Docker Network (flex_net)"]
+            Gateway["flex-api-gateway / Docker Container\nCall: http://host.docker.internal:59339/"]
+        end
     end
 
     %% Luồng đi
-    Browser -->|"Tầng 1: Đăng nhập HTTPS Port 443"| HAProxy
-    HAProxy -->|"Forward internal (flex_net)"| Gateway
-    Gateway -->|"Tầng 2: YARP Routing sang host.docker.internal:59338"| WinFirewall
-    WinFirewall -->|"Tầng 3: Nhận HTTP Request"| AgentService
+    Gateway -->|"1️⃣ Request từ Container (172.x.x.x)"| SocatProxy
+    SocatProxy -->|"2️⃣ User-Space Socket forward sang Loopback"| AgentService
 
     classDef hostStyle fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
     classDef wslStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+    classDef proxyStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
 
     class WindowsHost hostStyle;
     class WSL2 wslStyle;
+    class SocatProxy proxyStyle;
 ```
 
 ---
 
-## 2. Giải thích lý do xảy ra lỗi `502 Bad Gateway (Timeout)`
+## 2. Giải thích Bản chất Sự cố Treo (Hang/Timeout) trong WSL2 `mirrored` Mode
 
-### 🔴 Bản chất vấn đề 1: Phân tách Loopback (`127.0.0.1`)
-- **Trong Windows**: `localhost` (`127.0.0.1`) là giao diện mạng nội bộ của Windows.
-- **Trong WSL2**: WSL2 là một máy ảo Linux (Hyper-V / WSL2 Lightweight VM) có dải IP ảo riêng. `localhost` trong WSL2 là của Linux, **KHÔNG PHẢI** `localhost` của Windows.
+### 🔴 Nguyên nhân 1: Cơ chế bảo mật Routing của Linux Kernel khi `networkingMode=mirrored`
+- Khi WSL2 bật `networkingMode=mirrored`, port của Windows (`59338`) được mirror trực tiếp vào namespace của WSL2 Linux VM.
+- Khi Docker Container thuộc card mạng ảo bridge (`172.x.x.x` / `flex_net`) gửi gói tin tới host và bị `iptables` nat ép nhảy trực tiếp vào giao diện loopback `127.0.0.1`, Kernel Linux của WSL2 chủ động hủy (drop) các gói tin này vì lý do bảo mật routing (martian packet filtering). Kết quả là connection bị treo (hang/timeout).
 
-### 🔴 Bản chất vấn đề 2: Kestrel Binding trên Windows
-- Khi chạy `flex-agent-service` trên Windows với cấu hình mặc định `"applicationUrl": "http://localhost:59338"`, Kestrel C# chỉ lắng nghe duy nhất cổng `127.0.0.1:59338`.
-- Khi `flex-api-gateway` chạy trong WSL2 trỏ tới IP của Windows (ví dụ `192.168.1.44` hoặc `host.docker.internal`), gói tin mạng xuất phát từ WSL2 đi vào card mạng Windows với IP nguồn dạng `172.x.x.x` hoặc `192.168.x.x`.
-- Vì Kestrel chỉ nhận packet tới `127.0.0.1`, nó lập tức từ chối/bỏ qua packet đến từ WSL2 $\rightarrow$ Sinh lỗi **Connection Timed Out / 502 Bad Gateway**.
-
-### 🔴 Bản chất vấn đề 3: Windows Firewall
-- Tường lửa Windows (Windows Defender Firewall) mặc định chặn các kết nối đến từ adapter mạng ảo WSL2 vào các port chưa được mở (inbound rule).
-
-### 🔴 Bản chất vấn đề 4: `host.docker.internal` sai nghĩa khi KHÔNG dùng Docker Desktop
-Môi trường thực tế của `flex-environment` chạy **dockerd native bên trong distro Ubuntu của WSL2** (distro `docker-desktop` không được dùng/đang Stopped), kết hợp `.wslconfig` có `networkingMode=mirrored`.
-
-- Trên **Docker Desktop**, `host.docker.internal` được vpnkit bắc cầu thật sang Windows host — đây là cơ chế mà tài liệu này (bản trước) ngầm giả định.
-- Trên **dockerd native trong WSL2** (như ở đây), `extra_hosts: ["host.docker.internal:host-gateway"]` chỉ resolve về **gateway của bridge `docker0` bên trong chính VM WSL2** (ví dụ `172.17.0.1`) — đây là địa chỉ nội bộ của VM, **không hề định tuyến ra Windows**.
-- Vì `networkingMode=mirrored`, việc gọi `http://localhost:59338` **từ shell của VM WSL2** (`wsl <cmd>`) thành công (mirrored mode có cơ chế forward loopback đặc biệt cho `127.0.0.1`/`localhost`). Nhưng một **container** có network namespace riêng (`flex_net` bridge) — `localhost` bên trong container là chính nó, không kế thừa cơ chế mirrored loopback của VM, và `host.docker.internal` cũng không được vpnkit xử lý vì không có Docker Desktop.
-- **Kết luận**: với setup này, cách duy nhất để container chạm được service trên Windows là gọi thẳng vào **IP LAN thật của máy Windows** (địa chỉ mà `ipconfig` trên Windows và `ip addr` trong WSL2 VM cùng chia sẻ do mirrored mode), chứ không phải qua tên `host.docker.internal` mặc định.
+### 🔴 Nguyên nhân 2: Xung đột Port Binding
+- Ứng dụng .NET trên Windows đã chiếm giữ port `59338` (được mirror vào WSL2).
+- Do đó, các công cụ proxy như `socat` không thể bind trực tiếp đè lên port `59338` bên trong WSL2.
 
 ---
 
-## 3. Các Phương án Xử lý (Solution Options)
+## 3. Giải pháp Triệt để: User-Space Proxy (`socat` trên Port phụ 59339)
 
-### 🟢 Phương án A: Cho phép `flex-agent-service` lắng nghe từ WSL2 (Khuyên dùng khi chạy hybrid)
+Bằng cách chạy `socat` trên một **port phụ (`59339`)** ở WSL2, `socat` chạy ở tầng ứng dụng (user-space) nhận request từ Docker bridge và tự tạo một socket mới đẩy sang `127.0.0.1:59338`. Cách này vượt qua hoàn toàn rào cản routing ở cấp Kernel!
 
-#### Bước 1: Sửa Kestrel binding trong `launchSettings.json`
-Thay đổi `applicationUrl` từ `localhost` thành `0.0.0.0` (nghe tất cả card mạng):
+---
 
+### Bước 1: Làm sạch các rule `iptables` nat cũ
+
+Mở **Terminal WSL2** và chạy các lệnh dọn dẹp:
+
+```bash
+sudo iptables -t nat -F
+sudo iptables -t nat -X
+```
+
+---
+
+### Bước 2: Khởi chạy `socat` chạy ngầm vĩnh viễn
+
+Mở `socat` lắng nghe cổng `59339` và chuyển tiếp dữ liệu sang `127.0.0.1:59338` (.NET app trên Windows):
+
+```bash
+nohup socat TCP-LISTEN:59339,fork,reuseaddr TCP:127.0.0.1:59338 > /dev/null 2>&1 &
+```
+
+> 📌 **Giải thích:**
+> - `TCP-LISTEN:59339,fork,reuseaddr`: Lắng nghe trên port 59339 của WSL2, cho phép nhiều kết nối đồng thời.
+> - `TCP:127.0.0.1:59338`: Chuyển tiếp toàn bộ request sang ứng dụng .NET đang nghe ở `127.0.0.1:59338`.
+> - `nohup ... &`: Đảm bảo `socat` tiếp tục chạy ngầm ngay cả khi đóng Terminal WSL2.
+
+---
+
+### Bước 3: Kiểm tra kết nối từ Docker Container
+
+Từ bên trong Container (hoặc qua Portainer Terminal):
+
+```bash
+wget -qO- http://host.docker.internal:59339/
+# hoặc
+curl http://host.docker.internal:59339/
+```
+
+**Kết quả thành công:** Trả về JSON status của `Flex.Agent.Api` ngay lập tức:
 ```json
-{
-  "profiles": {
-    "Flex.Agent": {
-      "commandName": "Project",
-      "launchBrowser": false,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://0.0.0.0:59338"
-    }
-  }
-}
+{"status":"Up","name":"Flex.Agent.Api", ...}
 ```
 
-#### Bước 2: Thêm Inbound Rule cho Windows Firewall
-Mở PowerShell (Run as Administrator) trên Windows và chạy lệnh cho phép cổng `59338`:
+---
 
-```powershell
-New-NetFirewallRule -DisplayName "Allow Agent Service for WSL" -Direction Inbound -LocalPort 59338 -Protocol TCP -Action Allow
-```
+## 4. Cấu hình Sử dụng chính thức
 
-> Bước này bắt buộc phải do người dùng tự chạy (thay đổi cấu hình bảo mật hệ thống) — AI agent không tự thực hiện.
+Sau khi test thành công, chọn một trong hai phương án cấu hình:
 
-#### Bước 3: Trỏ đúng địa chỉ đích trong cấu hình YARP (bắt buộc khi KHÔNG dùng Docker Desktop)
-Với dockerd native trong WSL2 + `networkingMode=mirrored` (xem mục 2, vấn đề 4), `host.docker.internal` **không** trỏ về Windows. Phải override resolve của tên này về IP LAN thật của Windows trong `docker-compose.app.yml`:
+### 🟢 Lựa chọn A: Đổi Port gọi trong `docker-compose.yml` (Khuyên dùng - Cleanest)
+
+Cập nhật URL cấu hình của service trong `docker-compose.yml` (hoặc file environment):
 
 ```yaml
-services:
-  flex-api-gateway:
-    extra_hosts:
-      - "host.docker.internal:192.168.28.241"   # IP LAN thật của Windows host (mirrored mode) — xem `ipconfig` nếu đổi
+environment:
+  - AGENT_SERVICE_URL=http://host.docker.internal:59339/
 ```
 
-Giữ nguyên tên `host.docker.internal` trong `yarp.json` (destination `agent-service`) để dễ đọc; chỉ cần sửa nơi resolve tên này ở compose. IP này do DHCP cấp nên **có thể đổi** khi đổi mạng/router cấp lại lease — nếu gateway báo lỗi kết nối agent-service trở lại, kiểm tra lại `ipconfig` trên Windows và cập nhật IP tại đây (cân nhắc đặt DHCP reservation cho máy Windows để cố định IP).
+---
+
+### 🟢 Lựa chọn B: Giữ nguyên Port `59338` trong Config Container
+
+Nếu giữ nguyên URL `http://host.docker.internal:59338/` trong config của container, thêm 1 rule `iptables` duy nhất trên WSL2 để redirect port `59338` từ Docker bridge sang port phụ `59339`:
+
+```bash
+sudo iptables -t nat -A PREROUTING -p tcp --dport 59338 -j REDIRECT --to-ports 59339
+```
 
 ---
 
-### 🟢 Phương án B: Chạy `flex-agent-service` trực tiếp trong WSL2 hoặc Docker Container (Đồng bộ 100% môi trường)
-
-Nếu đưa `flex-agent-service` vào cùng mạng Docker/WSL2 với API Gateway:
-- Cả hai service cùng thuộc mạng `flex_net`.
-- API Gateway gọi trực tiếp tới `http://flex-agent-service:8080/` qua DNS nội bộ của Docker.
-- Không bị vướng ranh giới Windows/WSL2 Firewall.
-
----
-
-## 4. Sơ đồ luồng giao tiếp sau khi khắc phục
+## 5. Sơ đồ Luồng Giao tiếp sau khi Khắc phục
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Trình duyệt (Windows)
-    participant Gateway as flex-api-gateway (WSL2/Docker)
-    participant Agent as flex-agent-service (Windows Host)
-    participant DB as PostgreSQL agentdb (Docker)
+    actor User as Trình duyệt Web / Client
+    participant Container as Docker Container (flex_net)
+    participant Socat as socat Proxy (WSL2 Port 59339)
+    participant Agent as Flex.Agent.Api (Windows 127.0.0.1:59338)
 
-    User->>Gateway: GET https://api.flex.internal/api/v1/agents (Bearer Token)
-    Note over Gateway: YARP match route /api/v1/agents/*<br/>Forward sang http://host.docker.internal:59338
-    Gateway->>Agent: HTTP GET http://host.docker.internal:59338/api/v1/agents
-    Note over Agent: Kestrel 0.0.0.0:59338 tiếp nhận request<br/>Xác thực JWT Token
-    Agent->>DB: Query SELECT * FROM agents
-    DB-->>Agent: Trả về danh sách Agent
-    Agent-->>Gateway: HTTP 200 OK (JSON List Agents)
-    Gateway-->>User: HTTP 200 OK (Hiển thị UI Angular)
+    User->>Container: Request gọi API
+    Container->>Socat: HTTP GET http://host.docker.internal:59339/
+    Note over Socat: User-space socket nhận request,<br/>tạo socket mới forward sang 127.0.0.1:59338
+    Socat->>Agent: HTTP GET http://127.0.0.1:59338/
+    Note over Agent: .NET Kestrel xử lý request<br/>Trả về kết quả JSON
+    Agent-->>Socat: HTTP 200 OK (JSON Status)
+    Socat-->>Container: HTTP 200 OK
+    Container-->>User: HTTP 200 OK
 ```
+

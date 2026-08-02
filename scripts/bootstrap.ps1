@@ -264,6 +264,8 @@ Set-PowerShellUtf8Profile
 Write-Step "Configuring WSL2 global settings (.wslconfig)"
 Set-WslConfig
 
+& "$PSScriptRoot\ensure-wsl-proxy.ps1"
+
 Initialize-WorkspaceProjectConfig
 
 Write-Step "Syncing shared agent skills (.agents/skills source, .claude/skills junctions)"
