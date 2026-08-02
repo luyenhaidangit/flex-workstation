@@ -64,18 +64,24 @@ sudo iptables -t nat -X
 
 ---
 
-### Bước 2: Khởi chạy `socat` chạy ngầm vĩnh viễn
+### Bước 2: Khởi chạy `socat` chạy ngầm vĩnh viễn (Tự động hóa qua Systemd)
 
-Mở `socat` lắng nghe cổng `59339` và chuyển tiếp dữ liệu sang `127.0.0.1:59338` (.NET app trên Windows):
-
+Bạn có thể khởi chạy thủ công:
 ```bash
 nohup socat TCP-LISTEN:59339,fork,reuseaddr TCP:127.0.0.1:59338 > /dev/null 2>&1 &
+```
+
+Hoặc **tự động hóa 100% qua Systemd Service** (đã được tích hợp sẵn trong script [`scripts/ensure-wsl-proxy.ps1`](file:///c:/Workspace/Project/flex-workstation/scripts/ensure-wsl-proxy.ps1) thuộc quy trình bootstrap):
+
+```bash
+# File service tự động tại: /etc/systemd/system/flex-socat-proxy.service
+sudo systemctl enable --now flex-socat-proxy
 ```
 
 > 📌 **Giải thích:**
 > - `TCP-LISTEN:59339,fork,reuseaddr`: Lắng nghe trên port 59339 của WSL2, cho phép nhiều kết nối đồng thời.
 > - `TCP:127.0.0.1:59338`: Chuyển tiếp toàn bộ request sang ứng dụng .NET đang nghe ở `127.0.0.1:59338`.
-> - `nohup ... &`: Đảm bảo `socat` tiếp tục chạy ngầm ngay cả khi đóng Terminal WSL2.
+> - Systemd service đảm bảo `socat` tự động chạy mỗi khi bật WSL2 và tự động khôi phục nếu bị crash.
 
 ---
 
