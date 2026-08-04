@@ -34,6 +34,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Plan template cần có phạm vi kỹ thuật, phân tích tác động, quyết định kỹ thuật, rollout/rollback, observability/debug và checklist sẵn sàng trước khi chạy `/speckit-tasks`.
 - Plan template cần có tóm tắt đúng lifecycle, câu hỏi kỹ thuật cần research, thiết kế tổng quan, chiến lược kiểm thử, và dữ liệu/migration riêng cho feature có DB/data.
 - Bối cảnh kỹ thuật trong plan template ưu tiên ví dụ gần hệ thống backend/enterprise: service/app liên quan, đơn vị deploy, nền tảng chạy, framework/package/internal SDK, storage và test stack thực tế.
+- Bối cảnh kỹ thuật cần khai `Convention skill áp dụng`, map skill quy ước (vd. `flex-dotnet-engineering`, `flex-frontend-engineering`) theo từng service/app khi feature chạm nhiều repo/stack, để `/speckit-implement` biết skill nào cần nạp trước khi code.
 - Rollback trong plan template cần tách rollback code/config với rollback dữ liệu/migration; observability phải ghi rõ dữ liệu không được log như token, secret, API key hoặc dữ liệu nhạy cảm.
 - Constitution gate trong plan template cần dùng bảng có trạng thái ban đầu và trạng thái sau design để review được hai mốc kiểm tra.
 - Plan template cần tách chi tiết `API/Contract Detail`, `Permission Matrix`, và đánh giá idempotency/concurrency/retry khi feature có API, quyền, hoặc xử lý lặp.

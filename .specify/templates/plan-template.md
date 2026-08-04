@@ -41,6 +41,8 @@
 
 **Service/App liên quan**: [Tên service/app/module bị ảnh hưởng hoặc CẦN LÀM RÕ]
 
+**Convention skill áp dụng**: [Skill quy ước cần nạp khi implement, map theo từng service/app nếu feature chạm nhiều repo — ví dụ: `flex-agent-service` (.NET) → `flex-dotnet-engineering`; `flex-microfrontend` (Angular) → `flex-frontend-engineering`. Ghi CẦN LÀM RÕ nếu chưa xác định được skill phù hợp, hoặc Không áp dụng nếu repo/stack chưa có skill convention]
+
 **Phụ thuộc chính**: [Framework/package/internal SDK/service hiện có hoặc CẦN LÀM RÕ]
 
 **Lưu trữ**: [SQL Server/PostgreSQL/MySQL/Redis/ElasticSearch/file hoặc Không áp dụng]
