@@ -4,7 +4,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 
 ## Constitution
 
-- Constitution hiện ở version `1.2.0`, mở rộng theo template Speckit hiện hành với Source of Truth, cổng chất lượng, Definition of Done, ngoại lệ và lịch sử thay đổi.
+- Constitution hiện ở version `1.2.1`, mở rộng theo template Speckit hiện hành với Source of Truth, cổng chất lượng, Definition of Done, ngoại lệ và lịch sử thay đổi.
 - Tài liệu workflow Speckit phải nêu rõ hai dạng command: `$speckit-*` cho Codex skill invocation và `/speckit-*` cho slash command khi runtime hỗ trợ.
 
 ## Quy ước bảo trì
