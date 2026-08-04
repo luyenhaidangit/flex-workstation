@@ -26,13 +26,17 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ### 1. Locate the current feature spec
 
-Read `.specify/feature.json` to get `feature_directory` (e.g. `specs/000013-trading-session-bots`).
+Resolve `FEATURE_DIR` using this priority order:
+1. If the environment variable `SPECIFY_FEATURE_DIRECTORY` is set, use its value as `FEATURE_DIR`.
+2. Otherwise, read `.specify/feature.json` and use the `feature_directory` field as `FEATURE_DIR`.
+
+`FEATURE_DIR` example: `specs/000013-trading-session-bots`.
 
 - Extract the **feature number prefix** from the directory name: the leading digit sequence before the first `-` (e.g. `000013`).
 - Derive a **short display name** from the directory name: strip the numeric prefix and replace hyphens with spaces (e.g. `trading session bots`).
 
-Load `<feature_directory>/spec.md`.
-- If it does not exist, stop with: "spec.md not found in {feature_directory}. Run /speckit-specify first."
+Load `<FEATURE_DIR>/spec.md`.
+- If it does not exist, stop with: "spec.md not found in {FEATURE_DIR}. Run /speckit-specify first."
 
 ### 2. Check for an existing business doc
 
@@ -113,7 +117,7 @@ Use this document structure:
 
 ## Truy vết và nguồn tham khảo
 
-- [Đặc tả tính năng](<feature_directory>/spec.md): user stories, acceptance criteria và ràng buộc kỹ thuật.
+- [Đặc tả tính năng](<FEATURE_DIR>/spec.md): user stories, acceptance criteria và ràng buộc kỹ thuật.
 [+ any external regulation links or dependency docs extracted from spec Section 17]
 ```
 
@@ -134,7 +138,7 @@ Report to the user:
 
 ## Done When
 
-- [ ] `.specify/feature.json` read and feature directory resolved
+- [ ] `FEATURE_DIR` resolved (`SPECIFY_FEATURE_DIRECTORY` env var, or `.specify/feature.json` fallback)
 - [ ] `spec.md` loaded from the feature directory
 - [ ] `docs/business/` scanned for an existing doc matching this feature
 - [ ] Business narrative document written to `DOC_FILE`
