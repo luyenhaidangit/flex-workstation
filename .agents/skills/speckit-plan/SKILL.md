@@ -61,9 +61,9 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/powershell/setup-plan.ps1 -Json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `.specify/scripts/powershell/setup-plan.ps1 -Json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. If script fails or spec file (`spec.md`) is missing, abort immediately and instruct user to run `/speckit-specify` first (do not create or plan without a spec). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **Load context**: Read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied). If the feature touches database/schema/migration, also read `docs/architecture/system-map.md` (Projects, Data Architecture sections) before filling "Dữ liệu & Migration" — per Constitution VI, the target database and the repo that owns its migration script must be analyzed and cited, never assumed by habit (e.g. defaulting to the service repo being implemented).
+2. **Load context**: Verify FEATURE_SPEC exists on disk and read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied). If the feature touches database/schema/migration, also read `docs/architecture/system-map.md` (Projects, Data Architecture sections) before filling "Dữ liệu & Migration" — per Constitution VI, the target database and the repo that owns its migration script must be analyzed and cited, never assumed by habit (e.g. defaulting to the service repo being implemented).
 
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
@@ -167,6 +167,7 @@ Suggested next step: `/speckit-tasks` to generate the implementation task list f
 
 ## Key rules
 
+- If spec file (`FEATURE_SPEC`) is missing, instruct user to run `/speckit-specify` first (do not create or plan without a spec)
 - Use absolute paths for filesystem operations; use project-relative paths for references in documentation
 - ERROR on gate failures or unresolved clarifications
 - If the target database/repo for a migration is ambiguous or `system-map.md` conflicts with actual precedent in other specs, record it as `NEEDS CLARIFICATION` in Phase 0 research (with evidence from the conflicting sources) instead of picking a location without analysis

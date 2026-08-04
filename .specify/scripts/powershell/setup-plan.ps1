@@ -23,6 +23,13 @@ if ($Help) {
 # Get all paths and variables from common functions
 $paths = Get-FeaturePathsEnv
 
+if (-not (Test-Path $paths.FEATURE_SPEC -PathType Leaf)) {
+    [Console]::Error.WriteLine("ERROR: spec.md not found in $($paths.FEATURE_DIR)")
+    $specifyCommand = '/speckit-specify'
+    [Console]::Error.WriteLine("Run $specifyCommand first to create the feature structure.")
+    exit 1
+}
+
 # Ensure the feature directory exists
 New-Item -ItemType Directory -Path $paths.FEATURE_DIR -Force | Out-Null
 
