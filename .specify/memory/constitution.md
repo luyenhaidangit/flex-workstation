@@ -1,47 +1,31 @@
 <!--
 BÁO CÁO TÁC ĐỘNG ĐỒNG BỘ
 ==================
-Thay đổi phiên bản: 1.1.1 -> 1.2.0
+Thay đổi phiên bản: 1.2.0 -> 1.2.1
 Section đã sửa:
-  - Nguyên tắc cốt lõi: giữ 5 nguyên tắc hiện có, mở rộng thành cấu trúc có Quy định/Lý do/Áp dụng/Cách kiểm tra/Ngoại lệ
-  - Quy trình phát triển: làm rõ cú pháp command dùng được trong Codex (`$speckit-*`) và slash command (`/speckit-*`)
-  - Quản trị: mở rộng thành chính sách SemVer, compliance review và lịch sử thay đổi
-Đã thêm:
-  - Phạm vi áp dụng
-  - Quy ước từ khóa
-  - Source of Truth và thứ tự ưu tiên artifact
-  - Tiêu chuẩn artifact Speckit
-  - Cổng chất lượng
-  - Definition of Done
-  - Checklist review tối thiểu
-  - Ngoại lệ và biện minh độ phức tạp
-  - Lịch sử thay đổi
+  - Checklist review tối thiểu (Section 9): bổ sung câu hỏi kiểm tra database đích/repo migration cho Nguyên tắc VI
+Đã thêm: Không có section mới
 Đã bỏ: Không có
+Lý do: Nguyên tắc VI (xác định database/repo migration trước khi code) được thêm ở v1.2.0 và đã lan sang
+  `plan-template.md`, nhưng Section 9 — checklist mà reviewer PHẢI dùng — chưa có mục kiểm tra tương ứng,
+  khiến reviewer có thể pass review dù bỏ sót đúng rủi ro mà Nguyên tắc VI sinh ra để chặn.
 Template đã cập nhật:
-  ✅ .specify/templates/plan-template.md — đã kiểm tra, đang chứa Constitution Check, traceability, rollout/rollback và observability phù hợp
-  ✅ .specify/templates/spec-template.md — đã kiểm tra, đang giữ WHY/WHAT, MVP, quyền, audit, NFR và readiness phù hợp
-  ✅ .specify/templates/tasks-template.md — đã kiểm tra, đang có rule traceability, coverage, migration, contract, permission và validation phù hợp
+  ✅ .specify/templates/plan-template.md — đã kiểm tra, mục "Dữ liệu & Migration (Constitution VI)" đã khớp checklist mới
+  ✅ .specify/templates/spec-template.md — đã kiểm tra, không cần đổi cho amendment này
+  ✅ .specify/templates/tasks-template.md — đã kiểm tra, không cần đổi cho amendment này
   ✅ .specify/templates/checklist-template.md — đã kiểm tra, không cần đổi cho amendment này
-  ✅ .specify/templates/constitution-template.md — source template hiện hành đã được áp dụng vào constitution
+  ⚠ .specify/templates/constitution-template.md — là template generic, không mang nội dung đặc thù workstation
+    (tương tự dòng sub-repo ở Nguyên tắc V), không cập nhật theo chủ đích
   ✅ .specify/templates/commands/*.md — không tồn tại trong workspace này
-Tài liệu đã cập nhật:
-  ✅ docs/speckit/workflow.md — làm rõ cú pháp `$speckit-*` cho Codex và `/speckit-*` cho slash command
-  ✅ docs/speckit/template-guidelines.md — quy ước thiết kế và bảo trì template Speckit
-  ✅ docs/speckit/maintenance.md — ghi chú amendment constitution v1.2.0 và bảo trì Speckit
+Tài liệu đã cập nhật: Không cần, amendment chỉ sửa checklist nội bộ constitution
 TODO hoãn lại: Không có
 -->
 
 # Quy ước flex-workstation
 
-**Phiên bản**: 1.2.0
-
-**Trạng thái**: Active
-
-**Phê chuẩn**: 2026-07-05
-
-**Sửa đổi gần nhất**: 2026-07-11
-
-**Chủ sở hữu**: Nhóm Flex
+| Phiên bản | Trạng thái | Phê chuẩn | Sửa đổi gần nhất | Chủ sở hữu |
+|-----------|-----------|-----------|-------------------|------------|
+| 1.2.1 | Active | 2026-07-05 | 2026-08-05 | Nhóm Flex |
 
 ---
 
@@ -310,6 +294,7 @@ Reviewer PHẢI kiểm tra:
 - Có task/test cho rủi ro chính không?
 - Có over-engineering hoặc abstraction ngoài scope không?
 - Có chạm source code sub-repo khi yêu cầu chỉ thuộc workstation không?
+- Nếu feature có thay đổi database/schema/migration: `plan.md` đã xác định đúng database đích và repo chứa migration, có dẫn chứng `system-map.md` hoặc tiền lệ spec không? (Constitution VI)
 
 ---
 
@@ -362,6 +347,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 
 | Phiên bản | Ngày | Người thay đổi | Thay đổi | Lý do |
 |-----------|------|----------------|----------|-------|
+| 1.2.1 | 2026-08-05 | Nhóm Flex | Bổ sung câu hỏi kiểm tra database đích/repo migration (Nguyên tắc VI) vào Checklist review tối thiểu (Section 9) | Section 9 thiếu mục kiểm tra tương ứng Nguyên tắc VI dù đã lan sang `plan-template.md`, khiến reviewer có thể bỏ sót rủi ro |
 | 1.2.0 | 2026-07-11 | Nhóm Flex | Mở rộng constitution theo template hiện hành, thêm gate/DoD/exception/source-of-truth và làm rõ cú pháp command đa agent | Đồng bộ constitution với template Speckit tiếng Việt và quy tắc làm việc của workspace |
 | 1.1.1 | 2026-07-08 | Nhóm Flex | Làm rõ vai trò command Speckit và Việt hóa label hiển thị | Đồng bộ workflow Spec-Before-Code |
 | 1.1.0 | 2026-07-05 | Nhóm Flex | Thiết lập nguyên tắc workstation ban đầu | Khởi tạo governance cho `flex-workstation` |

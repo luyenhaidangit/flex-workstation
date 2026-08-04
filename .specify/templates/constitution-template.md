@@ -1,14 +1,8 @@
 # Quy ước của [PROJECT_NAME]
 
-**Phiên bản**: [CONSTITUTION_VERSION]
-
-**Trạng thái**: [Draft/Active/Deprecated]
-
-**Phê chuẩn**: [RATIFICATION_DATE]
-
-**Sửa đổi gần nhất**: [LAST_AMENDED_DATE]
-
-**Chủ sở hữu**: [OWNER/TEAM]
+| Phiên bản | Trạng thái | Phê chuẩn | Sửa đổi gần nhất | Chủ sở hữu |
+|-----------|-----------|-----------|-------------------|------------|
+| [CONSTITUTION_VERSION] | [Draft/Active/Deprecated] | [RATIFICATION_DATE] | [LAST_AMENDED_DATE] | [OWNER/TEAM] |
 
 ---
 
