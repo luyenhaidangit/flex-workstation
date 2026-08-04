@@ -43,6 +43,7 @@ Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào ph
 | Context | Skill |
 | --- | --- |
 | Viết, review hoặc generate C#/.NET code | `flex-dotnet-conventions` |
+| Viết/sửa giao diện Angular trong flex-microfrontend (component, template, modal, form) | `flex-frontend-engineering` |
 | Tính năng mới chưa có spec | `spec-driven-development` |
 | Có spec, cần breakdown task | `planning-and-task-breakdown` |
 | Viết code / implement (có hoặc không có plan) | `incremental-implementation` |
