@@ -146,6 +146,13 @@ do đó item này không chặn gate. Một `Status: Fail (ngoại lệ đã ph�
 `[x]`, nhưng phải có fail evidence cùng ngoại lệ được phê duyệt (owner, hạn xử lý,
 người phê duyệt và hạn xem lại); chỉ `Status: Fail` chưa phê duyệt dùng `[ ]` và chặn gate.
 
+**"Checklist sẵn sàng cho `/speckit-tasks`" là gate mềm của `/speckit-tasks`**
+Trước khi sinh task, `/speckit-tasks` đếm item chưa tick trong mục "Checklist sẵn
+sàng cho `/speckit-tasks`" ở `plan.md`. Nếu còn item chưa tick, command dừng và hỏi
+user có muốn tiếp tục sinh tasks hay quay lại `/speckit-plan`; nếu mục này không tồn
+tại hoặc đã tick hết thì tự động tiếp tục. Đây là gate mềm (hỏi rồi cho phép bỏ qua),
+khác với gate cứng của `/speckit-implement` ở trên.
+
 **Traceability Gate của `/speckit-analyze` và `/speckit-converge`**
 Hai command phải inventory và kiểm coverage cho `US`/`AC`, `FR`, `BR`, `SEC`,
 `NFR` và `SC` có work cần build. `MT` cũng được inventory để kiểm tra trace về

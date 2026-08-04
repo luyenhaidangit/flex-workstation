@@ -69,7 +69,17 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
-3. **Execute task generation workflow**:
+3. **Check plan readiness checklist** (in plan.md, section `Checklist sẵn sàng cho /speckit-tasks`):
+   - Count total items (`- [ ]` or `- [X]`/`- [x]`) and incomplete items (`- [ ]`) in that section.
+   - **If any item is incomplete**:
+     - List the incomplete items
+     - **STOP** and ask: "Plan chưa đủ sẵn sàng cho `/speckit-tasks` (còn N item chưa tick). Bạn muốn tiếp tục sinh tasks hay quay lại `/speckit-plan`? (proceed/stop)"
+     - Wait for user response before continuing
+     - If user says "stop" or "quay lại", halt execution
+     - If user says "proceed" or "tiếp tục", proceed to step 4
+   - **If the section is missing or all items are complete**: proceed to step 4 automatically.
+
+4. **Execute task generation workflow**:
    - Load plan.md and extract tech stack, libraries, project structure
    - Load spec.md and extract user stories with their priorities (P1, P2, P3, etc.)
    - If data-model.md exists: Extract entities and map to user stories
@@ -80,7 +90,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Create parallel execution examples per user story
    - Validate task completeness (each user story has all needed tasks, independently testable)
 
-4. **Generate tasks.md**: Read the tasks template from TASKS_TEMPLATE (from the JSON output above) and use it as structure. If TASKS_TEMPLATE is empty, fall back to `.specify/templates/tasks-template.md`. Fill with:
+5. **Generate tasks.md**: Read the tasks template from TASKS_TEMPLATE (from the JSON output above) and use it as structure. If TASKS_TEMPLATE is empty, fall back to `.specify/templates/tasks-template.md`. Fill with:
    - Correct feature name from plan.md
    - Phase 1: Setup tasks (project initialization)
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
