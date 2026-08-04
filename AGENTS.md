@@ -44,6 +44,7 @@ Thiết lập nguyên tắc: `$speckit-constitution`
 |------|------------|---------|
 | 1 | `$speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
 | 2 | `$speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
+| 2a | `$speckit-docbiz` | **Optional hook** sau specify/clarify — đồng bộ tài liệu BA trong `docs/business/` |
 | 3 | `$speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
 | 4 | `$speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
 | 5 | `$speckit-tasks` | Sinh task list theo dependency order |
