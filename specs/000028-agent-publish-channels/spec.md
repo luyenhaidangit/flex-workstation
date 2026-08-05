@@ -41,9 +41,10 @@ Trong phiên bản đầu tiên, tính năng PHẢI bao gồm:
 
 - **MVP-001**: Chuyển màn hình chi tiết/sửa agent hiện có sang bố cục 2 tab: "Thiết lập thông tin chung" và "Phát hành".
 - **MVP-002**: Tab "Thiết lập thông tin chung" giữ nguyên các trường và hành vi hiện có của `specs/000026-agent-catalog` (tên, mô tả, trạng thái) — không đổi logic nghiệp vụ, chỉ đổi vị trí hiển thị.
-- **MVP-003**: Tab "Phát hành" cho phép bật/tắt kênh Website cho agent và lưu lại lựa chọn đó.
+- **MVP-003**: Tab "Phát hành" cho phép bật/tắt kênh Website cho agent; thao tác bật/tắt dùng chung một hành động "Lưu" duy nhất với tab "Thiết lập thông tin chung" — bật/tắt trên giao diện chỉ là thay đổi tạm thời, chỉ được ghi nhận khi quản trị viên bấm "Lưu".
 - **MVP-004**: Tab "Phát hành" chỉ hiển thị/thao tác được sau khi agent đã được tạo (đã tồn tại trong danh mục).
-- **MVP-005**: Giới hạn MVP: chỉ có kênh Website; chưa tích hợp kênh khác (Zalo, Facebook, ...), chưa tạo phiên bản bất biến/rollback theo luồng phát hành ở `specs/000008-agent-platform-mvp`, chưa sinh mã nhúng widget hay xử lý runtime chat thực tế.
+- **MVP-005**: Tab "Phát hành" PHẢI hiển thị đủ danh sách kênh dự kiến của hệ thống (Fanpage Facebook, Zalo OA doanh nghiệp, Website, Chatbot, Zalo cá nhân), nhưng chỉ kênh Website cho phép bật/tắt và lưu; các kênh còn lại hiển thị ở trạng thái "chưa khả dụng" (vô hiệu hóa, không thao tác được).
+- **MVP-006**: Giới hạn MVP: chưa tích hợp kỹ thuật thật với các kênh "chưa khả dụng" (Zalo, Facebook, Chatbot, ...), chưa tạo phiên bản bất biến/rollback theo luồng phát hành ở `specs/000008-agent-platform-mvp`, chưa sinh mã nhúng widget hay xử lý runtime chat thực tế cho bất kỳ kênh nào.
 
 ---
 
@@ -79,35 +80,53 @@ Quản trị viên mở màn hình chi tiết một agent đã có, thấy tab "
 
 ### US-002 — Bật kênh Website và lưu cấu hình phát hành (Ưu tiên: P1)
 
-Quản trị viên mở tab "Phát hành" của một agent đã tồn tại, bật kênh Website, lưu lại; cấu hình được ghi nhận là agent đã được cho phép phục vụ chat trên kênh Website.
+Quản trị viên mở tab "Phát hành" của một agent đã tồn tại, bật công tắc kênh Website; thay đổi này tạm thời chưa được ghi nhận cho tới khi quản trị viên bấm nút "Lưu" chung của màn hình (cùng nút dùng cho tab "Thiết lập thông tin chung") — khi đó cấu hình mới được gửi xuống hệ thống và ghi nhận agent đã được cho phép phục vụ chat trên kênh Website.
 
 **Lý do ưu tiên**: Đây là mục tiêu chính của tính năng — có nơi lưu cấu hình kênh trước khi xây luồng phát hành/chat thực tế.
 
-**Liên quan yêu cầu**: FR-004, FR-005, FR-006
+**Liên quan yêu cầu**: FR-004, FR-005, FR-006, FR-008
 
-**Test độc lập**: Mở tab "Phát hành" của một agent đã có, bật kênh Website, lưu; tải lại màn hình và xác nhận kênh Website vẫn hiển thị ở trạng thái đã bật.
+**Test độc lập**: Mở tab "Phát hành" của một agent đã có, bật kênh Website, bấm "Lưu"; tải lại màn hình và xác nhận kênh Website vẫn hiển thị ở trạng thái đã bật.
 
 **Acceptance Criteria**:
 
-1. **AC-004**: **Cho trước** quản trị viên đang ở tab "Phát hành" của một agent đã tồn tại, **Khi** bật kênh Website và lưu, **Thì** hệ thống lưu lại trạng thái "đã bật" cho kênh Website của agent đó.
+1. **AC-004**: **Cho trước** quản trị viên đang ở tab "Phát hành" của một agent đã tồn tại, **Khi** bật kênh Website và bấm "Lưu", **Thì** hệ thống lưu lại trạng thái "đã bật" cho kênh Website của agent đó.
 2. **AC-005**: **Cho trước** kênh Website của agent đã được bật và lưu, **Khi** quản trị viên mở lại tab "Phát hành", **Thì** hệ thống hiển thị đúng trạng thái đã lưu (đã bật).
 3. **AC-006**: **Cho trước** quản trị viên chưa bật kênh nào, **Khi** mở tab "Phát hành" lần đầu của agent mới tạo, **Thì** hệ thống hiển thị Website ở trạng thái mặc định tắt, không tự động bật.
+4. **AC-008**: **Cho trước** quản trị viên bật công tắc kênh Website nhưng chưa bấm "Lưu", **Khi** quản trị viên rời màn hình hoặc tải lại trang mà không lưu, **Thì** thay đổi bật kênh KHÔNG được ghi nhận — hệ thống vẫn hiển thị trạng thái đã lưu trước đó ở lần mở kế tiếp.
 
 ---
 
 ### US-003 — Tắt kênh đã bật (Ưu tiên: P2)
 
-Quản trị viên tắt kênh Website đã từng bật cho một agent và lưu lại; cấu hình ghi nhận agent không còn được cho phép phục vụ chat trên kênh đó.
+Quản trị viên tắt kênh Website đã từng bật cho một agent và bấm "Lưu" (nút chung của màn hình); cấu hình ghi nhận agent không còn được cho phép phục vụ chat trên kênh đó.
 
 **Lý do ưu tiên**: Cần có khả năng thu hồi cấu hình đã cấp, tránh agent tiếp tục ở trạng thái "được phép" ngoài ý muốn.
 
-**Liên quan yêu cầu**: FR-006
+**Liên quan yêu cầu**: FR-006, FR-008
 
-**Test độc lập**: Với agent đã bật kênh Website, tắt kênh và lưu; tải lại tab "Phát hành" và xác nhận kênh hiển thị trạng thái tắt.
+**Test độc lập**: Với agent đã bật kênh Website, tắt kênh và bấm "Lưu"; tải lại tab "Phát hành" và xác nhận kênh hiển thị trạng thái tắt.
 
 **Acceptance Criteria**:
 
-1. **AC-007**: **Cho trước** kênh Website của agent đang ở trạng thái đã bật, **Khi** quản trị viên tắt kênh và lưu, **Thì** hệ thống lưu lại trạng thái "đã tắt" cho kênh đó.
+1. **AC-007**: **Cho trước** kênh Website của agent đang ở trạng thái đã bật, **Khi** quản trị viên tắt kênh và bấm "Lưu", **Thì** hệ thống lưu lại trạng thái "đã tắt" cho kênh đó.
+
+---
+
+### US-004 — Xem danh sách kênh chưa khả dụng (Ưu tiên: P3)
+
+Quản trị viên mở tab "Phát hành" và thấy đầy đủ danh sách các kênh dự kiến của hệ thống (Fanpage Facebook, Zalo OA, Website, Chatbot, Zalo cá nhân), trong đó chỉ Website thao tác được; các kênh còn lại hiển thị nhưng không bật được, giúp quản trị viên biết trước lộ trình mở rộng kênh.
+
+**Lý do ưu tiên**: Hỗ trợ đúng cảm nhận giao diện "chọn kênh từ danh sách có sẵn" mà không đòi hỏi tích hợp kỹ thuật thật với các kênh chưa sẵn sàng.
+
+**Liên quan yêu cầu**: FR-009
+
+**Test độc lập**: Mở tab "Phát hành" của một agent bất kỳ, xác nhận toàn bộ 5 kênh hiển thị; xác nhận công tắc của các kênh ngoài Website ở trạng thái vô hiệu hóa, không bật được.
+
+**Acceptance Criteria**:
+
+1. **AC-009**: **Cho trước** quản trị viên mở tab "Phát hành" của bất kỳ agent nào, **Khi** màn hình tải xong, **Thì** hệ thống hiển thị đủ danh sách kênh dự kiến (Fanpage Facebook, Zalo OA, Website, Chatbot, Zalo cá nhân).
+2. **AC-010**: **Cho trước** quản trị viên đang xem danh sách kênh, **Khi** thử bật một kênh ngoài Website, **Thì** hệ thống KHÔNG cho phép bật (công tắc ở trạng thái vô hiệu hóa/chưa khả dụng).
 
 ---
 
@@ -119,7 +138,7 @@ Quản trị viên tắt kênh Website đã từng bật cho một agent và lư
 - **Lỗi hệ thống**: Nếu lưu cấu hình kênh thất bại, hệ thống PHẢI báo lỗi rõ ràng và giữ nguyên trạng thái đã lưu trước đó, không để giao diện hiển thị sai lệch với dữ liệu đã lưu.
 - **Timeout**: Không áp dụng.
 - **Dữ liệu bị thay đổi bởi người khác**: Không áp dụng ở MVP (chưa có yêu cầu xử lý chỉnh sửa đồng thời).
-- **Người dùng thao tác lặp lại**: Bật/tắt lại cùng một kênh nhiều lần liên tiếp chỉ lưu đúng trạng thái cuối cùng, không tạo bản ghi trùng lặp.
+- **Người dùng thao tác lặp lại**: Bật/tắt lại cùng một kênh nhiều lần liên tiếp trước khi lưu chỉ tính trạng thái cuối cùng trên giao diện; chỉ khi bấm "Lưu" mới gửi đúng một trạng thái cuối cùng xuống hệ thống, không tạo bản ghi trùng lặp.
 - **Trường hợp biên khác**: Quản trị viên cố mở tab "Phát hành" khi agent chưa được tạo (đang ở luồng tạo mới, chưa lưu lần đầu) — hệ thống vô hiệu hóa tab này (AC-003).
 
 ---
@@ -140,6 +159,10 @@ Quản trị viên tắt kênh Website đã từng bật cho một agent và lư
   **Liên quan**: US-002, AC-006
 - **FR-007** `[P2]`: Hệ thống KHÔNG ĐƯỢC cho phép thao tác trên tab "Phát hành" khi agent chưa được tạo/lưu lần đầu.
   **Liên quan**: US-001, AC-003
+- **FR-008** `[P1]`: Hệ thống PHẢI dùng chung một hành động "Lưu" cho cả tab "Thiết lập thông tin chung" và tab "Phát hành"; thay đổi trạng thái bật/tắt kênh KHÔNG ĐƯỢC gửi xuống hệ thống cho tới khi hành động "Lưu" chung này được thực hiện.
+  **Liên quan**: US-002, AC-004, AC-008, US-003, AC-007
+- **FR-009** `[P3]`: Tab "Phát hành" PHẢI hiển thị đủ danh sách kênh dự kiến của hệ thống (Fanpage Facebook, Zalo OA, Website, Chatbot, Zalo cá nhân); hệ thống KHÔNG ĐƯỢC cho phép bật các kênh ngoài Website ở MVP.
+  **Liên quan**: US-004, AC-009, AC-010
 
 ---
 
@@ -148,6 +171,7 @@ Quản trị viên tắt kênh Website đã từng bật cho một agent và lư
 - **BR-001**: Cấu hình kênh phát hành luôn gắn với một agent cụ thể đã tồn tại; không có cấu hình kênh độc lập không thuộc agent nào.
 - **BR-002**: Việc tổ chức lại thành tab KHÔNG ĐƯỢC thay đổi quy tắc nghiệp vụ hiện có của tab "Thiết lập thông tin chung" (bắt buộc tên, chống trùng tên, giới hạn độ dài) đã định nghĩa ở `specs/000026-agent-catalog`.
 - **BR-003**: Bật một kênh trong tab "Phát hành" chỉ là lưu cấu hình cho phép; KHÔNG tạo phiên bản bất biến và KHÔNG kích hoạt luồng chat thực tế — nội dung đó thuộc phạm vi các đặc tả khác (`specs/000008-agent-platform-mvp`).
+- **BR-004**: Trạng thái bật/tắt kênh khi chưa lưu chỉ tồn tại tạm thời trên giao diện (client-side); chỉ hành động "Lưu" chung của màn hình mới làm thay đổi có hiệu lực và được hệ thống ghi nhận.
 
 **Luồng trạng thái nếu có**:
 
@@ -161,7 +185,7 @@ Quản trị viên tắt kênh Website đã từng bật cho một agent và lư
 ## 9. Thực thể dữ liệu
 
 - **Agent**: Thực thể đã có từ `specs/000026-agent-catalog` (tên, mô tả, trạng thái); không đổi trong tính năng này.
-- **Cấu hình kênh phát hành**: Gắn với một agent, gồm loại kênh (ví dụ: Website) và trạng thái bật/tắt. MVP chỉ có một loại kênh (Website); cấu trúc PHẢI cho phép bổ sung loại kênh khác sau này mà không đổi mô hình dữ liệu ở mức khái niệm.
+- **Cấu hình kênh phát hành**: Gắn với một agent, gồm loại kênh và trạng thái bật/tắt. Danh sách loại kênh hiển thị ở MVP gồm 5 loại cố định (Fanpage Facebook, Zalo OA, Website, Chatbot, Zalo cá nhân); chỉ loại Website có trạng thái bật/tắt thao tác được và được lưu, các loại còn lại ở trạng thái "chưa khả dụng" cố định. Cấu trúc PHẢI cho phép chuyển một loại kênh từ "chưa khả dụng" sang thao tác được trong tương lai mà không đổi mô hình dữ liệu ở mức khái niệm.
 
 ---
 
@@ -211,7 +235,7 @@ Cấu hình kênh phát hành MVP chỉ là cờ bật/tắt phục vụ nền t
 
 **Giả định**:
 - Màn hình chi tiết/sửa agent hiện tại của `specs/000026-agent-catalog` đã hoạt động và là nền để tái cấu trúc thành tab, không xây lại từ đầu.
-- "Nhiều kênh" trong yêu cầu ban đầu được hiểu là thiết kế có khả năng mở rộng; MVP triển khai cụ thể một kênh (Website) để xác nhận cơ chế hoạt động đúng trước khi bổ sung kênh khác.
+- "Nhiều kênh" trong yêu cầu ban đầu được hiểu là hiển thị đủ danh sách kênh dự kiến của hệ thống ngay từ MVP (theo mẫu tham khảo của người dùng), nhưng chỉ Website thao tác/lưu được thật; các kênh còn lại hiển thị "chưa khả dụng" để định hướng lộ trình mở rộng.
 - Cơ chế xác thực/phân quyền hiện có của danh mục agent được tái sử dụng, không có vai trò mới.
 
 **Ràng buộc**:
@@ -223,7 +247,7 @@ Cấu hình kênh phát hành MVP chỉ là cờ bật/tắt phục vụ nền t
 
 - Tích hợp kỹ thuật thực tế với kênh Website hoặc kênh khác (sinh mã nhúng widget, xử lý tin nhắn realtime) — thuộc `specs/000008-agent-platform-mvp`.
 - Quản lý phiên bản, rollback khi phát hành — thuộc `specs/000008-agent-platform-mvp`.
-- Thêm kênh Zalo, Facebook hoặc kênh khác ngoài Website — để lại cho lần lặp sau khi cơ chế bật/tắt kênh đã hoạt động ổn định.
+- Cho phép bật/lưu thật các kênh Fanpage Facebook, Zalo OA, Chatbot, Zalo cá nhân — các kênh này chỉ hiển thị ở trạng thái "chưa khả dụng" trong MVP, việc kích hoạt thao tác cho từng kênh để lại cho lần lặp sau.
 - Cấu hình chi tiết theo từng kênh (ví dụ giới hạn domain cho Website) — chưa có trong MVP này.
 
 ---
@@ -246,11 +270,16 @@ Cấu hình kênh phát hành MVP chỉ là cờ bật/tắt phục vụ nền t
 
 ## 18. Câu hỏi mở
 
-Không áp dụng — phạm vi kênh cho MVP đã được xác định bằng giả định hợp lý ở mục 14 (chỉ Website, thiết kế mở rộng được cho kênh sau này).
+Không áp dụng — phạm vi danh sách kênh và cơ chế lưu cho MVP đã được làm rõ ở mục Clarifications (Session 2026-08-05).
 
 ---
 
 ## Clarifications
+
+### Session 2026-08-05
+
+- Q: Cách lưu cấu hình kênh trên tab Phát hành — có nút Lưu riêng trên tab đó không? → A: Không tách biệt; dùng chung nút "Lưu" với tab Thiết lập thông tin chung. Bật/tắt công tắc kênh chỉ thay đổi trạng thái tạm ở FE; chỉ khi bấm "Lưu" (chung cho cả 2 tab), thay đổi mới được gửi xuống BE và ghi nhận.
+- Q: Danh sách kênh hiển thị trên tab Phát hành ở MVP gồm những gì? → A: Hiển thị đủ danh sách nhiều kênh theo mẫu tham khảo của người dùng (Fanpage Facebook, Zalo OA doanh nghiệp, Website, Chatbot, Zalo cá nhân), nhưng chỉ kênh Website thực sự bật/lưu được ở MVP; các kênh còn lại hiển thị ở trạng thái "chưa khả dụng" (vô hiệu hóa, không thao tác được).
 
 ---
 
