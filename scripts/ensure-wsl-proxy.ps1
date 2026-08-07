@@ -57,7 +57,7 @@ WantedBy=multi-user.target
 
     $b64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($serviceDef))
     wsl -u root -e bash -c "echo '$b64' | base64 -d > /etc/systemd/system/flex-socat-proxy.service"
-    wsl -u root -e bash -c "systemctl daemon-reload && systemctl enable --now flex-socat-proxy" 2>&1 | Out-Null
+    wsl -u root -e bash -c "systemctl daemon-reload && systemctl enable flex-socat-proxy && systemctl restart flex-socat-proxy" 2>&1 | Out-Null
 
     Write-Ok "WSL2 socat proxy service configured and active (7002 -> 7001)"
 }
