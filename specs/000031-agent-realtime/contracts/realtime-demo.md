@@ -70,4 +70,4 @@
 
 ## Compatibility
 
-Đây là contract mới, không thay đổi endpoint hoặc event hiện hữu. Consumer duy nhất trong MVP là `AgentRealtimeService` và quickstart developer.
+Đây là contract mới, không thay đổi endpoint hoặc event hiện hữu. Consumer duy nhất trong MVP là `ApplicationRealtimeService` và quickstart developer.

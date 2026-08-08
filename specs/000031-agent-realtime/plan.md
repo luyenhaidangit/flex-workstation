@@ -8,7 +8,7 @@
 
 **Yêu cầu chính từ spec**: Kết nối màn hình `ChatComponent` với `flex-agent-service` qua realtime; BE nhận và log tin nhắn FE gửi; một endpoint test của BE phát thông báo đến FE để FE hiển thị `alert`.
 
-**Hướng tiếp cận kỹ thuật dự kiến**: Dùng ASP.NET Core SignalR native ở Agent Service với một hub demo có method nhận tin nhắn và event thông báo. Dùng `@microsoft/signalr` đã có trong Angular để tạo `AgentRealtimeService`; `ChatComponent` quản lý kết nối, trạng thái và gửi tin nhắn. Endpoint HTTP được bảo vệ bằng authorization hiện có và gọi broadcaster của hub.
+**Hướng tiếp cận kỹ thuật dự kiến**: Dùng ASP.NET Core SignalR native ở Agent Service với một hub demo có method nhận tin nhắn và event thông báo. Dùng `@microsoft/signalr` đã có trong Angular để tạo `ApplicationRealtimeService`; `AgentCreateWizardComponent` quản lý kết nối, trạng thái và gửi tin nhắn. Endpoint HTTP được bảo vệ bằng authorization hiện có và gọi broadcaster của hub.
 
 **Kết quả sau research**: Đã xác nhận frontend đã có dependency và pattern SignalR trong `exchange-realtime.service.ts`; backend hiện chưa đăng ký SignalR/hub; Agent API đang dùng controller, JWT authorization và Serilog; demo không cần database.
 
@@ -71,7 +71,7 @@
 ## Thiết kế tổng quan
 
 **Luồng chính**:
-1. `AgentCreateWizardComponent` yêu cầu `AgentRealtimeService` mở kết nối tới `/hubs/application` và hiển thị trạng thái `connecting/connected/reconnecting/disconnected`.
+1. `AgentCreateWizardComponent` yêu cầu `ApplicationRealtimeService` mở kết nối tới `/hubs/application` và hiển thị trạng thái `connecting/connected/reconnecting/disconnected`.
 2. Khi người dùng gửi nội dung không rỗng, service gọi method hub `SendMessage`; hub chuẩn hóa/validate nội dung, ghi structured log và trả event `messageReceived` để FE xác nhận.
 3. Khi gọi `POST /api/v1/realtime-demo/notify`, controller gọi broadcaster phát event `demoNotification` tới các client đang kết nối; FE nhận event trong Angular zone và gọi `window.alert(message)`.
 4. Nếu không có client, endpoint trả kết quả có `connectedClients: 0`; nếu mất kết nối, FE hiển thị lỗi và SignalR automatic reconnect được dùng ở mức client.
@@ -80,7 +80,7 @@
 - `Flex.Agent.Api/Hubs/ApplicationHub.cs`: nhận message và phát event demo.
 - `Flex.Agent.Api/Controllers/RealtimeDemoController.cs`: endpoint kích hoạt thông báo.
 - `Flex.Agent.Api/Extensions/ServiceExtensions.cs`, `ApplicationExtensions.cs`: đăng ký SignalR, authorization/CORS cần thiết và map hub/controller.
-- `flex-microfrontend/src/app/core/services/agent-realtime.service.ts`: một service quản lý connection lifecycle và RxJS streams.
+- `flex-microfrontend/src/app/core/services/application-realtime.service.ts`: một service quản lý connection lifecycle và RxJS streams.
 - `flex-microfrontend/src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.ts/html`: gửi message, render state, nhận event và alert.
 - `flex-microfrontend/src/environments/environment*.ts`: cấu hình `agentApiBaseUrl`/hub URL theo môi trường.
 
@@ -106,7 +106,7 @@
 
 | Spec ID | Ưu tiên | Trạng thái | Hướng xử lý kỹ thuật | Module/Path dự kiến | API/Contract | Data/Entity | Kiểm thử |
 |---------|---------|------------|----------------------|---------------------|--------------|-------------|----------|
-| US-001 / FR-001 | P1 | Đủ rõ | FE trim/chặn message rỗng và gọi hub method | `agent-create-wizard.component.ts`, `core/services/agent-realtime.service.ts` | `SendMessage` | Không áp dụng | Angular unit + manual |
+| US-001 / FR-001 | P1 | Đủ rõ | FE trim/chặn message rỗng và gọi hub method | `agent-create-wizard.component.ts`, `core/services/application-realtime.service.ts` | `SendMessage` | Không áp dụng | Angular unit + manual |
 | US-001 / FR-002 | P1 | Đủ rõ | Hub nhận message trong connection hiện tại và phát ack | `Flex.Agent.Api/Hubs/AgentRealtimeHub.cs` | `SendMessage`, `messageReceived` | `DemoChatMessage` in-memory | xUnit/integration |
 | US-001 / FR-003 | P1 | Đủ rõ | Structured log tại boundary hub, không log credential | `AgentRealtimeHub.cs` | Không áp dụng | Không áp dụng | Log assertion/manual |
 | US-002 / FR-004 | P1 | Đủ rõ | Controller gọi hub context broadcast event, trả client count | `Controllers/RealtimeDemoController.cs` | `POST /api/v1/realtime-demo/notify` | Không áp dụng | Controller/integration |
@@ -130,7 +130,7 @@
 
 | Contract | Loại | Thay đổi | Backward compatible | Consumer bị ảnh hưởng |
 |----------|------|----------|---------------------|------------------------|
-| `/hubs/application` | SignalR Hub `ApplicationHub` | Thêm `SendMessage`, `messageReceived`, `demoNotification` | Có, contract mới độc lập | `AgentRealtimeService` |
+| `/hubs/application` | SignalR Hub `ApplicationHub` | Thêm `SendMessage`, `messageReceived`, `demoNotification` | Có, contract mới độc lập | `ApplicationRealtimeService` |
 | `POST /api/v1/realtime-demo/notify` | HTTP API | Thêm endpoint demo | Có, không đổi route cũ | Developer/quickstart |
 
 ## Permission Matrix
@@ -168,7 +168,7 @@
 | Quyết định | Lựa chọn | Lý do chọn | Phương án đã loại | Lý do loại |
 |------------|----------|------------|-------------------|------------|
 | DEC-001 | ASP.NET Core SignalR | Native với .NET 9 và frontend đã có `@microsoft/signalr`/pattern tương tự | WebSocket thủ công | Tăng code protocol/lifecycle, không cần cho demo |
-| DEC-002 | Một `AgentRealtimeService` singleton + RxJS streams | Tách lifecycle khỏi component và khớp pattern `ExchangeRealtimeService` hiện có | Tạo `HubConnection` trong `ChatComponent` | Khó test, dễ tạo nhiều connection và trộn UI với transport |
+| DEC-002 | Một `ApplicationRealtimeService` singleton + RxJS streams | Tách lifecycle khỏi component và khớp pattern `ExchangeRealtimeService` hiện có | Tạo `HubConnection` trong `AgentCreateWizardComponent` | Khó test, dễ tạo nhiều connection và trộn UI với transport |
 | DEC-003 | HTTP endpoint gọi `IHubContext` để phát test | Dễ gọi bằng Postman/curl và kiểm chứng BE → FE | Endpoint giả lập ở FE | Không chứng minh được BE phát event |
 | DEC-004 | Không persistence | Đúng phạm vi demo, giảm migration/rủi ro dữ liệu | Lưu message vào database | Ngoài phạm vi và không cần để xác nhận realtime |
 
@@ -221,7 +221,7 @@ flex-agent-service/
     └── Realtime/AgentRealtimeTests.cs
 
 flex-microfrontend/
-├── src/app/core/services/agent-realtime.service.ts
+├── src/app/core/services/application-realtime.service.ts
 ├── src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.ts
 ├── src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.html
 ├── src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.spec.ts
