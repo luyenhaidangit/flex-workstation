@@ -18,7 +18,7 @@
 **Mục đích**: Đăng ký transport, auth/CORS và contract types trước mọi user story.
 
 - [X] T005 Cập nhật `flex-agent-service/src/Flex.Agent.Api/Extensions/ServiceExtensions.cs` để đăng ký `AddSignalR()` và CORS policy chỉ cho origin Angular local đã cấu hình; không mở anonymous policy.
-- [X] T006 Cập nhật `flex-agent-service/src/Flex.Agent.Api/Extensions/ApplicationExtensions.cs` để gọi CORS đúng thứ tự middleware, giữ `UseAuthentication`/`UseAuthorization`, map controllers và map `/hubs/agent-realtime`.
+- [X] T006 Cập nhật `flex-agent-service/src/Flex.Agent.Api/Extensions/ApplicationExtensions.cs` để gọi CORS đúng thứ tự middleware, giữ `UseAuthentication`/`UseAuthorization`, map controllers và map `/hubs/application` tới `ApplicationHub`.
 - [X] T007 [P] Tạo DTO `DemoChatMessage` và `DemoNotification` trong `flex-agent-service/src/Flex.Agent.Api/DTOs/RealtimeDemoDtos.cs` theo contract, gồm trim/non-empty rule và timestamp do server gán.
 - [X] T008 [P] Tạo model TypeScript cho `DemoChatMessage`, `DemoNotification` và `RealtimeConnectionState` trong `flex-microfrontend/src/app/core/services/agent-realtime.service.ts`, khớp field/name trong `specs/000031-agent-realtime/contracts/realtime-demo.md`.
 - [X] T009 [P] Tạo contract test skeleton trong `flex-agent-service/tests/Flex.Agent.Tests/Realtime/AgentRealtimeContractTests.cs` để khóa hub path, method/event name và response shape của endpoint trước implementation.
@@ -44,7 +44,7 @@
 
 ### Implementation for User Story 1
 
-- [X] T013 [US1] Implement `AgentRealtimeHub.SendMessage` trong `flex-agent-service/src/Flex.Agent.Api/Hubs/AgentRealtimeHub.cs`: yêu cầu `[Authorize]`, trim/validate, gán UTC timestamp, ghi structured log không chứa token/secret và gọi `Clients.Caller.SendAsync("messageReceived", ...)`.
+- [X] T013 [US1] Implement `ApplicationHub.SendMessage` trong `flex-agent-service/src/Flex.Agent.Api/Hubs/ApplicationHub.cs`: yêu cầu `[Authorize]`, trim/validate, gán UTC timestamp, ghi structured log không chứa token/secret và gọi `Clients.Caller.SendAsync("messageReceived", ...)`.
 - [X] T014 [US1] Implement `AgentRealtimeService.connect`, `disconnect`, `sendMessage` và các observable state/event trong `flex-microfrontend/src/app/core/services/agent-realtime.service.ts` bằng `HubConnectionBuilder`, URL từ environment và automatic reconnect theo pattern `exchange-realtime.service.ts`.
 - [X] T015 [US1] Cập nhật `onSendMessage`, lifecycle init/destroy và hàm xử lý event trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.ts` để kết nối một lần, trim message, gọi `sendMessage`, hiển thị ack và không tạo connection trùng.
 - [X] T016 [US1] Cập nhật `flex-microfrontend/src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.html` để hiển thị trạng thái `Connecting/Connected/Reconnecting/Disconnected`, disable submit khi chưa connected và giữ layout preview hiện có.

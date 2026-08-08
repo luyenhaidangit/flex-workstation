@@ -2,7 +2,8 @@
 
 ## SignalR hub
 
-**Hub URL**: `/hubs/agent-realtime`
+**Hub**: `ApplicationHub`
+**Hub URL**: `/hubs/application`
 
 ### Client → server
 

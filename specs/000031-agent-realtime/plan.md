@@ -71,13 +71,13 @@
 ## Thiết kế tổng quan
 
 **Luồng chính**:
-1. `ChatComponent` yêu cầu `AgentRealtimeService` mở kết nối tới `/hubs/agent-realtime` và hiển thị trạng thái `connecting/connected/reconnecting/disconnected`.
+1. `AgentCreateWizardComponent` yêu cầu `AgentRealtimeService` mở kết nối tới `/hubs/application` và hiển thị trạng thái `connecting/connected/reconnecting/disconnected`.
 2. Khi người dùng gửi nội dung không rỗng, service gọi method hub `SendMessage`; hub chuẩn hóa/validate nội dung, ghi structured log và trả event `messageReceived` để FE xác nhận.
 3. Khi gọi `POST /api/v1/realtime-demo/notify`, controller gọi broadcaster phát event `demoNotification` tới các client đang kết nối; FE nhận event trong Angular zone và gọi `window.alert(message)`.
 4. Nếu không có client, endpoint trả kết quả có `connectedClients: 0`; nếu mất kết nối, FE hiển thị lỗi và SignalR automatic reconnect được dùng ở mức client.
 
 **Component/module tham gia**:
-- `Flex.Agent.Api/Hubs/AgentRealtimeHub.cs`: nhận message và phát event demo.
+- `Flex.Agent.Api/Hubs/ApplicationHub.cs`: nhận message và phát event demo.
 - `Flex.Agent.Api/Controllers/RealtimeDemoController.cs`: endpoint kích hoạt thông báo.
 - `Flex.Agent.Api/Extensions/ServiceExtensions.cs`, `ApplicationExtensions.cs`: đăng ký SignalR, authorization/CORS cần thiết và map hub/controller.
 - `flex-microfrontend/src/app/core/services/agent-realtime.service.ts`: một service quản lý connection lifecycle và RxJS streams.
@@ -130,7 +130,7 @@
 
 | Contract | Loại | Thay đổi | Backward compatible | Consumer bị ảnh hưởng |
 |----------|------|----------|---------------------|------------------------|
-| `/hubs/agent-realtime` | SignalR Hub | Thêm `SendMessage`, `messageReceived`, `demoNotification` | Có, contract mới độc lập | `AgentRealtimeService` |
+| `/hubs/application` | SignalR Hub `ApplicationHub` | Thêm `SendMessage`, `messageReceived`, `demoNotification` | Có, contract mới độc lập | `AgentRealtimeService` |
 | `POST /api/v1/realtime-demo/notify` | HTTP API | Thêm endpoint demo | Có, không đổi route cũ | Developer/quickstart |
 
 ## Permission Matrix
@@ -212,7 +212,7 @@ specs/000031-agent-realtime/
 ```text
 flex-agent-service/
 ├── src/Flex.Agent.Api/
-│   ├── Hubs/AgentRealtimeHub.cs
+│   ├── Hubs/ApplicationHub.cs
 │   ├── Controllers/RealtimeDemoController.cs
 │   ├── DTOs/RealtimeDemoDtos.cs
 │   ├── Extensions/ServiceExtensions.cs
