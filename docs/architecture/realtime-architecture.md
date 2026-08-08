@@ -39,6 +39,12 @@ Các thành phần chính:
 - `flex-microfrontend/src/app/core/services/application-realtime.service.ts`: quản lý lifecycle SignalR và phát RxJS stream.
 - `flex-microfrontend/src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.ts`: tích hợp chat preview.
 
+`RealtimeConnectionLifecycleService` điều phối connection theo authentication
+lifecycle. `AuthenticationService` chỉ phát sự kiện `authenticated` hoặc
+`loggedOut`; `ApplicationRealtimeService` chịu trách nhiệm transport.
+`AgentCreateWizardComponent` chỉ subscribe/unsubscribe các stream và không tự
+gọi `connect()` hoặc `disconnect()`.
+
 ## 3. Authentication khi kết nối
 
 Authentication được thực hiện ngay trong lúc SignalR handshake; không có bước
@@ -191,9 +197,43 @@ connecting → connected → reconnecting → connected
                          └──────────→ disconnected
 ```
 
-Access token hiện được lấy lại qua `accessTokenFactory` mỗi lần SignalR
-khởi tạo hoặc reconnect. Cơ chế refresh token chuyên biệt cho socket chưa
-được triển khai.
+Flow lifecycle hiện tại:
+
+```text
+Login thành công
+    ↓
+AuthenticationService.setAuthToken(...)
+    ↓
+RealtimeConnectionLifecycleService
+    ↓
+ApplicationRealtimeService.refreshAuthentication()
+    ↓
+START CONNECTION tới /hubs/application
+```
+
+Khi authentication service nhận access token mới, `setAuthToken` dừng
+connection hiện tại và mở lại connection bằng token mới. Bản thân frontend
+chưa triển khai refresh token; việc lấy access token mới vẫn do auth flow hiện
+tại đảm nhiệm.
+
+```text
+Token mới được lưu
+    ↓
+STOP connection cũ
+    ↓
+accessTokenFactory lấy token mới
+    ↓
+CONNECT lại ApplicationHub
+```
+
+Khi mất mạng, SignalR tự reconnect theo các mốc đã cấu hình. Khi logout hoặc
+token hết hạn, `AuthenticationService` phát sự kiện `loggedOut`; coordinator
+gọi `disconnect()` trước khi token bị xóa và điều hướng về màn login.
+
+`AgentCreateWizardComponent` không quản lý connection. Nếu người dùng mở lại
+màn `/agents/create` khi đã đăng nhập, service toàn cục đã được khởi động từ
+`RealtimeConnectionLifecycleService.initialize()` và sự kiện từ
+`initOnStartup()` hoặc `setAuthToken()`.
 
 ## 7. CORS và transport
 
