@@ -36,12 +36,15 @@ Các thành phần chính:
 - `flex-agent-service/src/Flex.Agent.Api/Hubs/ApplicationHub.cs`: SignalR hub.
 - `flex-agent-service/src/Flex.Agent.Api/Hubs/AgentRealtimeConnectionRegistry.cs`: theo dõi số connection đang hoạt động trong instance hiện tại.
 - `flex-agent-service/src/Flex.Agent.Api/Controllers/RealtimeDemoController.cs`: endpoint test broadcast.
-- `flex-microfrontend/src/app/core/services/application-realtime.service.ts`: quản lý lifecycle SignalR và phát RxJS stream.
+- `flex-microfrontend/src/app/core/realtime/realtime-connection.ts`: quản lý transport và lifecycle của `HubConnection`.
+- `flex-microfrontend/src/app/core/realtime/application-realtime.service.ts`: ánh xạ event nghiệp vụ thành RxJS stream.
+- `flex-microfrontend/src/app/core/realtime/realtime-event.model.ts`: định nghĩa state và payload event.
 - `flex-microfrontend/src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.ts`: tích hợp chat preview.
 
-`RealtimeConnectionLifecycleService` điều phối connection theo authentication
-lifecycle. `AuthenticationService` chỉ phát sự kiện `authenticated` hoặc
-`loggedOut`; `ApplicationRealtimeService` chịu trách nhiệm transport.
+`ApplicationRealtimeService` điều phối connection theo authentication
+lifecycle và ánh xạ event nghiệp vụ. `AuthenticationService` chỉ phát sự kiện
+`authenticated` hoặc `loggedOut`; `SocketConnectionManager` chịu trách nhiệm
+transport.
 `AgentCreateWizardComponent` chỉ subscribe/unsubscribe các stream và không tự
 gọi `connect()` hoặc `disconnect()`.
 
@@ -204,7 +207,7 @@ Login thành công
     ↓
 AuthenticationService.setAuthToken(...)
     ↓
-RealtimeConnectionLifecycleService
+ApplicationRealtimeService.initialize()
     ↓
 ApplicationRealtimeService.refreshAuthentication()
     ↓
@@ -232,7 +235,7 @@ gọi `disconnect()` trước khi token bị xóa và điều hướng về màn
 
 `AgentCreateWizardComponent` không quản lý connection. Nếu người dùng mở lại
 màn `/agents/create` khi đã đăng nhập, service toàn cục đã được khởi động từ
-`RealtimeConnectionLifecycleService.initialize()` và sự kiện từ
+`ApplicationRealtimeService.initialize()` và sự kiện từ
 `initOnStartup()` hoặc `setAuthToken()`.
 
 ## 7. CORS và transport
