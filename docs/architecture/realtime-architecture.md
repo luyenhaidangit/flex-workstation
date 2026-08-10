@@ -43,7 +43,7 @@ Các thành phần chính:
 
 `ApplicationRealtimeService` điều phối connection theo authentication
 lifecycle và ánh xạ event nghiệp vụ. `AuthenticationService` chỉ phát sự kiện
-`authenticated` hoặc `loggedOut`; `SocketConnectionManager` chịu trách nhiệm
+`authenticated` hoặc `loggedOut`; `RealtimeConnection` chịu trách nhiệm
 transport.
 `AgentCreateWizardComponent` chỉ subscribe/unsubscribe các stream và không tự
 gọi `connect()` hoặc `disconnect()`.
