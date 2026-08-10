@@ -25,6 +25,18 @@
 - Với task nhiều bước, nêu plan ngắn trước khi làm: `1. [Bước] → kiểm tra: [cách]`
 - Định nghĩa tiêu chí thành công rõ ràng trước khi bắt đầu thực hiện.
 
+### Skill routing bắt buộc
+
+Với mỗi task mới, trước khi đọc hoặc sửa code hay gọi tool thực thi, phải sử dụng
+`flex-using-agent-skills` để xác định skill chuyên môn phù hợp.
+
+- Chạy routing trước mọi implementation, review, diagnosis hoặc thay đổi file.
+- Sau khi router chọn skill, phải đọc và áp dụng skill đó trước khi thực hiện task.
+- Có thể chọn nhiều skill nếu task giao nhau giữa nhiều domain.
+- Nếu không có skill phù hợp, ghi nhận kết quả và tiếp tục theo instruction chung.
+- Không gọi router đệ quy khi task chính là `flex-using-agent-skills`.
+- Trong cùng một workflow, tái sử dụng skill đã chọn nếu phạm vi task không thay đổi.
+
 ## Quy tắc làm việc
 
 - Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo.
@@ -38,7 +50,7 @@
 
 ## Skills
 
-Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào phù hợp không. Skill được load tự động — chỉ cần áp dụng khi trigger khớp:
+Trước khi bắt đầu bất kỳ task mới nào, bắt buộc sử dụng `flex-using-agent-skills` để định tuyến và xác định skill phù hợp. Skill chuyên môn phải được đọc và áp dụng trước khi thực thi task:
 
 | Context | Skill |
 | --- | --- |
@@ -50,7 +62,7 @@ Trước khi bắt đầu bất kỳ task nào, kiểm tra xem có skill nào ph
 | Fix bug, lỗi runtime, test thất bại | `debugging-and-error-recovery` |
 | Nghiên cứu phương pháp kiếm tiền online (MMO) | `mmo-research` |
 
-Xem danh sách đầy đủ và cách phối hợp nhiều skill: `using-agent-skills`.
+Xem quy tắc định tuyến và cách phối hợp nhiều skill: `flex-using-agent-skills`.
 
 ## Speckit Workflow (Spec-Before-Code)
 
