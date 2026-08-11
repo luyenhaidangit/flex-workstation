@@ -1,4 +1,4 @@
-# Tasks: Chat AI cơ bản
+﻿# Tasks: Chat AI cơ bản
 
 **Đầu vào**: Design documents từ `specs/000032-ai-chat-basics/`
 
@@ -12,10 +12,10 @@
 
 **Mục đích**: Tạo application boundary tối thiểu, khớp solution .NET 9 hiện có.
 
-- [ ] T001 Tạo project `Flex.Agent.Application` target `net9.0` trong `flex-agent-service/src/Flex.Agent.Application/Flex.Agent.Application.csproj` với nullable và implicit usings được bật.
-- [ ] T002 Thêm project `Flex.Agent.Application` vào `flex-agent-service/Flex.Agent.sln` trong solution folder `src` (phụ thuộc T001).
-- [ ] T003 Khai báo project reference từ API và Infrastructure đến Application trong `flex-agent-service/src/Flex.Agent.Api/Flex.Agent.Api.csproj` và `flex-agent-service/src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj` (phụ thuộc T001).
-- [ ] T004 Khai báo project reference trực tiếp đến Application cho test project trong `flex-agent-service/tests/Flex.Agent.Tests/Flex.Agent.Tests.csproj` (phụ thuộc T001).
+- [x] T001 Tạo project `Flex.Agent.Application` target `net9.0` trong `flex-agent-service/src/Flex.Agent.Application/Flex.Agent.Application.csproj` với nullable và implicit usings được bật.
+- [x] T002 Thêm project `Flex.Agent.Application` vào `flex-agent-service/Flex.Agent.sln` trong solution folder `src` (phụ thuộc T001).
+- [x] T003 Khai báo project reference từ API và Infrastructure đến Application trong `flex-agent-service/src/Flex.Agent.Api/Flex.Agent.Api.csproj` và `flex-agent-service/src/Flex.Agent.Infrastructures/Flex.Agent.Infrastructures.csproj` (phụ thuộc T001).
+- [x] T004 Khai báo project reference trực tiếp đến Application cho test project trong `flex-agent-service/tests/Flex.Agent.Tests/Flex.Agent.Tests.csproj` (phụ thuộc T001).
 
 ---
 
@@ -25,9 +25,9 @@
 
 **CRITICAL**: Hoàn tất phase này trước Phase 3 và Phase 4.
 
-- [ ] T005 [P] Tạo port `IChatModelClient` cùng record provider-agnostic `ChatRequest` và `ChatResponse` trong `flex-agent-service/src/Flex.Agent.Application/AI/IChatModelClient.cs`, `flex-agent-service/src/Flex.Agent.Application/AI/ChatRequest.cs` và `flex-agent-service/src/Flex.Agent.Application/AI/ChatResponse.cs` theo `data-model.md`.
-- [ ] T006 [P] Tạo các exception application cho timeout, provider unavailable và response không hợp lệ trong `flex-agent-service/src/Flex.Agent.Application/AI/ChatModelExceptions.cs` để API không phụ thuộc exception/DTO của provider.
-- [ ] T007 Tạo `OllamaOptions` gồm endpoint, model và timeout trong `flex-agent-service/src/Flex.Agent.Infrastructures/AI/OllamaOptions.cs`; không đặt credential hay endpoint production trong source (phụ thuộc T003).
+- [x] T005 [P] Tạo port `IChatModelClient` cùng record provider-agnostic `ChatRequest` và `ChatResponse` trong `flex-agent-service/src/Flex.Agent.Application/AI/IChatModelClient.cs`, `flex-agent-service/src/Flex.Agent.Application/AI/ChatRequest.cs` và `flex-agent-service/src/Flex.Agent.Application/AI/ChatResponse.cs` theo `data-model.md`.
+- [x] T006 [P] Tạo các exception application cho timeout, provider unavailable và response không hợp lệ trong `flex-agent-service/src/Flex.Agent.Application/AI/ChatModelExceptions.cs` để API không phụ thuộc exception/DTO của provider.
+- [x] T007 Tạo `OllamaOptions` gồm endpoint, model và timeout trong `flex-agent-service/src/Flex.Agent.Infrastructures/AI/OllamaOptions.cs`; không đặt credential hay endpoint production trong source (phụ thuộc T003).
 
 **Checkpoint**: Application port và configuration model đã compile; implementation có thể đi theo từng story.
 
@@ -45,20 +45,20 @@
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Viết test cho success, `ChatResponse` rỗng và exception từ provider của `ConversationSummaryService` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/ConversationSummaryServiceTests.cs` theo BR-002/BR-003 (phụ thuộc T005, T006).
-- [ ] T009 [P] [US1] Viết test `HttpMessageHandler` cho serialization request OpenAI-compatible, response hợp lệ, 5xx, timeout và payload lỗi của `OllamaChatModelClient` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/OllamaChatModelClientTests.cs` theo FR-003/NFR-001 (phụ thuộc T005, T006, T007).
-- [ ] T010 [US1] Viết integration/contract test cho 200, 401, 502, 503 và 504 của `POST /api/v1/ai/chat/summarize` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AIControllerIntegrationTests.cs` theo `contracts/chat-summary-api.md` (phụ thuộc T004, T005, T006).
+- [x] T008 [P] [US1] Viết test cho success, `ChatResponse` rỗng và exception từ provider của `ConversationSummaryService` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/ConversationSummaryServiceTests.cs` theo BR-002/BR-003 (phụ thuộc T005, T006).
+- [x] T009 [P] [US1] Viết test `HttpMessageHandler` cho serialization request OpenAI-compatible, response hợp lệ, 5xx, timeout và payload lỗi của `OllamaChatModelClient` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/OllamaChatModelClientTests.cs` theo FR-003/NFR-001 (phụ thuộc T005, T006, T007).
+- [x] T010 [US1] Viết integration/contract test cho 200, 401, 502, 503 và 504 của `POST /api/v1/ai/chat/summarize` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AIControllerIntegrationTests.cs` theo `contracts/chat-summary-api.md` (phụ thuộc T004, T005, T006).
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement `ConversationSummaryService` trong `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs`: tạo instruction tóm tắt nội bộ, gọi `IChatModelClient.ChatAsync` với `CancellationToken`, chỉ chấp nhận summary không rỗng và không retry downstream (phụ thuộc T005, T006, T008).
-- [ ] T012 [US1] Implement `OllamaChatModelClient` trong `flex-agent-service/src/Flex.Agent.Infrastructures/AI/OllamaChatModelClient.cs`: map contract application sang `/v1/chat/completions`, áp timeout/configuration, propagate cancellation và map 5xx/timeout/payload lỗi sang exception application (phụ thuộc T005, T006, T007, T009).
-- [ ] T013 [P] [US1] Tạo `ConversationSummaryRequest` và `ConversationSummaryResponse` trong `flex-agent-service/src/Flex.Agent.Api/DTOs/ConversationSummaryDtos.cs` đúng schema public tại `contracts/chat-summary-api.md`.
-- [ ] T014 [US1] Đăng ký `OllamaOptions`, typed `HttpClient`, `IChatModelClient` và `ConversationSummaryService` trong method `AddInfrastructure` của `flex-agent-service/src/Flex.Agent.Api/Extensions/ServiceExtensions.cs` (phụ thuộc T011, T012).
-- [ ] T015 [P] [US1] Bổ sung section cấu hình mẫu không nhạy cảm cho endpoint, model `qwen2.5:1.5b` và timeout trong `flex-agent-service/src/Flex.Agent.Api/appsettings.Example.json` (phụ thuộc T007).
-- [ ] T016 [US1] Thay MVC placeholder bằng `[ApiController]`, `[Authorize]` và action `POST /api/v1/ai/chat/summarize` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs`; map exception application sang error code/status 502/503/504 theo contract (phụ thuộc T011, T013, T014, T010).
-- [ ] T017 [US1] Thêm structured log thành công/thất bại an toàn trong `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs` với `traceId`, provider, model, duration và `failureKind`; cấm log conversation, summary, prompt hoặc HTTP body (phụ thuộc T011).
-- [ ] T018 [US1] Chạy `dotnet test Flex.Agent.sln --configuration Release --filter FullyQualifiedName~AI` tại `flex-agent-service/` và xử lý toàn bộ failure của US-001 (phụ thuộc T008, T009, T010, T016, T017).
+- [x] T011 [US1] Implement `ConversationSummaryService` trong `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs`: tạo instruction tóm tắt nội bộ, gọi `IChatModelClient.ChatAsync` với `CancellationToken`, chỉ chấp nhận summary không rỗng và không retry downstream (phụ thuộc T005, T006, T008).
+- [x] T012 [US1] Implement `OllamaChatModelClient` trong `flex-agent-service/src/Flex.Agent.Infrastructures/AI/OllamaChatModelClient.cs`: map contract application sang `/v1/chat/completions`, áp timeout/configuration, propagate cancellation và map 5xx/timeout/payload lỗi sang exception application (phụ thuộc T005, T006, T007, T009).
+- [x] T013 [P] [US1] Tạo `ConversationSummaryRequest` và `ConversationSummaryResponse` trong `flex-agent-service/src/Flex.Agent.Api/DTOs/ConversationSummaryDtos.cs` đúng schema public tại `contracts/chat-summary-api.md`.
+- [x] T014 [US1] Đăng ký `OllamaOptions`, typed `HttpClient`, `IChatModelClient` và `ConversationSummaryService` trong method `AddInfrastructure` của `flex-agent-service/src/Flex.Agent.Api/Extensions/ServiceExtensions.cs` (phụ thuộc T011, T012).
+- [x] T015 [P] [US1] Bổ sung section cấu hình mẫu không nhạy cảm cho endpoint, model `qwen2.5:1.5b` và timeout trong `flex-agent-service/src/Flex.Agent.Api/appsettings.Example.json` (phụ thuộc T007).
+- [x] T016 [US1] Thay MVC placeholder bằng `[ApiController]`, `[Authorize]` và action `POST /api/v1/ai/chat/summarize` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs`; map exception application sang error code/status 502/503/504 theo contract (phụ thuộc T011, T013, T014, T010).
+- [x] T017 [US1] Thêm structured log thành công/thất bại an toàn trong `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs` với `traceId`, provider, model, duration và `failureKind`; cấm log conversation, summary, prompt hoặc HTTP body (phụ thuộc T011).
+- [x] T018 [US1] Chạy `dotnet test Flex.Agent.sln --configuration Release --filter FullyQualifiedName~AI` tại `flex-agent-service/` và xử lý toàn bộ failure của US-001 (phụ thuộc T008, T009, T010, T016, T017).
 
 **Checkpoint**: User Story 1 có thể test độc lập qua fake provider và endpoint authenticated, không cần Ollama thật.
 
@@ -76,14 +76,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T019 [US2] Bổ sung test empty/whitespace input và assertion fake client không được gọi trong `flex-agent-service/tests/Flex.Agent.Tests/AI/ConversationSummaryServiceTests.cs` theo AC-003/BR-001 (phụ thuộc T008).
-- [ ] T020 [US2] Bổ sung integration/contract test HTTP 400 và code `AI_CONVERSATION_REQUIRED` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AIControllerIntegrationTests.cs` theo AC-003 (phụ thuộc T010).
+- [x] T019 [US2] Bổ sung test empty/whitespace input và assertion fake client không được gọi trong `flex-agent-service/tests/Flex.Agent.Tests/AI/ConversationSummaryServiceTests.cs` theo AC-003/BR-001 (phụ thuộc T008).
+- [x] T020 [US2] Bổ sung integration/contract test HTTP 400 và code `AI_CONVERSATION_REQUIRED` trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AIControllerIntegrationTests.cs` theo AC-003 (phụ thuộc T010).
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Thêm validation trim input trong `ConversationSummaryService` tại `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs` để từ chối conversation rỗng trước lời gọi `IChatModelClient` (phụ thuộc T011, T019).
-- [ ] T022 [US2] Ánh xạ validation error thành HTTP 400/code `AI_CONVERSATION_REQUIRED` trong action summarize của `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs` (phụ thuộc T016, T020, T021).
-- [ ] T023 [US2] Chạy `dotnet test Flex.Agent.sln --configuration Release --filter FullyQualifiedName~AI` tại `flex-agent-service/` và xác nhận toàn bộ case US-002 pass (phụ thuộc T019, T020, T022).
+- [x] T021 [US2] Thêm validation trim input trong `ConversationSummaryService` tại `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs` để từ chối conversation rỗng trước lời gọi `IChatModelClient` (phụ thuộc T011, T019).
+- [x] T022 [US2] Ánh xạ validation error thành HTTP 400/code `AI_CONVERSATION_REQUIRED` trong action summarize của `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs` (phụ thuộc T016, T020, T021).
+- [x] T023 [US2] Chạy `dotnet test Flex.Agent.sln --configuration Release --filter FullyQualifiedName~AI` tại `flex-agent-service/` và xác nhận toàn bộ case US-002 pass (phụ thuộc T019, T020, T022).
 
 **Checkpoint**: Cả success path và input validation hoạt động độc lập qua test/fake provider.
 
@@ -93,8 +93,8 @@
 
 **Mục đích**: Xác minh security, observability, rollout và regression theo plan.
 
-- [ ] T024 Review `AIController`, `ConversationSummaryService` và `OllamaChatModelClient` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs`, `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs` và `flex-agent-service/src/Flex.Agent.Infrastructures/AI/OllamaChatModelClient.cs` để xác nhận error response/log không chứa conversation, summary, prompt, token, secret hay upstream body (phụ thuộc T017, T022).
-- [ ] T025 Chạy `dotnet build Flex.Agent.sln --configuration Release`, `dotnet test Flex.Agent.sln --configuration Release` và `git diff --check` tại `flex-agent-service/`; ghi nhận rõ các lệnh pass/fail và test còn không thực hiện (phụ thuộc T018, T023).
+- [x] T024 Review `AIController`, `ConversationSummaryService` và `OllamaChatModelClient` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs`, `flex-agent-service/src/Flex.Agent.Application/AI/ConversationSummaryService.cs` và `flex-agent-service/src/Flex.Agent.Infrastructures/AI/OllamaChatModelClient.cs` để xác nhận error response/log không chứa conversation, summary, prompt, token, secret hay upstream body (phụ thuộc T017, T022).
+- [x] T025 Chạy `dotnet build Flex.Agent.sln --configuration Release`, `dotnet test Flex.Agent.sln --configuration Release` và `git diff --check` tại `flex-agent-service/`; ghi nhận rõ các lệnh pass/fail và test còn không thực hiện (phụ thuộc T018, T023).
 - [ ] T026 Thực hiện smoke test success, empty input và provider unavailable theo `specs/000032-ai-chat-basics/quickstart.md` với Ollama/Qwen đã healthy; kiểm tra log metadata và latency/error/timeout trong 30 phút đầu (phụ thuộc T025).
 
 ---
@@ -161,3 +161,4 @@ Setup (T001–T004)
 - [x] Không có task migration/schema vì feature không persistence.
 - [x] Dependencies và cơ hội parallel đã được chỉ rõ.
 - [x] Không còn placeholder/template task trong danh sách.
+
