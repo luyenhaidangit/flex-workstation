@@ -36,7 +36,7 @@ Không có foundation code dùng chung ngoài gateway route: persistence, migrat
 
 ### Tests cho User Story 1
 
-- [ ] T004 [P] [US1] Tạo unit test trước implementation cho validation draft/history, dựng `ChatRequest`, reply rỗng và cancellation deadline trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AgentPreviewChatServiceTests.cs`.
+- [ ] T004 [P] [US1] Tạo unit test trước implementation cho validation draft/history, dựng `ChatRequest`, reply rỗng và cancellation theo timeout cấu hình trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AgentPreviewChatServiceTests.cs`.
 - [ ] T005 [P] [US1] Tạo integration/contract test trước implementation cho `POST /api/v1/ai/chat/preview` success, request invalid và JWT authorization trong `flex-agent-service/tests/Flex.Agent.Tests/AI/AgentPreviewChatControllerIntegrationTests.cs` theo `specs/000033-ai-chat-integration/contracts/agent-preview-chat-api.md`.
 - [ ] T006 [P] [US1] Tạo Angular service test trước implementation cho mapping request Agent draft/history và response `reply` trong `flex-microfrontend/src/app/features/agent-catalog/services/agent-preview.service.spec.ts`.
 
@@ -45,7 +45,7 @@ Không có foundation code dùng chung ngoài gateway route: persistence, migrat
 - [ ] T007 [P] [US1] Tạo interfaces `AgentPreviewContext`, `PreviewMessage`, `AgentPreviewRequest` và `AgentPreviewResponse` trong `flex-microfrontend/src/app/features/agent-catalog/models/agent-preview.model.ts` theo contract preview.
 - [ ] T008 [P] [US1] Tạo request/response DTO và validation contract preview trong `flex-agent-service/src/Flex.Agent.Api/DTOs/AgentPreviewChatDtos.cs` cho `agent.name`, `agent.role`, `agent.instructions` và ordered `messages`.
 - [ ] T009 [P] [US1] Tạo exception types preview cho invalid request và timeout/error mapping trong `flex-agent-service/src/Flex.Agent.Application/AI/AgentPreviewChatExceptions.cs`.
-- [ ] T010 [US1] Implement `AgentPreviewChatService` trong `flex-agent-service/src/Flex.Agent.Application/AI/AgentPreviewChatService.cs`: validate DTO model, tạo system instruction từ draft, chuyển history thành `ChatRequest`, tái sử dụng `IChatModelClient`, hủy request sau 15 giây và không retry downstream (phụ thuộc T004, T008, T009).
+- [ ] T010 [US1] Implement `AgentPreviewChatService` trong `flex-agent-service/src/Flex.Agent.Application/AI/AgentPreviewChatService.cs`: validate DTO model, tạo system instruction từ draft, chuyển history thành `ChatRequest`, dùng timeout `Ai:Ollama:TimeoutSeconds` và không retry downstream (phụ thuộc T004, T008, T009).
 - [ ] T011 [US1] Mở endpoint `[HttpPost("chat/preview")]` và map `400 AI_PREVIEW_REQUEST_INVALID`, `502`, `503`, `504` trong `flex-agent-service/src/Flex.Agent.Api/Controllers/AIController.cs` mà không đổi `chat/summarize` (phụ thuộc T005, T010).
 - [ ] T012 [US1] Implement `AgentPreviewService` gọi `${environment.apiBaseUrl}/api/v1/ai/chat/preview` và typed response/error mapping trong `flex-microfrontend/src/app/features/agent-catalog/services/agent-preview.service.ts` (phụ thuộc T006, T007, T001, T002, T003).
 - [ ] T013 [US1] Thay state và `onSendMessage()` của `AgentCreateWizardComponent` trong `flex-microfrontend/src/app/features/agent-catalog/components/agent-create-wizard/agent-create-wizard.component.ts` bằng preview session cục bộ: lấy caller profile, build draft/history, optimistic user pending, một request duy nhất và append reply Agent; gỡ subscription/call `directMessages$`/`SendMessage` chỉ dùng cho preview (phụ thuộc T011, T012).

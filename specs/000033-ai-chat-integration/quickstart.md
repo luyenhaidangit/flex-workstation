@@ -20,7 +20,7 @@ Xác minh người dùng đã đăng nhập gửi câu hỏi tại `/agents/crea
 3. Kiểm tra khung “Xem trước và kiểm tra” thể hiện người gửi là tài khoản hiện tại, không còn dropdown “Người nhận”.
 4. Gửi câu hỏi văn bản hợp lệ.
 5. Xác nhận câu hỏi xuất hiện ngay, có trạng thái đang chờ và không thể gửi tiếp trong lúc chờ.
-6. Xác nhận câu trả lời xuất hiện với nhãn Agent trong tối đa 15 giây; gửi câu hỏi tiếp theo và kiểm tra thứ tự hội thoại.
+6. Xác nhận câu trả lời xuất hiện với nhãn Agent trong thời gian `Ai:Ollama:TimeoutSeconds` đã cấu hình; gửi câu hỏi tiếp theo và kiểm tra thứ tự hội thoại.
 
 ### 2. Agent chưa sẵn sàng hoặc timeout
 

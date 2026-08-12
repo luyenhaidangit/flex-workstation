@@ -34,16 +34,16 @@
 - Giữ dropdown và gửi `testUserId`: loại vì không có nguồn quyền/contract kiểm chứng danh tính được chọn.
 - Dùng identity từ hub direct-message: loại vì đó là channel người–người, không phải phiên preview AI.
 
-## DEC-004 — Tái sử dụng AI port và deadline riêng 15 giây
+## DEC-004 — Tái sử dụng AI port và timeout theo cấu hình
 
-**Decision**: `AgentPreviewChatService` dùng `IChatModelClient` hiện có, tạo system prompt từ cấu hình bản nháp, truyền cancellation từ HTTP request và áp deadline preview 15 giây. Không sửa timeout mặc định 30 giây của use case tóm tắt.
+**Decision**: `AgentPreviewChatService` dùng `IChatModelClient` hiện có, tạo system prompt từ cấu hình bản nháp và truyền cancellation từ HTTP request. Timeout preview dùng `Ai:Ollama:TimeoutSeconds` của typed `HttpClient`, dùng chung với adapter AI.
 
-**Rationale**: Port, adapter Ollama và mapping lỗi provider đã tồn tại trong `flex-agent-service`. Deadline riêng khớp NFR-001 và không làm thay đổi hành vi endpoint tóm tắt hiện có.
+**Rationale**: Port, adapter Ollama và mapping lỗi provider đã tồn tại trong `flex-agent-service`. Dùng một nguồn cấu hình tránh deadline hard-code ở Application và bảo đảm timeout thực tế được điều chỉnh theo từng môi trường.
 
 **Alternatives considered**:
 
 - Gọi Ollama trực tiếp từ controller: loại vì lặp lại adapter, error mapping và logging hiện hữu.
-- Đổi global `OllamaOptions` về 15 giây: loại vì ảnh hưởng `chat/summarize` ngoài scope.
+- Tạo deadline hard-code riêng cho preview: loại vì có thể cắt request trước timeout đã cấu hình của provider.
 - Tự retry trong request: loại vì dễ tạo phản hồi khác nhau, kéo dài thời gian chờ và không cần cho MVP.
 
 ## DEC-005 — Đưa route AI qua API Gateway

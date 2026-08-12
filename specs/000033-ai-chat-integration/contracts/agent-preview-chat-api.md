@@ -62,7 +62,7 @@ Mọi lỗi trả JSON `{ "message": "...", "code": "..." }`. Không echo prompt
 | 403 | Theo authorization middleware | Caller không có quyền dùng endpoint |
 | 502 | `AI_RESPONSE_INVALID` | Provider trả payload không dùng được hoặc reply rỗng |
 | 503 | `AI_SERVICE_UNAVAILABLE` | Provider/Agent Service chưa sẵn sàng |
-| 504 | `AI_REQUEST_TIMEOUT` | Không nhận được kết quả trong deadline 15 giây |
+| 504 | `AI_REQUEST_TIMEOUT` | Không nhận được kết quả trong thời gian `Ai:Ollama:TimeoutSeconds` đã cấu hình |
 
 ## Compatibility
 

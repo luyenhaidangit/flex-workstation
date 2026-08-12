@@ -83,7 +83,7 @@ Chi tiết quyết định: [research.md](research.md).
 1. Caller đã xác thực mở `/agents/create`, nhập draft Agent và gửi câu hỏi văn bản hợp lệ.
 2. FE thêm tin nhắn user `pending`, khóa gửi tiếp và gọi gateway `POST /api/v1/ai/chat/preview` với Agent draft cùng history.
 3. Gateway định tuyến request kèm JWT tới `AIController`; controller validate/authorize, gọi `AgentPreviewChatService`.
-4. Use case tạo system instruction từ draft, chuyển history thành `ChatRequest`, tái dùng `IChatModelClient` với deadline 15 giây.
+4. Use case tạo system instruction từ draft, chuyển history thành `ChatRequest`, tái dùng `IChatModelClient` với timeout `Ai:Ollama:TimeoutSeconds`.
 5. FE nhận `reply`, đổi pending thành completed và thêm tin Agent; nếu lỗi, giữ history/câu hỏi, hiển thị lỗi và cho retry.
 
 **Component/module tham gia**:
@@ -128,7 +128,7 @@ Chi tiết quyết định: [research.md](research.md).
 | US-001 / FR-001 | P1 | Đủ rõ | Bỏ direct-message, gọi preview AI có draft/history | FE wizard; `AIController`, `AgentPreviewChatService` | `POST /api/v1/ai/chat/preview` | Transient session | Component + controller integration success |
 | US-001 / FR-002 | P1 | Đủ rõ | Caller JWT là test sender; context Agent lấy từ Reactive Form | FE preview service/wizard | Preview request | `AgentPreviewContext` transient | Request mapping + auth test |
 | US-001 / FR-003 | P1 | Đủ rõ | Render user/agent roles theo local response, không theo sender của hub | FE template/state | Success `reply` DTO | `PreviewMessage` transient | Component/E2E multi-turn order |
-| US-001 / FR-004 | P1 | Đủ rõ | Pending state, disable send, cancellation/deadline 15s | FE wizard; application service | 504 contract | Pending message state | Component + timeout integration |
+| US-001 / FR-004 | P1 | Đủ rõ | Pending state, disable send, cancellation/timeout cấu hình | FE wizard; application service | 504 contract | Pending message state | Component + timeout integration |
 | US-002 / FR-005 | P2 | Đủ rõ | Hiển thị unavailable/status, không fake Agent message | FE error mapper; controller mapping | 503 contract | Không áp dụng | 503 integration/manual |
 | US-002 / FR-006 | P2 | Đủ rõ | Preserve history, expose retry only after error | FE preview state | 502/503/504 contracts | Không áp dụng | Component/E2E error-retry |
 | US-002 / FR-007 | P2 | Đủ rõ | Remove `directMessages$` use for preview, use typed response only | FE wizard/realtime subscription cleanup | Không dùng `message.created` | Không áp dụng | Regression hub non-use |
@@ -191,14 +191,14 @@ Contract chi tiết: [agent-preview-chat-api.md](contracts/agent-preview-chat-ap
 | DEC-001 | HTTP preview endpoint qua gateway | Khớp request–response MVP, JWT interceptor và error contract | SignalR direct/custom command | Không gọi AI hoặc vượt scope streaming/correlation |
 | DEC-002 | Gửi draft context + history client-side | Test được config chưa phát hành, không persistence | Chỉ last message / lưu server session | Thiếu định hướng hoặc mở rộng retention/schema |
 | DEC-003 | Caller JWT là test sender | Không impersonation/dropdown hard-code | `testUserId` do FE chọn | Không có authority để validate selection |
-| DEC-004 | `AgentPreviewChatService` tái dùng `IChatModelClient`, deadline 15s | Tận dụng adapter/error handling mà không ảnh hưởng summary | Provider call controller/global timeout change | Coupling hoặc regression endpoint khác |
+| DEC-004 | `AgentPreviewChatService` tái dùng `IChatModelClient`, timeout theo `Ai:Ollama:TimeoutSeconds` | Tận dụng adapter/error handling và cấu hình theo môi trường | Provider call controller/deadline hard-code | Coupling hoặc cắt request sớm hơn cấu hình |
 | DEC-005 | Success DTO trực tiếp, error DTO AI hiện hữu | Nhất quán `AIController` | `Result<T>` CRUD envelope | Trộn pattern không cần thiết |
 
 ## Chiến lược kiểm thử
 
 **Unit test**:
 
-- `AgentPreviewChatService`: validate draft/messages, build system/history messages, reply empty, cancellation/15s timeout/error mapping.
+- `AgentPreviewChatService`: validate draft/messages, build system/history messages, reply empty, cancellation/timeout cấu hình/error mapping.
 - Angular preview mapper/state: optimistic pending, success order, error preserves history, retry và reset.
 
 **Integration test**:
