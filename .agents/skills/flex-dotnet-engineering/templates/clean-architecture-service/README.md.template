@@ -1,0 +1,31 @@
+# {Company}.{Service} service template
+
+Đây là code scaffold tối thiểu cho ASP.NET Core service theo Clean Architecture.
+
+Thay các placeholder sau trước khi sử dụng:
+
+- `{Company}`: tên tổ chức, ví dụ `Flex`.
+- `{Service}`: tên service, ví dụ `Payment`.
+- `{company}` và `{service}`: biến thể lowercase dùng trong tên cấu hình hoặc endpoint.
+
+Các project được tạo khi service cần đủ boundary:
+
+```text
+src/
+├── {Company}.{Service}.Api
+├── {Company}.{Service}.Application
+├── {Company}.{Service}.Domain
+└── {Company}.{Service}.Infrastructure
+tests/
+└── {Company}.{Service}.Api.Tests
+```
+
+Không thêm project hoặc abstraction nếu service chưa có boundary thực tế cần bảo vệ.
+
+Các package version của test và runtime được quản lý tập trung bằng `Directory.Packages.props`; cập nhật version theo SDK và package baseline mà repository đang hỗ trợ.
+
+Có thể render scaffold bằng PowerShell:
+
+```powershell
+.\render.ps1 -Company Flex -Service Payment -OutputPath C:\Workspace\Project\flex-payment-service
+```

@@ -1,0 +1,31 @@
+using Microsoft.OpenApi.Models;
+
+namespace {Company}.{Service}.Api.OpenApi;
+
+public static class SwaggerConfiguration
+{
+    public static void ConfigureSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "{Company}.{Service} API",
+                Version = "v1",
+                Description = "{Company}.{Service} HTTP API"
+            });
+
+            c.DocumentFilter<LowerCaseDocumentFilter>();
+
+            var apiAssembly = typeof(Program).Assembly;
+            var xmlPath = Path.Combine(
+                AppContext.BaseDirectory,
+                $"{apiAssembly.GetName().Name}.xml");
+
+            if (File.Exists(xmlPath))
+            {
+                c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+            }
+        });
+    }
+}

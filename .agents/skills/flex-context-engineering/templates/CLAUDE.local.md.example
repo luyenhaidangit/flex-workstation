@@ -1,0 +1,30 @@
+# CLAUDE.local.md
+
+<!--
+  File cá nhân, KHÔNG commit. Thêm `CLAUDE.local.md` vào .gitignore.
+  Nạp cùng lúc và ngay SAU CLAUDE.md ở cùng thư mục => ghi đè khi mâu thuẫn.
+  Đổi tên file này thành CLAUDE.local.md để dùng.
+-->
+
+## Môi trường của tôi
+
+- Sandbox/staging URL: TODO_https://my-sandbox.example.com
+- DB local chạy ở TODO_postgres://localhost:5433/app_dev (khác port mặc định)
+- Tôi dùng TODO_fish shell — viết lệnh tương thích, không dùng cú pháp bash-only.
+
+## Sở thích cá nhân
+
+- Giải thích ngắn gọn, đi thẳng vào diff.
+- TODO_Trả lời bằng tiếng Việt, nhưng code/comment/commit message bằng tiếng Anh.
+- Khi tôi hỏi "tại sao", giải thích trước, đừng sửa code ngay.
+
+## Test data của tôi
+
+- User test: TODO_dev@example.com / TODO_xem 1Password
+- TODO_Bỏ qua test e2e ở máy local, chúng chỉ chạy trên CI.
+
+<!--
+  Mẹo: nếu bạn dùng nhiều git worktree, file này chỉ tồn tại ở worktree đã tạo.
+  Muốn dùng chung mọi worktree, thay bằng một dòng import:
+      @~/.claude/my-project-instructions.md
+-->

@@ -1,0 +1,11 @@
+namespace {Company}.{Service}.Api.Logging;
+
+public static class LogFields
+{
+    public const string ServiceName = "service.name";
+    public const string ServiceEnvironment = "service.environment";
+    public const string HostName = "host.name";
+    public const string CorrelationId = "labels.correlation_id";
+    public const string RequestId = "http.request.id";
+    public const string TraceId = "trace.id";
+}

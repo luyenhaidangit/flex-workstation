@@ -1,0 +1,28 @@
+# .NET build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+
+# IDE
+.vs/
+.idea/
+.vscode/*
+!.vscode/settings.json
+*.user
+*.suo
+
+# Runtime logs
+[Ll]og/
+[Ll]ogs/
+*.log
+
+# Local configuration and secrets
+.env
+.env.*
+**/secrets/*
+!**/secrets/README.md
+
+# Packages and local tooling
+*.nupkg
+*.snupkg
+.codex/skills/

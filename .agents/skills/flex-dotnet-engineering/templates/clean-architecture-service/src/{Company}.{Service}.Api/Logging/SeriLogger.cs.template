@@ -1,0 +1,18 @@
+using Serilog;
+
+namespace {Company}.{Service}.Api.Logging;
+
+public static class SeriLogger
+{
+    public static void Configure(WebApplicationBuilder builder)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(builder.Configuration)
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("service.environment", builder.Environment.EnvironmentName.ToLowerInvariant())
+            .Enrich.WithProperty("host.name", Environment.MachineName)
+            .CreateLogger();
+
+        builder.Host.UseSerilog();
+    }
+}

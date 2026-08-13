@@ -1,0 +1,14 @@
+using Microsoft.Extensions.DependencyInjection;
+
+namespace {Company}.{Service}.Api.RequestContext;
+
+public static class RequestContextExtensions
+{
+    public static IServiceCollection AddRequestContextAccessor(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
+        services.AddScoped<IRequestContextAccessor, RequestContextAccessor>();
+
+        return services;
+    }
+}

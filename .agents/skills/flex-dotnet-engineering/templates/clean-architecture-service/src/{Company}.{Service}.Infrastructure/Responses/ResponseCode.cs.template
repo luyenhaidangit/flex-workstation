@@ -1,0 +1,21 @@
+namespace {Company}.{Service}.Infrastructure.Responses;
+
+public static class ResponseCode
+{
+    // Success codes (2xx)
+    public const string Success = "SUCCESS";
+
+    // Client error codes (4xx)
+    public const string ValidationError = "VALIDATION_ERROR";
+    public const string Unauthorized = "UNAUTHORIZED";
+    public const string Forbidden = "FORBIDDEN";
+    public const string NotFound = "NOT_FOUND";
+    public const string Conflict = "CONFLICT";
+    public const string BadRequest = "BAD_REQUEST";
+    public const string UnprocessableEntity = "UNPROCESSABLE_ENTITY";
+    public const string TooManyRequests = "TOO_MANY_REQUESTS";
+
+    // Server error codes (5xx)
+    public const string SystemError = "SYSTEM_ERROR";
+    public const string ServiceUnavailable = "SERVICE_UNAVAILABLE";
+}

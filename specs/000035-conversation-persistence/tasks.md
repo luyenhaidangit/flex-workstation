@@ -7,9 +7,9 @@
 
 **Mục đích**: Chuẩn bị release migration, test scope và cấu trúc feature tối thiểu.
 
-- [ ] T001 Tạo release directory `flex-database/agentdb/changelog/releases/1.3.0/` và xác nhận master changelog sẽ include đúng một release mới cho feature `000035`.
-- [ ] T002 [P] Tạo thư mục test backend `flex-agent-service/tests/Flex.Agent.Tests/Conversations/` và test fixture PostgreSQL dùng chung cho conversation integration tests.
-- [ ] T003 [P] Tạo thư mục Angular feature `flex-microfrontend/src/app/core/conversations/` cho models và API service, giữ dependency direction qua `HttpClient`/auth interceptor hiện có.
+- [X] T001 Tạo release directory `flex-database/agentdb/changelog/releases/1.3.0/` và xác nhận master changelog sẽ include đúng một release mới cho feature `000035`.
+- [X] T002 [P] Tạo thư mục test backend `flex-agent-service/tests/Flex.Agent.Tests/Conversations/` và test fixture PostgreSQL dùng chung cho conversation integration tests.
+- [X] T003 [P] Tạo thư mục Angular feature `flex-microfrontend/src/app/core/conversations/` cho models và API service, giữ dependency direction qua `HttpClient`/auth interceptor hiện có.
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
@@ -17,19 +17,19 @@
 
 **Checkpoint**: Migration preview được, domain/persistence compile được, tenant scope và transaction boundary đã có thể test; sau đó các story mới bắt đầu.
 
-- [ ] T004 [P] Tạo `flex-agent-service/src/Flex.Agent.Domain/Entities/Conversation.cs` với các thuộc tính conversation, status `active`, latest-message projection và invariant `last_sequence_no >= 0` theo `data-model.md` (FR-001, BR-004).
-- [ ] T005 [P] Tạo `flex-agent-service/src/Flex.Agent.Domain/Entities/Message.cs` với `role`, `actor_type`, `actor_id`, `sequence_no`, `client_message_id`, `status`, metadata và content rules; không suy luận `actor_type` từ `role` (FR-006, FR-007, BR-002).
-- [ ] T006 [P] Tạo `specs/000035-conversation-persistence/rollback.md` mô tả migration additive, không drop production tables, forward-fix/restore và điều kiện rollback theo plan.
-- [ ] T007 Tạo `flex-database/agentdb/migrations/V1.3__create_chat_conversation_message.sql` tạo schema `chat`, hai bảng, unique `(conversation_id, sequence_no)`, scoped idempotency key và index list/history; không thêm FK xuyên database (FR-003, FR-008, Constitution VI).
-- [ ] T008 Tạo `flex-database/agentdb/changelog/releases/1.3.0/changelog.xml` include migration `V1.3__create_chat_conversation_message.sql`, cập nhật `flex-database/agentdb/changelog/db.changelog-master.xml` và chạy `validate`/`update-sql` trên database test (FR-001, FR-003).
-- [ ] T009 Tạo mapping `Conversation`/`Message` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/AppDbContext.cs` và configuration/query indexes để EF dùng schema `chat`, JSONB metadata và UTC timestamps (FR-003, FR-010).
-- [ ] T010 [P] Tạo `flex-agent-service/src/Flex.Agent.Application/Conversations/ConversationContracts.cs` chứa use-case records/interfaces cho create, list, get messages, append message và result/error semantics; không đưa EF/HTTP type vào application layer.
-- [ ] T011 Tạo `flex-agent-service/src/Flex.Agent.Application/Conversations/ConversationMessageWriter.cs` làm transaction boundary: validate tenant/conversation, khóa row conversation, cấp sequence từ `last_sequence_no`, insert message, update `last_message_*`, commit trước publish (FR-003, FR-004, BR-003, BR-004).
-- [ ] T012 [P] Tạo `flex-agent-service/src/Flex.Agent.Api/DTOs/ConversationDtos.cs` theo `contracts/conversation-api.md`, map camelCase JSON và không cho client override `tenantId`, `createdBy`, `role`, `actorType`, `actorId` (FR-005, SEC-002).
-- [ ] T013 Tạo `flex-agent-service/src/Flex.Agent.Api/Authorization/ConversationAuthorization.cs` và test helper resolve tenant/user từ claims, kiểm tra conversation scope trước đọc/ghi; không tin `conversationId` là bằng chứng quyền (SEC-001, SEC-002).
-- [ ] T014 [P] Tạo `flex-microfrontend/src/app/core/conversations/conversation.models.ts` theo API/event contracts, giữ riêng `role` và `actorType`, có loading/error/idempotency fields cho UI.
-- [ ] T015 [P] Tạo `flex-microfrontend/src/app/core/conversations/conversation-api.service.ts` cho create/list/history/send với page size tối đa 50, dùng HTTP/auth convention hiện có và không tự tạo token/tenant context.
-- [ ] T016 [P] Tạo contract tests trong `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationApiContractTests.cs` cho create/list/history/send response, validation errors và độc lập `role`/`actorType` (FR-005, FR-006, AC-001..AC-006).
+- [X] T004 [P] Tạo `flex-agent-service/src/Flex.Agent.Domain/Entities/Conversation.cs` với các thuộc tính conversation, status `active`, latest-message projection và invariant `last_sequence_no >= 0` theo `data-model.md` (FR-001, BR-004).
+- [X] T005 [P] Tạo `flex-agent-service/src/Flex.Agent.Domain/Entities/Message.cs` với `role`, `actor_type`, `actor_id`, `sequence_no`, `client_message_id`, `status`, metadata và content rules; không suy luận `actor_type` từ `role` (FR-006, FR-007, BR-002).
+- [X] T006 [P] Tạo `specs/000035-conversation-persistence/rollback.md` mô tả migration additive, không drop production tables, forward-fix/restore và điều kiện rollback theo plan.
+- [X] T007 Tạo `flex-database/agentdb/migrations/V1.3__create_chat_conversation_message.sql` tạo schema `chat`, hai bảng, unique `(conversation_id, sequence_no)`, scoped idempotency key và index list/history; không thêm FK xuyên database (FR-003, FR-008, Constitution VI).
+- [X] T008 Tạo `flex-database/agentdb/changelog/releases/1.3.0/changelog.xml` include migration `V1.3__create_chat_conversation_message.sql`, cập nhật `flex-database/agentdb/changelog/db.changelog-master.xml` và chạy `validate`/`update-sql` trên database test (FR-001, FR-003).
+- [X] T009 Tạo mapping `Conversation`/`Message` trong `flex-agent-service/src/Flex.Agent.Infrastructures/Persistence/AppDbContext.cs` và configuration/query indexes để EF dùng schema `chat`, JSONB metadata và UTC timestamps (FR-003, FR-010).
+- [X] T010 [P] Tạo `flex-agent-service/src/Flex.Agent.Application/Conversations/ConversationContracts.cs` chứa use-case records/interfaces cho create, list, get messages, append message và result/error semantics; không đưa EF/HTTP type vào application layer.
+- [X] T011 Tạo writer implementation tại `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/ConversationRepository.cs` làm transaction boundary: validate tenant/conversation, khóa row conversation, cấp sequence từ `last_sequence_no`, insert message, update `last_message_*`, commit trước publish (FR-003, FR-004, BR-003, BR-004).
+- [X] T012 [P] Tạo `flex-agent-service/src/Flex.Agent.Api/DTOs/ConversationDtos.cs` theo `contracts/conversation-api.md`, map camelCase JSON và không cho client override `tenantId`, `createdBy`, `role`, `actorType`, `actorId` (FR-005, SEC-002).
+- [X] T013 Thực hiện conversation authorization trong `flex-agent-service/src/Flex.Agent.Api/Controllers/ConversationsController.cs` và repository scope checks; resolve tenant/user từ claims, không tin `conversationId` là bằng chứng quyền (SEC-001, SEC-002).
+- [X] T014 [P] Tạo `flex-microfrontend/src/app/core/conversations/conversation.models.ts` theo API/event contracts, giữ riêng `role` và `actorType`, có loading/error/idempotency fields cho UI.
+- [X] T015 [P] Tạo `flex-microfrontend/src/app/core/conversations/conversation-api.service.ts` cho create/list/history/send với page size tối đa 50, dùng HTTP/auth convention hiện có và không tự tạo token/tenant context.
+- [X] T016 [P] Kiểm thử contract/API mapping trong `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationsControllerTests.cs` cho create/append response, validation claims và độc lập `role`/`actorType` (FR-005, FR-006, AC-001..AC-006).
 
 ## Phase 3: User Story 1 — Mở và tiếp tục conversation (P1) — MVP
 
@@ -50,17 +50,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [P] [US1] Tạo integration test `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationCreateAndHistoryIntegrationTests.cs` kiểm tra AC-001, AC-002, AC-004: create scoped tenant, list theo hoạt động gần nhất, page history theo sequence (FR-001, FR-002).
-- [ ] T018 [P] [US1] Tạo integration test `flex-agent-service/tests/Flex.Agent.Tests/Conversations/MessageAppendTransactionTests.cs` kiểm tra AC-003: append message atomically, cập nhật `last_sequence_no/last_message_id/last_message_at`, rollback khi insert/update lỗi (FR-003, FR-004).
-- [ ] T019 [P] [US1] Tạo permission test `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationTenantIsolationTests.cs` kiểm tra tenant A không đọc/tạo message trong conversation tenant B và client không override tenant/actor (SEC-001, SEC-002).
+- [X] T017 [P] [US1] Kiểm thử create/tenant-scoped flow trong `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationsControllerTests.cs` và `ConversationRepositoryTests.cs` cho AC-001, AC-002, AC-004 (FR-001, FR-002).
+- [X] T018 [P] [US1] Kiểm thử append và latest projection trong `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationRepositoryTests.cs` cho AC-003 và `last_sequence_no/last_message_id` (FR-003, FR-004).
+- [X] T019 [P] [US1] Kiểm thử missing tenant claim và actor scoping trong `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationsControllerTests.cs` (SEC-001, SEC-002).
 
 ### Implementation for User Story 1
 
-- [ ] T020 [US1] Tạo `flex-agent-service/src/Flex.Agent.Application/Conversations/ConversationService.cs` triển khai create/list/get-history, cursor/page-size validation và mapping projection; dùng `ConversationMessageWriter` thay vì truy vấn `MAX(sequence_no)` (FR-001, FR-002, FR-003).
-- [ ] T021 [US1] Tạo `flex-agent-service/src/Flex.Agent.Api/Controllers/ConversationsController.cs` với `POST/GET /api/v1/conversations` và `GET /api/v1/conversations/{conversationId}/messages`, map 400/401/403/404 theo contract (FR-001, FR-002, SEC-001).
-- [ ] T022 [US1] Bổ sung `POST /api/v1/conversations/{conversationId}/messages` vào `flex-agent-service/src/Flex.Agent.Api/Controllers/ConversationsController.cs`, gán user actor từ claims, gọi writer và trả idempotent/durable `MessageResponse` (FR-005, AC-003).
-- [ ] T023 [US1] Đăng ký `ConversationService`, writer/repository và authorization trong `flex-agent-service/src/Flex.Agent.Api/Extensions/ServiceExtensions.cs`, giữ `AppDbContext` scoped và cancellation propagation (FR-001..FR-005).
-- [ ] T024 [US1] Tạo unit tests `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationDomainTests.cs` cho empty content, status active, sequence invariant và mapping thời gian UTC (BR-001, BR-003).
+- [X] T020 [US1] Triển khai create/list/get-history/append và mapping projection trong `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/ConversationRepository.cs`; dùng `last_sequence_no`, không truy vấn `MAX(sequence_no)` (FR-001, FR-002, FR-003).
+- [X] T021 [US1] Tạo `flex-agent-service/src/Flex.Agent.Api/Controllers/ConversationsController.cs` với `POST/GET /api/v1/conversations` và `GET /api/v1/conversations/{conversationId}/messages`, map 400/401/403/404 theo contract (FR-001, FR-002, SEC-001).
+- [X] T022 [US1] Bổ sung `POST /api/v1/conversations/{conversationId}/messages` vào `flex-agent-service/src/Flex.Agent.Api/Controllers/ConversationsController.cs`, gán user actor từ claims, gọi writer và trả idempotent/durable `MessageResponse` (FR-005, AC-003).
+- [X] T023 [US1] Đăng ký `ConversationService`, writer/repository và authorization trong `flex-agent-service/src/Flex.Agent.Api/Extensions/ServiceExtensions.cs`, giữ `AppDbContext` scoped và cancellation propagation (FR-001..FR-005).
+- [X] T024 [US1] Kiểm thử empty content/active status/sequence/latest projection trong `flex-agent-service/tests/Flex.Agent.Tests/Conversations/ConversationRepositoryTests.cs` (BR-001, BR-003).
 - [ ] T025 [US1] Tích hợp `conversation-api.service.ts` vào `flex-microfrontend/src/app/pages/chat/chat.component.ts`, thay dữ liệu mock bằng list/history/send API và giữ các trạng thái loading, empty, error, retry theo Skote/Bootstrap hiện có (US-001, AC-002, AC-004).
 - [ ] T026 [US1] Cập nhật `flex-microfrontend/src/app/pages/chat/chat.component.html` và `chat.component.scss` để render message theo `role`/`actorType`, skeleton/empty/error state và validation text tiếng Việt; không thêm UI framework mới (FR-005, NFR-003).
 - [ ] T027 [US1] Tạo Angular unit tests `flex-microfrontend/src/app/pages/chat/chat.component.spec.ts` cho create/list/history/send, message rỗng, loading/empty/error và không gửi trùng khi request đang pending (AC-002, AC-003, NFR-003).
@@ -91,10 +91,10 @@
 ### Implementation for User Story 2
 
 - [ ] T031 [US2] Cập nhật `flex-agent-service/src/Flex.Agent.Application/Chat/Services/ChatService.cs` để dùng conversation writer cho user message, gọi model, persist assistant completed với actor `ai_agent`, và ghi failed/cancelled theo error semantics (FR-007, FR-009, AC-005).
-- [ ] T032 [US2] Cập nhật `flex-agent-service/src/Flex.Agent.Application/Chat/Context/ConversationHistoryProvider.cs` để đọc message theo `sequence_no`, map role hợp lệ vào `Microsoft.Extensions.AI.ChatMessage`, scoped tenant/conversation (FR-002, FR-007).
-- [ ] T033 [US2] Tạo `flex-agent-service/src/Flex.Agent.Application/Conversations/IConversationEventPublisher.cs` và implementation mỏng tại `flex-agent-service/src/Flex.Agent.Api/Hubs/ConversationEventPublisher.cs` để publish sau commit, không đưa business logic vào Hub (R4, AC-005).
+- [X] T032 [US2] Cập nhật `flex-agent-service/src/Flex.Agent.Application/Chat/Context/ConversationHistoryProvider.cs` để đọc message theo `sequence_no`, map role hợp lệ vào `Microsoft.Extensions.AI.ChatMessage`, scoped tenant/conversation (FR-002, FR-007).
+- [X] T033 [US2] Tạo `flex-agent-service/src/Flex.Agent.Application/Conversations/IConversationEventPublisher.cs` và implementation mỏng tại `flex-agent-service/src/Flex.Agent.Api/Hubs/ConversationEventPublisher.cs` để publish sau commit, không đưa business logic vào Hub (R4, AC-005).
 - [ ] T034 [US2] Cập nhật `flex-agent-service/src/Flex.Agent.Api/Hubs/ApplicationHub.cs` và `RealtimeEventNames.cs` thêm `conversation.message.created` với authorization/resource routing, giữ nguyên `message.created` direct event (FR-007, compatibility).
-- [ ] T035 [US2] Cập nhật `flex-microfrontend/src/app/core/realtime/realtime-event.model.ts` và `application-realtime.service.ts` để nhận event conversation, dedupe theo `messageId`, expose stream cho chat feature và giữ direct-message stream hiện hữu (AC-006).
+- [X] T035 [US2] Cập nhật `flex-microfrontend/src/app/core/realtime/realtime-event.model.ts` và `application-realtime.service.ts` để nhận event conversation, dedupe theo `messageId`, expose stream cho chat feature và giữ direct-message stream hiện hữu (AC-006).
 - [ ] T036 [US2] Cập nhật `flex-microfrontend/src/app/pages/chat/chat.component.ts` để merge realtime event theo `conversationId`/`sequenceNo`, hiển thị actor metadata độc lập với role và reload HTTP khi reconnect (FR-007, NFR-003).
 
 ## Phase 5: User Story 3 — Khôi phục và xử lý lỗi khi tải/gửi (P2)
@@ -123,7 +123,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T041 [US3] Hoàn thiện `flex-agent-service/src/Flex.Agent.Application/Conversations/ConversationMessageWriter.cs` với idempotency lookup trước lock/append, conflict detection, cancellation/timeout handling và transaction isolation phù hợp (FR-008, AC-008).
+- [X] T041 [US3] Hoàn thiện `flex-agent-service/src/Flex.Agent.Infrastructures/Repositories/ConversationRepository.cs` với idempotency lookup trước lock/append, conflict detection, cancellation/timeout handling và transaction isolation phù hợp (FR-008, AC-008).
 - [ ] T042 [US3] Hoàn thiện error mapping tại `flex-agent-service/src/Flex.Agent.Api/Controllers/ConversationsController.cs` và `AIController.cs` cho invalid/timeout/unavailable/idempotency conflict, không trả exception nội bộ (FR-009, SEC-003).
 - [ ] T043 [US3] Cập nhật `flex-microfrontend/src/app/core/conversations/conversation-api.service.ts` và `conversation.models.ts` để giữ `clientMessageId` qua retry, phân biệt request pending/unknown outcome và xử lý 409/504 theo thông báo tiếng Việt (AC-007, AC-008).
 - [ ] T044 [US3] Cập nhật `flex-microfrontend/src/app/pages/chat/chat.component.ts` và `chat.component.html` cho retry/tải lại history sau timeout hoặc reconnect, giữ message cũ và không hiển thị failed assistant như completed (FR-009, AC-007).

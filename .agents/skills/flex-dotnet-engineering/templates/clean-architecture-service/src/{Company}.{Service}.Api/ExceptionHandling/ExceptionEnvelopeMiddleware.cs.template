@@ -1,0 +1,92 @@
+using {Company}.{Service}.Infrastructure.Responses;
+
+namespace {Company}.{Service}.Api.ExceptionHandling;
+
+/// <summary>
+/// Handles unhandled exceptions and error status codes, returning standardized Envelope JSON responses.
+/// </summary>
+public sealed class ExceptionEnvelopeMiddleware(RequestDelegate next, ILogger<ExceptionEnvelopeMiddleware> logger)
+{
+    public async Task Invoke(HttpContext context)
+    {
+        try
+        {
+            await next(context);
+
+            if (!context.Response.HasStarted && IsErrorStatusCode(context.Response.StatusCode))
+            {
+                await HandleCustomStatusCode(context);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
+            await HandleException(context, ex);
+        }
+    }
+
+    private async Task HandleException(HttpContext context, Exception ex)
+    {
+        if (context.Response.HasStarted) return;
+
+        var errorInfo = GetErrorInfo(ex);
+        await WriteErrorResponse(context, errorInfo.StatusCode, errorInfo.Message, errorInfo.ErrorCode, errorInfo.Errors);
+    }
+
+    private static ErrorInfo GetErrorInfo(Exception ex)
+    {
+        if (ex is UnauthorizedAccessException)
+        {
+            return new ErrorInfo
+            {
+                StatusCode = StatusCodes.Status403Forbidden,
+                ErrorCode = ResponseCode.Forbidden,
+                Message = "Forbidden: You do not have permission"
+            };
+        }
+
+        if (ex is ArgumentException)
+        {
+            return new ErrorInfo
+            {
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
+                ErrorCode = ResponseCode.UnprocessableEntity,
+                Message = ex.Message
+            };
+        }
+
+        return new ErrorInfo
+        {
+            StatusCode = StatusCodes.Status500InternalServerError,
+            ErrorCode = ResponseCode.SystemError,
+            Message = "An unexpected error occurred"
+        };
+    }
+
+    private static bool IsErrorStatusCode(int statusCode) => statusCode is >= 400 and < 600;
+
+    private async Task HandleCustomStatusCode(HttpContext context)
+    {
+        var (message, errorCode) = context.Response.StatusCode switch
+        {
+            StatusCodes.Status401Unauthorized => ("Unauthorized Access. Please provide a valid token.", ResponseCode.Unauthorized),
+            StatusCodes.Status403Forbidden => ("Forbidden: You do not have permission.", ResponseCode.Forbidden),
+            StatusCodes.Status404NotFound => ("Resource not found.", ResponseCode.NotFound),
+            StatusCodes.Status409Conflict => ("Request conflicts with current state.", ResponseCode.Conflict),
+            StatusCodes.Status422UnprocessableEntity => ("Request could not be processed.", ResponseCode.UnprocessableEntity),
+            StatusCodes.Status429TooManyRequests => ("Too many requests.", ResponseCode.TooManyRequests),
+            _ => ("An unexpected error occurred.", ResponseCode.SystemError)
+        };
+
+        await WriteErrorResponse(context, context.Response.StatusCode, message, errorCode);
+    }
+
+    private static async Task WriteErrorResponse(HttpContext context, int statusCode, string? message, string errorCode, object? errors = null)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = statusCode;
+
+        var response = Result.Failure(message: message, errorCode: errorCode, errors: errors);
+        await context.Response.WriteAsJsonAsync(response);
+    }
+}

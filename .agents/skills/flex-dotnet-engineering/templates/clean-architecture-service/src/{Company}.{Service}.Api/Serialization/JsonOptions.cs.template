@@ -1,0 +1,11 @@
+using System.Text.Json.Serialization;
+
+namespace {Company}.{Service}.Api.Serialization;
+
+public static class JsonOptions
+{
+    public static void Configure(Microsoft.AspNetCore.Mvc.JsonOptions options)
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    }
+}

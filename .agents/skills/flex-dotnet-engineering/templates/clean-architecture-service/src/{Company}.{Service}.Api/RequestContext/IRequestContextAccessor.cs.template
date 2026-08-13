@@ -1,0 +1,10 @@
+using System.Security.Claims;
+
+namespace {Company}.{Service}.Api.RequestContext;
+
+public interface IRequestContextAccessor
+{
+    string? ClientIp { get; }
+    ClaimsPrincipal? User { get; }
+    string? GetClaimValue(string claimType);
+}

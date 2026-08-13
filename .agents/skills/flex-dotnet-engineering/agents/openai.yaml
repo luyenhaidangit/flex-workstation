@@ -1,0 +1,12 @@
+interface:
+  display_name: .NET Engineering
+  short_description: Build clean, fast, maintainable .NET systems
+  default_prompt: Use $flex-dotnet-engineering to review and improve this .NET codebase
+    with production-ready conventions.
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

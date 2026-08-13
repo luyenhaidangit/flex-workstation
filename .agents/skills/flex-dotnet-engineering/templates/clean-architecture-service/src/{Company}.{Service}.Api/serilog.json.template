@@ -1,0 +1,72 @@
+{
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.Async",
+      "Serilog.Sinks.File",
+      "Serilog.Sinks.Http"
+    ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft.AspNetCore": "Warning"
+      }
+    },
+    "Enrich": ["FromLogContext"],
+    "Properties": {
+      "service.name": "{service}-service"
+    },
+    "WriteTo": [
+      {
+        "Name": "Async",
+        "Args": {
+          "bufferSize": 5000,
+          "configure": [
+            {
+              "Name": "Console",
+              "Args": {
+                "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}"
+              }
+            },
+            {
+              "Name": "File",
+              "Args": {
+                "path": "logs/log-.json",
+                "rollingInterval": "Day",
+                "fileSizeLimitBytes": 10000000,
+                "rollOnFileSizeLimit": true,
+                "retainedFileCountLimit": 7,
+                "shared": true,
+                "formatter": {
+                  "type": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+                  "renderMessage": true
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "Name": "Async",
+        "Args": {
+          "bufferSize": 10000,
+          "configure": [
+            {
+              "Name": "Http",
+              "Args": {
+                "requestUri": "http://logstash:5000",
+                "queueLimitBytes": 10000000,
+                "logEventsInBatchLimit": 100,
+                "period": "00:00:05",
+                "textFormatter": {
+                  "type": "Serilog.Formatting.Json.JsonFormatter, Serilog",
+                  "renderMessage": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

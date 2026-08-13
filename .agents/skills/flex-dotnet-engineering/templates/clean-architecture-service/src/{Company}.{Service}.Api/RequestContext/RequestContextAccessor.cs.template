@@ -1,0 +1,13 @@
+using System.Security.Claims;
+
+namespace {Company}.{Service}.Api.RequestContext;
+
+public sealed class RequestContextAccessor(IHttpContextAccessor httpContextAccessor) : IRequestContextAccessor
+{
+    public string? ClientIp => httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+
+    public ClaimsPrincipal? User => httpContextAccessor.HttpContext?.User;
+
+    public string? GetClaimValue(string claimType)
+        => User?.FindFirst(claimType)?.Value;
+}

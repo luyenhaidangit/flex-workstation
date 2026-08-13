@@ -1,0 +1,46 @@
+using {Company}.{Service}.Api.Hosting;
+using {Company}.{Service}.Api.OpenApi;
+using {Company}.{Service}.Api.RateLimiting;
+using {Company}.{Service}.Api.RequestContext;
+using {Company}.{Service}.Api.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+namespace {Company}.{Service}.Api.Extensions;
+
+public static class ServiceExtensions
+{
+    public static IServiceCollection AddConfigurationSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services;
+    }
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        services
+            .AddControllers()
+            .AddJsonOptions(JsonOptions.Configure);
+
+        services.AddEndpointsApiExplorer();
+        services.ConfigureSwagger();
+
+        // Gateway and request pipeline services
+        services.AddReverseProxyForwardedHeaders();
+        services.AddRequestContextAccessor();
+        services.AddApiRateLimiting(configuration);
+        services.AddCors(options => options.AddDefaultPolicy(policy =>
+            policy.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod()));
+
+        // Authentication is configured here; issuer, audience, and signing keys belong in deployment configuration.
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options => options.MapInboundClaims = false);
+        services.AddAuthorization();
+
+        services.AddHealthChecks();
+
+        // Register application and infrastructure adapters here.
+        return services;
+    }
+}
