@@ -83,7 +83,7 @@ Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
 | `rtk` | Proxy shell command để giảm token output; quy tắc dùng ở mục "Quy tắc rtk" bên dưới |
-| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos, cài tool, sync flex-agents, sync skill junctions |
+| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
 | `.codex/config.toml` | Cấu hình model, approval policy và sandbox cho Codex CLI |
 
 ### Quy tắc rtk (bắt buộc)

@@ -32,7 +32,6 @@ Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sẽ:
 - Đọc `workstation.json` và clone repo còn thiếu vào `flex-workstation/`.
 - Cập nhật repo đã có bằng `git fetch --prune` + `git pull --ff-only`.
 - Kiểm tra và cài Claude Code, `ccusage`, `rtk` nếu thiếu.
-- Cập nhật marketplace và plugin `flex-agents`.
 
 Repo đang có local changes, origin khác cấu hình hoặc đang ở detached HEAD sẽ được cảnh báo và bỏ qua. Sau khi sync xong, dùng `OPEN_VSCODE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 
@@ -40,7 +39,7 @@ Repo đang có local changes, origin khác cấu hình hoặc đang ở detached
 
 | File | Mục đích |
 | --- | --- |
-| `SYNC_WORKSPACE.cmd` | Bootstrap: clone repos, cài tool, sync flex-agents |
+| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest và cài tool |
 | `OPEN_VSCODE.cmd` | Mở workstation trong VS Code |
 | `OPEN_CLAUDE.cmd` | Mở Claude Code với `--dangerously-skip-permissions` |
 | `OPEN_CODEX.cmd` | Mở Codex |

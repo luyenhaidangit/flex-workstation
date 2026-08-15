@@ -3,10 +3,6 @@
   "repositories": {
     "items": [
       {
-        "name": "flex-agents",
-        "url": "https://github.com/luyenhaidangit/flex-agents.git"
-      },
-      {
         "name": "flex-auth-service",
         "url": "https://github.com/luyenhaidangit/flex-auth-service"
       },
