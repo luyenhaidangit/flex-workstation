@@ -81,6 +81,14 @@ Use PostgreSQL-compatible SQL. Name indexes and approved constraints explicitly.
 - Use `CREATE OR REPLACE` for functions, procedures, and views when the repository's repeatable-object strategy permits it. Use `runOnChange` or `runAlways` only when the intended re-execution behavior is explicit.
 - Keep triggers, functions, views, and indexes in separate, clearly scoped changesets when their lifecycle differs from the table change.
 
+#### Classified domain values
+
+- For classified columns such as `status`, `type`, and `category`, define the domain value set and its business meaning before choosing storage.
+- Use the same canonical vocabulary in the database and application contracts. Do not allow free-form text or duplicate inline string literals such as `"active"`, `"Active"`, and `"enabled"` for one domain state.
+- Choose the representation by changeability: use an application enum or shared constants when the value set is stable; use reference data when values require administration, metadata, localization, ordering, or likely expansion.
+- Persist a stable code when appropriate (for example, `PENDING`), rather than a UI label. Labels and presentation metadata belong in the application or reference data.
+- Do not introduce a PostgreSQL enum by default. Use it only when its migration cost and the value set's long-term stability are explicitly accepted.
+
 ### 5. Protect configuration and deployment
 
 - Keep passwords, tokens, real connection strings, and production hostnames out of source, changelogs, command output, and documentation.
