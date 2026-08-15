@@ -45,6 +45,8 @@ flowchart TD
         gap_check{Còn gap\ngiữa code và spec?}
         converge["$speckit-converge hoặc /speckit-converge\nAppend task còn thiếu vào tasks.md"]
 
+        specialist_review["Final specialist review\nRoute bằng flex-using-agent-skills\n→ áp dụng skill Flex phù hợp"]
+
         done(["✅ Feature hoàn thành"])
     end
 
@@ -76,8 +78,9 @@ flowchart TD
 
     implement --> gap_check
     gap_check -->|Có| converge
-    gap_check -->|Không| done
+    gap_check -->|Không| specialist_review
     converge --> implement
+    specialist_review --> done
 ```
 
 ## Bảng commands
@@ -168,6 +171,16 @@ trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact.
 **`/speckit-converge` lặp với `/speckit-implement`**
 Converge chỉ **append** task bổ sung vào `tasks.md`, không sửa gì khác.
 Sau converge → chạy lại implement → converge cho đến khi báo "✅ Converged".
+
+**Final specialist review sau khi converged**
+
+`✅ Converged` chỉ xác nhận code đã đáp ứng `spec.md`, `plan.md` và `tasks.md`.
+Nó không thay thế review theo chuẩn kỹ thuật. Trước khi feature được xem là hoàn
+thành hoặc mở PR, tạo một task review cuối; quy tắc workspace sẽ bắt đầu task đó
+bằng `flex-using-agent-skills`. Áp dụng mọi skill Flex mà router chọn cho artifact
+đã thay đổi. Ví dụ: C# dùng `flex-dotnet-engineering`, migration dùng
+`flex-database-engineering`, Angular UI dùng `flex-frontend-engineering`, và thay
+đổi tên/backend contract dùng `flex-naming-convention`.
 
 ## Artifacts sinh ra theo từng feature
 

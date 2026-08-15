@@ -28,6 +28,30 @@ Reuse the selected skills while the task scope remains unchanged. Route again on
 when the repository, primary artifact, or lifecycle changes; for example, from a C#
 review to a Liquibase migration, or from planning to implementation.
 
+## Speckit integration
+
+Speckit owns the feature lifecycle; it does not replace the engineering skill that
+governs a planned or changed artifact. Apply routing in two stages when a Speckit
+workflow makes the technical scope concrete:
+
+1. The initial route selects the invoked `speckit-*` lifecycle skill.
+2. After `plan.md` or `tasks.md` identifies the affected artifacts, route once more
+   to select **additional** specialist skills before planning or editing source.
+
+For this nested route, retain the active Speckit skill as the lifecycle owner and
+return only additional specialist skills. Do not route the same `speckit-*` skill
+again and do not recursively invoke this router.
+
+| Speckit lifecycle | Required routing behavior |
+| --- | --- |
+| `speckit-plan` | Use the technical context and planned artifacts to select applicable specialist skills before making architecture, data, API, or test decisions. |
+| `speckit-implement` | After loading plan and tasks, select and apply applicable specialist skills before editing source; re-route only if a later task introduces a new artifact domain. |
+| `speckit-converge` | Assess spec/plan/task coverage only. A converged result still requires a separate final review task routed to the applicable specialist skills before the feature is considered complete. |
+
+Examples: C# changes add `flex-dotnet-engineering`; database migrations add
+`flex-database-engineering`; Angular UI adds `flex-frontend-engineering`; backend
+or public-contract naming changes add `flex-naming-convention`.
+
 ## Routing table
 
 Select only skills that directly govern the task.
@@ -64,6 +88,8 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
 - A feature request starts with the applicable Speckit skill. A high-level request to
   “implement” a new feature starts at `speckit-specify`; do not skip the workspace's
   explicit Speckit gates.
+- An active Speckit workflow is not an exclusive route. Use the Speckit integration
+  rules to add only the specialist skills that govern its concrete artifacts.
 - A task editing rules or skills uses `flex-context-engineering` or
   `flex-skill-creator` respectively; do not add engineering skills unless their
   artifacts are also in scope.

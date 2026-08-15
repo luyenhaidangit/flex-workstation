@@ -104,6 +104,14 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read .specify/memory/constitution.md for governance constraints
    - **IF EXISTS**: Read quickstart.md for integration scenarios
 
+3a. **Route specialist skills**: Use `flex-using-agent-skills` once with the concrete
+    file paths and artifact types in the loaded plan and tasks. Keep
+    `speckit-implement` as the active lifecycle skill; select only additional
+    specialist skills, read them, and apply their instructions before editing source.
+    Do not route `speckit-implement` again. Re-route only when a later task introduces
+    an artifact domain not covered by the selected skills; record when no specialist
+    skill applies.
+
 4. **Project Setup Verification**:
    - Run this step only when tasks.md contains an explicit Setup task that requires creating or verifying ignore files or tool ignore configuration.
    - Limit verification and changes to the files and technologies named in that task.
@@ -142,6 +150,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Check that implemented features match the original specification
    - Validate that tests pass and coverage meets requirements
    - Confirm the implementation follows the technical plan
+   - Confirm all selected specialist-skill checks were completed or any approved
+     exception is recorded in the relevant artifact
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 

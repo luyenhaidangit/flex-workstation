@@ -1,19 +1,20 @@
 <!--
 BÁO CÁO TÁC ĐỘNG ĐỒNG BỘ
 ==================
-Thay đổi phiên bản: 1.2.0 -> 1.2.1
+Thay đổi phiên bản: 1.2.1 -> 1.3.0
 Section đã sửa:
-  - Checklist review tối thiểu (Section 9): bổ sung câu hỏi kiểm tra database đích/repo migration cho Nguyên tắc VI
+  - Cổng chất lượng (Section 7): bổ sung Specialist Skill Gate
+  - Definition of Done (Section 8): yêu cầu hoàn tất final specialist review sau converge
 Đã thêm: Không có section mới
 Đã bỏ: Không có
-Lý do: Nguyên tắc VI (xác định database/repo migration trước khi code) được thêm ở v1.2.0 và đã lan sang
-  `plan-template.md`, nhưng Section 9 — checklist mà reviewer PHẢI dùng — chưa có mục kiểm tra tương ứng,
-  khiến reviewer có thể pass review dù bỏ sót đúng rủi ro mà Nguyên tắc VI sinh ra để chặn.
+Lý do: Speckit kiểm tra code theo spec/plan/tasks, nhưng không tự bảo đảm các chuẩn kỹ thuật
+  của skill Flex phù hợp đã được áp dụng. Gate mới bắt buộc luôn route và chỉ áp dụng skill
+  chuyên môn liên quan trước khi kết luận feature hoàn thành.
 Template đã cập nhật:
-  ✅ .specify/templates/plan-template.md — đã kiểm tra, mục "Dữ liệu & Migration (Constitution VI)" đã khớp checklist mới
-  ✅ .specify/templates/spec-template.md — đã kiểm tra, không cần đổi cho amendment này
-  ✅ .specify/templates/tasks-template.md — đã kiểm tra, không cần đổi cho amendment này
-  ✅ .specify/templates/checklist-template.md — đã kiểm tra, không cần đổi cho amendment này
+  ✅ .specify/templates/plan-template.md — không cần đổi; routing diễn ra trong speckit-plan trước khi điền plan
+  ✅ .specify/templates/spec-template.md — không cần đổi; scope nghiệp vụ không thay đổi
+  ✅ .specify/templates/tasks-template.md — không cần đổi; implementation đọc paths/artifacts để route
+  ✅ .specify/templates/checklist-template.md — không cần đổi; final review theo specialist skill không phải checklist template
   ⚠ .specify/templates/constitution-template.md — là template generic, không mang nội dung đặc thù workstation
     (tương tự dòng sub-repo ở Nguyên tắc V), không cập nhật theo chủ đích
   ✅ .specify/templates/commands/*.md — không tồn tại trong workspace này
@@ -25,7 +26,7 @@ TODO hoãn lại: Không có
 
 | Phiên bản | Trạng thái | Phê chuẩn | Sửa đổi gần nhất | Chủ sở hữu |
 |-----------|-----------|-----------|-------------------|------------|
-| 1.2.1 | Active | 2026-07-05 | 2026-08-05 | Nhóm Flex |
+| 1.3.0 | Active | 2026-07-05 | 2026-08-15 | Nhóm Flex |
 
 ---
 
@@ -261,6 +262,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 | Compatibility Gate | `plan.md` / release | Contract/data migration có phương án tương thích | Bổ sung rollout/rollback |
 | Observability Gate | `plan.md` / release | Có log/trace/metric/check sau release | Bổ sung observability |
 | Complexity Gate | `plan.md` / review | Độ phức tạp thêm vào có lý do và phương án đơn giản hơn đã được xem xét | Giảm scope/thiết kế hoặc ghi ngoại lệ |
+| Specialist Skill Gate | `speckit-plan` / `speckit-implement` / final review | Đã route bằng `flex-using-agent-skills`; mọi skill Flex được chọn cho artifact liên quan đã được áp dụng | Không coi feature hoàn thành hoặc sẵn sàng PR |
 | Release Gate | release | Rollout, rollback, migration/backfill, observability và smoke test đã rõ | Không release |
 
 ---
@@ -277,6 +279,7 @@ Một feature chỉ được xem là hoàn thành khi:
 - Observability và smoke check sau release đã sẵn sàng.
 - Không còn ngoại lệ blocker chưa được phê duyệt.
 - `/speckit-converge` hoặc `$speckit-converge` không tìm thấy gap còn lại trong phạm vi đã specify.
+- Final review đã route bằng `flex-using-agent-skills` và hoàn tất mọi specialist skill được chọn cho artifact thay đổi.
 
 ---
 
@@ -347,6 +350,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 
 | Phiên bản | Ngày | Người thay đổi | Thay đổi | Lý do |
 |-----------|------|----------------|----------|-------|
+| 1.3.0 | 2026-08-15 | Nhóm Flex | Bổ sung Specialist Skill Gate và final specialist review sau converge | Bảo đảm Speckit luôn route và áp dụng skill Flex phù hợp với artifact thực tế, không chỉ kiểm coverage spec/plan/tasks |
 | 1.2.1 | 2026-08-05 | Nhóm Flex | Bổ sung câu hỏi kiểm tra database đích/repo migration (Nguyên tắc VI) vào Checklist review tối thiểu (Section 9) | Section 9 thiếu mục kiểm tra tương ứng Nguyên tắc VI dù đã lan sang `plan-template.md`, khiến reviewer có thể bỏ sót rủi ro |
 | 1.2.0 | 2026-07-11 | Nhóm Flex | Mở rộng constitution theo template hiện hành, thêm gate/DoD/exception/source-of-truth và làm rõ cú pháp command đa agent | Đồng bộ constitution với template Speckit tiếng Việt và quy tắc làm việc của workspace |
 | 1.1.1 | 2026-07-08 | Nhóm Flex | Làm rõ vai trò command Speckit và Việt hóa label hiển thị | Đồng bộ workflow Spec-Before-Code |

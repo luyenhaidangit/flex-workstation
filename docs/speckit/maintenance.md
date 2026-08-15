@@ -4,7 +4,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 
 ## Constitution
 
-- Constitution hiện ở version `1.2.1`, mở rộng theo template Speckit hiện hành với Source of Truth, cổng chất lượng, Definition of Done, ngoại lệ và lịch sử thay đổi.
+- Constitution hiện ở version `1.3.0`, bổ sung Specialist Skill Gate: Speckit luôn route qua `flex-using-agent-skills` và chỉ áp dụng các skill Flex phù hợp với artifact thực tế.
 - Tài liệu workflow Speckit phải nêu rõ hai dạng command: `$speckit-*` cho Codex skill invocation và `/speckit-*` cho slash command khi runtime hỗ trợ.
 
 ## Quy ước bảo trì
@@ -16,6 +16,8 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 - `$speckit-specify` phải dò thư mục cùng short-name trước khi dispatch `before_specify` hook hoặc tạo feature; khi có kết quả trùng, phải dừng để người dùng chọn cập nhật spec hiện có hoặc tạo feature mới. Update mode giữ `requirements.md` hiện có và chỉ re-validate status/tổng hợp, không copy đè lịch sử review hay ngoại lệ.
 - `$speckit-tasks` phải tuân theo Test Gate trong constitution: sinh test task cho rủi ro cần xác minh trong `plan.md`, hoặc manual/command validation kèm lý do không áp dụng automated test; không được coi test là tùy chọn chỉ vì không có yêu cầu riêng.
 - `speckit-docbiz` là optional hook sau `speckit-specify` và `speckit-clarify` để đồng bộ tài liệu BA khi `spec.md` thay đổi. Không gắn sau `speckit-converge` vì converge chỉ append `tasks.md`.
+- `$speckit-plan` và `$speckit-implement` phải gọi `flex-using-agent-skills` một lần sau khi technical context hoặc artifact scope đã rõ; giữ Speckit là lifecycle owner và chỉ lấy specialist skill bổ sung, không route đệ quy cùng command.
+- `$speckit-converge` chỉ xác nhận coverage với spec/plan/tasks. Khi converged, feature vẫn phải đi qua một final specialist review được route bằng `flex-using-agent-skills` trước khi được xem là hoàn thành hoặc sẵn sàng PR.
 - `$speckit-analyze` và `$speckit-converge` phải inventory `MT`/`US`/`AC`/`FR`/`BR`/`SEC`/`NFR`/`SC`; `BR`/`SEC`/`NFR` có work phải có implementation, test hoặc validation coverage theo Traceability Gate.
 - Các command Speckit có feature scope phải mở đầu Completion Report bằng `ACTIVE_FEATURE_DIRECTORY`; khi làm song song, dùng `SPECIFY_FEATURE_DIRECTORY` trong từng PowerShell session thay vì tin vào `.specify/feature.json` là con trỏ duy nhất.
 - `$speckit-taskstoissues` ưu tiên GitHub MCP; khi MCP không có, dùng `gh issue list/create` với `--repo` lấy từ `origin`. Nếu không xác thực hoặc không deduplicate được issue hiện có, phải dừng trước khi tạo issue. Mỗi issue mới phải có mô tả task, trace `[US#]`, link/path đến `spec.md`/`plan.md`/`tasks.md`, và label `feature:<feature-dir>` để tự đứng được trên GitHub.
