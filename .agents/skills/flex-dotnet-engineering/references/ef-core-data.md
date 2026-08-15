@@ -72,6 +72,18 @@ Use an explicit two-way mapping for every value. The mapping must fail for an
 unknown enum value or persisted code, and the same mapping must be reused by EF
 Core conversion, API serialization, validation, and database seed/reference data.
 
+Keep a classified domain type and its canonical-code mapping with the aggregate
+that owns its lifecycle. For example, `AgentStatus` belongs with `Agent`;
+`ConversationStatus` belongs with `Conversation`; and message role, actor type,
+content type, and status belong with `Message`.
+
+Do not collect unrelated aggregate classifications in a catch-all file or helper
+named after one aggregate, such as `AgentClassification`. Such files obscure
+ownership and become a growing god-type. Use a shared classification type only
+when the same business vocabulary has one owner and the same meaning across
+aggregates. Name mapping types after that owner, such as `MessageClassification`
+or `MessageStatusCodes`, not after an unrelated aggregate.
+
 When Liquibase owns schema changes, treat the approved database migration as the
 schema source of truth. EF Core configuration must match that schema; do not create
 a competing EF migration chain.
