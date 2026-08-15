@@ -92,6 +92,46 @@ Co-locate an operation's request, validation, handler/use case, mapping, and tes
 
 Avoid a large `Shared`, `Common`, or `Core` assembly that becomes an unowned dependency hub. Share only stable primitives or contracts with clear ownership.
 
+## Organize the Domain by aggregate
+
+When a Domain project contains more than a few related types, organize it by
+aggregate or business module rather than by technical type alone. Keep an
+aggregate root, its statuses, value objects, domain events, policies, and
+aggregate-local classifications together.
+
+```text
+Domain/
+  Agents/
+    Agent.cs
+    AgentStatus.cs
+    AgentPublishLocation.cs
+  Conversations/
+    Conversation.cs
+    ConversationStatus.cs
+    Message.cs
+    MessageClassification.cs
+  Shared/
+    # Only concepts with the same meaning across two or more modules
+```
+
+Do not create global `Entities/`, `Enums/`, or `ValueObjects/` folders that
+become long flat catalogs when the system has multiple aggregates. A type belongs
+in `Shared/` only when it has one stable business meaning across modules; do not
+move a type there merely to avoid duplication.
+
+For a small domain with only a few types, a flat layout is acceptable. Introduce
+module folders when the aggregate has supporting types or when navigation across
+type-based folders slows down feature work.
+
+Keep namespaces aligned with the module by default, for example
+`Flex.Agent.Domain.Agents` and `Flex.Agent.Domain.Conversations`. Preserve an
+existing public namespace only when changing it would create unnecessary
+compatibility impact.
+
+Migrate an existing flat Domain incrementally: move one aggregate in a focused
+change, update references and tests, verify the build, and avoid a broad
+folder-only reorganization during parallel feature work.
+
 ## Isolate module data ownership
 
 Give each module in a modular monolith its own schema (or database) and forbid another module from joining, querying, or holding a foreign key across that boundary. Access another module's data only through its published contract, never through a direct table or `DbContext` reference.
