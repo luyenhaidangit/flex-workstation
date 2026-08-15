@@ -60,13 +60,17 @@ Data Annotations are acceptable only when the repository has no separate Domain 
 Infrastructure boundary and the local convention explicitly adopts them.
 
 For classified values persisted as strings, define one explicit canonical-code
-strategy for the bounded context. Do not mix `ToString().ToLowerInvariant()` for
-some enums with hand-written `switch` mappings for others: multi-word enum members
-silently produce different formats such as `enduser` instead of `end_user`.
-Prefer an explicit mapping per enum value, such as a shared attribute-based mapper
-or a dedicated conversion method, when the persisted code is a contract. Reuse the
-same mapping in EF Core conversion, API serialization, validation, and database
-seed/reference data.
+mapping for every enum value. Persisted codes are long-lived database and API
+contracts; they must not be derived from the C# enum member name.
+
+Do not use `ToString()`, `ToLowerInvariant()`, `Enum.TryParse()`, or naming
+conventions as persistence conversion. Renaming `Active` to `Activated` is a safe
+source refactor but must not silently change the persisted code from `active` to
+`activated` or make existing rows unreadable.
+
+Use an explicit two-way mapping for every value. The mapping must fail for an
+unknown enum value or persisted code, and the same mapping must be reused by EF
+Core conversion, API serialization, validation, and database seed/reference data.
 
 When Liquibase owns schema changes, treat the approved database migration as the
 schema source of truth. EF Core configuration must match that schema; do not create
