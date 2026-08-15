@@ -84,6 +84,20 @@ when the same business vocabulary has one owner and the same meaning across
 aggregates. Name mapping types after that owner, such as `MessageClassification`
 or `MessageStatusCodes`, not after an unrelated aggregate.
 
+Handle classified-code failures by boundary; do not use one `Parse` method and one
+exception type for every source. An unknown enum value passed to persistence
+conversion is a programming invariant failure and should throw
+`ArgumentOutOfRangeException`. An unknown code from an API or other untrusted input
+is an expected validation outcome: use `TryParse` or a validation result and return
+a client-safe 400 response at the presentation boundary.
+
+An unknown code read from persisted data is a data-integrity failure. Throw a
+dedicated `InvalidPersistedCodeException` or repository-equivalent containing the
+classification type and code, surface it as an internal error, and alert. Do not
+silently substitute a default value. Place this exception with the persistence
+boundary when only EF Core/database conversion uses it; do not add it to an
+unrelated integration exception family.
+
 When Liquibase owns schema changes, treat the approved database migration as the
 schema source of truth. EF Core configuration must match that schema; do not create
 a competing EF migration chain.
