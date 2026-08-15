@@ -55,6 +55,7 @@ For each intended change:
 3. Include the file exactly once, after all objects it depends on and before all objects that depend on it. Do not rely on accidental filesystem order.
 4. Make compatibility explicit. Prefer expand → deploy compatible application → backfill/verify → contract for changes that could break old application versions or long-running workloads.
 5. Add a rollback only when it is correct, scoped, and authorized. For production changes with data-loss or irreversibility risk, prefer backup/restore planning or a forward-fix rather than an automatic rollback.
+6. Use `IF NOT EXISTS` only when intentional idempotency is required and a separate validation can detect an incompatible existing definition. Do not use it by default for indexes or constraints because it can hide schema drift.
 
 Use PostgreSQL-compatible SQL. Name indexes and approved constraints explicitly. Create only the tables, columns, indexes, constraints, and programmable objects required by the stated specification.
 
@@ -62,21 +63,23 @@ Use PostgreSQL-compatible SQL. Name indexes and approved constraints explicitly.
 
 #### Tables, columns, and constraints
 
-- Do not add `FOREIGN KEY`, `CHECK`, `UNIQUE`, or business constraints unless the specification explicitly requires them. Application services may own validation across independent databases.
+Add a constraint only when it enforces a documented domain invariant or data-integrity requirement. Do not add constraints speculatively.
+
 - Do not create foreign keys, joins, or transactions across independently owned business databases.
-- Use `IF NOT EXISTS` only when intentional idempotency is required and a separate validation can detect an incompatible existing definition. Do not use it by default for indexes or constraints because it can hide schema drift.
-- For write-heavy tables, favor compact, locality-friendly keys according to established repository practice. Do not introduce UUIDv4 as a primary key merely by habit.
 - Use clear, stable names for indexes and constraints. A migration should fail visibly when the expected schema is absent or incompatible, unless the requirement explicitly accepts a controlled idempotent path.
+- For large or write-heavy tables, assess write-path impact, locking, and rollout strategy before adding or validating a constraint.
 
-Apply constraints deliberately: protect data integrity where the domain needs it, but do not add constraints by habit. Assess the write path, table volume, and the business consequence of invalid data before adding one.
-
-| Constraint | Typical write cost | Apply when |
+| Constraint | Apply when | Important considerations |
 | --- | --- | --- |
-| `NOT NULL` | Negligible | The domain requires a value. Do not replace a meaningful unknown or optional value with an artificial default. |
-| `CHECK` for stable classified values | Very low | The domain value set is stable and the database must reject invalid persisted states. Keep it synchronized with the application contract. |
-| `DEFAULT` | Negligible | A value is correct when the writer omits the column; do not use it to silently compensate for a missing required business decision. |
-| `FOREIGN KEY` | Low to moderate | Referential integrity is owned by this database and the write path can accept the lookup/locking cost. Reassess for high-ingestion event logs or audit trails. |
-| `UNIQUE` | Moderate | The domain truly requires uniqueness, such as a canonical email or stable business code. Do not add it speculatively. |
+| `PRIMARY KEY` | A row needs a stable identifier. | Prefer compact, locality-friendly keys according to repository practice; do not introduce UUIDv4 merely by habit. |
+| `NOT NULL` | The domain requires a value. | Do not replace an unknown or optional value with an artificial default. |
+| `CHECK` | A stable, row-local business rule must be enforced by the database. | `CHECK` permits `NULL`; combine with `NOT NULL` when required. Keep it synchronized with the application contract. |
+| `DEFAULT` | The value is correct when the writer omits the column. | Do not use it to conceal a missing business decision. |
+| `FOREIGN KEY` | Referential integrity is owned by this database. | Assess locking and write cost; index referencing columns when query, delete, or update paths require it. Avoid by default for high-ingestion logs or audit trails. Specify the required `ON DELETE` behavior. |
+| `UNIQUE` | The domain truly requires uniqueness. | Define the expected `NULL` behavior; use a partial unique index for conditional uniqueness. |
+
+- For existing large tables, plan compatibility and validation separately; use `NOT VALID` followed by `VALIDATE CONSTRAINT` where PostgreSQL supports it.
+- A `CHECK` must depend only on the row being written and use immutable logic; do not use it to enforce cross-row or cross-table rules.
 
 #### Indexes and expensive changes
 
