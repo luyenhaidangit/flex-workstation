@@ -36,7 +36,7 @@ Bootstrap đọc `workstation.json`, clone các repo còn thiếu vào workstati
 
 `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
-Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, `uv`, `specify-cli` và Claude Code khi cần. Với `rtk`, sau khi chạy `rtk init -g --codex`, bootstrap ghi template `scripts/templates/rtk-codex.md` đè lên `~/.codex/RTK.md` — file này do workstation quản lý, không sửa tay ở global. Sau khi có Claude Code, bootstrap add/update marketplace `luyenhaidangit/flex-agents`, install plugin `flex-agents@flex-agents` nếu thiếu, rồi chạy `claude plugin update flex-agents@flex-agents` để lấy bộ skill/plugin mới nhất. Bootstrap cũng chạy `specify init . --integration claude` để khởi tạo spec-kit nếu `.specify/templates/` chưa tồn tại. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit`, `-SkipSpecifyInstall`, `-SkipSpecifyInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
+Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, `uv`, `specify-cli` và Claude Code khi cần. Với `rtk`, sau khi chạy `rtk init -g --codex`, bootstrap ghi template `scripts/templates/rtk-codex.md` đè lên `~/.codex/RTK.md` — file này do workstation quản lý, không sửa tay ở global. Bootstrap không cài hoặc đồng bộ Flex skill vào thư mục user-local; skill được dùng trực tiếp từ project. Bootstrap cũng chạy `specify init . --integration claude` để khởi tạo spec-kit nếu `.specify/templates/` chưa tồn tại. Dùng `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit`, `-SkipSpecifyInstall`, `-SkipSpecifyInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
 
 ## Cấu hình agent
 
@@ -47,7 +47,7 @@ Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, `uv`, `specify-cli` và Claude
 | Codex CLI | `.codex/config.toml` | Cấu hình model, approval policy và sandbox. |
 | Codex | `AGENTS.md`, `.agents/` | Context và resource runtime cho Codex. |
 
-Skill Speckit dùng chung có source runtime tại `.agents/skills/`; bootstrap chuyển các đường dẫn tương ứng trong `.claude/skills/` thành junction để Claude Code và Codex đọc cùng một bản. Bộ skill global của Claude Code tiếp tục được cập nhật qua plugin `flex-agents@flex-agents`.
+Skill Speckit dùng chung có source runtime tại `.agents/skills/`; bootstrap chuyển các đường dẫn tương ứng trong `.claude/skills/` thành junction để Claude Code và Codex đọc cùng một bản. Không có Flex skill nào được cài hoặc đồng bộ vào thư mục global của Claude Code hay Codex.
 
 ## Cấu hình workstation
 

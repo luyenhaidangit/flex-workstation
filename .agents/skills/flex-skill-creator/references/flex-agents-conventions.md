@@ -22,8 +22,6 @@ Follow the pre-flight in `flex-agents/CONTRIBUTING.md` (see the `#before-proposi
 2. Check open PRs/issues on the upstream repo for the same idea already in flight.
 3. Be able to state the gap the new skill fills that no existing skill covers.
 
-If the new skill is meant to sync to users' local `~/.claude/skills/` / `~/.agents/skills/`, add its directory name to the `skills` array in `flex-agents/profiles/flex.json` — that manifest is what `scripts/install-flex-profile.ps1` reads.
-
 ## Naming
 
 Skills that are specifically customized for Flex (diverge from an upstream/generic version, or are meant to sync via `profiles/flex.json`) are prefixed `flex-` — e.g. `flex-context-engineering`, `flex-dotnet-engineering`, `flex-using-agent-skills`, `flex-skill-creator` itself. A skill ported or adapted from elsewhere for this repo should generally carry the prefix too, unless the user says otherwise.

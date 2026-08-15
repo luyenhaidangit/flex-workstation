@@ -317,20 +317,6 @@ else {
 
 & "$PSScriptRoot\ensure-specify.ps1" -SkipInstall:$SkipSpecifyInstall -SkipInit:$SkipSpecifyInit
 
-Write-Step "Installing selected flex skill profile"
-
-$flexProfileInstaller = Join-Path $PSScriptRoot "install-flex-profile.ps1"
-if (Test-Path $flexProfileInstaller) {
-    if (Test-Command "claude") {
-        try { claude plugin uninstall flex-agents@flex-agents 2>$null } catch { }
-    }
-    & $flexProfileInstaller -Profile flex -Target Both -Clean -Force
-    Write-Ok "Selected flex skill profile installed"
-}
-else {
-    Write-Warn "flex-agents profile installer not found - skipping selected skill installation"
-}
-
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host "  Workspace template setup finished." -ForegroundColor Green
