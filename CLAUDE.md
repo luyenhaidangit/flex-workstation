@@ -27,11 +27,11 @@
 
 ### Skill routing bắt buộc
 
-Với mọi task đọc, phân tích, review, tạo, sửa, refactor, fix hoặc xóa source code
-trong repository, Claude bắt buộc dùng `flex-using-agent-skills` làm điểm vào để
-xác định đầy đủ các skill chuyên môn phù hợp và thứ tự áp dụng.
+Với mọi task cần đọc, phân tích, review hoặc thay đổi file trong workspace hoặc repository con,
+Agent bắt buộc dùng `flex-using-agent-skills` làm điểm vào để xác định đầy đủ các skill
+chuyên môn phù hợp và thứ tự áp dụng.
 
-- Trước khi sửa source code, Claude phải: (1) đọc và làm theo
+- Trước khi bắt đầu task, Agent phải: (1) đọc và làm theo
   `flex-using-agent-skills`; (2) xác định tất cả skill áp dụng; và (3) đọc, áp dụng
   các skill bắt buộc.
 - Không được bỏ qua `flex-using-agent-skills` bằng cách chọn trực tiếp domain skill,
@@ -54,7 +54,7 @@ xác định đầy đủ các skill chuyên môn phù hợp và thứ tự áp 
 
 ## Skills
 
-Trước khi bắt đầu bất kỳ task mới nào, bắt buộc sử dụng `flex-using-agent-skills` để định tuyến và xác định skill phù hợp. Skill chuyên môn phải được đọc và áp dụng trước khi thực thi task:
+Sau khi routing, dùng bảng này như gợi ý bổ sung để xác định skill chuyên môn:
 
 | Context | Skill |
 | --- | --- |
