@@ -68,6 +68,16 @@ Use PostgreSQL-compatible SQL. Name indexes and approved constraints explicitly.
 - For write-heavy tables, favor compact, locality-friendly keys according to established repository practice. Do not introduce UUIDv4 as a primary key merely by habit.
 - Use clear, stable names for indexes and constraints. A migration should fail visibly when the expected schema is absent or incompatible, unless the requirement explicitly accepts a controlled idempotent path.
 
+Apply constraints deliberately: protect data integrity where the domain needs it, but do not add constraints by habit. Assess the write path, table volume, and the business consequence of invalid data before adding one.
+
+| Constraint | Typical write cost | Apply when |
+| --- | --- | --- |
+| `NOT NULL` | Negligible | The domain requires a value. Do not replace a meaningful unknown or optional value with an artificial default. |
+| `CHECK` for stable classified values | Very low | The domain value set is stable and the database must reject invalid persisted states. Keep it synchronized with the application contract. |
+| `DEFAULT` | Negligible | A value is correct when the writer omits the column; do not use it to silently compensate for a missing required business decision. |
+| `FOREIGN KEY` | Low to moderate | Referential integrity is owned by this database and the write path can accept the lookup/locking cost. Reassess for high-ingestion event logs or audit trails. |
+| `UNIQUE` | Moderate | The domain truly requires uniqueness, such as a canonical email or stable business code. Do not add it speculatively. |
+
 #### Indexes and expensive changes
 
 - Check table size, lock behavior, query need, and PostgreSQL capabilities before adding/rebuilding an index or changing a heavily used column.
