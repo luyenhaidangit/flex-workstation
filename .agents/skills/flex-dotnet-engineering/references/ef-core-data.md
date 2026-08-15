@@ -41,6 +41,28 @@ Keep database-generated defaults and non-null additions migration-safe for exist
 
 Choose cascade deletes deliberately. Prevent a relationship change from deleting a large graph unexpectedly. Use soft deletion only with explicit uniqueness, retention, query, authorization, and purge semantics.
 
+## Keep EF Core mapping outside the Domain layer
+
+For a solution with a separate Domain project, do not place EF Core persistence metadata
+on Domain entities, including `[Table]`, `[Column]`, `[ForeignKey]`, `[Index]`, or
+provider-specific attributes.
+
+Place table, schema, and column mapping; keys; relationships; indexes; conversions;
+precision; database defaults; and delete behavior in
+`Infrastructure/Persistence/Configurations` using `IEntityTypeConfiguration<T>`.
+Apply configurations from the Infrastructure assembly through
+`ModelBuilder.ApplyConfigurationsFromAssembly(...)`.
+
+Domain entities own business state, invariants, and transitions. They must not know
+table names, column names, schemas, ORM APIs, or provider-specific storage details.
+
+Data Annotations are acceptable only when the repository has no separate Domain /
+Infrastructure boundary and the local convention explicitly adopts them.
+
+When Liquibase owns schema changes, treat the approved database migration as the
+schema source of truth. EF Core configuration must match that schema; do not create
+a competing EF migration chain.
+
 ## Write efficient queries
 
 Start from the response or operation's required data. Filter, aggregate, order, and project in SQL:
