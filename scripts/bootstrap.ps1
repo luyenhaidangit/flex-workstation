@@ -258,6 +258,27 @@ else {
     Write-Warn "WinGet is missing. This is fine because the default Claude Code install path is the native installer."
 }
 
+if (Test-Command "cloudflared") {
+    Write-Ok "Cloudflare Tunnel found: $(Get-CommandVersion cloudflared)"
+}
+elseif (-not (Test-Windows)) {
+    Write-Warn "Cloudflare Tunnel is missing. Install cloudflared with your platform package manager."
+}
+elseif (-not (Test-Command "winget")) {
+    Write-Warn "Cloudflare Tunnel is missing and WinGet is unavailable. Install it with: winget install --id Cloudflare.cloudflared"
+}
+else {
+    Write-Host "Installing Cloudflare Tunnel with WinGet..."
+    winget install --id Cloudflare.cloudflared --source winget --accept-package-agreements --accept-source-agreements
+
+    if (Test-Command "cloudflared") {
+        Write-Ok "Cloudflare Tunnel installed: $(Get-CommandVersion cloudflared)"
+    }
+    else {
+        Write-Warn "Cloudflare Tunnel installation finished, but 'cloudflared' is not available in this terminal yet. Open a new terminal and run 'cloudflared --version'."
+    }
+}
+
 Write-Step "Configuring PowerShell UTF-8 encoding"
 Set-PowerShellUtf8Profile
 
