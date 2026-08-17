@@ -9,8 +9,9 @@ public static class SeriLogger
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
-            .Enrich.WithProperty("service.environment", builder.Environment.EnvironmentName.ToLowerInvariant())
-            .Enrich.WithProperty("host.name", Environment.MachineName)
+            .Enrich.With(new EcsLogEnricher())
+            .Enrich.WithProperty(LogFields.ServiceEnvironment, builder.Environment.EnvironmentName.ToLowerInvariant())
+            .Enrich.WithProperty(LogFields.HostName, Environment.MachineName)
             .CreateLogger();
 
         builder.Host.UseSerilog();

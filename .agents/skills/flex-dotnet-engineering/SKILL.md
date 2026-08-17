@@ -74,6 +74,13 @@ Inspect before designing or editing:
 
 Do not assume the newest runtime is compatible. Preserve the repository target unless an upgrade is requested or an unsupported version creates material risk; verify current support status from official sources before making a version recommendation.
 
+For a new service, a new API/Worker host, or any change to startup/configuration,
+inspect the closest healthy service's logging implementation before editing. Compare
+the host bootstrap, logging configuration, package references, structured enrichers,
+service identity, correlation fields, sinks, buffering, shutdown flush, and deployment
+route. Treat an installed logging package as insufficient evidence: the sink must be
+configured and its destination must be reachable in the target hosting mode.
+
 Before choosing a project or startup format, locate and read the repository's applicable scaffold/template and its matching examples. Treat explicit template lifecycle rules as a contract: if the template defines a required `Program.cs` flow, logging initialization, exception boundary, shutdown flush, or extension entry point, follow it even when sibling projects are inconsistent. Build the implementation from the template first, then adapt only the registrations and concerns that actually exist in the target project. Do not infer the required format from sibling projects alone.
 
 ### Phase 2 — Design: responsibility, contracts, and execution flow
@@ -104,6 +111,38 @@ For a new business system, begin with a modular monolith organized by business c
 Do not create interfaces, repositories, mediators, factories, DTO layers, or projects solely to match a diagram. Introduce an abstraction when it protects a real boundary, supports multiple implementations, isolates volatile infrastructure, improves testability of important policy, or removes demonstrated duplication.
 
 For Clean Architecture work, make the responsibility and dependency of every layer explicit before adding code. Implement one thin vertical slice from transport to durable state, then add cross-cutting policies and asynchronous integration only when their failure semantics are designed. Keep the host as the composition root; do not let HTTP, EF Core, vendor SDK, or broker types leak into stable business policy.
+
+### Logging pattern gate
+
+When creating a service or updating a backend service's host, configuration, or
+operational behavior, logging review is a required design gate:
+
+1. Select one or more current repository services as canonical examples and read the
+   source configuration, not generated `bin/` output. Prefer the closest service with
+   the same hosting and deployment model; if examples disagree, record the conflict
+   and follow the explicit repository/template rule.
+2. Verify the complete path, not just application code:
+   `host bootstrap → structured logger → sink/transport → collector or Logstash →
+   Elasticsearch/index or other approved backend`.
+3. Match the current pattern for `service.name`, environment/host fields, trace/span
+   correlation, exception fields, minimum levels, batching/backpressure, local
+   fallback, and graceful `Log.CloseAndFlush()`/shutdown behavior.
+4. For centralized logging, verify the sink is actually present in `WriteTo`, the
+   endpoint is configuration-driven or deliberately fixed by the repository pattern,
+   credentials are secret-safe, and the target is reachable from the service's real
+   process/container network. A package listed in `csproj` or `Using` alone does not
+   count.
+5. Check the receiving route and index naming. Confirm the collector can preserve or
+   derive the service identity so a new service cannot silently fall into another
+   service's default index.
+6. Confirm safe telemetry: no tokens, credentials, authorization headers, connection
+   strings, raw sensitive bodies, or unbounded high-cardinality payloads. Log once at
+   the handling boundary and keep useful error context plus correlation identifiers.
+
+For a service creation or backend update, Phase 4 must include at least a static
+configuration check and a runtime smoke check when the logging infrastructure is
+available. If the service was not restarted or the backend/index was not queried,
+report logging as configured-but-unverified rather than claiming end-to-end delivery.
 
 ### Phase 3 — Implement or diagnose
 
@@ -167,6 +206,14 @@ Unless the repository has a justified alternative:
 
 Use the executable scaffold at [`templates/clean-architecture-service`](templates/clean-architecture-service) as the starting point for a new ASP.NET Core service. The scaffold contains `.template` source files with `{Company}`, `{Service}`, `{company}`, and `{service}` placeholders and a `render.ps1` script for safe copy-and-substitute generation. Keep [`templates/clean-architecture-template.md`](templates/clean-architecture-template.md) as the architecture rationale and review checklist; it is not a substitute for the code scaffold.
 
+The scaffold's `src/{Company}.{Service}.Api/Logging/` directory is the reference code
+sample for service logging. Reuse its shape and update only repository-approved
+differences: `SeriLogger.cs` owns logger construction, `LogFields.cs` owns stable
+field names, `EcsLogEnricher.cs` adds correlation and safe exception fields, and
+`serilog.json` owns Console/file/HTTP sink configuration. Do not create a second
+logging sample elsewhere in the skill; keep this scaffold and the live repository
+pattern aligned when either changes.
+
 When creating a new service or restructuring an existing one, apply this short checklist:
 
 1. Choose the service identity and project names first: `{Company}.{Service}.Domain`, `{Company}.{Service}.Api` or `{Company}.{Service}.Worker`, and add `Infrastructure` or `Application` only when their boundaries are real.
@@ -174,6 +221,10 @@ When creating a new service or restructuring an existing one, apply this short c
 3. Centralize SDK defaults, package versions, formatting, and package sources at the repository root. Pin the SDK with `global.json` when reproducible local and CI builds matter.
 4. Add focused domain tests and at least one boundary/integration test for an API or worker. For ASP.NET Core integration tests, expose `public partial class Program;` when `WebApplicationFactory<Program>` is used.
 5. Add CI before the first feature is merged and verify with `dotnet restore`, `dotnet build --configuration Release`, `dotnet test`, and `git diff --check`.
+6. Establish logging before the service is considered operational: reuse the approved
+   repository pattern, configure structured service identity and correlation, retain
+   a safe local/console fallback, and verify delivery to the configured collector and
+   backend when those dependencies are available.
 
 ## Avoid cargo-cult patterns
 
@@ -229,11 +280,17 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A review finding with no code location, evidence, or triggering scenario attached
 - A verification command reported as passing without its actual output having been observed
 - A secret, token, connection string, or full request/response payload appearing in logs, telemetry, or an error response
+- A new service has a logging package or `Using` entry but no configured sink, no service identity, or no verified collector/backend route
+- A backend change copies a sibling logger without checking whether its endpoint matches the target process/container network
 
 ## Verification
 
 - [ ] Repository-provided verification commands ran and their actual output was observed, not assumed
 - [ ] When an applicable scaffold/template exists, the touched startup/configuration files were compared against it and all mandatory lifecycle rules were preserved
+- [ ] For a new service or backend startup/configuration change, the closest current service logging pattern was inspected and differences were intentional
+- [ ] Structured logging has a stable service identity, environment, correlation fields, safe exception context, and the approved Console/file fallback where applicable
+- [ ] Every configured centralized sink has a reachable route from the actual hosting mode, and the collector/index preserves the service identity
+- [ ] Runtime logging delivery was smoke-tested when infrastructure was available; otherwise the result explicitly says configured-but-unverified
 - [ ] Nullable/analyzer warnings on touched code are not suppressed or weakened merely to pass
 - [ ] Dependency direction still points inward: `Domain` has no HTTP, persistence, or vendor SDK reference
 - [ ] Every new abstraction (interface, repository, mediator) has a stated reason — protects a real boundary or has 2+ implementations
