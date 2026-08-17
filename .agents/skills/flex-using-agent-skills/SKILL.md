@@ -1,6 +1,6 @@
 ---
 name: flex-using-agent-skills
-description: Routes a task to the smallest applicable set of installed workspace skills. Use at the start of every task that reads, analyzes, reviews, or changes workspace or repository files.
+description: Routes a task to the smallest applicable set of installed workspace skills. Use when starting any task that reads, analyzes, reviews, or changes workspace or repository files.
 ---
 
 # Using Agent Skills
@@ -61,6 +61,7 @@ Select only skills that directly govern the task.
 | PostgreSQL schema, Liquibase changelog, migration, seed, index, constraint, database function, view, or trigger | `flex-database-engineering` |
 | C#/.NET, ASP.NET Core, EF Core, dependency injection, tests, architecture, or service implementation | `flex-dotnet-engineering` |
 | Angular UI in `flex-microfrontend`, including components, templates, forms, modals, and tables | `flex-frontend-engineering` |
+| Dockerfile, Docker Compose, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, or rollback | `flex-devops-engineering` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, or decisions about persistent agent context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
@@ -83,6 +84,9 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
 
 - A database migration that also changes C# persistence uses
   `flex-database-engineering` and `flex-dotnet-engineering`.
+- Infrastructure work that also changes application code or database schema uses
+  `flex-devops-engineering` plus the applicable frontend, .NET, database, or naming
+  skill. Keep artifact ownership distinct rather than duplicating domain rules.
 - A task that creates, renames, or exposes a backend/domain/public-contract symbol
   adds `flex-naming-convention` to its primary engineering skill.
 - A feature request starts with the applicable Speckit skill. A high-level request to
