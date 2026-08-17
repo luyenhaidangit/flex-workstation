@@ -7,9 +7,9 @@ description: Build and modify Angular UI (components, HTML templates, SCSS, form
 
 ## Overview
 
-`flex-microfrontend` is Angular 16 on the Skote Bootstrap 5 admin template. There is no separate design-system package — the "design system" is the set of shared components under `src/app/shared/ui/` and `src/app/core/components/`, plus recurring Bootstrap utility patterns already used across `src/app/pages/**`. New screens must **reuse these**, not reinvent tables, modals, badges, or loading states from raw Bootstrap classes.
+`flex-microfrontend` is Angular 16 on the Skote Bootstrap 5 admin template. There is no separate design-system package. The effective design system is distributed across shared components (`src/app/shared/`, `src/app/shared/ui/`), core components (`src/app/core/components/`), feature-local components, third-party wrappers registered by feature modules, and recurring Bootstrap utility patterns already used across `src/app/**`. New screens must **reuse the best existing fit**, not reinvent tables, modals, editors, badges, or loading states from raw Bootstrap classes.
 
-This skill is descriptive of what the codebase already does (verified against `pages/master/issuer/*` and `pages/system/user/*`), not a generic Angular/Bootstrap style guide. When in doubt, grep for a sibling screen under `pages/master/` or `pages/system/` and match it rather than inventing a new pattern.
+This skill is descriptive of what the codebase already does (verified against `pages/master/issuer/*` and `pages/system/user/*`), not a generic Angular/Bootstrap style guide. When in doubt, grep the whole `src/app/` tree for a sibling screen or existing capability and match the closest valid pattern rather than inventing a new one.
 
 ## When to Use
 
@@ -20,10 +20,16 @@ This skill is descriptive of what the codebase already does (verified against `p
 
 ## Required checks before writing markup
 
-1. Find an existing screen doing the same job (list page, CRUD modal, approval flow) under `pages/master/` or `pages/system/` and use it as the template.
-2. Check `src/app/shared/ui/*` and `src/app/core/components/pagination/` for a component that already does what you're about to build by hand.
-3. Feature module (`*.module.ts`) **must** import `SharedModule` (provides `safeField` pipe) and `PaginationModule` (provides `<app-pagination>`).
-4. Never write a custom modal backdrop, spinner, or table skeleton — the patterns below exist precisely so nothing does that.
+1. Identify the capability you need before writing markup (for example: editor, modal, table, pagination, loading state, tabs, select, upload, or validation feedback).
+2. Search for an existing fit across the whole frontend, not only `src/app/shared/ui/`. Check, in this order:
+   - shared and core sources: `src/app/shared/`, `src/app/shared/ui/`, `src/app/core/components/`;
+   - the current feature and sibling features under `src/app/features/` and `src/app/pages/`;
+   - feature module imports and package dependencies for approved third-party wrappers (for example `CKEditorModule`, `NgSelectModule`, or upload components);
+   - existing templates and SCSS for a repeated markup pattern when no reusable component exists.
+3. Prefer the closest existing component or wrapper that already matches the behavior and visual language. Adapt its inputs/configuration and styling before creating new markup. If no component exists, follow the nearest sibling pattern and keep the new markup local; do not create a shared abstraction for a one-off use.
+4. Find an existing screen doing the same job (list page, CRUD modal, approval flow) and use it as the template, regardless of whether it lives under `pages/master/`, `pages/system/`, `pages/`, or `features/`.
+5. Feature module (`*.module.ts`) **must** import the Angular/shared modules required by the selected component. For list pages, this includes `SharedModule` (provides `safeField` pipe) and `PaginationModule` (provides `<app-pagination>`).
+6. Never write a custom modal backdrop, spinner, or table skeleton — the patterns below exist precisely so nothing does that.
 
 ## Shared components — use these, don't hand-roll
 
@@ -39,7 +45,14 @@ This skill is descriptive of what the codebase already does (verified against `p
 | Uppercase code inputs, no spaces | `appUpperNoSpace` directive | `shared/directives/upper-nospace.directive.ts` |
 | Uppercase code inputs, no accents | `appUpperNoAccent` directive | `shared/directives/upper-noaccent.directive.ts` |
 
-If a screen needs something not in this table, check whether a near-identical widget already exists before writing new CSS/markup from scratch.
+This table is not an exhaustive inventory. If a need is not listed, search the whole frontend and module dependencies for an existing component or wrapper before writing new CSS/markup from scratch.
+
+### Component discovery rules
+
+- Search by capability and selector/import names, not only by folder. A reusable editor may be provided by a package module and demonstrated under `src/app/pages/`, while a domain widget may live inside `src/app/features/`.
+- Treat an existing implementation as reusable only after checking its module visibility, inputs/outputs, reactive-form support, styling dependencies, and whether its behavior fits the current use case.
+- Prefer reuse in this order: existing shared/core component → existing feature component that can be safely consumed → approved third-party wrapper already used in the repo → local markup copied from the closest sibling pattern.
+- Do not force an unrelated shared component merely because it exists. Record the reason when choosing local markup (for example, different interaction contract or incompatible data model).
 
 ## List/table page pattern
 
@@ -268,6 +281,6 @@ Non-editable/system fields (e.g. codes after creation) use `class="form-control 
 - [ ] Create/Edit modal includes Status dropdown (`active` / `inactive`) when applicable
 - [ ] List/table pages render all three `<tbody>` states: skeleton loading, data, empty
 - [ ] Modals follow the `isVisible` input / `close` output / result-event contract, not a modal service
-- [ ] Shared components (`app-page-title`, `app-tabs`, `app-skeleton`, `app-badge`, `app-pagination`, `safeField` pipe) are reused instead of re-implemented
+- [ ] The closest existing component, wrapper, or sibling pattern was searched across `src/app/` and reused when compatible; listed shared components (`app-page-title`, `app-tabs`, `app-skeleton`, `app-badge`, `app-pagination`, `safeField` pipe) are not treated as the only valid sources
 - [ ] Form fields use `isFieldInvalid`/`getFieldError` + `invalid-tooltip`, copied from an existing modal, not a new validation UI
 - [ ] Action/semantic colors are consistent between modal title, icon, and submit button
