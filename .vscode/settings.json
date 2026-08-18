@@ -4,7 +4,23 @@
   },
   "git.autoRepositoryDetection": "subFolders",
   "scm.alwaysShowRepositories": true,
+  // Cấu hình search vscode
   "search.useIgnoreFiles": false,
+  "search.exclude": {
+    "**/.angular/cache/**": true,
+    "**/node_modules/**": true,
+    "**/bin/**": true,
+    "**/obj/**": true,
+    "**/dist/**": true,
+    "**/out-tsc/**": true,
+    "**/coverage/**": true,
+    "**/.git/**": true,
+    "**/.vs/**": true,
+    "**/.idea/**": true,
+    "**/.terraform/**": true,
+    "**/logs/**": true,
+    "**/*.log": true
+  },
   "typescript.tsdk": "flex-microfrontend/node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   // Cấu hình full quyền cho antigravity
