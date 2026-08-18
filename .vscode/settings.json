@@ -4,7 +4,7 @@
   },
   "git.autoRepositoryDetection": "subFolders",
   "scm.alwaysShowRepositories": true,
-  // Cấu hình search vscode
+  // Workspace search configuration
   "search.useIgnoreFiles": false,
   "search.exclude": {
     "**/.angular/cache/**": true,
