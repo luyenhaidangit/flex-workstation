@@ -378,3 +378,17 @@ Nếu có, hệ thống PHẢI ghi nhận:
 - [ ] Phân quyền/bảo mật đã rõ hoặc được đánh dấu là câu hỏi mở.
 - [ ] Ngoài phạm vi đã rõ.
 - [ ] Các câu hỏi mở quan trọng đã được trả lời hoặc được chấp nhận là rủi ro.
+
+---
+
+## 20. Đánh giá tác động tài liệu nghiệp vụ
+
+<!--
+  Do /speckit-docbiz cập nhật sau lần sửa cuối của spec và trước /speckit-plan.
+  Đây là đánh giá bắt buộc, nhưng không bắt buộc tạo hoặc sửa tài liệu khi thay đổi
+  không làm đổi ý nghĩa nghiệp vụ cho BA/stakeholder.
+-->
+
+- **Trạng thái**: CHƯA ĐÁNH GIÁ
+- **Căn cứ**: [Section/spec fact chứng minh có hoặc không có tác động đáng kể]
+- **Tài liệu đã cập nhật**: [Path tài liệu hiện hữu, hoặc "Không áp dụng"]

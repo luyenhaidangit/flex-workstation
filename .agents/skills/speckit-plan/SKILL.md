@@ -63,7 +63,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 1. **Setup**: Run `.specify/scripts/powershell/setup-plan.ps1 -Json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. If script fails or spec file (`spec.md`) is missing, abort immediately and instruct user to run `/speckit-specify` first (do not create or plan without a spec). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-2. **Load context**: Verify FEATURE_SPEC exists on disk and read FEATURE_SPEC and `.specify/memory/constitution.md`. Load IMPL_PLAN template (already copied). If the feature touches database/schema/migration, also read `docs/architecture/system-map.md` (Projects, Data Architecture sections) before filling "Dữ liệu & Migration" — per Constitution VI, the target database and the repo that owns its migration script must be analyzed and cited, never assumed by habit (e.g. defaulting to the service repo being implemented).
+2. **Load context**: Verify FEATURE_SPEC exists on disk and read FEATURE_SPEC and `.specify/memory/constitution.md`. Verify `FEATURE_SPEC` contains a completed `## 20. Đánh giá tác động tài liệu nghiệp vụ` from `/speckit-docbiz` after the most recent spec update. If the section is missing or marked `CHƯA ĐÁNH GIÁ`, stop and instruct the user to run `/speckit-docbiz`; do not plan until the Documentation Impact Gate has a result. Load IMPL_PLAN template (already copied). If the feature touches database/schema/migration, also read `docs/architecture/system-map.md` (Projects, Data Architecture sections) before filling "Dữ liệu & Migration" — per Constitution VI, the target database and the repo that owns its migration script must be analyzed and cited, never assumed by habit (e.g. defaulting to the service repo being implemented).
 
 3. **Route specialist skills**: Use `flex-using-agent-skills` once with the technical
    context and planned artifacts. Keep `speckit-plan` as the active lifecycle skill;
@@ -73,6 +73,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 4. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
+   - Copy the completed Documentation Impact Gate result from `spec.md` §20 into `Tác động tài liệu nghiệp vụ`; name every existing document and section that still needs work after implementation
    - Fill Constitution Check section from constitution
    - Evaluate gates (ERROR if violations unjustified)
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)

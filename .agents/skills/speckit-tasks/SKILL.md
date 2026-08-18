@@ -67,6 +67,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
    - **Optional**: data-model.md (entities), contracts/ (interface contracts), research.md (decisions), quickstart.md (test scenarios)
    - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints
+   - Read `plan.md` section `Tác động tài liệu nghiệp vụ` and `spec.md` §20. Do not infer a documentation task from the feature name or an example task.
    - Note: Not all projects have all documents. Generate tasks based on what's available.
 
 3. **Check plan readiness checklist** (in plan.md, section `Checklist sẵn sàng cho /speckit-tasks`):
@@ -96,6 +97,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Phase 2: Foundational tasks (blocking prerequisites for all user stories)
    - Phase 3+: One phase per user story (in priority order from spec.md)
    - Each phase includes: story goal, independent test criteria, test tasks required by risks and test strategy in `plan.md`, implementation tasks
+   - Add a documentation task only when `Tác động tài liệu nghiệp vụ` names an outstanding update after implementation; use its exact existing document path and section. Otherwise omit that task.
    - Final Phase: Polish & cross-cutting concerns
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task

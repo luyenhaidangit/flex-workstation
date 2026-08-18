@@ -74,6 +74,8 @@ Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất 
 
 **Gate bắt buộc giữa các bước**: Mỗi lệnh `/speckit-*` là bước người dùng gọi tường minh. Sau khi hoàn thành, DỪNG và chờ — không tự chuyển sang bước tiếp theo. "Suggested next step" chỉ là thông tin, không phải lệnh. `/speckit-implement` chỉ chạy khi được gọi trực tiếp. Lệnh cấp cao như "implement X" chỉ tương đương với `/speckit-specify`, không phải toàn bộ pipeline.
 
+Trước `/speckit-plan`, PHẢI gọi `/speckit-docbiz` sau lần cập nhật cuối của `spec.md`. Đây là Documentation Impact Gate: luôn đánh giá tác động, nhưng chỉ sửa tài liệu khi luồng, vai trò, quy tắc, thực thể hoặc phạm vi nghiệp vụ có thay đổi đáng kể; ưu tiên cập nhật section của tài liệu hiện hữu.
+
 ## Cấu trúc project
 
 ```text

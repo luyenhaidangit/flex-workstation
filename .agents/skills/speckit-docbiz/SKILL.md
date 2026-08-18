@@ -1,6 +1,6 @@
 ---
 name: "speckit-docbiz"
-description: "Synthesize the current feature spec into a business narrative document in docs/business/ — written for BA and non-technical stakeholders."
+description: "Use when a feature spec changes: assess its business-documentation impact, then update the relevant existing business documents or create one only when no suitable document exists."
 argument-hint: "Optional notes or extra context for the business doc"
 compatibility: "Requires .specify/feature.json and a completed spec.md"
 metadata:
@@ -26,31 +26,54 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ### 1. Locate the current feature spec
 
-Resolve `FEATURE_DIR` using this priority order:
-1. If the environment variable `SPECIFY_FEATURE_DIRECTORY` is set, use its value as `FEATURE_DIR`.
-2. Otherwise, read `.specify/feature.json` and use the `feature_directory` field as `FEATURE_DIR`.
+Resolve `FEATURE_DIR` using `SPECIFY_FEATURE_DIRECTORY`, falling back to
+`.specify/feature.json`. Load `<FEATURE_DIR>/spec.md`; if it does not exist, stop
+with: "spec.md not found in {FEATURE_DIR}. Run /speckit-specify first."
 
-`FEATURE_DIR` example: `specs/000013-trading-session-bots`.
+Extract the feature number prefix and short display name from the directory name.
 
-- Extract the **feature number prefix** from the directory name: the leading digit sequence before the first `-` (e.g. `000013`).
-- Derive a **short display name** from the directory name: strip the numeric prefix and replace hyphens with spaces (e.g. `trading session bots`).
+### 2. Run the Documentation Impact Assessment
 
-Load `<FEATURE_DIR>/spec.md`.
-- If it does not exist, stop with: "spec.md not found in {FEATURE_DIR}. Run /speckit-specify first."
+This assessment is mandatory even when no document will be changed. Compare the
+feature's business scope with the existing documentation and classify the result:
 
-### 2. Check for an existing business doc
+- **Material — update required**: the spec adds or changes an end-to-end business
+  flow, actor responsibility or hand-off, business rule, business entity/lifecycle,
+  business scope, or a stakeholder-facing compliance obligation.
+- **Not material — no update required**: the change is implementation-only,
+  refactoring, test/observability/performance work, or does not alter the business
+  meaning already documented.
 
-Scan `docs/business/` for any `.md` file whose content contains the feature spec number (e.g. `000013`). Also check if any file references the feature directory path.
+Do not treat a new feature number, a new API, or a technical design decision alone
+as evidence of material documentation impact. State the concrete spec sections and
+business facts that support the decision.
 
-- **If found**: `DOC_FILE = <that file path>`, `MODE = update`
-- **If not found**: `MODE = create`
-  - Count existing `.md` files in `docs/business/` to determine the next sequential number (e.g. if `01-*` and `02-*` exist, next is `03`). Zero-pad to 2 digits.
-  - Derive `DOC_SLUG` from the feature directory short name: use the portion after the numeric prefix, keep hyphens (e.g. `trading-session-bots`).
-  - `DOC_FILE = docs/business/<NN>-<DOC_SLUG>.md`
+### 3. Find the right document before creating anything
 
-### 3. Extract business content from spec.md
+Scan existing Markdown under `docs/business/` first, including
+`business-docs-index.md`. Then scan other stakeholder-facing files under `docs/`
+when the business subject is documented there. Match candidates in this order:
 
-Read `spec.md` and extract only the business-relevant elements listed below. **Skip implementation details, technical constraints, and acceptance criteria details** — those belong in the spec.
+1. Explicit links to `FEATURE_DIR` or its feature number.
+2. The same business domain, actor chain, entity, or end-to-end flow.
+3. A cross-cutting document whose stated scope includes the changed rule or flow.
+
+Do not select a document merely because it shares a generic word. Record the
+evidence for every selected candidate.
+
+- If the impact is **not material**, set `MODE = no-change`; do not create or edit a
+  business document.
+- If one or more suitable documents exist, set `MODE = update` and keep their
+  existing filenames. Multiple documents may be updated when the change genuinely
+  affects each of them.
+- Create `docs/business/<NN>-<slug>.md` only when the impact is material and no
+  suitable document exists. Derive `<NN>` from the highest existing two-digit
+  business-document prefix, not from the number of Markdown files.
+
+### 4. Extract only the business content needed for the change
+
+Read `spec.md` and extract only the business-relevant elements below. Skip
+implementation details, technical constraints, and acceptance-criteria mechanics.
 
 | Spec section | What to extract |
 |---|---|
@@ -64,9 +87,17 @@ Read `spec.md` and extract only the business-relevant elements listed below. **S
 | Section 15 (Ngoài phạm vi) | Out-of-scope items; group by theme |
 | Section 17 (Phụ thuộc) | Related documents for the reference section |
 
-### 4. Generate the business narrative document
+### 5. Update conservatively or create a narrowly scoped document
 
-Write **entirely in Vietnamese**. Audience: BA and non-technical stakeholders who need to understand WHAT this MVP does and WHY, without reading technical specs or code.
+Write entirely in Vietnamese for BA and non-technical stakeholders.
+
+For `MODE = update`, edit only the sections affected by the assessed change. Preserve
+unrelated content, existing structure, history, links, and filename. Do not replace
+the whole document with a fresh feature narrative, duplicate an existing flow, or
+invent a new document just to match the current feature number. Add or adjust the
+spec trace link where appropriate.
+
+For `MODE = create`, generate one business narrative using this structure:
 
 - Explain the real-world business domain being simulated — not just the system behavior.
 - Use plain, concrete language. Prefer examples over abstractions.
@@ -121,17 +152,27 @@ Use this document structure:
 [+ any external regulation links or dependency docs extracted from spec Section 17]
 ```
 
-### 5. Write or update the document
+### 6. Record the gate decision and update the index when needed
 
-- **MODE = create**: Write the generated content to `DOC_FILE`. Create `docs/business/` if it does not exist.
-- **MODE = update**: Overwrite the existing file at `DOC_FILE` with the newly generated content. Do not change the filename.
+Update `spec.md` section `## 20. Đánh giá tác động tài liệu nghiệp vụ` with:
 
-### 6. Completion Report
+- assessment status: `CÓ CẬP NHẬT` or `KHÔNG CẦN CẬP NHẬT`;
+- concise evidence from the spec;
+- every document changed, or `Không áp dụng` for `MODE = no-change`.
+
+If that section is absent in an older spec, add it after section 19 without
+reordering unrelated content.
+
+For `MODE = create`, also update `docs/business/business-docs-index.md` in its
+appropriate existing category. Do not add an index row for a no-change assessment.
+
+### 7. Completion Report
 
 Report to the user:
-- `DOC_FILE` — path of the written document
-- Mode: created / updated
-- Key sections included
+- Documentation impact: material / not material, with the reason
+- Mode: no change / updated / created
+- `DOC_FILES` — paths changed, if any
+- Sections updated and documents considered
 - Next step if applicable (e.g. `/speckit-plan` if planning has not started)
 
 **HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-plan` or any other command. Report completion and wait for the user to explicitly invoke the next step.
@@ -140,6 +181,8 @@ Report to the user:
 
 - [ ] `FEATURE_DIR` resolved (`SPECIFY_FEATURE_DIRECTORY` env var, or `.specify/feature.json` fallback)
 - [ ] `spec.md` loaded from the feature directory
-- [ ] `docs/business/` scanned for an existing doc matching this feature
-- [ ] Business narrative document written to `DOC_FILE`
-- [ ] Completion reported to user with file path and mode
+- [ ] Documentation impact assessed against concrete business changes
+- [ ] Existing documentation scanned and selected by evidence before any creation
+- [ ] `spec.md` documentation-impact section updated
+- [ ] Existing document updated minimally, or a new document and its index entry created only when required
+- [ ] Completion reported with the assessment and affected paths

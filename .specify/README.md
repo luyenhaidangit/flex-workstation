@@ -9,6 +9,10 @@ Muốn hiểu **luồng làm việc** (bước nào chạy trước/sau, khi nà
 [`docs/speckit/workflow.md`](../docs/speckit/workflow.md) — đó là tài liệu
 canonical, không phải thư mục này.
 
+Sau lần cập nhật cuối của `spec.md`, bắt buộc chạy `speckit-docbiz` trước
+`speckit-plan`. Đây là Documentation Impact Gate: đánh giá mọi thay đổi nhưng chỉ
+cập nhật section của tài liệu hiện hữu khi có tác động nghiệp vụ đáng kể.
+
 ## Cấu trúc
 
 | Đường dẫn | Nội dung |

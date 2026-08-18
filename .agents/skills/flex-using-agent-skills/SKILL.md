@@ -73,7 +73,7 @@ Select only skills that directly govern the task.
 | Implement approved tasks | `speckit-implement` |
 | Assess remaining implementation gaps | `speckit-converge` |
 | Create a feature checklist | `speckit-checklist` |
-| Produce a business narrative from a feature spec | `speckit-docbiz` |
+| Assess a feature's business-documentation impact and update the relevant documentation | `speckit-docbiz` |
 | Create or update the project constitution | `speckit-constitution` |
 | Convert approved tasks into GitHub issues | `speckit-taskstoissues` |
 

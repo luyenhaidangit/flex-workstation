@@ -60,7 +60,7 @@ Thiết lập nguyên tắc: `$speckit-constitution`
 |------|------------|---------|
 | 1 | `$speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
 | 2 | `$speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
-| 2a | `$speckit-docbiz` | **Optional hook** sau specify/clarify — đồng bộ tài liệu BA trong `docs/business/` |
+| 2a | `$speckit-docbiz` | **Documentation Impact Gate bắt buộc** sau lần cập nhật cuối của `spec.md`, trước plan — đánh giá và chỉ cập nhật tài liệu nghiệp vụ khi có tác động đáng kể |
 | 3 | `$speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
 | 4 | `$speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
 | 5 | `$speckit-tasks` | Sinh task list theo dependency order |
@@ -80,6 +80,7 @@ Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 - Sau khi mỗi lệnh hoàn thành, DỪNG và chờ người dùng gọi lệnh tiếp theo tường minh.
 - `$speckit-implement` chỉ chạy khi người dùng gọi trực tiếp — không bao giờ tự chạy.
 - Lệnh cấp cao như "thực hiện X" hay "implement X" chỉ tương đương với bước 1 (`$speckit-specify`) — không phải toàn bộ pipeline.
+- Trước `$speckit-plan`, PHẢI gọi `$speckit-docbiz` sau lần cập nhật cuối của `spec.md`. Skill này luôn đánh giá tác động tài liệu; chỉ cập nhật khi thay đổi làm đổi luồng nghiệp vụ, vai trò, quy tắc, thực thể hoặc phạm vi mà BA/stakeholder cần biết. Khi cần cập nhật, ưu tiên chỉnh đúng phần của tài liệu hiện hữu; chỉ tạo tài liệu mới khi không có tài liệu phù hợp.
 
 ## Tooling Codex
 

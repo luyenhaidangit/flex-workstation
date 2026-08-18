@@ -1,13 +1,3 @@
-hooks:
-  after_specify:
-    - extension: "speckit-docbiz"
-      command: "speckit-docbiz"
-      description: "Cập nhật tài liệu nghiệp vụ trong docs/business/ sau khi spec hoàn thành"
-      optional: true
-      enabled: true
-  after_clarify:
-    - extension: "speckit-docbiz"
-      command: "speckit-docbiz"
-      description: "Đồng bộ tài liệu nghiệp vụ trong docs/business/ sau khi clarify cập nhật spec"
-      optional: true
-      enabled: true
+# Documentation Impact Gate là bước người dùng gọi tường minh trước speckit-plan;
+# không dùng hook tự chạy để giữ nguyên gate giữa các lệnh Speckit.
+hooks: {}

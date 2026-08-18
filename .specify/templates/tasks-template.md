@@ -147,6 +147,7 @@ Khi sinh `tasks.md`, phải đảm bảo:
 - Mỗi endpoint/event trong `contracts/` có task implementation hoặc contract test tương ứng khi áp dụng.
 - Mỗi constraint trong `plan.md` có task hoặc ghi chú xử lý tương ứng.
 - Rollout, rollback, migration, feature flag, observability và security review có task khi `plan.md` đánh dấu liên quan.
+- Không sinh task tài liệu mặc định. Chỉ sinh task khi `plan.md` §Tác động tài liệu nghiệp vụ nêu cập nhật còn lại sau implementation; task phải chỉ rõ tài liệu hiện hữu và section cần sửa.
 - FR chứa nhiều điều kiện hoặc vế khác nhau (ví dụ: "từ chối X; sau khi Y thì Z"): mỗi vế phải xuất hiện tường minh trong description của ít nhất một task — không đủ khi chỉ liệt kê FR ID trong traceability.
 
 ## Quy ước path
@@ -340,7 +341,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 
 **Mục đích**: Hoàn tất kiểm tra chéo, tài liệu, observability và validation ảnh hưởng nhiều user story.
 
-- [ ] T027 [P] Cập nhật tài liệu feature trong `docs/[feature-name].md`
+- [ ] T027 [P] Chỉ khi `plan.md` §Tác động tài liệu nghiệp vụ yêu cầu: cập nhật section đã nêu trong tài liệu hiện hữu tại `[path thật]`
 - [ ] T028 Kiểm tra error response không leak internal exception trong `backend/src/Features/[FeatureName]/Endpoints/`
 - [ ] T029 Kiểm tra log không chứa token, secret, API key hoặc dữ liệu nhạy cảm trong `backend/src/Application/[FeatureName]/`
 - [ ] T030 Kiểm tra authorization cho toàn bộ endpoint mới trong `backend/tests/Integration/[FeatureName]PermissionTests.cs`

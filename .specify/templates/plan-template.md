@@ -227,6 +227,17 @@
 **Regression test**:
 - [Luồng hiện có có nguy cơ bị ảnh hưởng hoặc "Không áp dụng"]
 
+## Tác động tài liệu nghiệp vụ
+
+- **Kết quả Documentation Impact Gate**: [CÓ CẬP NHẬT / KHÔNG CẦN CẬP NHẬT]
+- **Tham chiếu đánh giá**: `spec.md` §20
+- **Tài liệu hiện hữu đã cập nhật**: [Path + section, hoặc "Không áp dụng"]
+- **Cập nhật còn lại sau implementation**: [Task có path/section cụ thể, hoặc "Không áp dụng"]
+
+Không tạo task tài liệu mặc định. Nếu implementation làm thay đổi luồng nghiệp vụ đã
+được đánh giá, cập nhật `spec.md` rồi chạy lại `/speckit-docbiz` trước khi sinh task
+tương ứng.
+
 ## Cấu trúc project
 
 ### Tài liệu cho feature này

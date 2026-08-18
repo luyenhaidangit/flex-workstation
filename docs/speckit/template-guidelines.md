@@ -25,6 +25,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Spec template cần có phạm vi MVP, mapping `US`/`AC` về `FR`, và trạng thái dữ liệu/lỗi phổ biến để tránh scope creep và giúp task/test traceable.
 - Spec template cần có người phụ trách, stakeholder xác nhận, và quy tắc nghiệp vụ `BR` để làm rõ ai quyết định scope/rule. Hai trường metadata mặc định dùng `git config user.name`.
 - Spec template cần tách phân quyền/bảo mật, audit/lịch sử thay đổi, và checklist sẵn sàng lập plan kỹ thuật để tránh chuyển sang `/plan` khi spec còn mơ hồ.
+- Spec template cần có kết quả Documentation Impact Gate do `/speckit-docbiz` quản lý. Đánh giá này luôn bắt buộc trước plan, nhưng chỉ yêu cầu cập nhật tài liệu khi luồng, vai trò, quy tắc, thực thể/vòng đời, phạm vi hoặc compliance có tác động đáng kể tới BA/stakeholder.
 - Không xóa section tùy chọn trong spec template; ghi `Không áp dụng` để giữ cấu trúc ổn định cho AI/automation.
 - `FR` cần có priority `[P1]`/`[P2]`/`[P3]` và trace ngược về `US`/`AC`; `Thực thể dữ liệu` đứng trước phân quyền/audit để làm rõ đối tượng nghiệp vụ trước khi xác định quyền.
 
@@ -32,6 +33,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 
 - Plan template phải nối spec với thiết kế kỹ thuật bằng traceability từ `US`/`FR` sang module/path, API/contract, data/entity và kiểm thử tương ứng.
 - Plan template cần có phạm vi kỹ thuật, phân tích tác động, quyết định kỹ thuật, rollout/rollback, observability/debug và checklist sẵn sàng trước khi chạy `/speckit-tasks`.
+- Plan template cần phản chiếu kết quả Documentation Impact Gate từ `spec.md`: tài liệu hiện hữu đã cập nhật và mọi cập nhật còn lại sau implementation. Không tạo task tài liệu mặc định.
 - Plan template cần có tóm tắt đúng lifecycle, câu hỏi kỹ thuật cần research, thiết kế tổng quan, chiến lược kiểm thử, và dữ liệu/migration riêng cho feature có DB/data.
 - Bối cảnh kỹ thuật trong plan template ưu tiên ví dụ gần hệ thống backend/enterprise: service/app liên quan, đơn vị deploy, nền tảng chạy, framework/package/internal SDK, storage và test stack thực tế.
 - Bối cảnh kỹ thuật cần khai `Convention skill áp dụng`, map skill quy ước (vd. `flex-dotnet-engineering`, `flex-frontend-engineering`) theo từng service/app khi feature chạm nhiều repo/stack, để `/speckit-implement` biết skill nào cần nạp trước khi code.
@@ -82,6 +84,7 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Task có phụ thuộc rõ phải ghi dependency task ID; mỗi user story cần có `Definition of Done`, và output cuối nên có `Traceability Matrix` map `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` sang task.
 - Tasks template cần có rule riêng cho data/migration safety và API/event contract: không gộp migration schema với business handler, có backward compatibility/backfill/rollback note khi cần, và contract quan trọng có implementation/test task tương ứng.
 - Không sinh test task hình thức; test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
+- Chỉ sinh task tài liệu khi `plan.md` xác định cập nhật còn lại sau implementation, và task phải nêu tài liệu hiện hữu cùng section cụ thể; không dùng path placeholder hoặc tạo file mới theo mặc định.
 - Test Gate của constitution có hiệu lực cao hơn lựa chọn tùy chọn: mọi rủi ro trong `plan.md` phải có test task theo chiến lược kiểm thử, hoặc manual/command validation cụ thể kèm lý do không áp dụng automated test.
 - Output cuối của `/speckit-tasks` chỉ sinh phase cho user story thật trong `spec.md`, không giữ placeholder, `TXXX`, `Phase N`, phase ví dụ hoặc tự tạo đủ `US1`/`US2`/`US3` khi spec không có.
 - Nếu một user story không có automated test task, tasks output phải có manual validation task hoặc command validation task để dev có task verify cụ thể.
