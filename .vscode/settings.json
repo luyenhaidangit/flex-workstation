@@ -4,6 +4,7 @@
   },
   "git.autoRepositoryDetection": "subFolders",
   "scm.alwaysShowRepositories": true,
+  "search.useIgnoreFiles": false,
   "typescript.tsdk": "flex-microfrontend/node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   // Cấu hình full quyền cho antigravity
