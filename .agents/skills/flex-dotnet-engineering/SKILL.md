@@ -112,6 +112,37 @@ Do not create interfaces, repositories, mediators, factories, DTO layers, or pro
 
 For Clean Architecture work, make the responsibility and dependency of every layer explicit before adding code. Implement one thin vertical slice from transport to durable state, then add cross-cutting policies and asynchronous integration only when their failure semantics are designed. Keep the host as the composition root; do not let HTTP, EF Core, vendor SDK, or broker types leak into stable business policy.
 
+### Keep HTTP controllers at the transport boundary
+
+Keep controllers focused on routing, binding, authentication/authorization context,
+calling one use case, and translating that use case's outcome to HTTP. A controller
+may perform a short, one-off response projection, but it must not accumulate
+application orchestration.
+
+When an endpoint coordinates more than one repository or external port, batches or
+joins related data, applies application-level authorization/decision logic, owns a
+transaction, or has logic that another transport could reuse, move that work to one
+focused Application command/query handler. Name it after the use case, such as
+`GetAgentsQueryHandler`, rather than creating a generic `AgentService` or a handler
+per entity by default.
+
+- Application owns use-case input and read/write models. A read handler may return a
+  purpose-specific application read model and project only the data it needs; it does
+  not need to hydrate an aggregate solely for an API response.
+- Presentation owns public request/response DTOs, HTTP status codes, and mapping from
+  an application result to its HTTP contract. Do not make Application depend on an
+  API DTO merely to shorten a controller.
+- Infrastructure implements Application-owned ports. Do not introduce a mediator,
+  generic query service, generic repository, or interface for a single concrete
+  handler unless the repository already uses it or a real substitution/pipeline
+  boundary exists.
+- Keep the refactor at the operation boundary. Moving `GET /agents` into a query
+  handler does not authorize an unrelated rewrite of every action in `AgentsController`.
+
+For simple CRUD that has no meaningful orchestration, keep the direct endpoint flow
+and do not add an Application project, handler, or abstraction only to imitate a
+diagram.
+
 ### Logging pattern gate
 
 When creating a service or updating a backend service's host, configuration, or
@@ -317,6 +348,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 | "I ran the tests" (but didn't check the output) | A command that wasn't observed to succeed can't be reported as passing. State what actually ran and what its result was. |
 | "Every DTO needs its own mapper class or generic mapper interface" | Group pure mappings by aggregate ownership (`AgentMapper`) and split only at a real domain or contract boundary; abstractions without variation add indirection, not safety. |
 | "Making a new controller dependency nullable is the fastest way to keep old tests compiling" | That weakens the production contract and leaves dead branches. Compose required dependencies in the tests and verify the collaboration instead. |
+| "I can put the API response DTO in the query handler to make the controller thinner" | That reverses ownership of the HTTP contract. Let Application return a purpose-specific result and map it in Presentation. |
+| "Every endpoint needs a handler, mediator, and repository to be Clean Architecture" | Clean Architecture protects responsibilities and dependency direction; straightforward CRUD can remain direct when no use-case boundary is needed. |
 
 ## Red Flags
 
@@ -334,6 +367,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A `Common`, `Shared`, or generic mapper layer owns unrelated aggregate mappings with no stable owner
 - A mapper performs validation, authorization, timestamp/default assignment, repository access, I/O, or aggregate mutation
 - A controller still builds a reusable DTO inline after an aggregate mapper exists
+- A controller batches/join data from multiple repositories, coordinates external ports, or makes application decisions that belong in a focused command/query handler
+- An Application handler imports an API request/response DTO or returns HTTP-specific status/result types
 - A required controller dependency is changed to nullable to avoid updating direct controller construction in tests
 
 ## Verification
@@ -353,5 +388,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] Every mapper sits at the project boundary that owns its destination contract and does not reverse dependency direction
 - [ ] Aggregate mappings use a focused `<Aggregate>Mapper` with explicit target methods; unrelated mappings are not mixed into it
 - [ ] Mappers contain only pure transformation; validation, business decisions, I/O, and trusted values remain outside
+- [ ] Each controller action either remains a simple transport flow or delegates its orchestration to one focused Application use case
+- [ ] Application query/command results are free of HTTP DTOs, status codes, and framework response types
 - [ ] Direct controller tests supply every required dependency and cover the newly introduced collaboration
 - [ ] For a review: findings are ranked Critical/High/Medium/Low, each with location, evidence, and remediation
