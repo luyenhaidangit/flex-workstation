@@ -112,6 +112,38 @@ Do not create interfaces, repositories, mediators, factories, DTO layers, or pro
 
 For Clean Architecture work, make the responsibility and dependency of every layer explicit before adding code. Implement one thin vertical slice from transport to durable state, then add cross-cutting policies and asynchronous integration only when their failure semantics are designed. Keep the host as the composition root; do not let HTTP, EF Core, vendor SDK, or broker types leak into stable business policy.
 
+### Adopt an in-process mediator only at a demonstrated operation boundary
+
+MediatR or another in-process mediator is justified when a controller owns several
+non-trivial use cases and the same Application operations need a uniform dispatch,
+test, or pipeline boundary. Reducing a constructor's parameter count alone is not
+sufficient justification; the mediator must also remove application orchestration
+from the transport layer.
+
+Before adding a mediator package, inspect its target-framework compatibility,
+transitive `Microsoft.Extensions.*` dependencies, license/runtime configuration,
+and the repository's package-version convention. Pin an intentional version and
+record any compatibility or licensing constraint; do not select an old version
+solely to avoid an unreviewed package policy.
+
+When a mediator is justified:
+
+1. Define a focused `IRequest<TResponse>` command or query and an
+   `IRequestHandler<TRequest, TResponse>` named after the use case.
+2. Inject `ISender` into a controller that only sends requests; do not inject
+   `IMediator` when publishing notifications is not part of its responsibility.
+3. Move every in-scope action that still owns application orchestration. Do not
+   add one concrete handler beside repositories and claim the controller DI problem
+   is solved; explicitly label that state as an intermediate migration instead.
+4. Keep Application request/result types free of API DTOs, `ActionResult`, status
+   codes, and HTTP error envelopes. Map them at the controller boundary.
+5. Scan the Application assembly from the composition root rather than registering
+   individual handlers as concrete services. Add a pipeline behavior only for a
+   defined cross-cutting policy and test its ordering and failure semantics.
+
+For a simple one-step CRUD action with no reusable orchestration, keep the direct
+flow. Do not introduce a mediator merely because nearby actions use one.
+
 ### Keep HTTP controllers at the transport boundary
 
 Keep controllers focused on routing, binding, authentication/authorization context,
@@ -142,6 +174,25 @@ per entity by default.
 For simple CRUD that has no meaningful orchestration, keep the direct endpoint flow
 and do not add an Application project, handler, or abstraction only to imitate a
 diagram.
+
+### Make write ownership and database conflicts explicit
+
+For a command that stages changes through multiple repositories sharing one EF Core
+`DbContext`, the handler owns one explicit commit. Repository methods stage changes;
+the handler commits once after all domain transitions and local validation succeed.
+Do not call `SaveChangesAsync` through each repository, because the first call flushes
+the whole tracked unit of work and obscures the real transaction owner.
+
+A preflight uniqueness check improves the ordinary error path but cannot prevent a
+concurrent writer from winning the race. Keep the database unique constraint as the
+authority. The Infrastructure adapter should translate the known provider-specific
+constraint violation into an Application-owned expected alternative; the handler
+then returns its focused conflict outcome, and Presentation maps it to the existing
+HTTP contract. Do not catch every `DbUpdateException` as a conflict or convert
+unexpected database failures into a routine result.
+
+When this behavior is material, add a focused handler test for the translated
+alternative and a real-provider integration/concurrency test for the constraint.
 
 ### Logging pattern gate
 
@@ -341,6 +392,9 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 |---|---|
 | "It's simpler to wrap EF Core in a generic repository now" | That removes the query and transaction semantics EF Core already gives you. Add a repository only when it protects a real boundary or has more than one implementation. |
 | "We'll add a mediator/event bus so it's ready to scale" | An in-process method call dressed up as an event adds indirection with no payoff until there is a real reason to decouple caller from handler. |
+| "I moved one action into a handler, so the controller no longer has a DI problem" | A concrete handler injected beside repositories increases constructor coupling. Use `ISender` and migrate the in-scope orchestration, or label the change as an intermediate step. |
+| "A `NameExistsAsync` check guarantees the duplicate-name response" | Concurrent writers can both pass the check. Preserve the database constraint and translate only its known violation into the expected conflict outcome. |
+| "Calling `SaveChangesAsync` through each repository makes persistence safer" | Repositories sharing one `DbContext` share one tracked unit of work. Commit once from the command handler so transaction ownership is visible. |
 | "Passing unit tests means it's production-ready" | Unit tests don't prove database, serialization, authorization, or distributed-system correctness — verify those paths with the checks that actually exercise them. |
 | "The newest .NET version is always safe to target" | Preserve the repository's current target framework unless an upgrade was requested or the current version is unsupported and creates material, verified risk. |
 | "It's just a review comment, I don't need to point at code" | A finding without a location, evidence, and triggering scenario gets argued with instead of fixed. Cite the exact line and the failure path. |
@@ -369,6 +423,10 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A controller still builds a reusable DTO inline after an aggregate mapper exists
 - A controller batches/join data from multiple repositories, coordinates external ports, or makes application decisions that belong in a focused command/query handler
 - An Application handler imports an API request/response DTO or returns HTTP-specific status/result types
+- A concrete command/query handler is injected alongside repository dependencies in a controller that is being refactored to reduce DI
+- A mediator package is added without checking target framework, transitive framework dependencies, or its license/runtime configuration
+- A write handler calls `SaveChangesAsync` through multiple repositories backed by the same `DbContext`
+- A check-then-insert uniqueness rule has no database constraint or no translation path for its known concurrent constraint violation
 - A required controller dependency is changed to nullable to avoid updating direct controller construction in tests
 
 ## Verification
@@ -390,5 +448,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] Mappers contain only pure transformation; validation, business decisions, I/O, and trusted values remain outside
 - [ ] Each controller action either remains a simple transport flow or delegates its orchestration to one focused Application use case
 - [ ] Application query/command results are free of HTTP DTOs, status codes, and framework response types
+- [ ] A mediator was introduced only for a demonstrated operation boundary; the controller injects `ISender` and handler discovery is assembly-scanned from the composition root
+- [ ] Every state-changing handler has one visible commit owner; database-backed uniqueness rules retain their constraint and map known concurrent violations consistently
+- [ ] Tests that exercise a mediator controller compose the actual `ISender`/handler registration, while provider-specific constraints have a real-provider integration test when material
 - [ ] Direct controller tests supply every required dependency and cover the newly introduced collaboration
 - [ ] For a review: findings are ranked Critical/High/Medium/Low, each with location, evidence, and remediation
