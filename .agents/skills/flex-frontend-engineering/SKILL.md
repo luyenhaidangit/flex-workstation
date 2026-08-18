@@ -54,6 +54,43 @@ This table is not an exhaustive inventory. If a need is not listed, search the w
 - Prefer reuse in this order: existing shared/core component → existing feature component that can be safely consumed → approved third-party wrapper already used in the repo → local markup copied from the closest sibling pattern.
 - Do not force an unrelated shared component merely because it exists. Record the reason when choosing local markup (for example, different interaction contract or incompatible data model).
 
+## HTTP Error Notification Ownership
+
+`AppHttpInterceptor` is the default and single owner of HTTP error toasts. A failed
+request must not create both an interceptor toast and a component toast.
+
+- For ordinary requests, let the interceptor translate and present the error. Do not
+  call `ToastService.error(...)` again in the subscription's `error` handler.
+- Keep an `error` handler when the interceptor rethrows the error, so RxJS does not
+  report it as unhandled. Make the intent explicit:
+
+  ```ts
+  error: () => {
+    // AppHttpInterceptor has already displayed the error notification.
+  }
+  ```
+
+  Do not use opaque no-op forms such as `error: () => undefined`.
+- If a screen needs its own recovery UX, such as an initial list load with an inline
+  error and a Retry button, opt that request out of the global toast with
+  `Header.SkipToastError`. The component then owns the complete error state and must
+  not also create a toast.
+
+  ```ts
+  const headers = new HttpHeaders().set(Header.SkipToastError, 'true');
+  return this.http.get<ApiResult<Item[]>>(this.apiUrl, { headers });
+  ```
+
+  `AppHttpInterceptor` consumes this UI-only header before dispatching the request,
+  so it is not sent to the API. Reuse this convention until the core HTTP policy is
+  migrated to `HttpContextToken`; do not introduce a competing per-feature mechanism.
+- An inline load error is distinct from an empty result. Track an explicit error flag,
+  hide the normal empty state and pagination while it is set, and provide a retry
+  action that calls the same load method.
+- For an explicit user action (create, update, delete), use the interceptor toast by
+  default. Opt out only when the component can provide one complete, action-specific
+  error experience; never show both.
+
 ## List/table page pattern
 
 Structure (see `pages/master/issuer/issuer.component.html` as the reference):
@@ -258,6 +295,7 @@ Non-editable/system fields (e.g. codes after creation) use `class="form-control 
 | "Skipping the empty/loading state saves time, I'll add it later" | The three-state `<tbody>` pattern (skeleton/data/empty) is what every existing list page does — a table missing it reads as unfinished, not simplified. |
 | "I'll write my own validation message logic, it's just a few lines" | `isFieldInvalid`/`getFieldError` + `invalid-tooltip` is the established pattern across every modal — a different validation UI on one screen breaks consistency for no benefit. |
 | "The color doesn't really matter, I'll just use btn-primary everywhere" | Action color is semantic (success=create, warning=edit, danger=delete/reject, info/primary=view/approve) and tied consistently to header + icon + submit button — using primary for a delete action misleads the user. |
+| "The interceptor will toast it, but I will add a clearer toast in the component too" | This creates duplicate notifications for one HTTP failure. Use the interceptor by default, or opt out and fully own the feature-specific recovery UX. |
 
 ## Red Flags
 
@@ -271,6 +309,9 @@ Non-editable/system fields (e.g. codes after creation) use `class="form-control 
 - A hardcoded status/action label+color pair in a template instead of `app-badge`
 - A new page-level or component-level `.scss` file with more than a few lines of custom layout/spacing CSS
 - A disabled (`disabled`) system-controlled field where the existing convention is `readonly` + `non-editable-field` + `form-text` hint
+- `ToastService.error(...)` in a request error handler while the request has not opted out with `Header.SkipToastError`
+- A list that renders its empty state or pagination after its initial load has failed
+- `Header.SkipToastError` passed through to the API instead of being consumed by `AppHttpInterceptor`
 
 ## Verification
 
@@ -284,3 +325,5 @@ Non-editable/system fields (e.g. codes after creation) use `class="form-control 
 - [ ] The closest existing component, wrapper, or sibling pattern was searched across `src/app/` and reused when compatible; listed shared components (`app-page-title`, `app-tabs`, `app-skeleton`, `app-badge`, `app-pagination`, `safeField` pipe) are not treated as the only valid sources
 - [ ] Form fields use `isFieldInvalid`/`getFieldError` + `invalid-tooltip`, copied from an existing modal, not a new validation UI
 - [ ] Action/semantic colors are consistent between modal title, icon, and submit button
+- [ ] Each failed HTTP request has exactly one notification owner: `AppHttpInterceptor` by default, or the component after opting out with `Header.SkipToastError`
+- [ ] A list request that opts out of the global toast renders an inline error state with Retry, not its ordinary empty state
