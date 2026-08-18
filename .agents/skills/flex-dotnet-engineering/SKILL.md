@@ -202,6 +202,52 @@ Unless the repository has a justified alternative:
 - Emit correlated logs, traces, and metrics for critical paths; expose meaningful readiness and liveness signals.
 - Test behavior at the cheapest reliable level and use real infrastructure semantics where mocks would lie.
 
+## Map Models at Their Owning Boundary
+
+Place a mapper in the project that owns the boundary contract it produces. The
+mapper may reference the source model and the boundary contract, but must not
+reverse an inward dependency just to reuse a DTO.
+
+| Mapping | Owner and location |
+| --- | --- |
+| Domain entity → HTTP request/response DTO | `Api` / Presentation, for example `Mappers/AgentMapper.cs` or `Features/Agents/Mappers/AgentMapper.cs` |
+| Domain entity → application command/query result | `Application`, colocated with the use case that owns that contract |
+| Domain entity ↔ EF Core persistence configuration/model | `Infrastructure` |
+| Domain value/entity → another domain type | `Domain`, only when the conversion is domain behavior rather than transport glue |
+
+Do not put API DTO mapping in `Domain` or `Application`, and do not put
+application contracts in `Api` merely because an endpoint is their first caller.
+Keep public HTTP DTOs independent from persistence entities and map them at the
+presentation boundary.
+
+### Mapper shape and naming
+
+- A bounded context or aggregate can have one mapper such as `AgentMapper` with
+  multiple pure mappings related to that aggregate (`ToResponse`,
+  `ToListItemResponse`, and other explicit target names). Prefer this over one
+  class per tiny DTO when the source ownership is the same.
+- Split a mapper when the mapping belongs to another aggregate or grows into a
+  separate coherent concern, for example `AgentPublishLocationMapper`; do not let
+  `AgentMapper` map conversations, users, or unrelated contracts.
+- For a small, deterministic conversion, use an `internal static` mapper with
+  explicit methods. Do not add AutoMapper, `IMapper`, or a generic mapper
+  abstraction without demonstrated mapping complexity, configuration, or a real
+  substitution boundary.
+- A mapper only transforms already-valid values. It must not validate input, check
+  authorization or uniqueness, set trusted defaults or timestamps, call a
+  repository, mutate an aggregate through business methods, or perform I/O. Those
+  responsibilities remain in the presentation/application/domain flow that owns
+  them.
+- Controllers invoke a mapper instead of constructing reusable response DTOs
+  inline. Keep a one-off projection local only when extracting it would add an
+  unshared type with no clearer boundary.
+
+When a controller adds a required dependency, update every direct controller
+construction in tests to compose the same dependency graph using the test
+infrastructure. Do not make a production dependency nullable merely to preserve
+outdated tests. Remove null checks once the dependency contract is non-nullable,
+then add or update a behavior test that exercises the new collaboration.
+
 ## Bootstrap a new service consistently
 
 Use the executable scaffold at [`templates/clean-architecture-service`](templates/clean-architecture-service) as the starting point for a new ASP.NET Core service. The scaffold contains `.template` source files with `{Company}`, `{Service}`, `{company}`, and `{service}` placeholders and a `render.ps1` script for safe copy-and-substitute generation. Keep [`templates/clean-architecture-template.md`](templates/clean-architecture-template.md) as the architecture rationale and review checklist; it is not a substitute for the code scaffold.
@@ -269,6 +315,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 | "It's just a review comment, I don't need to point at code" | A finding without a location, evidence, and triggering scenario gets argued with instead of fixed. Cite the exact line and the failure path. |
 | "Retrying failed calls is always safer" | Retrying a non-idempotent operation without an idempotency design can duplicate side effects. Design the retry, don't default to it. |
 | "I ran the tests" (but didn't check the output) | A command that wasn't observed to succeed can't be reported as passing. State what actually ran and what its result was. |
+| "Every DTO needs its own mapper class or generic mapper interface" | Group pure mappings by aggregate ownership (`AgentMapper`) and split only at a real domain or contract boundary; abstractions without variation add indirection, not safety. |
+| "Making a new controller dependency nullable is the fastest way to keep old tests compiling" | That weakens the production contract and leaves dead branches. Compose required dependencies in the tests and verify the collaboration instead. |
 
 ## Red Flags
 
@@ -282,6 +330,11 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A secret, token, connection string, or full request/response payload appearing in logs, telemetry, or an error response
 - A new service has a logging package or `Using` entry but no configured sink, no service identity, or no verified collector/backend route
 - A backend change copies a sibling logger without checking whether its endpoint matches the target process/container network
+- A mapper in `Domain` or `Application` references an API DTO, or an API mapper references an application/persistence type in a way that reverses project dependencies
+- A `Common`, `Shared`, or generic mapper layer owns unrelated aggregate mappings with no stable owner
+- A mapper performs validation, authorization, timestamp/default assignment, repository access, I/O, or aggregate mutation
+- A controller still builds a reusable DTO inline after an aggregate mapper exists
+- A required controller dependency is changed to nullable to avoid updating direct controller construction in tests
 
 ## Verification
 
@@ -297,4 +350,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] State-changing use cases have an explicit transaction owner, concurrency behavior, and idempotency strategy
 - [ ] Authorization and tenant scoping are enforced before data access, not assumed
 - [ ] No secret, token, connection string, or unnecessary personal data appears in logs, telemetry, or responses
+- [ ] Every mapper sits at the project boundary that owns its destination contract and does not reverse dependency direction
+- [ ] Aggregate mappings use a focused `<Aggregate>Mapper` with explicit target methods; unrelated mappings are not mixed into it
+- [ ] Mappers contain only pure transformation; validation, business decisions, I/O, and trusted values remain outside
+- [ ] Direct controller tests supply every required dependency and cover the newly introduced collaboration
 - [ ] For a review: findings are ranked Critical/High/Medium/Low, each with location, evidence, and remediation
