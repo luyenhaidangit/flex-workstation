@@ -5,7 +5,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 ## Constitution
 
 - Constitution hiện ở version `1.3.0`, bổ sung Specialist Skill Gate: Speckit luôn route qua `flex-using-agent-skills` và chỉ áp dụng các skill Flex phù hợp với artifact thực tế.
-- Tài liệu workflow Speckit phải nêu rõ hai dạng command: `$speckit-*` cho Codex skill invocation và `/speckit-*` cho slash command khi runtime hỗ trợ.
+- Tài liệu workflow Speckit phải nêu rõ hai dạng command: `$speckit-*` cho Codex và `/speckit-*` cho Antigravity IDE/CLI cùng Claude Code. Ba runtime dùng chung source `.agents/skills/`; không thêm workflow tự chạy toàn bộ Speckit.
 
 ## Quy ước bảo trì
 
@@ -23,7 +23,7 @@ Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-worksta
 - `$speckit-taskstoissues` ưu tiên GitHub MCP; khi MCP không có, dùng `gh issue list/create` với `--repo` lấy từ `origin`. Nếu không xác thực hoặc không deduplicate được issue hiện có, phải dừng trước khi tạo issue. Mỗi issue mới phải có mô tả task, trace `[US#]`, link/path đến `spec.md`/`plan.md`/`tasks.md`, và label `feature:<feature-dir>` để tự đứng được trên GitHub.
 - Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
 - Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và rà `git diff -- .agents/skills`.
-- Khi upgrade Spec Kit, không nhận tự động file upstream mà manifest đang theo dõi. Diff từng file trong `.specify/integrations/claude.manifest.json` và `.specify/integrations/speckit.manifest.json` với custom source hiện hành; chỉ merge thay đổi được review, rồi cập nhật manifest/hash theo cơ chế chính thức của tool. `claude.manifest.json` đã tắt tracking skill custom bằng `_disabled_files`; `speckit.manifest.json` vẫn có hash upstream nên đặc biệt phải review template/script trước khi upgrade.
+- Khi upgrade Spec Kit, không nhận tự động file upstream mà manifest đang theo dõi. Diff từng file trong `.specify/integrations/agy.manifest.json`, `.specify/integrations/claude.manifest.json` và `.specify/integrations/speckit.manifest.json` với custom source hiện hành; chỉ merge thay đổi được review, rồi cập nhật manifest/hash theo cơ chế chính thức của tool. `claude.manifest.json` được giữ cho audit; `agy.manifest.json` là integration mặc định. Các skill `.agents/skills/` và template/script tùy biến phải được bảo toàn qua `scripts/migrate-speckit-antigravity.ps1`.
 
 ## Requirements Quality Gate
 

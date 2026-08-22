@@ -1,4 +1,5 @@
 param(
+    [switch]$SkipAntigravityInstall,
     [switch]$SkipClaudeInstall,
     [switch]$SkipCcusageInstall,
     [switch]$SkipRtkInstall,
@@ -298,6 +299,8 @@ Sync-AgentSkills
 
 & "$PSScriptRoot\ensure-rtk.ps1" -SkipInstall:$SkipRtkInstall -SkipInit:$SkipRtkInit
 
+& "$PSScriptRoot\ensure-antigravity.ps1" -SkipInstall:$SkipAntigravityInstall
+
 Write-Step "Checking Claude Code"
 
 if (Test-Command "claude") {
@@ -345,9 +348,10 @@ Write-Host "============================================================" -Foreg
 Write-Host ""
 
 Write-Step "Next steps"
-Write-Host "1. Run 'claude' in this repository and complete browser login."
-Write-Host "2. Run 'claude doctor' if login or shell integration fails."
-Write-Host "3. Open the flex-workstation project root with:"
+Write-Host "1. Run 'agy' in this repository and complete Google sign-in if prompted."
+Write-Host "2. Run scripts\migrate-speckit-antigravity.ps1 once to switch an existing Spec Kit workspace."
+Write-Host "3. Run 'claude' or 'claude doctor' when using Claude Code."
+Write-Host "4. Open the flex-workstation project root with:"
 Write-Host "   .\OPEN_VSCODE.cmd"
 
 if ($OpenWorkspace) {

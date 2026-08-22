@@ -2,8 +2,13 @@
 
 Luồng làm việc chuẩn với bộ speckit cho `flex-workstation`.
 
-Ghi chú cú pháp: trong Codex, invoke skill bằng `$speckit-*`; trong runtime hỗ trợ
-slash command, dùng `/speckit-*`. Hai dạng trỏ tới cùng một bước workflow.
+Ghi chú cú pháp: Codex gọi skill bằng `$speckit-*`; Antigravity IDE/CLI và Claude
+Code gọi bằng `/speckit-*`. Các dạng này trỏ tới cùng một bước workflow và dùng
+cùng source `.agents/skills/`.
+
+Antigravity phải hiển thị các skill qua `/skills`. Không tạo một workflow
+`/speckit` tự chạy toàn bộ chuỗi, vì mỗi phase bên dưới phải dừng sau completion
+report và chờ người dùng gọi phase tiếp theo.
 
 Mọi tác vụ đều bắt đầu từ workflow Speckit đầy đủ, với `$speckit-specify` hoặc
 `/speckit-specify` làm bước mô tả nghiệp vụ đầu tiên.

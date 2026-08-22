@@ -81,14 +81,27 @@ function Install-Uv {
 }
 
 function Install-SpecifyCli {
-    $specKitVersion = "v0.12.4"
+    $specKitVersion = "v1.0.1"
     Write-Host "Installing specify-cli $specKitVersion via uv..."
-    uv tool install specify-cli --from "git+https://github.com/github/spec-kit.git@$specKitVersion"
+    uv tool install specify-cli --force --from "git+https://github.com/github/spec-kit.git@$specKitVersion"
 
     $uvToolBinDir = Join-Path $env:USERPROFILE ".local\bin"
     if (Test-Path (Join-Path $uvToolBinDir "specify.exe")) {
         Add-UserPath $uvToolBinDir
     }
+}
+
+function Get-SpecifyVersion {
+    if (-not (Test-Command "specify")) {
+        return $null
+    }
+
+    $versionLine = Get-CommandVersion specify
+    if ($versionLine -match "([0-9]+\.[0-9]+\.[0-9]+)") {
+        return $Matches[1]
+    }
+
+    return $null
 }
 
 # --- uv ---
@@ -118,21 +131,36 @@ else {
 
 Write-Step "Checking specify-cli"
 
-if (Test-Command "specify") {
-    Write-Ok "specify found: $(Get-CommandVersion specify)"
+$requiredSpecKitVersion = "1.0.1"
+$installedSpecKitVersion = Get-SpecifyVersion
+
+if ($installedSpecKitVersion -eq $requiredSpecKitVersion) {
+    Write-Ok "specify-cli found: $(Get-CommandVersion specify)"
 }
 elseif ($SkipInstall) {
-    Write-Warn "specify-cli is not installed and installation was skipped."
+    if ($installedSpecKitVersion) {
+        Write-Warn "specify-cli $installedSpecKitVersion is installed, but $requiredSpecKitVersion is required and upgrade was skipped."
+    }
+    else {
+        Write-Warn "specify-cli is not installed and installation was skipped."
+    }
     return
 }
 else {
-    Install-SpecifyCli
-
-    if (Test-Command "specify") {
-        Write-Ok "specify-cli installed: $(Get-CommandVersion specify)"
+    if ($installedSpecKitVersion) {
+        Write-Host "Upgrading specify-cli from $installedSpecKitVersion to $requiredSpecKitVersion..."
     }
     else {
-        Write-Warn "specify-cli install finished, but 'specify' is not available in this terminal yet. Open a new terminal and re-run bootstrap."
+        Write-Host "specify-cli is missing. Installing $requiredSpecKitVersion..."
+    }
+
+    Install-SpecifyCli
+    $installedSpecKitVersion = Get-SpecifyVersion
+    if ($installedSpecKitVersion -eq $requiredSpecKitVersion) {
+        Write-Ok "specify-cli ready: $(Get-CommandVersion specify)"
+    }
+    else {
+        Write-Warn "specify-cli install finished, but version $requiredSpecKitVersion is not available in this terminal yet. Open a new terminal and re-run bootstrap."
         return
     }
 }
@@ -144,6 +172,11 @@ if ($SkipInit) {
     return
 }
 
+if (-not (Test-Command "agy")) {
+    Write-Warn "Antigravity CLI 'agy' is required before initializing Spec Kit. Run scripts\ensure-antigravity.ps1, then re-run bootstrap."
+    return
+}
+
 Write-Step "Initializing spec-kit project"
 
 $projectRoot = Resolve-Path "$PSScriptRoot\.."
@@ -151,6 +184,7 @@ $specifyTemplatesPath = Join-Path $projectRoot ".specify\templates"
 
 if (Test-Path $specifyTemplatesPath) {
     Write-Ok "spec-kit already initialized: $specifyTemplatesPath"
+    Write-Host "Run scripts\migrate-speckit-antigravity.ps1 once to switch an existing workspace to Antigravity."
     return
 }
 
@@ -166,17 +200,17 @@ foreach ($file in $customFiles) {
 }
 
 try {
-    Write-Host "Running: specify init . --integration claude --script-type ps --force"
+    Write-Host "Running: specify init . --integration agy --script ps --force"
     Push-Location $projectRoot
-    specify init . --integration claude --script-type ps --force
+    specify init . --integration agy --script ps --force
     Pop-Location
-    Write-Ok "spec-kit initialized with Claude Code integration."
+    Write-Ok "spec-kit initialized with Antigravity integration."
 }
 catch {
     Pop-Location -ErrorAction SilentlyContinue
     Write-Warn "specify init failed: $($_.Exception.Message)"
     if (Test-Path (Join-Path $projectRoot ".specify")) {
-        Write-Warn ".specify directory exists but may be incomplete. Run 'specify init . --integration claude --script-type ps --force' manually."
+        Write-Warn ".specify directory exists but may be incomplete. Run 'specify init . --integration agy --script ps --force' manually."
     }
 }
 

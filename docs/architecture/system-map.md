@@ -17,7 +17,7 @@ Tài liệu này gộp bản đồ cấu trúc `flex-workstation` (repo, bootstr
 ```text
 flex-workstation/
 ├── .claude/              # Cấu hình Claude Code; skills dùng junction tới .agents/skills
-├── .agents/              # Source runtime dùng chung cho skills Claude Code và Codex
+├── .agents/              # Source skill chung cho Codex, Antigravity và Claude Code
 ├── .codex/               # Cấu hình Codex CLI
 ├── .specify/             # Spec Kit runtime, templates, scripts và workflows
 ├── .vscode/              # VS Code workspace tasks
@@ -30,8 +30,8 @@ flex-workstation/
 ├── flex-environment/     # Repo con độc lập - local/dev infrastructure stack
 ├── flex-agent-service/   # Repo con độc lập - nền tảng AI Agent đa tenant
 ├── flex-database/        # Repo con độc lập - migration/schema script dùng chung cho các database
-├── AGENTS.md             # Context cho Codex agent
-├── CLAUDE.md             # Context cho Claude Code
+├── AGENTS.md             # Context chung cho Codex, Antigravity và Claude Code
+├── CLAUDE.md             # Adapter Claude Code import AGENTS.md
 ├── README.md             # Index và hướng dẫn tổng quan
 └── workstation.json      # Manifest repo được clone khi bootstrap
 ```
@@ -159,9 +159,10 @@ SYNC_WORKSPACE.cmd
       → fetch --prune và pull --ff-only repo đã có nếu working tree sạch
     → kiểm tra/cài ccusage
     → kiểm tra/cài rtk, chạy rtk init nếu cần và apply template Codex RTK từ scripts\templates\rtk-codex.md vào ~\.codex\RTK.md
+    → kiểm tra/cài Antigravity CLI agy nếu thiếu
     → kiểm tra/cài Claude Code nếu thiếu
     → kiểm tra/cài uv và specify-cli
-    → initialize Spec Kit nếu .specify\templates chưa có
+    → initialize Spec Kit với integration agy nếu .specify\templates chưa có
 ```
 
 Script bỏ qua repo có local changes, origin khác cấu hình hoặc đang ở detached HEAD. Nếu repo có branch khác `branch` trong manifest, script cảnh báo nhưng vẫn pull branch hiện tại.
@@ -173,6 +174,7 @@ Script bỏ qua repo có local changes, origin khác cấu hình hoặc đang �
 | Claude Code config | `CLAUDE.md`, `.claude/` | Context, settings, hooks, commands và skill runtime cho Claude Code |
 | Codex agent context | `AGENTS.md` | Context và quy tắc làm việc cho Codex |
 | Codex CLI config | `.codex/` | Cấu hình Codex CLI |
+| Antigravity IDE/CLI | `AGENTS.md`, `.agents/skills/` | Context chung; `/speckit-*` và `/skills` |
 | Spec Kit | `.specify/`, `specs/` | Template, workflow và feature specs |
 | VS Code tasks | `.vscode/tasks.json` | Shortcut command khi dùng `Terminal: Run Task` trong VS Code |
 | `ccusage` | User global CLI | Theo dõi token/cost usage Claude |
@@ -184,7 +186,7 @@ Script bỏ qua repo có local changes, origin khác cấu hình hoặc đang �
 
 - Tài liệu workstation: `README.md`, `docs/`.
 - Manifest repo con: `workstation.json`.
-- Runtime config: `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/`.
+- Runtime config: `AGENTS.md`, `CLAUDE.md`, `.claude/`, `.agents/`, `.codex/`.
 - Spec Kit: `.specify/`, `specs/`.
 - VS Code task shortcuts: `.vscode/tasks.json`.
 - Repo nghiệp vụ: các repo con trong `workstation.json`.

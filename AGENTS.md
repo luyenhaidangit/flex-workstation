@@ -7,7 +7,7 @@
 - Dùng tiếng Việt có dấu trong trả lời, tài liệu và ghi chú.
 - Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật bằng English khi đó là định danh kỹ thuật.
 
-## Hành vi làm việc cho Codex
+## Hành vi làm việc chung cho agent
 
 ### Nghĩ trước khi thực hiện
 - Nêu rõ giả định trước khi bắt đầu. Nếu không chắc, hỏi — đừng tự suy đoán im lặng.
@@ -50,37 +50,46 @@ chuyên môn phù hợp và thứ tự áp dụng.
 
 Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
 
+### Cú pháp theo runtime
+
+| Runtime | Cú pháp gọi skill Speckit |
+| --- | --- |
+| Codex | `$speckit-<command>` |
+| Antigravity IDE/CLI và Claude Code | `/speckit-<command>` |
+
+`/skills` trong Antigravity phải liệt kê các skill từ `.agents/skills/`. Không tạo workflow `/speckit` tự chạy toàn bộ vòng đời vì mỗi gate bên dưới cần người dùng gọi tường minh.
+
 ### Setup (chạy một lần cho project)
 
-Thiết lập nguyên tắc: `$speckit-constitution`
+Thiết lập nguyên tắc: `$speckit-constitution` hoặc `/speckit-constitution`
 
 ### Mỗi feature (lặp lại)
 
-| Bước | Lệnh Codex | Ghi chú |
-|------|------------|---------|
-| 1 | `$speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
-| 2 | `$speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
-| 2a | `$speckit-docbiz` | **Documentation Impact Gate bắt buộc** sau lần cập nhật cuối của `spec.md`, trước plan — đánh giá và chỉ cập nhật tài liệu nghiệp vụ khi có tác động đáng kể |
-| 3 | `$speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
-| 4 | `$speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
-| 5 | `$speckit-tasks` | Sinh task list theo dependency order |
-| 6 | `$speckit-taskstoissues` | **Optional** — chuyển tasks.md thành GitHub Issues |
-| 7 | `$speckit-analyze` | **Optional** — cross-artifact quality gate trước implement |
-| 8 | `$speckit-implement` | Thực thi tasks; tự dừng nếu checklist còn item chưa tick |
-| 9 | `$speckit-converge` | Nếu còn gap: append task bổ sung vào tasks.md → quay lại bước 8 |
+| Bước | Codex | Antigravity / Claude | Ghi chú |
+| --- | --- | --- | --- |
+| 1 | `$speckit-specify <mô tả nghiệp vụ>` | `/speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
+| 2 | `$speckit-clarify` | `/speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
+| 2a | `$speckit-docbiz` | `/speckit-docbiz` | **Documentation Impact Gate bắt buộc** sau lần cập nhật cuối của `spec.md`, trước plan |
+| 3 | `$speckit-checklist [domain]` | `/speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
+| 4 | `$speckit-plan <tech stack + architecture>` | `/speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
+| 5 | `$speckit-tasks` | `/speckit-tasks` | Sinh task list theo dependency order |
+| 6 | `$speckit-taskstoissues` | `/speckit-taskstoissues` | **Optional** — chuyển tasks → GitHub Issues |
+| 7 | `$speckit-analyze` | `/speckit-analyze` | **Optional** — cross-artifact quality gate trước implement |
+| 8 | `$speckit-implement` | `/speckit-implement` | Thực thi tasks; tự dừng nếu checklist còn item chưa tick |
+| 9 | `$speckit-converge` | `/speckit-converge` | Nếu còn gap: append task bổ sung vào `tasks.md` → quay lại bước 8 |
 
-Skills speckit nằm tại `.agents/skills/` — source of truth dùng chung cho cả Codex và Claude Code.
+Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho Codex, Antigravity và Claude Code.
 
 ### Gate bắt buộc giữa các bước
 
-**Mỗi lệnh `$speckit-*` là một bước riêng biệt do người dùng chủ động gọi.**
+**Mỗi lệnh Speckit là một bước riêng biệt do người dùng chủ động gọi.**
 
 - Không tự chuyển sang bước tiếp theo sau khi hoàn thành một lệnh.
 - "Suggested next step" trong completion report chỉ là thông tin — không được tự thực thi.
 - Sau khi mỗi lệnh hoàn thành, DỪNG và chờ người dùng gọi lệnh tiếp theo tường minh.
-- `$speckit-implement` chỉ chạy khi người dùng gọi trực tiếp — không bao giờ tự chạy.
-- Lệnh cấp cao như "thực hiện X" hay "implement X" chỉ tương đương với bước 1 (`$speckit-specify`) — không phải toàn bộ pipeline.
-- Trước `$speckit-plan`, PHẢI gọi `$speckit-docbiz` sau lần cập nhật cuối của `spec.md`. Skill này luôn đánh giá tác động tài liệu; chỉ cập nhật khi thay đổi làm đổi luồng nghiệp vụ, vai trò, quy tắc, thực thể hoặc phạm vi mà BA/stakeholder cần biết. Khi cần cập nhật, ưu tiên chỉnh đúng phần của tài liệu hiện hữu; chỉ tạo tài liệu mới khi không có tài liệu phù hợp.
+- `speckit-implement` chỉ chạy khi người dùng gọi trực tiếp — không bao giờ tự chạy.
+- Lệnh cấp cao như "thực hiện X" hay "implement X" chỉ tương đương với bước 1 (`speckit-specify`) — không phải toàn bộ pipeline.
+- Trước `speckit-plan`, PHẢI gọi `speckit-docbiz` sau lần cập nhật cuối của `spec.md`. Skill này luôn đánh giá tác động tài liệu; chỉ cập nhật khi thay đổi làm đổi luồng nghiệp vụ, vai trò, quy tắc, thực thể hoặc phạm vi mà BA/stakeholder cần biết. Khi cần cập nhật, ưu tiên chỉnh đúng phần của tài liệu hiện hữu; chỉ tạo tài liệu mới khi không có tài liệu phù hợp.
 
 ## Tooling Codex
 
@@ -103,7 +112,7 @@ Thay lệnh đọc/tìm/liệt kê/git bằng lệnh `rtk` tương ứng — kh�
 
 Chi tiết đầy đủ tại `~/.codex/RTK.md` (sync từ `scripts/templates/rtk-codex.md` khi bootstrap).
 
-Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.
+`CLAUDE.md` import file này; thay đổi quy tắc chung chỉ thực hiện tại `AGENTS.md`.
 
 ## Cấu trúc project
 
@@ -111,12 +120,12 @@ Khi thay đổi quy tắc hành vi chung cho Claude trong `CLAUDE.md`, rà lại
 flex-workstation/
 ├── docs/            # Tài liệu workspace (system-map, onboarding, speckit)
 ├── scripts/         # Bootstrap và tooling scripts
-├── .agents/         # Cấu hình Codex agent; skill source tại .agents/skills/
+├── .agents/         # Skill source chung cho Codex, Antigravity và Claude Code
 ├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands)
 ├── .codex/          # Cấu hình Codex CLI
 ├── workstation.json # Manifest repo được clone khi bootstrap
 ├── CLAUDE.md        # Context cho Claude Code
-├── AGENTS.md        # File này — context cho Codex agent
+├── AGENTS.md        # Context chung cho Codex, Antigravity và Claude Code
 └── <repo-con>/      # Repo con độc lập, ignore bởi Git của workstation
 ```
 
@@ -135,8 +144,8 @@ flex-workstation/
 | Loại | Vị trí |
 | --- | --- |
 | Tài liệu workstation | `docs/` |
-| Skill dùng chung | `.agents/skills/<skill-name>/SKILL.md` |
-| Runtime config | `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.agents/`, `.codex/` |
+| Skill dùng chung | `.agents/skills/<skill-name>/SKILL.md` (`.claude/skills` là junction) |
+| Runtime config | `AGENTS.md`, `CLAUDE.md`, `.claude/`, `.agents/`, `.codex/` |
 
 ## Tài liệu
 

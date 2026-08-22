@@ -6,7 +6,7 @@
 
 - Tập trung tài liệu định hướng cho các project trong cùng workspace.
 - Cung cấp entrypoint Windows để bootstrap và mở workspace.
-- Lưu skill source dùng chung trong `skills/`.
+- Lưu skill source dùng chung trong `.agents/skills/`.
 
 ## Cấu trúc chính
 
@@ -14,7 +14,7 @@
 flex-workstation/
 ├── docs/            # Tài liệu workspace
 ├── scripts/         # Bootstrap và tooling scripts
-├── skills/          # Skill source dùng chung
+├── .agents/         # Skill source chung cho Codex, Antigravity và Claude Code
 ├── .claude/         # Cấu hình Claude Code
 ├── .agents/         # Cấu hình Codex agent
 ├── .codex/          # Cấu hình Codex CLI
@@ -31,9 +31,9 @@ Double-click `SYNC_WORKSPACE.cmd` để chạy bootstrap. Script sẽ:
 - Cấu hình mã hóa UTF-8 cho PowerShell và tự động thiết lập toàn cục `%USERPROFILE%\.wslconfig` (`localhostForwarding=false`) cho WSL2 trên Windows.
 - Đọc `workstation.json` và clone repo còn thiếu vào `flex-workstation/`.
 - Cập nhật repo đã có bằng `git fetch --prune` + `git pull --ff-only`.
-- Kiểm tra và cài Claude Code, `ccusage`, `rtk` nếu thiếu.
+- Kiểm tra và cài Antigravity CLI `agy`, Claude Code, `ccusage`, `rtk`, `uv` và `specify-cli` nếu thiếu.
 
-Repo đang có local changes, origin khác cấu hình hoặc đang ở detached HEAD sẽ được cảnh báo và bỏ qua. Sau khi sync xong, dùng `OPEN_VSCODE.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
+Repo đang có local changes, origin khác cấu hình hoặc đang ở detached HEAD sẽ được cảnh báo và bỏ qua. Sau khi sync xong, dùng `OPEN_VSCODE.cmd`, `OPEN_ANTIGRAVITY.cmd`, `OPEN_CLAUDE.cmd` hoặc `OPEN_CODEX.cmd` theo nhu cầu.
 
 ## Entrypoint Windows
 
@@ -43,6 +43,7 @@ Repo đang có local changes, origin khác cấu hình hoặc đang ở detached
 | `OPEN_VSCODE.cmd` | Mở workstation trong VS Code |
 | `OPEN_CLAUDE.cmd` | Mở Claude Code với `--dangerously-skip-permissions` |
 | `OPEN_CODEX.cmd` | Mở Codex |
+| `OPEN_ANTIGRAVITY.cmd` | Mở Antigravity CLI với permission prompt mặc định |
 
 ## Cấu hình coding agent
 
@@ -51,6 +52,7 @@ Repo đang có local changes, origin khác cấu hình hoặc đang ở detached
 | Claude Code | `.claude/`, `CLAUDE.md` |
 | Codex agent | `.agents/`, `AGENTS.md` |
 | Codex CLI | `.codex/` |
+| Antigravity IDE/CLI | `.agents/skills/`, `AGENTS.md` |
 
 ## Cấu hình workstation
 
