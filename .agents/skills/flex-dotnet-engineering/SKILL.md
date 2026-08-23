@@ -141,6 +141,15 @@ When a mediator is justified:
    individual handlers as concrete services. Add a pipeline behavior only for a
    defined cross-cutting policy and test its ordering and failure semantics.
 
+Keep a request and its single handler co-located in the feature folder when the
+request is only used by that handler and the combined file remains easy to scan.
+Name the file after the request type, such as `GetAgentsQuery.cs` or
+`CreateAgentCommand.cs`, because the file contains both the request and handler;
+do not name it `*Handler.cs` merely because the handler is the executable part.
+Split the request and handler when either type has an independent reuse boundary,
+the file contains several supporting responsibilities, or the combined file has
+become difficult to navigate. File length is a review signal, not a hard threshold.
+
 For a simple one-step CRUD action with no reusable orchestration, keep the direct
 flow. Do not introduce a mediator merely because nearby actions use one.
 
@@ -424,6 +433,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A controller batches/join data from multiple repositories, coordinates external ports, or makes application decisions that belong in a focused command/query handler
 - An Application handler imports an API request/response DTO or returns HTTP-specific status/result types
 - A concrete command/query handler is injected alongside repository dependencies in a controller that is being refactored to reduce DI
+- A file containing both a command/query and its single handler is named `*Handler.cs`, obscuring the request that owns the use-case entry point
 - A mediator package is added without checking target framework, transitive framework dependencies, or its license/runtime configuration
 - A write handler calls `SaveChangesAsync` through multiple repositories backed by the same `DbContext`
 - A check-then-insert uniqueness rule has no database constraint or no translation path for its known concurrent constraint violation
@@ -449,6 +459,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] Each controller action either remains a simple transport flow or delegates its orchestration to one focused Application use case
 - [ ] Application query/command results are free of HTTP DTOs, status codes, and framework response types
 - [ ] A mediator was introduced only for a demonstrated operation boundary; the controller injects `ISender` and handler discovery is assembly-scanned from the composition root
+- [ ] A co-located request and single handler file is named after the request (`*Query.cs` or `*Command.cs`), and request/handler splitting is justified by reuse or complexity
 - [ ] Every state-changing handler has one visible commit owner; database-backed uniqueness rules retain their constraint and map known concurrent violations consistently
 - [ ] Tests that exercise a mediator controller compose the actual `ISender`/handler registration, while provider-specific constraints have a real-provider integration test when material
 - [ ] Direct controller tests supply every required dependency and cover the newly introduced collaboration
