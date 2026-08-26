@@ -2,7 +2,7 @@
 
 ## Mục đích và phạm vi
 
-MVP này giúp người cấu hình AI Agent kiểm tra trực tiếp cách Agent trả lời câu hỏi ngay tại màn cấu hình. Trước đây, khung xem trước chỉ mô phỏng hai người trao đổi với nhau nên không thể hiện được năng lực thực tế của Agent. Sau thay đổi, một người dùng thử nghiệm gửi câu hỏi và nhận phản hồi của chính AI Agent đang được cấu hình.
+MVP này giúp người cấu hình AI Agent kiểm tra trực tiếp cách Agent trả lời câu hỏi ngay tại màn cấu hình. Trước đây, khung xem trước chỉ mô phỏng hai người trao đổi với nhau nên không thể hiện được năng lực thực tế của Agent. Sau thay đổi, một người dùng thử nghiệm gửi câu hỏi và nhận phản hồi của chính AI Agent đang được cấu hình. Việc kiểm thử chỉ bắt đầu sau khi Agent đã được khởi tạo và đạt điều kiện sẵn sàng; ở giai đoạn tạo mới, người dùng phải nhận hướng dẫn thay vì một khung chat có thể gửi câu hỏi.
 
 Phạm vi chỉ là phiên kiểm tra tức thời trước khi phát hành Agent. MVP không phải là kênh chăm sóc khách hàng thực tế, không lưu trữ lịch sử dài hạn và không thay thế các quy trình tiếp nhận, phân công hoặc xử lý hội thoại đang có. Nguồn yêu cầu chi tiết: [spec.md](../../specs/000033-ai-chat-integration/spec.md).
 
@@ -31,7 +31,7 @@ Khách hàng thực tế → Kênh chăm sóc khách hàng → Nhân viên/AI v�
 
 ## Luồng nghiệp vụ đầu-cuối
 
-1. Người cấu hình hoàn tất các thông tin và chỉ dẫn cần thiết cho AI Agent.
+1. Người cấu hình hoàn tất các thông tin và chỉ dẫn cần thiết cho AI Agent, đồng thời khởi tạo Agent trước khi kiểm thử.
 2. Người cấu hình mở khung xem trước, chọn người gửi thử nghiệm và kiểm tra Agent có sẵn sàng nhận câu hỏi không. **Trong phạm vi MVP.**
 3. Người gửi thử nghiệm nhập một câu hỏi đại diện cho tình huống chăm sóc khách hàng. **Trong phạm vi MVP.**
 4. Câu hỏi được thể hiện là tin nhắn của người dùng; AI Agent xử lý câu hỏi và khung xem trước báo rõ đang chờ kết quả. **Trong phạm vi MVP.**
@@ -54,6 +54,7 @@ Khách hàng thực tế → Kênh chăm sóc khách hàng → Nhân viên/AI v�
 - Mỗi câu hỏi trong khung xem trước thuộc về người gửi thử nghiệm được chọn tại thời điểm gửi. Điều này giữ đúng ngữ cảnh “người hỏi — Agent trả lời”, thay vì tạo cảm giác có hai khách hàng đang chat với nhau.
 - Tại một thời điểm chỉ xử lý một câu hỏi đang chờ trong một phiên xem trước. Quy tắc này giúp người cấu hình biết chính xác phản hồi nào thuộc về câu hỏi nào và tránh gửi lặp do chưa thấy kết quả.
 - Chỉ phản hồi thực tế từ AI Agent đang kiểm tra mới được hiển thị là câu trả lời của Agent. Không dùng câu trả lời có sẵn hay tin nhắn của người khác thay thế, vì việc kiểm tra cần phản ánh năng lực thật của Agent.
+- Agent chưa được khởi tạo hoặc chưa đạt điều kiện sẵn sàng thì không được mở input kiểm thử; người cấu hình phải nhận thông báo rõ ràng về điều kiện cần hoàn tất trước.
 - Khi Agent chưa sẵn sàng, người dùng phải được báo rõ trước hoặc ngay lúc gửi câu hỏi. Mục đích là để người cấu hình phân biệt lỗi sẵn sàng với chất lượng trả lời của Agent.
 - Chỉ người có quyền xem trước và kiểm tra Agent mới được xem hoặc gửi câu hỏi. Câu hỏi kiểm tra có thể chứa thông tin nghiệp vụ hoặc dữ liệu khách hàng nên không được hiển thị ngoài phạm vi quyền được cấp.
 

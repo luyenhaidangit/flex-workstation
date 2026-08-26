@@ -23,6 +23,12 @@ Không gắn với một MVP cụ thể — đào sâu kỹ thuật/nghiệp v�
 
 - [05-trading-session-state-machine-exchange-communication.md](05-trading-session-state-machine-exchange-communication.md): chi tiết 7-phase state machine của phiên giao dịch (PreOpen/ATO/Continuous/Intermission/ATC/PLO/Close) và cơ chế giao tiếp Sở-Broker. Đọc sau khi đã đọc tổng quan ở mục 2 (đặc biệt `02-trading-session-bots.md`).
 
+## 4. Nghiệp vụ AI Agent
+
+| Tài liệu | MVP | Nghiệp vụ |
+| --- | --- | --- |
+| [12-agent-creation-and-configuration.md](12-agent-creation-and-configuration.md) | MVP 12 | Tạo Agent, mở khóa cấu hình và điều kiện kiểm thử |
+
 ## Quy ước
 
 - Mỗi tài liệu tổng quan (mục 2) phải ref về tài liệu nền `00` và, nếu có, tài liệu chi tiết liên quan (mục 3) trong phần "Truy vết và nguồn tham khảo".
