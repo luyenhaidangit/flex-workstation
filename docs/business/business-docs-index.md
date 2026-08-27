@@ -28,6 +28,7 @@ Không gắn với một MVP cụ thể — đào sâu kỹ thuật/nghiệp v�
 | Tài liệu | MVP | Nghiệp vụ |
 | --- | --- | --- |
 | [12-agent-creation-and-configuration.md](12-agent-creation-and-configuration.md) | MVP 12 | Tạo Agent, mở khóa cấu hình và điều kiện kiểm thử |
+| [13-meta-channel-connections.md](13-meta-channel-connections.md) | MVP 13 | Kết nối tài khoản Instagram và trang Facebook qua Meta |
 
 ## Quy ước
 
