@@ -23,7 +23,7 @@
 ## Phạm vi kỹ thuật
 
 **Trong phạm vi**:
-- `flex-agent-service`: application ports/use cases, Meta provider client, Instagram/Facebook connection orchestration, session state, persistence mapping, permission, audit log và API adapters.
+- `flex-agent-service`: application ports, Meta provider client, Instagram/Facebook connection orchestration, session state, persistence mapping, permission, audit log và API adapters.
 - `flex-database`: migration mới cho `agentdb` và changelog release kế tiếp; tương thích với các bảng Instagram hiện hữu hoặc legacy deployment.
 - `flex-microfrontend`: tích hợp HTTP vào `AgentEditorWizard`, hiển thị hai channel, redirect OAuth, discovery/selection/complete, connected state và disconnect.
 - Unit, integration, permission/security, contract và frontend component tests cho các luồng P1/P2.
@@ -104,7 +104,7 @@
 **Component/module tham gia**:
 - `Flex.Agent.Application/Abstractions/Integrations/Meta`: `IMetaOAuthService`, `IMetaGraphService`, provider-neutral records và `IIntegrationSessionStore`.
 - `Flex.Agent.Application/Abstractions/Integrations/Instagram` và `Facebook`: connection service ports/context/result; không chứa `HttpClient` hay provider response DTO.
-- `Flex.Agent.Application/Integrations/Instagram` và `Facebook`: MediatR command/query handlers cho connect, callback/discovery, complete, list, disconnect.
+- `Flex.Agent.Infrastructures/Integrations/Instagram` và `Facebook`: channel-specific connection services cho connect, callback/discovery, complete, list, disconnect; API controllers gọi qua application interfaces theo convention hiện hữu của service.
 - `Flex.Agent.Infrastructures/Integrations/Meta`: `MetaOAuthService`, `MetaGraphService`, `MetaOptions`, provider JSON models; scope/version/configurable URL.
 - `Flex.Agent.Infrastructures/Integrations/Instagram` và `Facebook`: orchestration implementations gọi Meta ports và persistence/session abstractions.
 - `Flex.Agent.Api/Channels/Instagram`: route-compatible adapter hiện hữu; `Flex.Agent.Api/Controllers/Integrations/FacebookController.cs` và callback adapter mới.
@@ -127,7 +127,7 @@
 - Disconnect không tìm thấy hoặc đã disconnected → trả trạng thái idempotent, không phát sinh lỗi nghiệp vụ mới.
 
 **Thay đổi boundary giữa service/module**:
-- `Flex.Agent.Application` sở hữu use-case/port; `Flex.Agent.Infrastructures` sở hữu Meta HTTP, JSON và EF persistence; `Flex.Agent.Api` chỉ binding/auth/mapping.
+- `Flex.Agent.Application` sở hữu port và contract; `Flex.Agent.Infrastructures` sở hữu Meta HTTP, JSON, orchestration và EF persistence; `Flex.Agent.Api` chỉ binding/auth/mapping.
 - `flex-database` là owner migration của `agentdb`; `flex-agent-service` chỉ map schema, không tạo EF migration mới.
 - Frontend chỉ nhận URL/session/candidate metadata, không nhận access token.
 
@@ -350,13 +350,13 @@ flex-microfrontend/src/app/features/agent-catalog/
     ├── agent-editor-wizard/agent-editor-wizard.component.ts
     ├── agent-editor-wizard/agent-editor-wizard.component.html
     ├── agent-editor-wizard/agent-editor-wizard.component.spec.ts
-    ├── agent-step-publish/agent-step-publish.component.ts
-    ├── agent-step-publish/agent-step-publish.component.html
-    ├── agent-step-publish/agent-step-publish.component.spec.ts
-    ├── agent-instagram-connect-modal/agent-instagram-connect-modal.component.ts
-    ├── agent-instagram-connect-modal/agent-instagram-connect-modal.component.html
-    ├── agent-instagram-connect-modal/agent-instagram-connect-modal.component.spec.ts
-    └── agent-channel-connection-result-modal/
+    ├── agent-editor-wizard/steps/agent-step-publish/agent-step-publish.component.ts
+    ├── agent-editor-wizard/steps/agent-step-publish/agent-step-publish.component.html
+    ├── agent-editor-wizard/steps/agent-step-publish/agent-step-publish.component.spec.ts
+    ├── agent-editor-wizard/steps/agent-step-publish/channels/instagram/agent-instagram-connect-modal.component.ts
+    ├── agent-editor-wizard/steps/agent-step-publish/channels/instagram/agent-instagram-connect-modal.component.html
+    ├── agent-editor-wizard/steps/agent-step-publish/channels/instagram/agent-instagram-connect-modal.component.spec.ts
+    └── agent-editor-wizard/steps/agent-step-publish/channels/connection-result/
         agent-channel-connection-result-modal.component.ts
         agent-channel-connection-result-modal.component.html
         agent-channel-connection-result-modal.component.scss

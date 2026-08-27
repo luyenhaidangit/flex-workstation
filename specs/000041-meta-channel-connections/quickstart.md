@@ -82,3 +82,12 @@ Xác nhận `AgentEditorWizardComponent` test không còn giả định chỉ c�
 
 - `IMemoryCache` chỉ phù hợp khi topology hiện tại bảo đảm callback/result đi qua cùng instance hoặc có cơ chế affinity. Trước khi scale nhiều replica phải thay `IIntegrationSessionStore` bằng distributed implementation và kiểm thử lại.
 - Meta permissions/API version/app review là điều kiện bên ngoài code; staging smoke test là bắt buộc trước production.
+
+## 9. Kết quả kiểm chứng local ngày 2026-08-27
+
+- `dotnet build Flex.Agent.sln`: pass bằng output validation riêng; có warning analyzer `OllamaSharp` hiện hữu.
+- `dotnet test Flex.Agent.sln`: pass `66/66`.
+- `ng build --configuration development`: pass.
+- `ng test --watch=false`: `135` pass, `41` fail do test harness hiện hữu thiếu module/provider cho các màn hình khác; đây không phải lỗi compile của feature này.
+- `liquibase validate`: pass; `liquibase update-sql` chỉ sinh SQL, `liquibase status` vẫn báo các changeset pending. Chưa chạy `liquibase update`.
+- Chưa thực hiện Meta staging smoke test vì cần Meta test app, HTTPS callback và secret ngoài repo.
