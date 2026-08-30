@@ -139,6 +139,16 @@ class merely to wrap one framework call. Keep framework-specific utilities in th
 outer layer that needs them; do not pull ASP.NET Core dependencies into `Domain`
 or stable application policy without a boundary reason.
 
+### Prefer named intermediate results when they improve inspectability
+
+For non-trivial expressions, external-call results, constructed URLs or payloads,
+query results, mappings, and values that may need debugging, assign the result to a
+clearly named local variable before returning it. This gives the debugger a stable
+value to inspect and makes logging, validation, and step-by-step diagnosis easier.
+Use direct `return` for genuinely simple expressions where a local name adds no
+debugging or readability value; do not create meaningless aliases solely to add a
+line of code.
+
 For Clean Architecture work, make the responsibility and dependency of every layer explicit before adding code. Implement one thin vertical slice from transport to durable state, then add cross-cutting policies and asynchronous integration only when their failure semantics are designed. Keep the host as the composition root; do not let HTTP, EF Core, vendor SDK, or broker types leak into stable business policy.
 
 ### Adopt an in-process mediator only at a demonstrated operation boundary
@@ -315,6 +325,9 @@ Unless the repository has a justified alternative:
 - Prefer supported .NET/BCL, ASP.NET Core, EF Core, and `Microsoft.Extensions`
   capabilities over equivalent handwritten code; verify existing APIs and package
   references before introducing a helper or dependency.
+- Prefer a clearly named local result before `return` when the expression is
+  non-trivial or likely to be inspected during debugging; keep direct returns for
+  simple expressions where the extra variable has no practical value.
 - Use exceptions for exceptional failure, not routine branching; map boundary failures consistently.
 - Use explicit outcomes for expected business alternatives, but do not hide programming, infrastructure, timeout, or cancellation failures inside a universal `Result<T>` wrapper.
 - Use UTC or `DateTimeOffset` for instants and inject `TimeProvider` when time affects behavior.
@@ -447,6 +460,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 | "Every endpoint needs a handler, mediator, and repository to be Clean Architecture" | Clean Architecture protects responsibilities and dependency direction; straightforward CRUD can remain direct when no use-case boundary is needed. |
 | "A small helper is faster than checking whether .NET already provides this" | Framework APIs carry tested encoding, parsing, cancellation, disposal, and edge-case behavior; search first and add custom code only for a real semantic gap. |
 | "Adding a package is harmless because the API is convenient" | A package changes the dependency and support surface; verify target compatibility, ownership, version policy, and whether an existing framework reference already provides the capability. |
+| "A direct return is always cleaner" | For non-trivial or externally produced values, a named local improves debugger inspection and makes validation or diagnostics explicit; use direct return only when it remains equally inspectable and clear. |
 
 ## Red Flags
 
@@ -474,6 +488,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A required controller dependency is changed to nullable to avoid updating direct controller construction in tests
 - A handwritten helper duplicates a BCL, ASP.NET Core, EF Core, or `Microsoft.Extensions` capability without a documented semantic difference
 - A new package is added for a framework capability without checking target-framework compatibility, existing package/framework references, or version policy
+- A complex expression, external-call result, URL, payload, or mapping is returned directly when a named local would materially improve debugging or validation
 
 ## Verification
 
@@ -487,6 +502,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] Before adding a helper or package, the codebase and applicable .NET/ASP.NET Core APIs were checked for an equivalent capability
 - [ ] Any selected framework API or package has compatible target framework, ownership, version policy, and layer placement
 - [ ] Custom utility code documents the semantic gap that prevents reuse of the existing framework capability
+- [ ] Non-trivial results that need inspection, validation, logging, or debugging use clearly named local variables before being returned
 - [ ] Dependency direction still points inward: `Domain` has no HTTP, persistence, or vendor SDK reference
 - [ ] Every new abstraction (interface, repository, mediator) has a stated reason — protects a real boundary or has 2+ implementations
 - [ ] State-changing use cases have an explicit transaction owner, concurrency behavior, and idempotency strategy
