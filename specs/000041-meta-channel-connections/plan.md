@@ -4,6 +4,8 @@
 
 **Đầu vào**: Đặc tả tính năng từ `specs/000041-meta-channel-connections/spec.md`
 
+**Cập nhật triển khai**: OAuth state và temporary connection session sử dụng Redis distributed store với TTL 10 phút, hashed opaque state và atomic consume (`SET NX`/`GETDEL`). `IMemoryCache` không còn là storage runtime cho flow này.
+
 ## Tóm tắt
 
 **Yêu cầu chính từ spec**:
@@ -31,7 +33,7 @@
 **Ngoài phạm vi kỹ thuật**:
 - Gửi/nhận tin nhắn, webhook, conversation routing, posting, ads, analytics và content management.
 - `Direct Instagram` hoặc provider ngoài Meta; chỉ để boundary tương lai, không đăng ký implementation chưa dùng.
-- Tự động refresh token, background worker, Redis/distributed session và thay đổi các luồng webhook Instagram hiện có.
+- Tự động refresh token, background worker và thay đổi các luồng webhook Instagram hiện có.
 - Xóa/đổi tên các bảng hoặc route Instagram hiện hữu trong MVP.
 
 ## Bối cảnh kỹ thuật

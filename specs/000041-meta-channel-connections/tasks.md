@@ -6,6 +6,8 @@
 
 **Nguyên tắc thực thi**: Test tự động phải được viết trước implementation trong mỗi phase. Không commit secret, không chạy `liquibase update` trên database thật nếu chưa xác nhận target và authorization vận hành.
 
+**Cập nhật triển khai**: T018 được thực hiện bằng Redis distributed store; `IMemoryCache` không còn được dùng cho OAuth/session/webhook dedup runtime.
+
 ## Phase 1: Setup
 
 **Mục đích**: Xác nhận baseline và chuẩn bị cấu hình mẫu cho ba repository bị ảnh hưởng.
