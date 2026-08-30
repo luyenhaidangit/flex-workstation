@@ -110,6 +110,35 @@ For a new business system, begin with a modular monolith organized by business c
 
 Do not create interfaces, repositories, mediators, factories, DTO layers, or projects solely to match a diagram. Introduce an abstraction when it protects a real boundary, supports multiple implementations, isolates volatile infrastructure, improves testability of important policy, or removes demonstrated duplication.
 
+### Prefer framework capabilities before custom code
+
+Before writing a helper, utility, extension method, serializer, query builder,
+validation rule, HTTP abstraction, or infrastructure wrapper, search the current
+codebase and verify whether the target framework or an already-approved Microsoft
+package provides the behavior. Prefer the existing capability when it matches the
+required semantics because it reduces duplicated edge-case handling and keeps the
+code aligned with supported .NET behavior.
+
+Use this order of preference:
+
+1. Existing project code with the same responsibility and compatible semantics.
+2. .NET BCL APIs such as `UriBuilder`, `HttpClient`, `System.Text.Json`,
+   `TimeProvider`, collections, and cancellation primitives.
+3. ASP.NET Core, EF Core, and `Microsoft.Extensions` APIs already available to the
+   project, such as `QueryHelpers`, model binding, `ProblemDetails`, options,
+   logging, caching, and EF query operators.
+4. An official, supported Microsoft package when the project does not already
+   reference the required API and the dependency is justified by the boundary.
+5. A focused custom implementation only when the framework capability is missing,
+   has incompatible semantics, or the behavior is domain-specific.
+
+Before adding a package, check target-framework compatibility, package ownership,
+version policy, transitive dependency impact, and whether the same capability is
+already exposed by a framework reference. Do not add a custom `Helper` or `Utils`
+class merely to wrap one framework call. Keep framework-specific utilities in the
+outer layer that needs them; do not pull ASP.NET Core dependencies into `Domain`
+or stable application policy without a boundary reason.
+
 For Clean Architecture work, make the responsibility and dependency of every layer explicit before adding code. Implement one thin vertical slice from transport to durable state, then add cross-cutting policies and asynchronous integration only when their failure semantics are designed. Keep the host as the composition root; do not let HTTP, EF Core, vendor SDK, or broker types leak into stable business policy.
 
 ### Adopt an in-process mediator only at a demonstrated operation boundary
@@ -283,6 +312,9 @@ Unless the repository has a justified alternative:
 - Let `Application` own use-case orchestration, application authorization decisions, transaction boundaries, and ports to volatile infrastructure. Let `Domain` own invariants and state transitions; keep persistence mapping and side-effect delivery outside it.
 - For a new service baseline, inspect or add `global.json`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, `NuGet.config` when multiple package feeds exist, and a CI workflow that runs restore, build, and test.
 - Prefer immutable request/value data and explicit state transitions.
+- Prefer supported .NET/BCL, ASP.NET Core, EF Core, and `Microsoft.Extensions`
+  capabilities over equivalent handwritten code; verify existing APIs and package
+  references before introducing a helper or dependency.
 - Use exceptions for exceptional failure, not routine branching; map boundary failures consistently.
 - Use explicit outcomes for expected business alternatives, but do not hide programming, infrastructure, timeout, or cancellation failures inside a universal `Result<T>` wrapper.
 - Use UTC or `DateTimeOffset` for instants and inject `TimeProvider` when time affects behavior.
@@ -413,6 +445,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 | "Making a new controller dependency nullable is the fastest way to keep old tests compiling" | That weakens the production contract and leaves dead branches. Compose required dependencies in the tests and verify the collaboration instead. |
 | "I can put the API response DTO in the query handler to make the controller thinner" | That reverses ownership of the HTTP contract. Let Application return a purpose-specific result and map it in Presentation. |
 | "Every endpoint needs a handler, mediator, and repository to be Clean Architecture" | Clean Architecture protects responsibilities and dependency direction; straightforward CRUD can remain direct when no use-case boundary is needed. |
+| "A small helper is faster than checking whether .NET already provides this" | Framework APIs carry tested encoding, parsing, cancellation, disposal, and edge-case behavior; search first and add custom code only for a real semantic gap. |
+| "Adding a package is harmless because the API is convenient" | A package changes the dependency and support surface; verify target compatibility, ownership, version policy, and whether an existing framework reference already provides the capability. |
 
 ## Red Flags
 
@@ -438,6 +472,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A write handler calls `SaveChangesAsync` through multiple repositories backed by the same `DbContext`
 - A check-then-insert uniqueness rule has no database constraint or no translation path for its known concurrent constraint violation
 - A required controller dependency is changed to nullable to avoid updating direct controller construction in tests
+- A handwritten helper duplicates a BCL, ASP.NET Core, EF Core, or `Microsoft.Extensions` capability without a documented semantic difference
+- A new package is added for a framework capability without checking target-framework compatibility, existing package/framework references, or version policy
 
 ## Verification
 
@@ -448,6 +484,9 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] Every configured centralized sink has a reachable route from the actual hosting mode, and the collector/index preserves the service identity
 - [ ] Runtime logging delivery was smoke-tested when infrastructure was available; otherwise the result explicitly says configured-but-unverified
 - [ ] Nullable/analyzer warnings on touched code are not suppressed or weakened merely to pass
+- [ ] Before adding a helper or package, the codebase and applicable .NET/ASP.NET Core APIs were checked for an equivalent capability
+- [ ] Any selected framework API or package has compatible target framework, ownership, version policy, and layer placement
+- [ ] Custom utility code documents the semantic gap that prevents reuse of the existing framework capability
 - [ ] Dependency direction still points inward: `Domain` has no HTTP, persistence, or vendor SDK reference
 - [ ] Every new abstraction (interface, repository, mediator) has a stated reason — protects a real boundary or has 2+ implementations
 - [ ] State-changing use cases have an explicit transaction owner, concurrency behavior, and idempotency strategy
