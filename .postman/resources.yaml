@@ -1,0 +1,17 @@
+workspace:
+  id: f25bcbd8-351a-4cea-8f93-b2473eab0317
+
+localResources:
+  collections:
+    - ../flex.postman_collection.json
+  specs:
+    - ../postman/specs/Flex Agent Catalog API/agent-catalog-api.yaml
+resourceNameMappings:
+  specs:
+    - ../postman/specs/Flex Agent Catalog API/agent-catalog-api.yaml: Flex Agent Catalog API
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Flex - Local Services: 31e04cbd-242d-4c6c-999c-f5ed89bca923

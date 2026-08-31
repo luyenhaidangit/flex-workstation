@@ -1,0 +1,8 @@
+$kind: http-request
+description: Gọi sau khi Meta redirect về callback; response là redirect tới frontend.
+url: "{{agentBaseUrl}}/api/channels/facebook/callback?code={{facebookCode}}&state={{facebookState}}"
+method: GET
+queryParams:
+  code: "{{facebookCode}}"
+  state: "{{facebookState}}"
+order: 2000

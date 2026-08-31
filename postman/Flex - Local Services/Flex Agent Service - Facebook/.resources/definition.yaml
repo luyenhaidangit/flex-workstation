@@ -1,0 +1,3 @@
+$kind: collection
+description: Luồng kết nối Facebook OAuth. Cần accessToken hợp lệ và AgentId tồn tại.
+order: 2000

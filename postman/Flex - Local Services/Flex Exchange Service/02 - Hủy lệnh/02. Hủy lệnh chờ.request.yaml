@@ -1,0 +1,9 @@
+$kind: http-request
+description: Chạy sau request 01 trong cùng folder.
+url: "{{exchangeBaseUrl}}/api/orders/{{exchangeOrderId}}?brokerId={{exchangeBrokerId}}"
+method: DELETE
+headers:
+  X-Correlation-Id: "{{exchangeCorrelationId}}"
+queryParams:
+  brokerId: "{{exchangeBrokerId}}"
+order: 2000

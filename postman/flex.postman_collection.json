@@ -41,6 +41,34 @@
     {
       "key": "exchangeCorrelationId",
       "value": "postman-mvp02-001"
+    },
+    {
+      "key": "agentBaseUrl",
+      "value": "http://localhost:7001"
+    },
+    {
+      "key": "facebookAgentId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "facebookState",
+      "value": ""
+    },
+    {
+      "key": "facebookCode",
+      "value": ""
+    },
+    {
+      "key": "facebookResourceId",
+      "value": ""
+    },
+    {
+      "key": "facebookConnectionId",
+      "value": ""
+    },
+    {
+      "key": "accessToken",
+      "value": ""
     }
   ],
   "item": [
@@ -467,6 +495,113 @@
               "response": []
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Flex Agent Service - Facebook",
+      "description": "Luồng kết nối Facebook OAuth. Cần accessToken hợp lệ và AgentId tồn tại.",
+      "item": [
+        {
+          "name": "01. Start Facebook connection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.state) pm.collectionVariables.set('facebookState', response.state);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agentId\": \"{{facebookAgentId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{agentBaseUrl}}/api/channels/facebook/connect"
+          },
+          "response": []
+        },
+        {
+          "name": "02. Facebook OAuth callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{agentBaseUrl}}/api/channels/facebook/callback?code={{facebookCode}}&state={{facebookState}}",
+            "description": "Gọi sau khi Meta redirect về callback; response là redirect tới frontend."
+          },
+          "response": []
+        },
+        {
+          "name": "03. Get Facebook discovery result",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{agentBaseUrl}}/api/channels/facebook/connect/result?agentId={{facebookAgentId}}&state={{facebookState}}"
+          },
+          "response": []
+        },
+        {
+          "name": "04. Complete Facebook connection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.connectionId) pm.collectionVariables.set('facebookConnectionId', response.connectionId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agentId\": \"{{facebookAgentId}}\",\n  \"state\": \"{{facebookState}}\",\n  \"resourceId\": \"{{facebookResourceId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{agentBaseUrl}}/api/channels/facebook/connections/complete"
+          },
+          "response": []
+        },
+        {
+          "name": "05. List Facebook connections",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{agentBaseUrl}}/api/channels/facebook/connections?agentId={{facebookAgentId}}"
+          },
+          "response": []
+        },
+        {
+          "name": "06. Disconnect Facebook connection",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{agentBaseUrl}}/api/channels/facebook/connections/{{facebookConnectionId}}?agentId={{facebookAgentId}}"
+          },
+          "response": []
         }
       ]
     }

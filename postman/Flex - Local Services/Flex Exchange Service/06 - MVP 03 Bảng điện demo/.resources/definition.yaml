@@ -1,0 +1,3 @@
+$kind: collection
+description: "Smoke flow cho bảng điện FXS: đọc market snapshot, tạo hai lệnh đối ứng bằng hai broker demo và hủy lệnh còn chờ."
+order: 6000

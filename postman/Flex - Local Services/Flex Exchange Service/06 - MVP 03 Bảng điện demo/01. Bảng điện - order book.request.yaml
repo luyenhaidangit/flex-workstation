@@ -1,0 +1,5 @@
+$kind: http-request
+description: Nguồn dữ liệu bid/ask và khối lượng chờ của mã FXS.
+url: "{{exchangeBaseUrl}}/api/orderbook"
+method: GET
+order: 1000

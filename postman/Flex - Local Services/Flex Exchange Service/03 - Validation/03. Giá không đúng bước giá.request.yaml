@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{exchangeBaseUrl}}/api/orders"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "brokerId": "{{exchangeBrokerId}}",
+      "symbol": "{{exchangeSymbol}}",
+      "side": "Buy",
+      "price": 20050,
+      "quantity": 100
+    }
+order: 3000

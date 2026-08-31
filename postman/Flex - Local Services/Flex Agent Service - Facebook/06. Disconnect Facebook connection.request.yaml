@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{agentBaseUrl}}/api/channels/facebook/connections/{{facebookConnectionId}}?agentId={{facebookAgentId}}"
+method: DELETE
+headers:
+  Authorization: Bearer {{accessToken}}
+queryParams:
+  agentId: "{{facebookAgentId}}"
+order: 6000

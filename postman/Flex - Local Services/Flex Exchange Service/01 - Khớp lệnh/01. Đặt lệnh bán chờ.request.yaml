@@ -1,0 +1,18 @@
+$kind: http-request
+description: Lệnh không có đối ứng, được giữ trong order book.
+url: "{{exchangeBaseUrl}}/api/orders"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Correlation-Id: "{{exchangeCorrelationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "brokerId": "{{exchangeBrokerId}}",
+      "symbol": "{{exchangeSymbol}}",
+      "side": "Sell",
+      "price": 20000,
+      "quantity": 100
+    }
+order: 1000
