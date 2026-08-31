@@ -1,5 +1,0 @@
-$kind: http-request
-description: Nguồn dữ liệu giao dịch mới nhất để UI hiển thị trade tape.
-url: "{{exchangeBaseUrl}}/api/trades"
-method: GET
-order: 2000

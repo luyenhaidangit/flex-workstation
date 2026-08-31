@@ -1,9 +1,0 @@
-$kind: http-request
-url: "{{agentBaseUrl}}/api/channels/facebook/connect/result?agentId={{facebookAgentId}}&state={{facebookState}}"
-method: GET
-headers:
-  Authorization: Bearer {{accessToken}}
-queryParams:
-  agentId: "{{facebookAgentId}}"
-  state: "{{facebookState}}"
-order: 3000

@@ -1,3 +1,0 @@
-$kind: collection
-description: API khớp lệnh instrument mô phỏng trong-memory. Dữ liệu bị xóa khi khởi động lại service.
-order: 1000

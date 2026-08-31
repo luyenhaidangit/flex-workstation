@@ -1,4 +1,0 @@
-$kind: http-request
-url: "{{exchangeBaseUrl}}/api/events"
-method: GET
-order: 4000

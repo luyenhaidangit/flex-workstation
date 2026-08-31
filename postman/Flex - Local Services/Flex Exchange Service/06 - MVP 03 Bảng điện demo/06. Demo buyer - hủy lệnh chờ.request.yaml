@@ -1,9 +1,0 @@
-$kind: http-request
-description: Chạy sau request 05 để kiểm tra vòng đời hủy lệnh demo.
-url: "{{exchangeBaseUrl}}/api/orders/{{exchangeBuyerOrderId}}?brokerId={{exchangeBuyerBrokerId}}"
-method: DELETE
-headers:
-  X-Correlation-Id: "{{exchangeCorrelationId}}"
-queryParams:
-  brokerId: "{{exchangeBuyerBrokerId}}"
-order: 6000

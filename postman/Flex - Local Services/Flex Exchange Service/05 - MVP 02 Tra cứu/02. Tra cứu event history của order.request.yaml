@@ -1,6 +1,0 @@
-$kind: http-request
-url: "{{exchangeBaseUrl}}/api/orders/{{exchangeOrderId}}/events?brokerId={{exchangeBrokerId}}"
-method: GET
-queryParams:
-  brokerId: "{{exchangeBrokerId}}"
-order: 2000
