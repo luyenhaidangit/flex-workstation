@@ -58,6 +58,11 @@ Keep parameters cohesive. Introduce a request/options type when parameters form 
 
 Prefer command/query clarity: make a method either change state or return data unless an atomic operation naturally needs both. Document important side effects, idempotency, ordering, thread safety, and ownership.
 
+Keep method declarations on one line when the signature remains readable and fits
+the repository's formatting conventions; wrap only when a longer signature would
+materially reduce readability. Name `CancellationToken` parameters `ct` consistently
+and keep the token last, defaulting it only on an appropriate public boundary.
+
 For reusable libraries:
 
 - Keep the public API minimal and stable.
@@ -83,11 +88,11 @@ Keep asynchronous I/O async through the call chain:
 ```csharp
 public async Task<Order?> GetOrderAsync(
     OrderId orderId,
-    CancellationToken cancellationToken)
+    CancellationToken ct)
 {
     return await dbContext.Orders
         .AsNoTracking()
-        .SingleOrDefaultAsync(x => x.Id == orderId, cancellationToken);
+        .SingleOrDefaultAsync(x => x.Id == orderId, ct);
 }
 ```
 
