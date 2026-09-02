@@ -51,7 +51,15 @@
       "value": "00000000-0000-0000-0000-000000000000"
     },
     {
+      "key": "instagramAgentId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
       "key": "facebookState",
+      "value": ""
+    },
+    {
+      "key": "instagramState",
       "value": ""
     },
     {
@@ -600,6 +608,42 @@
               { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
             "url": "{{agentBaseUrl}}/api/channels/facebook/connections/{{facebookConnectionId}}?agentId={{facebookAgentId}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Flex Agent Service - Instagram",
+      "description": "Bắt đầu luồng kết nối Instagram OAuth. Cần accessToken hợp lệ và AgentId tồn tại.",
+      "item": [
+        {
+          "name": "01. Start Instagram connection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.state) pm.collectionVariables.set('instagramState', response.state);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agentId\": \"{{instagramAgentId}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{agentBaseUrl}}/api/channels/instagram/connect",
+            "description": "Response trả về oauthUrl và state. Mở oauthUrl trên trình duyệt để tiếp tục xác thực Instagram."
           },
           "response": []
         }
