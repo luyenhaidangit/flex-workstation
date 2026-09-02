@@ -12,7 +12,7 @@
 
 | Method/route | Request/query | Response thành công | Lỗi chính |
 |---|---|---|---|
-| `POST /api/channels/instagram/connect` | `{ "agentId": "uuid" }` | `{ "oauthUrl": "https://...", "state": "opaque-or-legacy-compatible" }` | `401/403`, `400 INVALID_AGENT_SCOPE` |
+| `POST /api/channels/instagram/connect` | `{ "agentId": "uuid" }` | `{ "oauthUrl": "https://..." }` | `401/403`, `400 INVALID_AGENT_SCOPE` |
 | `GET /api/channels/instagram/callback` | Meta `code`, `state`, hoặc `error` params | Redirect về configured editor route với `channel=instagram`, `sessionId`, `status` | `INVALID_STATE`, `SESSION_EXPIRED`, `META_AUTH_FAILED` |
 | `GET /api/channels/instagram/connect/result` | `sessionKey`/`sessionId` theo compatibility mapping | `{ "valid": [...], "invalid": [...], "metaAccountInfo": {...} }` | `400 SESSION_EXPIRED`, `403 FORBIDDEN` |
 | `POST /api/channels/instagram/pages/confirm` | Legacy `{ "agentId": "uuid", "sessionKey": "...", "selectedPageIds": ["..."] }` | Existing-compatible connected response | `400 INVALID_CANDIDATE`, `409 CONNECTION_CONFLICT` |
@@ -25,7 +25,7 @@ Legacy `selectedPageIds` được giữ để không phá consumer hiện hữu;
 
 | Method/route | Request/query | Response thành công | Lỗi chính |
 |---|---|---|---|
-| `POST /api/channels/facebook/connect` | `{ "agentId": "uuid", "method": "meta" }` | `{ "sessionId": "opaque", "oauthUrl": "https://..." }` | `401/403`, `400 UNSUPPORTED_METHOD` |
+| `POST /api/channels/facebook/connect` | `{ "agentId": "uuid", "method": "meta" }` | `{ "oauthUrl": "https://..." }` | `401/403`, `400 UNSUPPORTED_METHOD` |
 | `GET /api/channels/facebook/callback` | Meta `code`, `state`, hoặc `error` params | Redirect về editor route với `channel=facebook`, `sessionId`, `status` | `INVALID_STATE`, `SESSION_EXPIRED`, `META_AUTH_FAILED` |
 | `GET /api/channels/facebook/connect/result` | `agentId`, `sessionId` | `{ "sessionId": "opaque", "channel": "facebook", "candidates": [...], "status": "discovered" }` | `400 SESSION_EXPIRED`, `403 FORBIDDEN` |
 | `POST /api/channels/facebook/connections/complete` | `{ "agentId": "uuid", "sessionId": "opaque", "resourceId": "page-id" }` | `{ "connectionId": "uuid", "channel": "facebook", "resource": {...}, "status": "active" }` | `400 INVALID_CANDIDATE`, `409 CONNECTION_CONFLICT`, `422 PROVIDER_PERMISSION_REVOKED` |

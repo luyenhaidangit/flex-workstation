@@ -518,7 +518,10 @@
               "script": {
                 "exec": [
                   "const response = pm.response.json();",
-                  "if (response.state) pm.collectionVariables.set('facebookState', response.state);"
+                  "if (response.oauthUrl) {",
+                  "    const state = new URL(response.oauthUrl).searchParams.get('state');",
+                  "    if (state) pm.collectionVariables.set('facebookState', state);",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
@@ -625,7 +628,10 @@
               "script": {
                 "exec": [
                   "const response = pm.response.json();",
-                  "if (response.state) pm.collectionVariables.set('instagramState', response.state);"
+                  "if (response.oauthUrl) {",
+                  "    const state = new URL(response.oauthUrl).searchParams.get('state');",
+                  "    if (state) pm.collectionVariables.set('instagramState', state);",
+                  "}"
                 ],
                 "type": "text/javascript"
               }
@@ -643,7 +649,7 @@
               "options": { "raw": { "language": "json" } }
             },
             "url": "{{agentBaseUrl}}/api/channels/instagram/connect",
-            "description": "Response trả về oauthUrl và state. Mở oauthUrl trên trình duyệt để tiếp tục xác thực Instagram."
+            "description": "Response chỉ trả về oauthUrl. Mở oauthUrl trên trình duyệt để tiếp tục xác thực Instagram."
           },
           "response": []
         }
