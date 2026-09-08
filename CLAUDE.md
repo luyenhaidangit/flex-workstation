@@ -1,7 +1,11 @@
 @AGENTS.md
 
-## Claude Code
+## Claude Code Rules
 
-- Cấu hình dùng chung ở `.claude/settings.json`; thiết lập theo máy/người dùng ở `.claude/settings.local.json` và không được commit.
-- `.claude/skills/` là junction do bootstrap tạo tới `.agents/skills/`; chỉ sửa skill nguồn đã được Git theo dõi.
-- Hook kiểm tra format skill nằm tại `.claude/hooks/skill-format-guard.js`.
+- **Cấu hình**:
+  - Dùng chung repo: `.claude/settings.json`
+  - Thiết lập máy/cá nhân: `.claude/settings.local.json` (tuyệt đối không commit file này).
+- **Quản lý Skills**:
+  - Thư mục `.claude/skills/` chỉ là junction trỏ tới `.agents/skills/`.
+  - **Quy tắc bắt buộc**: Khi tạo hoặc chỉnh sửa skill, chỉ thao tác trực tiếp trên source gốc tại `.agents/skills/`.
+  - Kiểm tra tính hợp lệ qua hook: `.claude/hooks/skill-format-guard.js`.
