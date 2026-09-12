@@ -99,29 +99,27 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
-| `rtk` | Proxy shell command để giảm token output (quy tắc chi tiết bên dưới) |
+| `rtk` | Proxy CLI giảm 60–99% token output; dùng cho mọi shell command (xem `tooling/RTK.md`) |
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
 
 ### Quy tắc rtk (bắt buộc)
 
-Thay lệnh đọc/tìm/liệt kê/git bằng lệnh `rtk` tương ứng — không bọc trong PowerShell wrapper:
+**Golden Rule: luôn prefix command bằng `rtk`** — nếu không có filter riêng, rtk pass-through nguyên vẹn, không có tác dụng phụ.
 
-- Đọc file: `rtk read <file>` (thay `Get-Content`/`cat`)
-- Tìm kiếm: `rtk grep <pattern> <path>` (thay `rg`/`Select-String`)
-- Liệt kê: `rtk ls <path>` (thay `Get-ChildItem`/`ls`)
-- Git: `rtk git <args>`
-- Cấm: `rtk powershell -Command "..."` — rtk không filter được lệnh bọc, tiết kiệm 0 token
-- Cấm: `rtk <PowerShell cmdlet>` — cmdlet không phải executable, sẽ fail
+Phạm vi áp dụng: git, gh, build (cargo/tsc/lint/next), test (jest/vitest/pytest/playwright), file (read/grep/ls/find), docker, curl và hầu hết CLI tool. Chi tiết: `tooling/RTK.md`.
 
-Nếu buộc phải dùng wrapper `powershell -Command`, chạy thẳng không có `rtk`.
+Anti-pattern cần tránh:
+- `rtk powershell -Command "..."` — rtk không filter được lệnh bọc, tiết kiệm 0 token
+- `rtk <PowerShell cmdlet>` — cmdlet không phải executable, sẽ fail
 
-Chi tiết đầy đủ tại `~/.codex/RTK.md` (sync từ `scripts/templates/rtk-codex.md` khi bootstrap).
+Nếu buộc dùng wrapper `powershell -Command`, chạy thẳng không có `rtk`.
 
 ## Cấu trúc project
 
 ```text
 flex-workstation/
 ├── docs/            # Tài liệu workspace (system-map, onboarding, speckit)
+├── tooling/         # Tài liệu công cụ workspace (RTK.md, ...)
 ├── scripts/         # Bootstrap và tooling scripts
 ├── .agents/         # Skill source chung cho Codex, Antigravity và Claude Code
 ├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands)
