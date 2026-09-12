@@ -11,6 +11,8 @@
 - [Manage resources and concurrency](#manage-resources-and-concurrency)
 - [Keep mapping and serialization explicit](#keep-mapping-and-serialization-explicit)
 - [Automate style and analysis](#automate-style-and-analysis)
+- [Use named constants for domain-significant strings](#use-named-constants-for-domain-significant-strings)
+- [Make same-class method calls explicit with this.](#make-same-class-method-calls-explicit-with-this)
 - [Review common hazards](#review-common-hazards)
 
 ## Optimize for readable contracts
@@ -127,6 +129,22 @@ Treat serialized names, enum values, required fields, precision, and date format
 Use `.editorconfig`, SDK analyzers, nullable analysis, and repository build properties as executable conventions. Add analyzers incrementally and configure severity intentionally. Prefer fixing a warning or scoping a documented suppression over disabling a rule globally.
 
 Use centralized build/package files when a solution has several projects, but avoid changing unrelated project behavior during a focused feature. Pin SDK selection when reproducibility requires it and keep dependencies within supported, patched versions.
+
+## Use named constants for domain-significant strings
+
+Replace repeated string literals that represent protocol identifiers, claim types, header names, routing keys, event names, configuration keys, or any value with domain meaning with named constants declared in one authoritative location. Locate the existing constant class before introducing a new one. When two constant classes with identical names coexist in scope (for example a custom `ClaimTypes` alongside `System.Security.Claims.ClaimTypes`), disambiguate with a using alias to make the source explicit rather than relying on implicit shadowing.
+
+## Make same-class method calls explicit with `this.`
+
+When calling an instance method of the current class from another method in the same class — especially in expression-bodied members where the receiver is implicit — prefix the call with `this.` to make it visually distinct from static calls, extension methods, and inherited members. This is particularly important for short expression-bodied methods where the call chain can otherwise be mistaken for an external API call.
+
+```csharp
+// Clear: reader knows GetClaimValue is a local instance method
+public string? GetUserId() => this.GetClaimValue(AuthClaimTypes.Sub);
+
+// Ambiguous: could be an extension method or inherited member
+public string? GetUserId() => GetClaimValue(AuthClaimTypes.Sub);
+```
 
 ## Review common hazards
 

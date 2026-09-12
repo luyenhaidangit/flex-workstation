@@ -62,6 +62,8 @@ Use Critical for exploitable security, cross-tenant access, likely data loss, or
 - [ ] Singleton/static state is thread-safe and cannot leak request/tenant data.
 - [ ] Parallelism, queues, recursion, payloads, and collections are bounded.
 - [ ] Time, timezone, culture, equality, and precision semantics are explicit.
+- [ ] Protocol strings, claim types, header names, routing keys, and other domain-significant string values use named constants rather than repeated literals; when two constant classes with the same name coexist, a using alias disambiguates the source.
+- [ ] Instance method calls targeting the current class use the `this.` prefix, especially in expression-bodied members.
 
 ## ASP.NET Core and API contracts
 
