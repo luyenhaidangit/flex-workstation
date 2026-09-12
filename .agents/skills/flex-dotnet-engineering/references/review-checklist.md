@@ -124,6 +124,8 @@ Use Critical for exploitable security, cross-tenant access, likely data loss, or
 ## Observability and operations
 
 - [ ] Logs use stable structured properties and record a failure once.
+- [ ] Every catch clause that changes control flow (alternate outcome, marked-failed resource, swallowed exception) logs via `ILogger` before returning — none is silent.
+- [ ] Log message templates are fixed strings with named, PascalCase placeholders — never string-interpolated — and the exception is passed through the logger's dedicated exception parameter.
 - [ ] Traces propagate across HTTP/messages and metrics avoid high-cardinality labels.
 - [ ] Critical rates, errors, duration, saturation, queue age, and business outcomes are measured.
 - [ ] Liveness is process-focused; readiness reflects ability to serve safely.

@@ -1,9 +1,10 @@
 @echo off
 setlocal
+chcp 65001 >nul
 cd /d "%~dp0"
 
 echo flex-workstation / AI Usage Monitor
 echo Opens ccusage monitor for all detected coding AI CLIs.
 echo.
 
-powershell -NoProfile -ExecutionPolicy Bypass -NoExit -File "%~dp0scripts\open-ai-usage-monitor.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -NoExit -File "%~dp0scripts\open-ai-usage-monitor.ps1" %*

@@ -3,12 +3,21 @@ param(
     [string]$View = "daily",
     [string]$Since = (Get-Date).AddDays(-30).ToString("yyyy-MM-dd"),
     [int]$RefreshSeconds = 30,
-    [switch]$Once
+    [switch]$Once,
+    [switch]$Online
 )
 
 $ErrorActionPreference = "Stop"
 
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 & "$PSScriptRoot\ensure-ccusage.ps1"
+
+if (-not (Get-Command "ccusage" -ErrorAction SilentlyContinue)) {
+    Write-Error "ccusage is not available in PATH. Please run SYNC_WORKSPACE.cmd or 'npm install -g ccusage'."
+    return
+}
 
 $workspaceRoot = (Resolve-Path "$PSScriptRoot\..").Path
 Set-Location $workspaceRoot
@@ -217,19 +226,38 @@ function Write-UsageTable {
 function Show-DailyUsageReport {
     param([string]$FromDate)
 
-    $jsonText = (& ccusage daily --all --since $FromDate --json) -join "`n"
-    $report = $jsonText | ConvertFrom-Json
+    $cmdArgs = @("daily", "--all", "--since", $FromDate, "--json")
+    if (-not $Online) {
+        $cmdArgs += "--offline"
+    }
+
+    $jsonText = (& ccusage @cmdArgs) -join "`n"
+    if ([string]::IsNullOrWhiteSpace($jsonText)) {
+        Write-Warning "Không nhận được dữ liệu từ ccusage."
+        return
+    }
+
+    try {
+        $report = $jsonText | ConvertFrom-Json
+    }
+    catch {
+        Write-Warning "Lỗi đọc dữ liệu JSON từ ccusage: $_"
+        return
+    }
+
     $rows = @()
 
-    $rows += New-UsageRow "TOTAL" "" "" `
-        $report.totals.inputTokens `
-        $report.totals.outputTokens `
-        $report.totals.cacheCreationTokens `
-        $report.totals.cacheReadTokens `
-        $report.totals.totalTokens `
-        $report.totals.totalCost
+    if ($report.totals) {
+        $rows += New-UsageRow "TOTAL" "" "" `
+            $report.totals.inputTokens `
+            $report.totals.outputTokens `
+            $report.totals.cacheCreationTokens `
+            $report.totals.cacheReadTokens `
+            $report.totals.totalTokens `
+            $report.totals.totalCost
+    }
 
-    $dailyRows = @($report.daily | Sort-Object period -Descending)
+    $dailyRows = if ($report.daily) { @($report.daily | Sort-Object period -Descending) } else { @() }
 
     for ($index = 0; $index -lt $dailyRows.Count; $index++) {
         $day = $dailyRows[$index]
@@ -241,31 +269,52 @@ function Show-DailyUsageReport {
             $day.totalTokens `
             $day.totalCost
 
-        $day.modelBreakdowns |
-            Sort-Object @{ Expression = { Get-AgentFromModel $_.modelName } }, modelName |
-            ForEach-Object {
-                $rows += New-UsageRow "" ("- " + (Get-AgentFromModel $_.modelName)) (Format-ModelName $_.modelName) `
-                    $_.inputTokens `
-                    $_.outputTokens `
-                    $_.cacheCreationTokens `
-                    $_.cacheReadTokens `
-                    ($_.inputTokens + $_.outputTokens + $_.cacheCreationTokens + $_.cacheReadTokens) `
-                    $_.cost
-            }
+        if ($day.modelBreakdowns) {
+            $day.modelBreakdowns |
+                Sort-Object @{ Expression = { Get-AgentFromModel $_.modelName } }, modelName |
+                ForEach-Object {
+                    $rows += New-UsageRow "" ("- " + (Get-AgentFromModel $_.modelName)) (Format-ModelName $_.modelName) `
+                        $_.inputTokens `
+                        $_.outputTokens `
+                        $_.cacheCreationTokens `
+                        $_.cacheReadTokens `
+                        ($_.inputTokens + $_.outputTokens + $_.cacheCreationTokens + $_.cacheReadTokens) `
+                        $_.cost
+                }
+        }
 
         if ($index -lt ($dailyRows.Count - 1)) {
             $rows += New-UsageSpacerRow
         }
     }
 
+    if ($rows.Count -eq 0) {
+        Write-Host "Không có dữ liệu usage trong khoảng thời gian đã chọn (từ ngày $FromDate)." -ForegroundColor Yellow
+        return
+    }
+
     Write-UsageTable $rows
+}
+
+function Invoke-CcusageCommand {
+    param(
+        [string]$Subcommand,
+        [string[]]$Arguments = @()
+    )
+
+    $allArgs = @($Subcommand) + $Arguments
+    if (-not $Online) {
+        $allArgs += "--offline"
+    }
+
+    & ccusage @allArgs
 }
 
 if ($View -eq "claude-blocks") {
     $blocksHelp = (& ccusage blocks --help 2>$null) -join "`n"
 
     if ($blocksHelp -match "(^|\s)--live(\s|,|$)") {
-        ccusage blocks --live
+        Invoke-CcusageCommand "blocks" @("--live")
         return
     }
 }
@@ -277,6 +326,7 @@ while ($true) {
     if ($View -ne "claude-blocks") {
         Write-Host "Since: $Since"
     }
+    Write-Host "Mode: $(if ($Online) { 'Online' } else { 'Offline (Fast)' })"
     Write-Host "Refresh: every $RefreshSeconds seconds. Press Ctrl+C to stop."
     Write-Host ""
 
@@ -285,16 +335,16 @@ while ($true) {
             Show-DailyUsageReport -FromDate $Since
         }
         "weekly" {
-            ccusage weekly --all --since $Since
+            Invoke-CcusageCommand "weekly" @("--all", "--since", $Since)
         }
         "monthly" {
-            ccusage monthly --all --since $Since
+            Invoke-CcusageCommand "monthly" @("--all", "--since", $Since)
         }
         "session" {
-            ccusage session --all --since $Since
+            Invoke-CcusageCommand "session" @("--all", "--since", $Since)
         }
         "claude-blocks" {
-            ccusage blocks --active
+            Invoke-CcusageCommand "blocks" @("--active")
         }
     }
 

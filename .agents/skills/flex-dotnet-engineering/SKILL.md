@@ -461,6 +461,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 | "A small helper is faster than checking whether .NET already provides this" | Framework APIs carry tested encoding, parsing, cancellation, disposal, and edge-case behavior; search first and add custom code only for a real semantic gap. |
 | "Adding a package is harmless because the API is convenient" | A package changes the dependency and support surface; verify target compatibility, ownership, version policy, and whether an existing framework reference already provides the capability. |
 | "A direct return is always cleaner" | For non-trivial or externally produced values, a named local improves debugger inspection and makes validation or diagnostics explicit; use direct return only when it remains equally inspectable and clear. |
+| "This exception is expected/benign, no need to log it" | A caught exception that changes control flow (returns an alternate outcome, marks a resource failed, swallows it) still needs a log line — Debug/Trace for an expected race, Warning/Error for a real failure — otherwise production has no signal that the alternate path was taken. |
 
 ## Red Flags
 
@@ -489,6 +490,8 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A handwritten helper duplicates a BCL, ASP.NET Core, EF Core, or `Microsoft.Extensions` capability without a documented semantic difference
 - A new package is added for a framework capability without checking target-framework compatibility, existing package/framework references, or version policy
 - A complex expression, external-call result, URL, payload, or mapping is returned directly when a named local would materially improve debugging or validation
+- A catch clause that changes control flow (returns an alternate result, marks a resource failed, or swallows the exception) with no corresponding `ILogger` call, leaving the failure invisible in production
+- A log call interpolates a value into the message string (`$"..."` or string concatenation) instead of using a fixed template with named placeholders and separate arguments
 
 ## Verification
 
@@ -508,6 +511,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] State-changing use cases have an explicit transaction owner, concurrency behavior, and idempotency strategy
 - [ ] Authorization and tenant scoping are enforced before data access, not assumed
 - [ ] No secret, token, connection string, or unnecessary personal data appears in logs, telemetry, or responses
+- [ ] Every catch clause that changes control flow (alternate outcome, marked-failed resource, swallowed exception) has a matching `ILogger` call at a level matching severity, using a fixed message template with named PascalCase placeholders and the exception passed as its own parameter
 - [ ] Every mapper sits at the project boundary that owns its destination contract and does not reverse dependency direction
 - [ ] Aggregate mappings use a focused `<Aggregate>Mapper` with explicit target methods; unrelated mappings are not mixed into it
 - [ ] Mappers contain only pure transformation; validation, business decisions, I/O, and trusted values remain outside
