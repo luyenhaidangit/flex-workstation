@@ -36,7 +36,7 @@ Bootstrap đọc `workstation.json`, clone các repo còn thiếu vào workstati
 
 `.claude/settings.local.json` được giữ nguyên nếu đã tồn tại vì đây là cấu hình local theo máy/người dùng.
 
-Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, Antigravity CLI `agy`, `uv`, `specify-cli` và Claude Code khi cần. Với `rtk`, sau khi chạy `rtk init -g --codex`, bootstrap ghi template `scripts/templates/rtk-codex.md` đè lên `~/.codex/RTK.md` — file này do workstation quản lý, không sửa tay ở global. Bootstrap không cài hoặc đồng bộ Flex skill vào thư mục user-local; skill được dùng trực tiếp từ project. Với workspace mới, bootstrap chạy `specify init . --integration agy --script ps` để khởi tạo Spec Kit. Dùng `-SkipAntigravityInstall`, `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit`, `-SkipSpecifyInstall`, `-SkipSpecifyInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
+Bootstrap cũng kiểm tra/cài `ccusage`, `rtk`, Antigravity CLI `agy`, `uv`, `specify-cli` và Claude Code khi cần. Bootstrap không cài hoặc đồng bộ Flex skill vào thư mục user-local; skill được dùng trực tiếp từ project. Với workspace mới, bootstrap chạy `specify init . --integration agy --script ps` để khởi tạo Spec Kit. Dùng `-SkipAntigravityInstall`, `-SkipCcusageInstall`, `-SkipRtkInstall`, `-SkipRtkInit`, `-SkipSpecifyInstall`, `-SkipSpecifyInit` hoặc `-UseWinget` khi cần kiểm soát các bước này.
 
 Với workspace đã có `.specify/`, bootstrap không tự migration để tránh ghi đè tùy biến. Sau khi worktree sạch, chạy tường minh:
 
