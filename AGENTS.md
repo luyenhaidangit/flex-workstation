@@ -99,20 +99,11 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
-| `rtk` | Proxy CLI giảm 60–99% token output; dùng cho mọi shell command (xem `tooling/RTK.md`) |
+| `rtk` | Proxy CLI giảm 60–99% token output; xem `tooling/RTK.md` |
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
 
-### Quy tắc rtk (bắt buộc)
 
-**Golden Rule: luôn prefix command bằng `rtk`** — nếu không có filter riêng, rtk pass-through nguyên vẹn, không có tác dụng phụ.
-
-Phạm vi áp dụng: git, gh, build (cargo/tsc/lint/next), test (jest/vitest/pytest/playwright), file (read/grep/ls/find), docker, curl và hầu hết CLI tool. Chi tiết: `tooling/RTK.md`.
-
-Anti-pattern cần tránh:
-- `rtk powershell -Command "..."` — rtk không filter được lệnh bọc, tiết kiệm 0 token
-- `rtk <PowerShell cmdlet>` — cmdlet không phải executable, sẽ fail
-
-Nếu buộc dùng wrapper `powershell -Command`, chạy thẳng không có `rtk`.
+> **rtk — Golden Rule:** luôn prefix mọi command bằng `rtk` (pass-through an toàn khi không có filter). Cấm: bọc trong `powershell -Command` (0 token savings) hoặc gọi PowerShell cmdlet trực tiếp (fail).
 
 ## Cấu trúc project
 
