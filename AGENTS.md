@@ -7,7 +7,7 @@
 - Dùng tiếng Việt có dấu trong trả lời, tài liệu và ghi chú.
 - Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật bằng English khi đó là định danh kỹ thuật.
 
-## Hành vi làm việc chung cho agent
+## Nguyên tắc làm việc
 
 ### Nghĩ trước khi thực hiện
 - Nêu rõ giả định trước khi bắt đầu. Nếu không chắc, hỏi — đừng tự suy đoán im lặng.
@@ -35,7 +35,7 @@
 - Định nghĩa tiêu chí thành công rõ ràng trước khi bắt đầu thực hiện.
 - Biến yêu cầu mơ hồ thành goal có thể verify: "thêm validation" → "test case X phải pass". Tiêu chí yếu ("làm cho nó chạy") cần hỏi lại trước khi bắt đầu.
 
-### Skill routing bắt buộc
+## Skill routing bắt buộc
 
 Với mọi task cần đọc, phân tích, review hoặc thay đổi file trong workspace hoặc repository con,
 Agent bắt buộc dùng `flex-using-agent-skills` làm điểm vào để xác định đầy đủ các skill
