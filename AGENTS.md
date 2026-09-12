@@ -72,7 +72,7 @@ Thiết lập nguyên tắc: `$speckit-constitution` hoặc `/speckit-constituti
 | --- | --- | --- | --- |
 | 1 | `$speckit-specify <mô tả nghiệp vụ>` | `/speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — không có tech stack |
 | 2 | `$speckit-clarify` | `/speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước plan để giảm rework |
-| 2a | `$speckit-docbiz` | `/speckit-docbiz` | **Documentation Impact Gate bắt buộc** sau lần cập nhật cuối của `spec.md`, trước plan |
+| 2a | `$speckit-docbiz` | `/speckit-docbiz` | **⚠️ Gate bắt buộc trước bước 4** — chạy sau lần cập nhật cuối `spec.md`; chỉ cập nhật doc khi thay đổi ảnh hưởng luồng nghiệp vụ, vai trò, thực thể hoặc phạm vi |
 | 3 | `$speckit-checklist [domain]` | `/speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
 | 4 | `$speckit-plan <tech stack + architecture>` | `/speckit-plan <tech stack + architecture>` | Tech stack và architecture được truyền vào đây |
 | 5 | `$speckit-tasks` | `/speckit-tasks` | Sinh task list theo dependency order |
@@ -87,12 +87,9 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 
 **Mỗi lệnh Speckit là một bước riêng biệt do người dùng chủ động gọi.**
 
-- Không tự chuyển sang bước tiếp theo sau khi hoàn thành một lệnh.
-- "Suggested next step" trong completion report chỉ là thông tin — không được tự thực thi.
-- Sau khi mỗi lệnh hoàn thành, DỪNG và chờ người dùng gọi lệnh tiếp theo tường minh.
-- `speckit-implement` chỉ chạy khi người dùng gọi trực tiếp — không bao giờ tự chạy.
-- Lệnh cấp cao như "thực hiện X" hay "implement X" chỉ tương đương với bước 1 (`speckit-specify`) — không phải toàn bộ pipeline.
-- Trước `speckit-plan`, PHẢI gọi `speckit-docbiz` sau lần cập nhật cuối của `spec.md`. Skill này luôn đánh giá tác động tài liệu; chỉ cập nhật khi thay đổi làm đổi luồng nghiệp vụ, vai trò, quy tắc, thực thể hoặc phạm vi mà BA/stakeholder cần biết. Khi cần cập nhật, ưu tiên chỉnh đúng phần của tài liệu hiện hữu; chỉ tạo tài liệu mới khi không có tài liệu phù hợp.
+- Không tự chuyển sang bước tiếp theo — "Suggested next step" chỉ là thông tin, không tự thực thi.
+- `speckit-implement` chỉ chạy khi được gọi trực tiếp.
+- "Implement X" hay "thực hiện X" chỉ tương đương bước 1 (`speckit-specify`), không phải toàn pipeline.
 
 ## Tooling
 
