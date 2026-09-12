@@ -37,19 +37,17 @@
 
 ## Skill routing bắt buộc
 
-Với mọi task cần đọc, phân tích, review hoặc thay đổi file trong workspace hoặc repository con,
-Agent bắt buộc dùng `flex-using-agent-skills` làm điểm vào để xác định đầy đủ các skill
-chuyên môn phù hợp và thứ tự áp dụng.
+Trước mọi task liên quan đến file trong workspace, Agent phải:
+1. Đọc và làm theo `flex-using-agent-skills`
+2. Xác định tất cả skill áp dụng
+3. Đọc và áp dụng từng skill trước khi bắt đầu
 
-- Trước khi bắt đầu task, Agent phải: (1) đọc và làm theo
-  `flex-using-agent-skills`; (2) xác định tất cả skill áp dụng; và (3) đọc, áp dụng
-  các skill bắt buộc.
-- Không được bỏ qua `flex-using-agent-skills` bằng cách chọn trực tiếp domain skill,
-  trừ khi chính skill đó hướng dẫn khác.
-- Có thể chọn nhiều skill nếu task giao nhau giữa nhiều domain.
-- Nếu không có skill phù hợp, ghi nhận kết quả và tiếp tục theo instruction chung.
+Các quy tắc bổ sung:
+- Không chọn trực tiếp domain skill, bỏ qua router — trừ khi `flex-using-agent-skills` chính nó hướng dẫn khác.
+- Nếu không có skill phù hợp, thông báo cho người dùng rồi tiếp tục theo instruction chung.
 - Không gọi router đệ quy khi task chính là `flex-using-agent-skills`.
 - Trong cùng một workflow, tái sử dụng skill đã chọn nếu phạm vi task không thay đổi.
+- Có thể chọn nhiều skill nếu task giao nhau giữa nhiều domain.
 
 ## Speckit Workflow (Spec-Before-Code)
 
