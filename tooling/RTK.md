@@ -1,138 +1,60 @@
-<!-- rtk-instructions v2 -->
-# RTK (Rust Token Killer) - Token-Optimized Commands
+# RTK - Rust Token Killer
 
-## Golden Rule
+**Usage**: Token-optimized CLI proxy (60-90% savings on dev operations)
 
-**Always prefix commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, it passes through unchanged. This means RTK is always safe to use.
+## Hook-Based Usage
 
-**Important**: Even in command chains with `&&`, use `rtk`:
+Các lệnh shell/git được tự động rewrite bởi hook — không cần prefix thủ công.
+Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
+
+## Native tool priority (Claude Code)
+
+Khi native tool có sẵn, **luôn dùng native tool thay vì rtk + Bash**:
+
+| Thao tác | Native tool | Không dùng |
+| --- | --- | --- |
+| Đọc file | **Read tool** | `rtk read` qua Bash |
+| Tìm file | **Glob tool** | `rtk ls` qua Bash |
+| Tìm nội dung | **Grep tool** (dùng `head_limit` thay `\| head -N`) | `rtk grep` qua Bash |
+
+`rtk grep` / `rtk ls` / `rtk read` qua Bash chỉ dùng khi output cần pipe vào lệnh khác trong cùng shell command và không có native tool thay thế.
+
+## Mapping lệnh
+
+| Thay vì | Dùng | Shell |
+| --- | --- | --- |
+| `Get-Content <file>` / `cat` / `type` | `rtk read <file>` | Bash hoặc PowerShell |
+| `rg <pattern> <path>` / `Select-String` | `rtk grep <pattern> <path>` | **Bash tool** (chỉ khi không có native Grep tool) |
+| `Get-ChildItem` / `ls` / `dir` | `rtk ls <path>` | **Bash tool** (chỉ khi không có native Glob tool) |
+| `git <args>` | `rtk git <args>` | Bash hoặc PowerShell |
+| `tree` | `rtk tree <path>` | **Bash tool** |
+
+> **Lưu ý shell**: `rtk ls`, `rtk grep`, `rtk tree` phụ thuộc vào Unix binary (`ls`, `grep`).
+> Chỉ hoạt động qua **Bash tool** (Git Bash) — không chạy được từ PowerShell.
+
+## Anti-pattern (cấm)
+
+- `rtk powershell -Command "..."` — rtk không filter được lệnh bọc trong PowerShell, tiết kiệm 0 token.
+- `rtk <PowerShell cmdlet>` (ví dụ `rtk Test-Path ...`) — fail vì cmdlet không phải executable.
+- `rtk ls` / `rtk grep` / `rtk tree` từ PowerShell shell — fail vì binary Unix không có trên Windows PATH.
+- Nếu buộc phải chạy wrapper `powershell -Command` (logic nhiều bước), chạy thẳng không có `rtk`.
+- `rtk grep ... 2>/dev/null | head -N` qua Bash — dùng native **Grep tool** với `head_limit` thay thế; shell pipe gây timeout 120s trên codebase lớn.
+
+## Meta Commands (always use rtk directly)
+
 ```bash
-# ❌ Wrong
-git add . && git commit -m "msg" && git push
-
-# ✅ Correct
-rtk git add . && rtk git commit -m "msg" && rtk git push
+rtk gain              # Show token savings analytics
+rtk gain --history    # Show command usage history with savings
+rtk discover          # Analyze Claude Code history for missed opportunities
+rtk proxy <cmd>       # Execute raw command without filtering (for debugging)
 ```
 
-## RTK Commands by Workflow
+## Installation Verification
 
-### Build & Compile (80-90% savings)
 ```bash
-rtk cargo build         # Cargo build output
-rtk cargo check         # Cargo check output
-rtk cargo clippy        # Clippy warnings grouped by file (80%)
-rtk tsc                 # TypeScript errors grouped by file/code (83%)
-rtk lint                # ESLint/Biome violations grouped (84%)
-rtk prettier --check    # Files needing format only (70%)
-rtk next build          # Next.js build with route metrics (87%)
+rtk --version         # Should show: rtk X.Y.Z
+rtk gain              # Should work (not "command not found")
+which rtk             # Verify correct binary (run in Bash tool)
 ```
 
-### Test (60-99% savings)
-```bash
-rtk cargo test          # Cargo test failures only (90%)
-rtk go test             # Go test failures only (90%)
-rtk jest                # Jest failures only (99.5%)
-rtk vitest              # Vitest failures only (99.5%)
-rtk playwright test     # Playwright failures only (94%)
-rtk pytest              # Python test failures only (90%)
-rtk rake test           # Ruby test failures only (90%)
-rtk rspec               # RSpec test failures only (60%)
-rtk test <cmd>          # Generic test wrapper - failures only
-```
-
-### Git (59-80% savings)
-```bash
-rtk git status          # Compact status
-rtk git log             # Compact log (works with all git flags)
-rtk git diff            # Compact diff (80%)
-rtk git show            # Compact show (80%)
-rtk git add             # Ultra-compact confirmations (59%)
-rtk git commit          # Ultra-compact confirmations (59%)
-rtk git push            # Ultra-compact confirmations
-rtk git pull            # Ultra-compact confirmations
-rtk git branch          # Compact branch list
-rtk git fetch           # Compact fetch
-rtk git stash           # Compact stash
-rtk git worktree        # Compact worktree
-```
-
-Note: Git passthrough works for ALL subcommands, even those not explicitly listed.
-
-### GitHub (26-87% savings)
-```bash
-rtk gh pr view <num>    # Compact PR view (87%)
-rtk gh pr checks        # Compact PR checks (79%)
-rtk gh run list         # Compact workflow runs (82%)
-rtk gh issue list       # Compact issue list (80%)
-rtk gh api              # Compact API responses (26%)
-```
-
-### JavaScript/TypeScript Tooling (70-90% savings)
-```bash
-rtk pnpm list           # Compact dependency tree (70%)
-rtk pnpm outdated       # Compact outdated packages (80%)
-rtk pnpm install        # Compact install output (90%)
-rtk npm run <script>    # Compact npm script output
-rtk npx <cmd>           # Compact npx command output
-rtk prisma              # Prisma without ASCII art (88%)
-```
-
-### Files & Search (60-75% savings)
-```bash
-rtk ls <path>           # Tree format, compact (65%)
-rtk read <file>         # Code reading with filtering (60%)
-rtk grep <pattern>      # Search grouped by file (75%). Format flags (-c, -l, -L, -o, -Z) run raw.
-rtk find <pattern>      # Find grouped by directory (70%)
-```
-
-### Analysis & Debug (70-90% savings)
-```bash
-rtk err <cmd>           # Filter errors only from any command
-rtk log <file>          # Deduplicated logs with counts
-rtk json <file>         # JSON structure without values
-rtk deps                # Dependency overview
-rtk env                 # Environment variables compact
-rtk summary <cmd>       # Smart summary of command output
-rtk diff                # Ultra-compact diffs
-```
-
-### Infrastructure (85% savings)
-```bash
-rtk docker ps           # Compact container list
-rtk docker images       # Compact image list
-rtk docker logs <c>     # Deduplicated logs
-rtk kubectl get         # Compact resource list
-rtk kubectl logs        # Deduplicated pod logs
-```
-
-### Network (65-70% savings)
-```bash
-rtk curl <url>          # Compact HTTP responses (70%)
-rtk wget <url>          # Compact download output (65%)
-```
-
-### Meta Commands
-```bash
-rtk gain                # View token savings statistics
-rtk gain --history      # View command history with savings
-rtk discover            # Analyze Claude Code sessions for missed RTK usage
-rtk proxy <cmd>         # Run command without filtering (for debugging)
-rtk init                # Add RTK instructions to CLAUDE.md
-rtk init --global       # Add RTK to ~/.claude/CLAUDE.md
-```
-
-## Token Savings Overview
-
-| Category | Commands | Typical Savings |
-|----------|----------|-----------------|
-| Tests | vitest, playwright, cargo test | 90-99% |
-| Build | next, tsc, lint, prettier | 70-87% |
-| Git | status, log, diff, add, commit | 59-80% |
-| GitHub | gh pr, gh run, gh issue | 26-87% |
-| Package Managers | pnpm, npm, npx | 70-90% |
-| Files | ls, read, grep, find | 60-75% |
-| Infrastructure | docker, kubectl | 85% |
-| Network | curl, wget | 65-70% |
-
-Overall average: **60-90% token reduction** on common development operations.
-<!-- /rtk-instructions -->
+⚠️ **Name collision**: If `rtk gain` fails, you may have reachingforthejack/rtk (Rust Type Kit) installed instead.

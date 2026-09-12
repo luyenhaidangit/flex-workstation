@@ -7,13 +7,25 @@
 Các lệnh shell/git được tự động rewrite bởi hook — không cần prefix thủ công.
 Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
 
+## Native tool priority (Claude Code)
+
+Khi native tool có sẵn, **luôn dùng native tool thay vì rtk + Bash**:
+
+| Thao tác | Native tool | Không dùng |
+| --- | --- | --- |
+| Đọc file | **Read tool** | `rtk read` qua Bash |
+| Tìm file | **Glob tool** | `rtk ls` qua Bash |
+| Tìm nội dung | **Grep tool** (dùng `head_limit` thay `\| head -N`) | `rtk grep` qua Bash |
+
+`rtk grep` / `rtk ls` / `rtk read` qua Bash chỉ dùng khi output cần pipe vào lệnh khác trong cùng shell command và không có native tool thay thế.
+
 ## Mapping lệnh
 
 | Thay vì | Dùng | Shell |
 | --- | --- | --- |
 | `Get-Content <file>` / `cat` / `type` | `rtk read <file>` | Bash hoặc PowerShell |
-| `rg <pattern> <path>` / `Select-String` | `rtk grep <pattern> <path>` | **Bash tool** |
-| `Get-ChildItem` / `ls` / `dir` | `rtk ls <path>` | **Bash tool** |
+| `rg <pattern> <path>` / `Select-String` | `rtk grep <pattern> <path>` | **Bash tool** (chỉ khi không có native Grep tool) |
+| `Get-ChildItem` / `ls` / `dir` | `rtk ls <path>` | **Bash tool** (chỉ khi không có native Glob tool) |
 | `git <args>` | `rtk git <args>` | Bash hoặc PowerShell |
 | `tree` | `rtk tree <path>` | **Bash tool** |
 
@@ -26,6 +38,7 @@ Example: `git status` → `rtk git status` (transparent, 0 tokens overhead)
 - `rtk <PowerShell cmdlet>` (ví dụ `rtk Test-Path ...`) — fail vì cmdlet không phải executable.
 - `rtk ls` / `rtk grep` / `rtk tree` từ PowerShell shell — fail vì binary Unix không có trên Windows PATH.
 - Nếu buộc phải chạy wrapper `powershell -Command` (logic nhiều bước), chạy thẳng không có `rtk`.
+- `rtk grep ... 2>/dev/null | head -N` qua Bash — dùng native **Grep tool** với `head_limit` thay thế; shell pipe gây timeout 120s trên codebase lớn.
 
 ## Meta Commands (always use rtk directly)
 
