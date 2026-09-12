@@ -492,6 +492,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - A complex expression, external-call result, URL, payload, or mapping is returned directly when a named local would materially improve debugging or validation
 - A catch clause that changes control flow (returns an alternate result, marks a resource failed, or swallows the exception) with no corresponding `ILogger` call, leaving the failure invisible in production
 - A log call interpolates a value into the message string (`$"..."` or string concatenation) instead of using a fixed template with named placeholders and separate arguments
+- A log message's `[Class.Method]` prefix is a hand-typed string literal instead of `nameof(...)`/`[CallerMemberName]`, so it silently goes stale the next time the type or method is renamed
 
 ## Verification
 
@@ -512,6 +513,7 @@ Prefer official .NET, ASP.NET Core, EF Core, C#, and OpenTelemetry documentation
 - [ ] Authorization and tenant scoping are enforced before data access, not assumed
 - [ ] No secret, token, connection string, or unnecessary personal data appears in logs, telemetry, or responses
 - [ ] Every catch clause that changes control flow (alternate outcome, marked-failed resource, swallowed exception) has a matching `ILogger` call at a level matching severity, using a fixed message template with named PascalCase placeholders and the exception passed as its own parameter
+- [ ] Log messages carry a `[{Class}.{Method}]` prefix sourced from `nameof(...)`/`[CallerMemberName]`, not a hand-typed string
 - [ ] Every mapper sits at the project boundary that owns its destination contract and does not reverse dependency direction
 - [ ] Aggregate mappings use a focused `<Aggregate>Mapper` with explicit target methods; unrelated mappings are not mixed into it
 - [ ] Mappers contain only pure transformation; validation, business decisions, I/O, and trusted values remain outside
