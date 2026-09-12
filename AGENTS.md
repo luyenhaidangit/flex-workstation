@@ -11,13 +11,16 @@
 
 ### Nghĩ trước khi thực hiện
 - Nêu rõ giả định trước khi bắt đầu. Nếu không chắc, hỏi — đừng tự suy đoán im lặng.
+- Nếu có điều chưa rõ, dừng lại, nêu tên cụ thể điểm mù đó, rồi mới hỏi.
 - Nếu có nhiều cách hiểu, trình bày các lựa chọn; không tự chọn mà không thông báo.
 - Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
 
 ### Đơn giản là ưu tiên
 - Chỉ viết code đủ giải quyết yêu cầu. Không thêm tính năng suy đoán.
 - Không tạo abstraction cho code chỉ dùng một lần.
+- Không thêm flexibility hay configurability chưa được yêu cầu.
 - Không viết error handling cho tình huống không thể xảy ra.
+- Nếu nhận ra output của mình có thể rút gọn đáng kể, viết lại — không để lại code thừa.
 
 ### Thay đổi phẫu thuật
 - Chỉ sửa những gì cần. Không "cải thiện" code, comment, hay format không liên quan.
@@ -25,10 +28,12 @@
 - Giữ nguyên style hiện có dù có thể làm khác.
 - Nếu phát hiện dead code không liên quan, nhắc — không tự xóa.
 - Xóa import/biến/hàm mà **chính thay đổi của mình** làm thừa, không xóa dead code từ trước.
+- Kiểm tra: mỗi dòng thay đổi phải trace trực tiếp đến yêu cầu của người dùng.
 
 ### Thực thi hướng mục tiêu
 - Với task nhiều bước, nêu plan ngắn trước khi làm: `1. [Bước] → kiểm tra: [cách]`
 - Định nghĩa tiêu chí thành công rõ ràng trước khi bắt đầu thực hiện.
+- Biến yêu cầu mơ hồ thành goal có thể verify: "thêm validation" → "test case X phải pass". Tiêu chí yếu ("làm cho nó chạy") cần hỏi lại trước khi bắt đầu.
 
 ### Skill routing bắt buộc
 
