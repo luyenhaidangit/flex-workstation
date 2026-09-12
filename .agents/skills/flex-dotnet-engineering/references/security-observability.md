@@ -84,15 +84,13 @@ Log once at the handling boundary. Use levels consistently:
 
 Keep the message template a fixed string with named placeholders; never interpolate values into it (`$"..."` or concatenation), because an interpolated template can't be aggregated or queried as one event by log tooling (Seq, ELK, Loki...). Pass the exception through the logger's dedicated exception parameter (`LogWarning(ex, "...")`), never through `ex.Message` inside the template. Use PascalCase placeholder names and keep the same name for the same concept everywhere in the codebase (`{AgentId}` everywhere, not `{agentId}` in one place and `{AccountId}` in another).
 
-Prefix every message template with `[{Class}.{Method}]`, passed as `nameof(TypeName)` and `nameof(MethodName)` — never a hand-typed string. `ILogger<T>` already records the class as the structured `SourceContext` field, but the bracketed prefix still earns its place because plain-text consoles, file tails, and CI output render only the message, not the enricher fields; the prefix gives instant visual grep-ability there. Using `nameof` instead of a literal string means an IDE rename of the class or method updates the log automatically — a hand-typed `"OrderService.AddToCart"` silently goes stale the next time either is renamed, and nothing catches it because the string still compiles. Keep any existing dotted business-event key (e.g. `instagram.callback.provider_failure`) after the prefix rather than replacing it:
+Write the message template as a raw dotted business-event key (`domain.subject.event`, e.g. `instagram.callback.provider_failure`, `meta.auth.provider_error`) — no `[{Class}.{Method}]` bracket prefix. This is the convention already established across the codebase (`instagram.webhook.*`, `instagram.oauth.*`, `meta.auth.*`, `meta.graph.*`); `ILogger<T>` already records the class as the structured `SourceContext` field, and the dotted event key is itself the stable, greppable, aggregatable identity that log tooling (Seq, ELK, Loki...) queries on — an extra `[Class.Method]` prefix would just duplicate `SourceContext` without adding a new dimension:
 
 ```csharp
 logger.LogWarning(ex,
-    "[{Class}.{Method}] instagram.callback.provider_failure {State} {AgentId}",
-    nameof(ProcessInstagramCallbackCommandHandler), nameof(Handle), session.State, session.AgentId);
+    "instagram.callback.provider_failure {State} {AgentId}",
+    session.State, session.AgentId);
 ```
-
-For a class with many log call sites, prefer capturing `Method` once via a `[CallerMemberName] string method = ""` parameter on a small internal logging helper over repeating `nameof(...)` at every call — same non-drifting guarantee, less repetition.
 
 A catch clause that changes control flow — returns an alternate outcome, marks a resource failed, retries, or otherwise swallows the exception instead of letting it propagate — must log it before returning. An empty catch block leaves that decision invisible in production: the caller sees a normal-looking alternate result with no trace of why. Map an expected/benign condition (e.g. a concurrent state transition someone else already completed) to Debug/Trace, and a genuine failure to Warning/Error. For an event that must be searchable or alertable independent of message-text edits, attach a stable `EventId`.
 
