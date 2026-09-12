@@ -94,28 +94,28 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 - Lệnh cấp cao như "thực hiện X" hay "implement X" chỉ tương đương với bước 1 (`speckit-specify`) — không phải toàn bộ pipeline.
 - Trước `speckit-plan`, PHẢI gọi `speckit-docbiz` sau lần cập nhật cuối của `spec.md`. Skill này luôn đánh giá tác động tài liệu; chỉ cập nhật khi thay đổi làm đổi luồng nghiệp vụ, vai trò, quy tắc, thực thể hoặc phạm vi mà BA/stakeholder cần biết. Khi cần cập nhật, ưu tiên chỉnh đúng phần của tài liệu hiện hữu; chỉ tạo tài liệu mới khi không có tài liệu phù hợp.
 
-## Tooling Codex
+## Tooling
 
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
-| `rtk` | Proxy shell command để giảm token output; quy tắc dùng ở mục "Quy tắc rtk" bên dưới |
+| `rtk` | Proxy shell command để giảm token output (quy tắc chi tiết bên dưới) |
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
-| `.codex/config.toml` | Cấu hình model, approval policy và sandbox cho Codex CLI |
 
 ### Quy tắc rtk (bắt buộc)
 
-Thay lệnh đọc/tìm/liệt kê/git bằng lệnh `rtk` tương ứng — không bọc PowerShell wrapper trong `rtk`:
+Thay lệnh đọc/tìm/liệt kê/git bằng lệnh `rtk` tương ứng — không bọc trong PowerShell wrapper:
 
-- Đọc file: `rtk read <file>` (thay `Get-Content`/`cat`; xuất UTF-8 đúng, không cần wrapper `[Console]::OutputEncoding`).
-- Tìm kiếm: `rtk grep <pattern> <path>` (thay `rg`/`Select-String`).
-- Liệt kê: `rtk ls <path>` (thay `Get-ChildItem`/`ls`).
-- Git: `rtk git <args>`.
-- Cấm: `rtk powershell -Command "..."` (tiết kiệm 0 token) và `rtk <PowerShell cmdlet>` (fail). Nếu buộc phải dùng wrapper `powershell -Command`, chạy thẳng không có `rtk`.
+- Đọc file: `rtk read <file>` (thay `Get-Content`/`cat`)
+- Tìm kiếm: `rtk grep <pattern> <path>` (thay `rg`/`Select-String`)
+- Liệt kê: `rtk ls <path>` (thay `Get-ChildItem`/`ls`)
+- Git: `rtk git <args>`
+- Cấm: `rtk powershell -Command "..."` — rtk không filter được lệnh bọc, tiết kiệm 0 token
+- Cấm: `rtk <PowerShell cmdlet>` — cmdlet không phải executable, sẽ fail
+
+Nếu buộc phải dùng wrapper `powershell -Command`, chạy thẳng không có `rtk`.
 
 Chi tiết đầy đủ tại `~/.codex/RTK.md` (sync từ `scripts/templates/rtk-codex.md` khi bootstrap).
-
-`CLAUDE.md` import file này; thay đổi quy tắc chung chỉ thực hiện tại `AGENTS.md`.
 
 ## Cấu trúc project
 
