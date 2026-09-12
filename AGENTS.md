@@ -96,14 +96,11 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 
 ## Tooling
 
-| Tool | Mục đích |
-| --- | --- |
-| `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
-| `rtk` | Proxy CLI giảm 60–99% token output; xem `tooling/RTK.md` |
-| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
-
-
-> **rtk — Golden Rule:** luôn prefix mọi command bằng `rtk` (pass-through an toàn khi không có filter). Cấm: bọc trong `powershell -Command` (0 token savings) hoặc gọi PowerShell cmdlet trực tiếp (fail).
+| Tool | Mục đích | Ghi chú |
+| --- | --- | --- |
+| `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` | |
+| `rtk` | Proxy CLI giảm 60–99% token output; xem `tooling/RTK.md` | **Golden Rule:** luôn prefix mọi command. Cấm bọc trong `powershell -Command` hoặc gọi PowerShell cmdlet. |
+| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions | |
 
 ## Cấu trúc project
 
