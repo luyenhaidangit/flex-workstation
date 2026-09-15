@@ -60,7 +60,7 @@ Auth: token truyền qua query string, không set header. Interface: `IMetaAuthC
 | `UnsubscribeAppAsync` | DELETE | `.../{objectId}/subscribed_apps` | `access_token` (**App token**) | `success` |
 
 > `SubscribeAppAsync`/`UnsubscribeAppAsync` dùng **App Access Token** (`AppAccessTokenParam`), khác
-> với `InstagramPageService.SubscribeWebhookAsync` (mục 5) vốn cần **Page Access Token** — hai
+> với `InstagramPageService.SubscribeWebhookAsync` (mục 4) vốn cần **Page Access Token** — hai
 > method này không thể gộp trực tiếp, xem phần Debt.
 
 ---
@@ -73,7 +73,7 @@ Auth: header `Authorization: Bearer {accessToken}`. Interface: `IFacebookPageCli
 
 | Method | HTTP | Path | Query/Body chính | Response field chính |
 |---|---|---|---|---|
-| `ListManagedPagesAsync` | GET | `{v}/{userId}/accounts` | `fields=id,name,category,access_token,tasks,fan_count,followers_count,instagram_business_account,picture` | `data[]` → `FacebookPage`, phân trang |
+| `ListManagedPagesAsync` | GET | `{v}/{userId}/accounts` | `fields=id,name,category,access_token,tasks,fan_count,followers_count,instagram_business_account{id,username},picture` | `data[]` → `FacebookPage`, phân trang |
 | `GetAsync` | GET | `{v}/{pageId}` | `fields` (mặc định `id,name,category,fan_count,followers_count`) | `FacebookPage` |
 | `UpdateAsync` | POST | `{v}/{pageId}` | form fields tuỳ ý | `success` |
 | `GetSubscribedFieldsAsync` | GET | `{v}/{pageId}/subscribed_apps` | — | `data[0].subscribed_fields` |
@@ -85,7 +85,7 @@ Auth: header `Authorization: Bearer {accessToken}`. Interface: `IFacebookPageCli
 
 ```bash
 curl -G "https://graph.facebook.com/v26.0/me/accounts" \
-  --data-urlencode "fields=id,name,category,access_token,tasks,fan_count,followers_count,instagram_business_account,picture" \
+  --data-urlencode "fields=id,name,category,access_token,tasks,fan_count,followers_count,instagram_business_account{id,username},picture" \
   --data-urlencode "access_token=<USER_ACCESS_TOKEN>"
 ```
 
@@ -177,6 +177,25 @@ Ghi chú: `paging` chỉ có `cursors`, **không có `next`** — đúng hành v
 gọi đầu, không có trang tiếp theo. `instagram_business_account` chỉ xuất hiện ở 2/4 Page (có liên
 kết IG Business/Creator) — field nullable trong record `FacebookPage`, không cần xử lý đặc biệt.
 
+> Response mẫu trên được chụp **trước khi đổi field sang dạng expand** — lúc đó
+> `instagram_business_account` chỉ trả `{ "id": "..." }`. Sau khi đổi field thành
+> `instagram_business_account{id,username}` (2026-09), 2 Page có liên kết IG sẽ trả thêm
+> `username`, ví dụ: `"instagram_business_account": { "id": "17841453926494688", "username": "..." }`.
+>
+> **`account_type` KHÔNG nằm trong field expand này** — đã thử và bị Graph API trả lỗi
+> `(#100) Tried accessing nonexisting field (account_type)`. Đối chiếu tài liệu chính thức của
+> Meta (Page reference, IG User reference trong Instagram Platform docs, Instagram Platform
+> changelog — 2026-09) xác nhận `account_type` **không còn là field hợp lệ trên IG User node**,
+> không phải vấn đề nested expansion. Vì `instagram_business_account` chỉ trả giá trị khi IG
+> account là Business/Creator (personal account không thể link Page qua API), sự tồn tại của field
+> này đã tự đảm bảo BR-001 — không cần biết chính xác BUSINESS hay CREATOR nữa. Đã xoá hẳn field
+> này xuyên toàn bộ chuỗi (không giữ lại dạng nullable): `InstagramOwner.AccountType`,
+> `ValidPageDto.AccountType`, `ConnectionCandidate.InstagramAccountType`,
+> `CandidateCacheEntry.InstagramAccountType`, `FacebookDiscoveryCandidate.InstagramAccountType`,
+> `InstagramPageConnection.InstagramAccountType`, và cột DB `instagram_page_connections.instagram_account_type`
+> (migration `DropInstagramAccountType.sql`, drop hẳn cột — migration gốc `AddInstagramTables.sql`
+> giữ nguyên không sửa). `ProcessInstagramCallbackCommand` chỉ lọc theo `igAccount is null`.
+
 ### Đăng nội dung
 
 | Method | HTTP | Path | Query/Body chính | Response field chính |
@@ -214,9 +233,10 @@ kết IG Business/Creator) — field nullable trong record `FacebookPage`, khôn
 | `GetPostInsightsAsync` | GET | `{v}/{postId}/insights` | `metric` | `data[]` → `FacebookInsightMetric` |
 
 > **Debt đã biết**: 18/19 method của `IFacebookPageClient` chưa có caller thực trong solution
-> (grep xác nhận, 2026-09) — chỉ `PublishPostAsync` nhóm content-publish đang dùng. File 405 dòng,
-> chưa tách theo resource (profile/content/comment/insight) vì chưa có nhu cầu thực; quyết định giữ
-> nguyên đã được xác nhận rõ ràng, tách khi có caller thật cho từng nhóm.
+> (grep xác nhận, 2026-09) — chỉ `ListManagedPagesAsync` đang được gọi thật (từ
+> `ProcessFacebookCallbackCommand` và `ProcessInstagramCallbackCommand`). File 405 dòng, chưa tách
+> theo resource (profile/content/comment/insight) vì chưa có nhu cầu thực; quyết định giữ nguyên đã
+> được xác nhận rõ ràng, tách khi có caller thật cho từng nhóm.
 
 ---
 
@@ -245,21 +265,11 @@ Auth: header `Authorization: Bearer {accessToken}`. Interface: `IMessengerClient
 | `GetThreadOwnerAsync` | GET | `{v}/{pageId}/thread_owner` | `recipient` | `data[0]` → `MessengerThreadOwner` |
 
 > `SendAsync` không hỗ trợ truyền thêm header tuỳ chỉnh (ví dụ `X-Correlation-ID`) — đây là lý do
-> `InstagramWebhookHandler.SendReplyAsync` (mục 5) chưa gọi qua interface này, xem Debt.
+> `InstagramWebhookHandler.SendReplyAsync` (mục 4) chưa gọi qua interface này, xem Debt.
 
 ---
 
-## 4. Instagram Business Account — `InstagramClient.cs`
-
-Auth: header `Authorization: Bearer {pageAccessToken}`. Interface: `IInstagramClient`.
-
-| Method | HTTP | Path | Query/Body chính | Response field chính |
-|---|---|---|---|---|
-| `GetInstagramAccountAsync` | GET | `{v}/{pageId}` | `fields=instagram_business_account{id,name,username,account_type,profile_picture_url}` | `instagram_business_account.{id,name,username,account_type,profile_picture_url}` (null nếu Page không liên kết IG) |
-
----
-
-## 5. Channels/Instagram — nghiệp vụ DM và webhook
+## 4. Channels/Instagram — nghiệp vụ DM và webhook
 
 Các service này **không dùng chung `MetaGraphHttpClient`** — gọi `HttpClient` trực tiếp qua
 `IOptions<MetaOptions>` để build base URL (đã đồng bộ `ApiVersion`, trước đây hardcode `v21.0`, xem
@@ -272,14 +282,19 @@ Decision Log của thay đổi liên quan).
 | `GetPageAccessTokenAsync` | GET | `{v}/{pageId}` | `fields=access_token, access_token` | `access_token` | không có tương đương trực tiếp trong `IFacebookPageClient` |
 | `GetMeAsync` | GET | `{v}/me` | `fields=id,name,picture, access_token` | `MetaMeResponse` | `MetaAuthClient.GetCurrentUserAsync` |
 | `GetManagedPagesAsync` | GET | `{v}/me/accounts` | `fields=id,name,access_token,picture, access_token` | `MetaPageListResponse.Data` | `FacebookPageClient.ListManagedPagesAsync` (field set khác, không phân trang) |
-| `GetLinkedInstagramAccountAsync` | GET | `{v}/{pageId}` | `fields=instagram_business_account, access_token` | `MetaPageIgResponse.InstagramBusinessAccount` | `InstagramClient.GetInstagramAccountAsync` (field set khác) |
-| `GetIgAccountInfoAsync` | GET | `{v}/{igAccountId}` | `fields=id,username,account_type,profile_picture_url, access_token` | `MetaIgAccountInfoResponse` | không có tương đương trực tiếp |
+| `GetLinkedInstagramAccountAsync` | GET | `{v}/{pageId}` | `fields=instagram_business_account, access_token` | `MetaPageIgResponse.InstagramBusinessAccount` | `FacebookPageClient.ListManagedPagesAsync` (field expand `instagram_business_account{id,username}`, không phân trang) |
+| `GetIgAccountInfoAsync` | GET | `{v}/{igAccountId}` | `fields=id,username,account_type,profile_picture_url, access_token` | `MetaIgAccountInfoResponse` | `FacebookPageClient.ListManagedPagesAsync` (field expand, thiếu `profile_picture_url` — chưa có caller nào cần) |
 
 > **Debt đã biết**: các call này dùng DTO riêng (`MetaMeResponse`, `MetaPageItem`, `MetaIgAccountRef`,
 > `MetaIgAccountInfoResponse`) khác với DTO trong `Integrations/Meta`, và không dùng
 > `MetaGraphHttpClient` nên không có structured error (`MetaErrorInfo`) hay xử lý pagination chuẩn.
 > Gộp về `Integrations/Meta` cần đổi shared DTO dùng xuyên suốt luồng Instagram OAuth — rủi ro cao
 > hơn lợi ích tức thời, chưa thực hiện.
+>
+> **Debt bổ sung (2026-09)**: `GetIgAccountInfoAsync` request field `account_type` — field này đã
+> bị Meta gỡ khỏi IG User node (xem mục 2, Debt & follow-up tổng hợp), request này sẽ lỗi
+> `(#100) nonexisting field` nếu có caller thật gọi tới. Hiện chưa có caller (grep xác nhận) nên
+> chưa gây lỗi runtime, nhưng phải sửa field trước khi ai đó nối caller vào.
 
 ### `InstagramPageService.cs`
 
@@ -308,6 +323,8 @@ Decision Log của thay đổi liên quan).
 |---|---|---|
 | `IFacebookPageClient` 18/19 method chưa có caller | `FacebookPageClient.cs` (405 dòng) | Tách theo resource khi từng nhóm (content-publish, comment, insight...) có caller thật |
 | `InstagramOAuthService` trùng logic Graph call với `Integrations/Meta` | `Channels/Instagram/InstagramOAuthService.cs` | Khi cần sửa đồng thời cả 2 nơi (dấu hiệu drift), hoặc khi refactor DTO dùng chung |
+| ~~`ListManagedPagesAsync` gọi N+1 request để lấy `account_type` của IG account~~ | `ProcessInstagramCallbackCommand.cs` | **Đã xử lý (2026-09)**: đổi sang expand `instagram_business_account{id,username}` ngay trong `/me/accounts`; xoá `IInstagramClient`/`InstagramClient` (không còn caller) |
+| ~~`account_type` không còn là field hợp lệ trên IG User node~~ (Meta đã gỡ — xác nhận qua Page reference, IG User reference, Instagram Platform changelog + lỗi Graph API thật `(#100) nonexisting field`) | Toàn bộ chuỗi `AccountType`/`instagram_account_type` | **Đã xử lý (2026-09)**: xoá hẳn field xuyên toàn bộ chuỗi có caller thật — `InstagramOwner`, `ValidPageDto`, `ConnectionCandidate`, `CandidateCacheEntry`, `FacebookDiscoveryCandidate`, `InstagramPageConnection`, cột DB (migration `DropInstagramAccountType.sql`). `ProcessInstagramCallbackCommand` chỉ lọc theo `instagram_business_account` có giá trị hay không (đã tự đảm bảo Business/Creator). `InstagramOAuthService.GetIgAccountInfoAsync` vẫn còn field chết nhưng chưa có caller — xem debt ở mục 4 |
 | `IMessengerClient.SendAsync` không truyền được header tuỳ chỉnh | `Application/Abstractions/.../IMessengerClient.cs` | Thêm overload nhận `extraHeaders`/`correlationId` khi có nhu cầu thứ 2 ngoài Instagram DM |
 | `IMetaAuthClient.SubscribeAppAsync`/`UnsubscribeAppAsync` chỉ nhận App token | `Application/Abstractions/.../IMetaAuthClient.cs` | Thêm overload nhận `accessToken` tường minh khi cần gộp với `InstagramPageService` |
 | Không có resilience (retry/backoff) cho HTTP client gọi Meta | toàn bộ `Integrations/Meta` | Thêm khi có bằng chứng lỗi transient thực tế (log `meta.graph.transport_error`/`timeout`) |
