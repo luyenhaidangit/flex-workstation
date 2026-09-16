@@ -193,8 +193,9 @@ kết IG Business/Creator) — field nullable trong record `FacebookPage`, khôn
 > `ValidPageDto.AccountType`, `ConnectionCandidate.InstagramAccountType`,
 > `CandidateCacheEntry.InstagramAccountType`, `FacebookDiscoveryCandidate.InstagramAccountType`,
 > `InstagramPageConnection.InstagramAccountType`, và cột DB `instagram_page_connections.instagram_account_type`
-> (migration `DropInstagramAccountType.sql`, drop hẳn cột — migration gốc `AddInstagramTables.sql`
-> giữ nguyên không sửa). `ProcessInstagramCallbackCommand` chỉ lọc theo `igAccount is null`.
+> — bỏ thẳng khỏi CREATE TABLE trong `AddInstagramTables.sql` (migration chưa từng apply ở môi
+> trường nào nên sửa trực tiếp, không tạo migration ALTER riêng). `ProcessInstagramCallbackCommand`
+> chỉ lọc theo `igAccount is null`.
 
 ### Đăng nội dung
 
