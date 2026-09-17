@@ -58,6 +58,7 @@ Select only skills that directly govern the task.
 
 | Task or primary artifact | Primary skill |
 | --- | --- |
+| Adding a feature, fixing a bug, refactoring, creating a new file/module/class, or scaffolding a new project/module/API client in any language — architectural placement, reuse, hardcoding, and coupling discipline | `flex-codebase-architect` |
 | PostgreSQL schema, Liquibase changelog, migration, seed, index, constraint, database function, view, or trigger | `flex-database-engineering` |
 | C#/.NET, ASP.NET Core, EF Core, dependency injection, tests, architecture, or service implementation | `flex-dotnet-engineering` |
 | Angular UI in `flex-microfrontend`, including components, templates, forms, modals, and tables | `flex-frontend-engineering` |
@@ -82,6 +83,9 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
 
 ## Combination rules
 
+- Any non-trivial code change adds `flex-codebase-architect` alongside the
+  domain-specific engineering skill that governs the artifact (e.g. a C# change
+  uses `flex-dotnet-engineering` and `flex-codebase-architect` together).
 - A database migration that also changes C# persistence uses
   `flex-database-engineering` and `flex-dotnet-engineering`.
 - Infrastructure work that also changes application code or database schema uses

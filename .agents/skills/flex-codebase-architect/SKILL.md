@@ -1,27 +1,11 @@
 ---
-name: codebase-architect
-description: >
-  Enforce senior-engineer architectural discipline on code you write — both when
-  changing a large existing codebase and when creating something from scratch.
-  Use this skill whenever you are about to add a feature, fix a bug, refactor,
-  create a new file/module/class, or modify existing code in a non-trivial
-  project — even if the user does not explicitly ask for "clean code" or "good
-  architecture." Also use it when bootstrapping new ground where no sibling code
-  exists to copy: starting a project or service, scaffolding a new module or
-  bounded context, or building a client/wrapper for an external API or SDK
-  (payment, messaging, social, LLM/AI providers). Trigger on phrases like
-  "implement", "add this feature", "wire this up", "create a service/endpoint/
-  component", "refactor", "where should this go", "start a new project",
-  "scaffold", "set up the structure", "build a client for <API>", "integrate
-  <provider>", or any change touching more than a few lines. The skill keeps
-  placement correct, prevents hardcoding, god services, duplicate logic,
-  premature abstraction, and tight coupling, and makes the codebase easier to
-  extend after the change than before it. Apply it by default for production
-  code; only skip for throwaway scripts, prototypes explicitly marked as
-  disposable, or single-line trivial edits.
+name: flex-codebase-architect
+description: Enforce senior-engineer architectural discipline on code you write, in an existing codebase or from scratch. Use when adding a feature, fixing a bug, refactoring, creating a new file/module/class, modifying existing code in a non-trivial project, starting a new project or service, scaffolding a new module or bounded context, or building a client/wrapper for an external API or SDK (payment, messaging, social, LLM/AI providers) — even without an explicit ask for clean code or good architecture. Prevents hardcoding, god services, duplicate logic, premature abstraction, and tight coupling; keeps placement correct and the codebase easier to extend after the change than before it. Skip only for throwaway scripts, prototypes explicitly marked disposable, or single-line trivial edits.
 ---
 
 # Codebase Architect
+
+## Overview
 
 You are operating as a senior engineer working in a large, long-lived production
 codebase that other people maintain. Your job is not to make the code *work* —
@@ -32,6 +16,18 @@ months from now, who is often not you.
 This skill is opinionated on purpose. When a rule below conflicts with a habit
 or a "best practice" that adds indirection without paying for itself, follow the
 rule.
+
+## When to Use
+
+Apply this skill whenever you are about to add a feature, fix a bug, refactor,
+create a new file/module/class, or modify existing code in a non-trivial
+project — even if the user does not explicitly ask for "clean code" or "good
+architecture." Also apply it when bootstrapping new ground where no sibling
+code exists to copy: starting a project or service, scaffolding a new module or
+bounded context, or building a client/wrapper for an external API or SDK
+(payment, messaging, social, LLM/AI providers). Default to applying it for
+production code; see "When NOT to Use This Skill" below for the narrow
+exceptions.
 
 ---
 
@@ -223,7 +219,21 @@ concrete checklist and lists the failure modes specific to that shape of work.
 
 ---
 
-## Anti-Patterns This Skill Prevents
+## Common Rationalizations
+
+Each of these is a real thought that shows up mid-change. Recognize it, then do
+the correct move instead.
+
+| Rationalization | Why it's wrong | Correct move |
+|---|---|---|
+| "It's just a small change, doesn't need a plan." | Small changes are exactly where wrong placement and quiet duplication slip in unreviewed. | Run the pre-change gate anyway; collapse the plan to one line, don't skip it. |
+| "I'll extract the interface later, once I need to swap it." | Retrofitting a seam after call sites exist is expensive and reliably gets deferred forever. | Add the seam now if the dependency is non-deterministic or externally owned. |
+| "This is basically the same as X, I'll just copy it." | A near-copy under a new name is duplicate logic the moment it's pasted, not later. | Search first; extend or parameterize the original. |
+| "We'll probably need XLSX/JSON/etc. later, might as well build it generic now." | Speculative abstractions are built against imagined requirements, not real ones, and are usually wrong. | Build for today's one real case; note the extraction trigger for when the 2nd real case lands. |
+| "It's just a config value, hardcoding it is faster." | Anything that can differ by environment, tenant, or time will eventually need to change without a redeploy. | Externalize it now — named constant, config, or injected value. |
+| "This file already has similar methods, one more won't hurt." | God files grow one reasonable-sounding method at a time; the file, not any single method, is the problem. | Check the size/cohesion smell; split into a focused unit before adding. |
+
+## Red Flags
 
 | Smell | What it looks like | The fix |
 |---|---|---|
@@ -241,42 +251,42 @@ concrete checklist and lists the failure modes specific to that shape of work.
 
 ---
 
-## Mandatory Checks
+## Verification
 
 Before writing code, confirm the **pre-change gate**:
-1. I read the surrounding code and the project's conventions for this kind of
-   change (naming, layering, error handling, testing). *(Bootstrap: I have
-   decided these and written them down.)*
-2. I can name where the change goes and point to ≥1 existing sibling that
-   justifies that placement. *(Bootstrap: I can name the boundary and its single
-   responsibility.)*
-3. I searched for existing implementations of this behavior and decided to
-   reuse, extend, or (with reason) write new.
+- [ ] I read the surrounding code and the project's conventions for this kind of
+      change (naming, layering, error handling, testing). *(Bootstrap: I have
+      decided these and written them down.)*
+- [ ] I can name where the change goes and point to ≥1 existing sibling that
+      justifies that placement. *(Bootstrap: I can name the boundary and its
+      single responsibility.)*
+- [ ] I searched for existing implementations of this behavior and decided to
+      reuse, extend, or (with reason) write new.
 
 Before declaring the change **done**, confirm the **completion gate**:
-4. No literal in logic that should be config / a named constant / injected. No
-   secrets in source.
-5. I did not grow an already-large file/class; new responsibilities got their
-   own unit.
-6. Every new dependency points inward/downward only; seams exist where I'll need
-   to swap implementations.
-7. No abstraction was introduced without ≥3 real present uses (or, for shared
-   plumbing in Bootstrap mode, ≥2 and stated as such).
-8. Each touched unit still has one nameable responsibility.
-9. The change is verifiable — tests added/updated, or a clear statement of how
-   it was confirmed and why automated tests are absent.
-10. I produced a decision log and flagged any deliberate debt with a revisit
-    trigger.
+- [ ] No literal in logic that should be config / a named constant / injected.
+      No secrets in source.
+- [ ] I did not grow an already-large file/class; new responsibilities got
+      their own unit.
+- [ ] Every new dependency points inward/downward only; seams exist where I'll
+      need to swap implementations.
+- [ ] No abstraction was introduced without ≥3 real present uses (or, for
+      shared plumbing in Bootstrap mode, ≥2 and stated as such).
+- [ ] Each touched unit still has one nameable responsibility.
+- [ ] The change is verifiable — tests added/updated, or a clear statement of
+      how it was confirmed and why automated tests are absent.
+- [ ] I produced a decision log and flagged any deliberate debt with a revisit
+      trigger.
 
 Bootstrap mode adds:
-11. Signatures are **consistent across the whole surface** — same parameter
-    order, same naming, same cancellation/context convention. Scan the full set
-    in one pass; an inconsistent signature is a latent bug at every positional
-    call site.
-12. Errors crossing the boundary are **classified**, not just wrapped.
-13. Nothing sensitive can reach logs — credentials, tokens, PII. Check what the
-    logging statements actually serialize, not just what they intend to.
-14. Conventions are recorded somewhere the next person will find them.
+- [ ] Signatures are **consistent across the whole surface** — same parameter
+      order, same naming, same cancellation/context convention. Scan the full
+      set in one pass; an inconsistent signature is a latent bug at every
+      positional call site.
+- [ ] Errors crossing the boundary are **classified**, not just wrapped.
+- [ ] Nothing sensitive can reach logs — credentials, tokens, PII. Check what
+      the logging statements actually serialize, not just what they intend to.
+- [ ] Conventions are recorded somewhere the next person will find them.
 
 If any check fails, fix it or explicitly justify the exception in the output —
 do not silently ship past it.

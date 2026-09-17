@@ -40,7 +40,7 @@ Use this shape by default for a skill targeting `.agents/skills/`, in place of t
 - `name:` — plain (unquoted) YAML, lowercase-hyphenated, **must exactly match the directory name**. The validator (and the `PreToolUse` hook) blocks on a mismatch — but still double-check by eye before delivering.
 - `description:` — plain YAML, one paragraph, must contain a literal **"Use when …"** (or "Use during…", "Use before/after…") clause naming concrete triggers, not just a summary of what the skill does.
 - Naming prefix: a skill customized for or specific to this Flex workspace/codebase gets the `flex-` prefix (e.g. `flex-dotnet-engineering`). A skill that is a ported lifecycle tool with its own external convention (Speckit) keeps that tool's prefix (`speckit-*`) instead — don't force `flex-` onto it.
-- Length: observed `flex-*` descriptions run 175–960 characters. `flex-codebase-architect` currently sits at 1352 characters using folded (`>`) frontmatter and a `name:` that doesn't match its directory (`codebase-architect` vs. the `flex-codebase-architect/` folder) — that's a known existing defect in this repo, not a pattern to copy.
+- Length: observed `flex-*` descriptions run 175–960 characters.
 
 ## Reference material placement
 
