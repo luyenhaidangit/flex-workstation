@@ -22,7 +22,7 @@ Before reading, analyzing, reviewing, or changing workspace or repository files:
 4. Announce the routing result concisely.
 
 Do not invoke this skill recursively when the task is solely to review or update
-`flex-using-agent-skills`. Use the applicable skill-creation workflow instead.
+`flex-using-agent-skills`. Use `flex-skill-creator` instead.
 
 Reuse the selected skills while the task scope remains unchanged. Route again only
 when the repository, primary artifact, or lifecycle changes; for example, from a C#
@@ -45,6 +45,7 @@ again and do not recursively invoke this router.
 | Speckit lifecycle | Required routing behavior |
 | --- | --- |
 | `speckit-plan` | Use the technical context and planned artifacts to select applicable specialist skills before making architecture, data, API, or test decisions. |
+| `speckit-tasks` | If a task description already names a concrete artifact, symbol, or endpoint, route the applicable specialist skills before finalizing that task's wording; otherwise task breakdown stays artifact-agnostic and no additional route is needed. |
 | `speckit-implement` | After loading plan and tasks, select and apply applicable specialist skills before editing source; re-route only if a later task introduces a new artifact domain. |
 | `speckit-converge` | Assess spec/plan/task coverage only. A converged result still requires a separate final review task routed to the applicable specialist skills before the feature is considered complete. |
 

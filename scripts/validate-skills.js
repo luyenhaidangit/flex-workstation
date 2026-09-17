@@ -102,6 +102,40 @@ function checkSkill(dirName, content, routingTableText) {
   return { errors, warnings };
 }
 
+const STANDALONE_CELL_PATTERN = /^`([a-z][a-z0-9]*(?:-[a-z0-9]+)+)`$/;
+
+/**
+ * Cross-check flex-using-agent-skills's routing table against the actual
+ * catalog: every skill name that appears as its own table cell (the "Primary
+ * skill" / lifecycle column — not a skill name mentioned inline in prose,
+ * like the `flex-microfrontend` *repo* referenced as an example artifact)
+ * must still exist as a directory under .agents/skills/, so a rename or
+ * deletion that skips flex-skill-creator's "Consolidating or retiring a
+ * skill" step gets caught instead of silently going stale.
+ * @param {string} routingTableText
+ * @param {string[]} existingDirs
+ * @returns {string[]} warnings
+ */
+function checkRoutingTableDrift(routingTableText, existingDirs) {
+  if (!routingTableText) return [];
+  const existingSet = new Set(existingDirs);
+  const mentioned = new Set();
+  for (const line of routingTableText.split(/\r?\n/)) {
+    if (!line.trim().startsWith('|')) continue;
+    for (const cell of line.split('|')) {
+      const m = cell.trim().match(STANDALONE_CELL_PATTERN);
+      if (m) mentioned.add(m[1]);
+    }
+  }
+  const warnings = [];
+  for (const name of mentioned) {
+    if (!existingSet.has(name)) {
+      warnings.push(`Routing table references \`${name}\` as a standalone skill cell, but it is not an installed skill directory under .agents/skills/ — stale or misspelled reference.`);
+    }
+  }
+  return warnings;
+}
+
 function listSkillDirs() {
   return fs
     .readdirSync(SKILLS_DIR, { withFileTypes: true })
@@ -112,7 +146,8 @@ function listSkillDirs() {
 
 function main() {
   const only = process.argv[2];
-  const dirs = only ? [only] : listSkillDirs();
+  const allDirs = listSkillDirs();
+  const dirs = only ? [only] : allDirs;
   const routingTableText = fs.existsSync(ROUTING_TABLE_FILE) ? fs.readFileSync(ROUTING_TABLE_FILE, 'utf8') : null;
 
   let hadError = false;
@@ -142,6 +177,11 @@ function main() {
     }
   }
 
+  for (const w of checkRoutingTableDrift(routingTableText, allDirs)) {
+    console.warn(`[routing-table] WARN: ${w}`);
+    hadWarning = true;
+  }
+
   if (!hadError && !hadWarning) {
     console.log('\nAll skills pass.');
   } else {
@@ -155,4 +195,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { checkSkill, parseFrontmatter, listSkillDirs, SECTION_EXEMPT_SKILLS, SKILLS_DIR, ROUTING_TABLE_FILE };
+module.exports = { checkSkill, checkRoutingTableDrift, parseFrontmatter, listSkillDirs, SECTION_EXEMPT_SKILLS, SKILLS_DIR, ROUTING_TABLE_FILE };
