@@ -156,13 +156,15 @@ Separate application-generated audit fields from database-generated values and d
 
 Use the smallest transaction that protects the invariant. A single `SaveChanges` is transactional for supported relational providers; add an explicit transaction when several saves or compatible operations must be atomic.
 
+For a command that stages changes through multiple repositories sharing one `DbContext`, give the handler one explicit commit: repository methods stage changes, and the handler calls `SaveChangesAsync` once after every domain transition and local validation succeeds. Do not call `SaveChangesAsync` through each repository — the first call flushes the whole tracked unit of work and obscures who actually owns the transaction.
+
 Do not keep a database transaction open across slow remote calls. Coordinate database state and external messages with an outbox or another explicit consistency pattern.
 
 Use optimistic concurrency tokens for updates where lost writes matter. On a concurrency conflict, choose deliberately among reject, reload, merge, or retry. Retry the complete transaction only when its operations are safe and bounded.
 
 Understand provider execution strategies before combining automatic retries with explicit transactions. Avoid nested retry layers that can repeat side effects.
 
-Use database uniqueness and atomic conditional updates for race-sensitive invariants; an application check followed by an insert is not sufficient under concurrency.
+Use database uniqueness and atomic conditional updates for race-sensitive invariants; an application check followed by an insert is not sufficient under concurrency — a preflight check improves the ordinary error path but cannot stop a concurrent writer from winning the race. Keep the unique constraint as the authority, and have the Infrastructure adapter translate the known provider-specific constraint violation into an Application-owned expected alternative rather than treating every `DbUpdateException` as a routine conflict. Add a focused handler test for the translated alternative and a real-provider integration/concurrency test for the constraint when this behavior is material.
 
 ## Manage migrations and deployment
 

@@ -46,7 +46,7 @@ Prefer builders/factories with meaningful defaults for complex domain setup. Avo
 
 Use a stub/fake for a stable port when it makes business behavior faster and clearer. Mock interactions only when the interaction itself is the contract, such as a required publish or forbidden remote call.
 
-Do not mock EF Core query internals, `DbSet`, HTTP internals, or a broker so deeply that the test reproduces framework implementation. Use the real relational provider/containerized dependency for translation, constraints, transactions, locking, serialization, and acknowledgment behavior.
+Do not mock EF Core query internals, `DbSet`, HTTP internals, or a broker so deeply that the test reproduces framework implementation. Use the real relational provider/containerized dependency for translation, constraints, transactions, locking, serialization, and acknowledgment behavior — Testcontainers for .NET is the default way to run that real dependency (database, broker) in CI; reserve SQLite/in-memory providers for cases where the test intentionally does not need real provider semantics.
 
 Use an HTTP fake handler or local test server for outbound client behavior and verify URL, headers, body, timeout, retry, and response handling. Never call a live production service from automated tests.
 

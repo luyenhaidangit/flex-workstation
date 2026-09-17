@@ -10,7 +10,10 @@
 - [Define dependency boundaries](#define-dependency-boundaries)
 - [Apply Clean Architecture proportionately](#apply-clean-architecture-proportionately)
 - [Assign layer ownership](#assign-layer-ownership)
+- [Map models at their owning boundary](#map-models-at-their-owning-boundary)
 - [Build a vertical slice](#build-a-vertical-slice)
+- [Adopt a mediator only at a demonstrated boundary](#adopt-a-mediator-only-at-a-demonstrated-boundary)
+- [Keep the transport layer thin](#keep-the-transport-layer-thin)
 - [Design state changes and external effects](#design-state-changes-and-external-effects)
 - [Choose domain-model depth](#choose-domain-model-depth)
 - [Design projects and assemblies](#design-projects-and-assemblies)
@@ -209,6 +212,46 @@ Keep public transport contracts, persistence entities, and domain types separate
 
 Use explicit outcomes for expected business alternatives such as invalid state, conflict, or not found. Map those outcomes at the presentation boundary. Use exceptions for unexpected infrastructure failures, programmer errors, and failures that cannot be handled as ordinary business flow. Keep requested cancellation separate from server failure.
 
+## Map models at their owning boundary
+
+Place a mapper in the project that owns the boundary contract it produces. The
+mapper may reference the source model and the boundary contract, but must not
+reverse an inward dependency just to reuse a DTO.
+
+| Mapping | Owner and location |
+| --- | --- |
+| Domain entity → HTTP request/response DTO | `Api` / Presentation, for example `Mappers/AgentMapper.cs` or `Features/Agents/Mappers/AgentMapper.cs` |
+| Domain entity → application command/query result | `Application`, colocated with the use case that owns that contract |
+| Domain entity ↔ EF Core persistence configuration/model | `Infrastructure` |
+| Domain value/entity → another domain type | `Domain`, only when the conversion is domain behavior rather than transport glue |
+
+Do not put API DTO mapping in `Domain` or `Application`, and do not put
+application contracts in `Api` merely because an endpoint is their first caller.
+Keep public HTTP DTOs independent from persistence entities and map them at the
+presentation boundary.
+
+### Mapper shape and naming
+
+- A bounded context or aggregate can have one mapper such as `AgentMapper` with
+  multiple pure mappings related to that aggregate (`ToResponse`,
+  `ToListItemResponse`, and other explicit target names). Prefer this over one
+  class per tiny DTO when the source ownership is the same.
+- Split a mapper when the mapping belongs to another aggregate or grows into a
+  separate coherent concern, for example `AgentPublishLocationMapper`; do not let
+  `AgentMapper` map conversations, users, or unrelated contracts.
+- For a small, deterministic conversion, use an `internal static` mapper with
+  explicit methods. Do not add AutoMapper, `IMapper`, or a generic mapper
+  abstraction without demonstrated mapping complexity, configuration, or a real
+  substitution boundary.
+- A mapper only transforms already-valid values. It must not validate input, check
+  authorization or uniqueness, set trusted defaults or timestamps, call a
+  repository, mutate an aggregate through business methods, or perform I/O. Those
+  responsibilities remain in the presentation/application/domain flow that owns
+  them.
+- Controllers invoke a mapper instead of constructing reusable response DTOs
+  inline. Keep a one-off projection local only when extracting it would add an
+  unshared type with no clearer boundary.
+
 ## Build a vertical slice
 
 Implement a complete thin use case before generalizing an architecture. For a state-changing HTTP API operation, use this sequence:
@@ -224,7 +267,85 @@ Implement a complete thin use case before generalizing an architecture. For a st
 
 Keep endpoint code limited to transport concerns: bind, authenticate/authorize, map, invoke, and translate. Keep the application operation focused on one use case. Do not move a coherent rule into a generic helper simply because it is shared twice; first establish its owner.
 
-Use commands and queries when the distinction makes intent, validation, optimization, or ownership clearer. A query may project directly to a response shape; it does not need to hydrate an aggregate. A mediator is optional: use it only if its pipeline policies or module boundary provide value beyond a direct service call.
+Use commands and queries when the distinction makes intent, validation, optimization, or ownership clearer. A query may project directly to a response shape; it does not need to hydrate an aggregate.
+
+## Adopt a mediator only at a demonstrated boundary
+
+MediatR or another in-process mediator is justified when a controller owns several
+non-trivial use cases and the same Application operations need a uniform dispatch,
+test, or pipeline boundary. Reducing a constructor's parameter count alone is not
+sufficient justification; the mediator must also remove application orchestration
+from the transport layer.
+
+Before adding a mediator package, inspect its target-framework compatibility,
+transitive `Microsoft.Extensions.*` dependencies, license/runtime configuration,
+and the repository's package-version convention. Pin an intentional version and
+record any compatibility or licensing constraint; do not select an old version
+solely to avoid an unreviewed package policy.
+
+When a mediator is justified:
+
+1. Define a focused `IRequest<TResponse>` command or query and an
+   `IRequestHandler<TRequest, TResponse>` named after the use case.
+2. Inject `ISender` into a controller that only sends requests; do not inject
+   `IMediator` when publishing notifications is not part of its responsibility.
+3. Move every in-scope action that still owns application orchestration. Do not
+   add one concrete handler beside repositories and claim the controller DI problem
+   is solved; explicitly label that state as an intermediate migration instead.
+4. Keep Application request/result types free of API DTOs, `ActionResult`, status
+   codes, and HTTP error envelopes. Map them at the controller boundary.
+5. Scan the Application assembly from the composition root rather than registering
+   individual handlers as concrete services. Add a pipeline behavior only for a
+   defined cross-cutting policy and test its ordering and failure semantics.
+
+Keep a request and its single handler co-located in the feature folder when the
+request is only used by that handler and the combined file remains easy to scan.
+Name the file after the request type, such as `GetAgentsQuery.cs` or
+`CreateAgentCommand.cs`, because the file contains both the request and handler;
+do not name it `*Handler.cs` merely because the handler is the executable part.
+Split the request and handler when either type has an independent reuse boundary,
+the file contains several supporting responsibilities, or the combined file has
+become difficult to navigate. File length is a review signal, not a hard threshold.
+
+For a simple one-step CRUD action with no reusable orchestration, keep the direct
+flow. Do not introduce a mediator merely because nearby actions use one.
+
+## Keep the transport layer thin
+
+Keep controllers focused on routing, binding, authentication/authorization context,
+calling one use case, and translating that use case's outcome to HTTP. A controller
+may perform a short, one-off response projection, but it must not accumulate
+application orchestration.
+
+When an endpoint coordinates more than one repository or external port, batches or
+joins related data, applies application-level authorization/decision logic, owns a
+transaction, or has logic that another transport could reuse, move that work to one
+focused Application command/query handler. Name it after the use case, such as
+`GetAgentsQueryHandler`, rather than creating a generic `AgentService` or a handler
+per entity by default.
+
+- Application owns use-case input and read/write models. A read handler may return a
+  purpose-specific application read model and project only the data it needs; it does
+  not need to hydrate an aggregate solely for an API response.
+- Presentation owns public request/response DTOs, HTTP status codes, and mapping from
+  an application result to its HTTP contract. Do not make Application depend on an
+  API DTO merely to shorten a controller.
+- Infrastructure implements Application-owned ports. Do not introduce a mediator,
+  generic query service, generic repository, or interface for a single concrete
+  handler unless the repository already uses it or a real substitution/pipeline
+  boundary exists.
+- Keep the refactor at the operation boundary. Moving `GET /agents` into a query
+  handler does not authorize an unrelated rewrite of every action in `AgentsController`.
+
+For simple CRUD that has no meaningful orchestration, keep the direct endpoint flow
+and do not add an Application project, handler, or abstraction only to imitate a
+diagram.
+
+When a controller adds a required dependency, update every direct controller
+construction in tests to compose the same dependency graph using the test
+infrastructure. Do not make a production dependency nullable merely to preserve
+outdated tests. Remove null checks once the dependency contract is non-nullable,
+then add or update a behavior test that exercises the new collaboration.
 
 ## Design state changes and external effects
 
