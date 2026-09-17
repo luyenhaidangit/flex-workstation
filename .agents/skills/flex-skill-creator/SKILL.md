@@ -1,6 +1,6 @@
 ---
 name: flex-skill-creator
-description: Creates, hardens, tests, evaluates, optimizes, or packages a Claude skill — especially for software development, codebase analysis, debugging, architecture review, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved, or a repetitive workflow captured. Trigger on "make me a skill for X", "create a skill that does Y", "turn this workflow into a skill", "improve/test/benchmark my skill", "optimize the triggering of this skill", or any such request in English or Vietnamese. Also trigger on bare invocation (no argument) to scan the session for AI/skill misalignments and propose targeted fixes. Enforces a clarify-first design process, then carries the skill through the full lifecycle — draft, test, review, iterate, optimize the description, package — producing a structured, opinionated, production-ready skill.
+description: Creates, hardens, tests, evaluates, optimizes, or packages a Claude skill — especially for software development, codebase analysis, debugging, architecture review, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved, or a repetitive workflow captured. Trigger on "make me a skill for X", "create a skill that does Y", "turn this workflow into a skill", "improve/test/benchmark my skill", "optimize the triggering of this skill", or any such request in English or Vietnamese. Also trigger on bare invocation (no argument) for a session retrospective, on a request to audit one named existing skill standalone, or on "audit/health-check all skills" for a catalog sweep. Enforces a clarify-first design process, then carries the skill through the full lifecycle — draft, test, review, iterate, optimize the description, package — producing a structured, opinionated, production-ready skill.
 ---
 
 # Flex Skill Creator
@@ -30,6 +30,8 @@ Your job is to figure out **where the user is in this loop** and jump in there. 
 - The user wants to **test, evaluate, benchmark, or iterate** on an existing skill.
 - The user wants to **optimize a skill's description** for more reliable triggering, or to **package** a skill for installation.
 - The user invokes the skill **with no argument** — signals a session retrospective: scan the current conversation, surface where AI or skills misunderstood intent, and propose concrete SKILL.md fixes.
+- The user asks you to **review, audit, or "check for improvements" on a specific existing skill** by name or path, standalone — not from a session mistake and not a fresh idea. See "Auditing an existing skill" below.
+- The user asks to **audit, health-check, or "review all" skills** in the catalog at once. See "Catalog-wide health check" below.
 
 ## When NOT to use
 
@@ -56,7 +58,7 @@ Skill creation gets used by people across a wide range of technical familiarity 
 
 7. **No surprises, no harm.** A skill must never contain malware, exploit code, or anything that could compromise security, and its actual behavior must match what its description promises — a user reading the description should not be surprised by what it does. Decline requests to build misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activity. (Benign roleplay or persona skills are fine.)
 
-8. **Iterate on the real target, not the examples.** A skill is meant to be used across thousands of prompts; you test it on a handful only because that's fast. Improvements must generalize — resist overfitting fiddly fixes to the two or three examples in front of you. (Applies during the iterate loop; see `references/evaluation-and-iteration.md`. This principle is restated there and echoed in `references/skill-anatomy.md`'s writing patterns — keep all three in sync if you change the framing.)
+8. **Iterate on the real target, not the examples.** A skill is meant to be used across thousands of prompts; you test it on a handful only because that's fast. Full rationale lives in `references/evaluation-and-iteration.md` ("Generalize from the feedback") — that's the canonical copy; don't restate it elsewhere.
 
 ## Operating procedure
 
@@ -135,6 +137,29 @@ Present all findings and proposals in one pass. Ask the user which ones to imple
 
 **Scope guard**: if the session shows no clear misalignment signals, say so briefly and offer to switch to normal skill-creation mode instead.
 
+## Auditing an existing skill
+
+Triggered by a request to review, audit, or find improvements in one named skill — distinct from the no-argument session retrospective (which looks at *this conversation*, not a skill's own file) and from ordinary "harden my draft" requests (which assume the user is mid-design). Here the skill already exists and is presumably working; the job is a cold, standalone quality pass.
+
+1. Read the skill's `SKILL.md` and every file it references — don't review from memory or a partial read.
+2. If it targets `.agents/skills/`, run `node scripts/validate-skills.js <skill-name>` for the mechanical checks.
+3. Walk the "Quality bar" checklist below against the skill as it stands, plus `references/flex-workspace-spec.md`'s Verification checklist if it targets this repo (routing-table row present, `evals/` exists if the skill's own domain recommends eval sets, description length and "Use when" clause, no silently duplicated reference material).
+4. Report concrete findings only — file, section, what's wrong, why it matters, and a specific fix. Skip praise for things that are merely fine; a finding-free section needs no line.
+5. Ask which findings to implement before touching any files. A full audit often surfaces more than the user wants fixed today.
+
+This mode starts from Step 6's Quality bar and works backward to specific edits — it skips Steps 1–5 of the operating procedure entirely (there's no new name or structure to propose).
+
+## Catalog-wide health check
+
+Triggered by an explicit request to audit, health-check, or "review all" skills in `.agents/skills/` — the same idea as "Auditing an existing skill" above, but run over every skill instead of one.
+
+1. Run `node scripts/validate-skills.js` with no argument (validates the whole catalog) for the mechanical checks.
+2. For each skill, check the same drift patterns this skill's own house style calls out: missing `evals/` despite the skill's domain recommending them, description length outside the observed 175–960 character range, a missing routing-table row in `flex-using-agent-skills`, a description missing a literal "Use when" clause, and reference material duplicated instead of pointed-to.
+3. Group findings by skill, most actionable first. Skip a skill entirely if it has no findings — don't manufacture filler to look thorough.
+4. Present all findings in one pass, same shape as the no-argument mode's Step 2–3, and ask which to implement before editing anything — a catalog-wide audit touches many files, so confirm scope first.
+
+Keep this to the mechanical/structural checks above, not a content rewrite of each skill's domain logic — a finding that needs deeper rework is a separate, per-skill conversation (use "Auditing an existing skill" for that one skill) once this pass surfaces it as a candidate.
+
 ## Consolidating or retiring a skill
 
 Skill creation isn't the only outcome of a catalog check. Reach for this instead of a new skill when:
@@ -202,6 +227,10 @@ Before handing over a generated skill, verify each:
 - Targeting `.agents/skills/` (this repo): run `node scripts/validate-skills.js <skill-name>` and the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material, routing-table row added per Step 7.5).
 
 If any fail, revise before delivering.
+
+## Tracking changes
+
+Don't add a `CHANGELOG.md` or a version field to a skill — git history over `.agents/skills/<skill-name>/` is the changelog. When you edit a skill for a specific reason (a no-argument-mode fix, an audit finding, a triggering tweak), say so in the commit message so `git log --follow SKILL.md` stays a readable record of why the skill looks the way it does.
 
 ## Language handling
 

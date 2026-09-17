@@ -75,9 +75,9 @@ Input: Added user authentication with JWT tokens
 Output: feat(auth): implement JWT-based authentication
 ```
 
-**Explain the why.** Today's models have good theory of mind; a rule with its rationale is followed more intelligently and survives editing because the next maintainer understands its purpose. Reserve all-caps MUST/NEVER for genuine safety or correctness invariants. Rigid, over-constrained structures are a yellow flag — reframe and explain instead.
+**Explain the why.** Same rule as SKILL.md's Core Principles ("Explain the why, not just the what") — canonical rationale lives there, don't restate it here.
 
-**Draft, then re-read with fresh eyes.** Write a first version, then look at it anew and cut filler, tighten, and improve. Keep the skill general rather than overfit to the specific examples that prompted it.
+**Draft, then re-read with fresh eyes.** Write a first version, then look at it anew and cut filler, tighten, and improve. Keep the skill general — see SKILL.md's Core Principles ("Iterate on the real target, not the examples") for why.
 
 ## The no-surprises principle
 

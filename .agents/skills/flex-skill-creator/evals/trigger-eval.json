@@ -1,0 +1,22 @@
+[
+  { "query": "make me a skill for reviewing PRs against our team's checklist", "should_trigger": true },
+  { "query": "turn this workflow into a skill: every time I get a bug report I check logs, repro locally, then write a regression test", "should_trigger": true },
+  { "query": "tôi muốn tạo 1 skill để review database migration trước khi merge", "should_trigger": true },
+  { "query": "can you optimize the description on my db-migration-reviewer skill so it triggers more reliably?", "should_trigger": true },
+  { "query": "package up my research-helper skill so I can install it on another machine", "should_trigger": true },
+  { "query": "here's my draft SKILL.md for code review, can you harden it? it feels too generic", "should_trigger": true },
+  { "query": "review flex-skill-creator itself and suggest improvements", "should_trigger": true },
+  { "query": "I want to benchmark two competing description versions for my changelog-writer skill", "should_trigger": true },
+  { "query": "sửa mô tả cho skill flex-database-engineering để nó bắt đúng câu hỏi về Liquibase hơn", "should_trigger": true },
+  { "query": "can you audit every skill in .agents/skills/ and tell me which ones are stale?", "should_trigger": true },
+  { "query": "review this PR for bugs before I merge it", "should_trigger": false },
+  { "query": "fix the bug in the migration-reviewer microservice where it doesn't catch missing indexes", "should_trigger": false },
+  { "query": "explain how skills work in Claude Code", "should_trigger": false },
+  { "query": "add a new section to CLAUDE.md about our git branching workflow", "should_trigger": false },
+  { "query": "the C# example in flex-dotnet-engineering's snippet has a null-ref bug, can you fix the code sample?", "should_trigger": false },
+  { "query": "can you improve this PR review checklist doc on our team wiki?", "should_trigger": false },
+  { "query": "write a Python script that validates JSON schemas against a spec", "should_trigger": false },
+  { "query": "run the unit tests in the migration-reviewer microservice and tell me if they pass", "should_trigger": false },
+  { "query": "package a zip of the build artifacts for this release", "should_trigger": false },
+  { "query": "optimize the SQL query in this migration for performance", "should_trigger": false }
+]
