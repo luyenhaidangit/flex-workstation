@@ -23,7 +23,7 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/skill-format-guard.js\"",
-            "if": "Write(flex-agents/skills/**/SKILL.md)"
+            "if": "Write(.agents/skills/**/SKILL.md)"
           }
         ]
       },
@@ -33,7 +33,7 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/skill-format-guard.js\"",
-            "if": "Edit(flex-agents/skills/**/SKILL.md)"
+            "if": "Edit(.agents/skills/**/SKILL.md)"
           }
         ]
       }
