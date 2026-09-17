@@ -29,8 +29,9 @@ Before modifying files or applying a database change:
 
 1. Identify the target repository, database, PostgreSQL version, Liquibase entry point, affected tables/objects, and deployment environment.
 2. Read repository instructions, database documentation, master changelog, the relevant release/domain changelog, and nearby changesets before choosing a location or format.
-3. Classify the request: baseline, new migration, seed, repeatable programmable object, review, or operational diagnosis.
-4. State the acceptance criteria, non-goals, compatibility risk, locking impact, and whether the request authorizes an actual database update.
+3. If the target database's ownership or migration location is not obvious from local convention (a new bounded context, a database shared across repos, or any hint of unresolved topology), read `docs/architecture/system-map.md`'s Data Architecture section before choosing. If that document itself flags the area as unresolved (e.g. "Cần làm rõ"), stop and ask rather than inferring a location from precedent.
+4. Classify the request: baseline, new migration, seed, repeatable programmable object, review, or operational diagnosis.
+5. State the acceptance criteria, non-goals, compatibility risk, locking impact, and whether the request authorizes an actual database update.
 
 Stop for direction when the target database, ownership boundary, release state, or permission to apply a migration is unclear. Never silently choose a production database or infer authority for destructive operations.
 
@@ -71,7 +72,7 @@ Add a constraint only when it enforces a documented domain invariant or data-int
 
 | Constraint | Apply when | Important considerations |
 | --- | --- | --- |
-| `PRIMARY KEY` | A row needs a stable identifier. | Prefer compact, locality-friendly keys according to repository practice; do not introduce UUIDv4 merely by habit. |
+| `PRIMARY KEY` | A row needs a stable identifier. | Use an increasing `BIGINT` for write-heavy, high-volume tables (e.g. order/trade) — compact and index-friendly. Use `UUID` for reference data, sessions, or identity created across services. When UUID needs time locality, prefer `UUIDv7` (native as `uuidv7()` on PostgreSQL 18+; generate a compatible value in the service on older versions) over random `UUIDv4`, especially for write-heavy tables. If a non-sequential public identifier is needed on a `BIGINT`-keyed table, add a separate `public_id UUID` column — do not replace the primary key. |
 | `NOT NULL` | The domain requires a value. | Do not replace an unknown or optional value with an artificial default. |
 | `CHECK` | A stable, row-local business rule must be enforced by the database. | `CHECK` permits `NULL`; combine with `NOT NULL` when required. Keep it synchronized with the application contract. |
 | `DEFAULT` | The value is correct when the writer omits the column. | Do not use it to conceal a missing business decision. |
@@ -90,9 +91,15 @@ Add a constraint only when it enforces a documented domain invariant or data-int
 #### Seed and repeatable objects
 
 - Seed only reference/local/test data unless production seed data is explicitly approved.
-- Identify the business keys owned by a seed script. Never delete a whole table or unrelated records to refresh a seed set; do not hard-code generated surrogate IDs.
-- Use `CREATE OR REPLACE` for functions, procedures, and views when the repository's repeatable-object strategy permits it. Use `runOnChange` or `runAlways` only when the intended re-execution behavior is explicit.
+- Identify the business keys owned by a seed script. Never delete a whole table or unrelated records to refresh a seed set; do not hard-code generated surrogate IDs. Use `runAlways: true` when the seed must be re-applied on every update.
+- Use `CREATE OR REPLACE` for functions, procedures, and views when the repository's repeatable-object strategy permits it; use `runOnChange: true` so Liquibase re-applies the change when the definition changes.
 - Keep triggers, functions, views, and indexes in separate, clearly scoped changesets when their lifecycle differs from the table change.
+- Column addition: use `ADD COLUMN IF NOT EXISTS` only when keeping an existing definition unchanged is acceptable; if type, default, or nullability must change, write a separate `ALTER COLUMN` changeset instead of layering it onto the idempotent add.
+- Trigger: `DROP TRIGGER IF EXISTS <name> ON <table>` then `CREATE TRIGGER`, scoped to the one trigger being replaced — never drop a different trigger on the same table.
+- Index intended to be resynced exactly: `DROP INDEX IF EXISTS <name>` then `CREATE INDEX <name> ...` with a stable, explicit name.
+- Constraint already approved by the spec: `DROP CONSTRAINT IF EXISTS <name>` then recreate it under the same stable name; never probe for or drop a constraint outside the change's scope.
+- Sequence: `CREATE SEQUENCE IF NOT EXISTS`; only call `setval` when the script owns that sequence and the intended starting value is known.
+- Any drop-then-recreate step must be scoped to a named object or an explicit key set, and run inside a transaction when the database supports it.
 
 #### Classified domain values
 
@@ -100,6 +107,7 @@ Add a constraint only when it enforces a documented domain invariant or data-int
 - Use the same canonical vocabulary in the database and application contracts. Do not allow free-form text or duplicate inline string literals such as `"active"`, `"Active"`, and `"enabled"` for one domain state.
 - Choose the representation by changeability: use an application enum or shared constants when the value set is stable; use reference data when values require administration, metadata, localization, ordering, or likely expansion.
 - Persist a stable code when appropriate (for example, `PENDING`), rather than a UI label. Labels and presentation metadata belong in the application or reference data.
+- For lifecycle/status columns specifically, store lowercase, meaningful `VARCHAR` values (for example `active`, `suspended`, `inactive`, `delisted`). Do not encode status as a letter or number (`A`, `1`/`0`). Reserve `BOOLEAN`/`is_active` for a state that is genuinely binary today and has no realistic third value coming.
 - Do not introduce a PostgreSQL enum by default. Use it only when its migration cost and the value set's long-term stability are explicitly accepted.
 
 ### 5. Protect configuration and deployment
