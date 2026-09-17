@@ -60,7 +60,9 @@ Skill creation gets used by people across a wide range of technical familiarity 
 
 ## Operating procedure
 
-Follow these steps in order. Steps 1–7 are the design front-end (always apply the care). Steps 8–11 are the lifecycle back half — apply them when the user wants validation and rigor, and skip or compress them when the user just wants the artifact.
+Follow these steps in order. Steps 1–7 (plus 0 and 7.5 where they apply) are the design front-end (always apply the care). Steps 8–11 are the lifecycle back half — apply them when the user wants validation and rigor, and skip or compress them when the user just wants the artifact.
+
+**Step 0 — Check the catalog (skills targeting `.agents/skills/` only).** Before designing anything, scan the existing skills in `.agents/skills/` for overlap. Prefer extending an existing skill (a new section, a new reference file) over adding a near-duplicate, and be able to state the specific gap the new skill fills that no existing skill covers. Skip this step for a skill targeting somewhere outside this repo (e.g. the user's personal `~/.claude/skills/`) — there is no shared catalog to check.
 
 **Step 1 — Restate the intended purpose.** In one or two sentences, reflect back what you understand the skill is for, who uses it, and when. This catches misunderstandings before any work is wasted and gives the user a cheap correction point.
 
@@ -75,6 +77,8 @@ Follow these steps in order. Steps 1–7 are the design front-end (always apply 
 **Step 6 — Generate the full, production-ready skill.** Write the complete skill using the output contract in `references/output-template.md`. Every generated skill includes all the required sections — the decision framework, mandatory checks, anti-patterns, and output format are not optional and not to be skipped. **Exception: a skill targeting `.agents/skills/` (this repo) uses the section set and frontmatter rules in `references/flex-workspace-spec.md` instead of this generic contract.**
 
 **Step 7 — Provide 3 example prompts.** Show realistic, concrete things a user would type to invoke the new skill — the kind with file paths, real-sounding context, and casual phrasing — so the user can confirm it triggers on the right things.
+
+**Step 7.5 — Wire it into the workspace (skills targeting `.agents/skills/` only).** Generating the file is not the finish line here: create the directory at `.agents/skills/<skill-name>/`, add a row to `flex-using-agent-skills`'s routing table naming the task/artifact the new skill governs (a skill missing from that table is invisible — this workspace's routing rule in `AGENTS.md` means nothing gets selected outside it), and tell the user to run `SYNC_WORKSPACE.cmd` so the `.claude/skills/` junction picks it up. If the change alters workspace structure or onboarding, flag that `docs/architecture/system-map.md` or `docs/setup/onboarding.md` may need a matching update rather than silently editing them yourself. See `references/flex-workspace-spec.md` for the full checklist. Skip this step for a skill targeting somewhere outside this repo.
 
 **Step 8 — Offer to test it.** Propose 2–3 realistic test prompts and, with the user's OK, run the skill on them to see real output. On Claude.ai this is done inline (no subagents). Full procedure and platform differences are in `references/evaluation-and-iteration.md`.
 
@@ -185,7 +189,7 @@ Before handing over a generated skill, verify each:
 - Paste-ready — clean, self-contained, written as direct instructions to Claude.
 - Reasoned — important rules explain their "why."
 - Safe and honest — no malicious behavior; what it does matches what its description says.
-- Targeting `.agents/skills/` (this repo): also run the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material).
+- Targeting `.agents/skills/` (this repo): also run the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material, routing-table row added per Step 7.5).
 
 If any fail, revise before delivering.
 
@@ -195,7 +199,7 @@ Write the final skill in **English by default** — it is the most portable and 
 
 ## Reference files
 
-- `references/flex-workspace-spec.md` — this repo's own house style for skills (where they live, the observed section set, frontmatter rules, reference-material placement), which overrides `references/output-template.md` and `references/skill-anatomy.md` whenever the generated skill will live under `.agents/skills/` (this repo, `flex-workstation`). Read this first, before Step 5, for any skill targeting this repo.
+- `references/flex-workspace-spec.md` — this repo's own house style for skills (where they live, the observed section set, frontmatter rules, reference-material placement, the routing/wiring checklist), which overrides `references/output-template.md` and `references/skill-anatomy.md` whenever the generated skill will live under `.agents/skills/` (this repo, `flex-workstation`). Read this first, before Step 5, for any skill targeting this repo.
 - `references/output-template.md` — the exact structure and required sections every generated skill must follow **for skills outside this repo** (e.g. the user's personal `~/.claude/skills/`). Read this before writing any skill (Step 6) that isn't targeting `.agents/skills/`.
 - `references/codebase-conventions.md` — engineering rules to fold into any code-related skill (file placement, dependency direction, no hardcoding, avoiding god services and premature abstraction, extensibility, production-readiness). Read this when the skill being created touches code.
 - `references/skill-anatomy.md` — how skills are physically built: progressive disclosure / three-level loading, the SKILL.md + scripts/ + references/ + assets/ layout, domain organization, writing patterns, and the no-surprises principle. Read when proposing structure (Step 5) or when you need the underlying mechanics.

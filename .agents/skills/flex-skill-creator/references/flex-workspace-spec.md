@@ -47,9 +47,25 @@ Use this shape by default for a skill targeting `.agents/skills/`, in place of t
 - A supporting file specific to **one** skill's own content goes in that skill's own `references/` (e.g. `flex-skill-creator/references/*.md`).
 - There is no shared, cross-skill `references/` directory at the workspace root today. If several skills would genuinely need the same shared material, raise that with the user rather than inventing a new shared location unasked.
 
+## Before creating a new skill directory
+
+1. **Search the existing catalog** (`.agents/skills/`, currently ~20 skills) for overlap. Prefer extending an existing skill (a new section, a new reference file) over adding a near-duplicate. Name the specific gap the new skill fills that no existing skill covers.
+2. **Check `flex-using-agent-skills`'s routing table.** A skill that isn't listed there is invisible under this workspace's mandatory routing rule (`AGENTS.md` → "Skill routing bắt buộc"): agents will never select it. Confirm the new skill will get a row before treating the work as done (see "Wiring a new or changed skill" below).
+
+## Wiring a new or changed skill into the workspace
+
+Generating `SKILL.md` is not the last step for a skill targeting this repo. Before calling the work done:
+
+1. **Create it at `.agents/skills/<skill-name>/`** — never under `.claude/skills/` or a standalone `flex-agents/` path.
+2. **Add a row to the routing table** in `.agents/skills/flex-using-agent-skills/SKILL.md` (`## Routing table`), naming the task/artifact this skill governs. Without this row the skill is dead weight — nothing will ever select it.
+3. **Tell the user to run `SYNC_WORKSPACE.cmd`** (or confirm the junction already covers it) so `.claude/skills/` picks up the new directory for Claude Code.
+4. **If the change alters workspace structure or onboarding** (new category of skill, new convention), flag that `docs/architecture/system-map.md` or `docs/setup/onboarding.md` may need a matching update, per `AGENTS.md`'s documentation rule — don't silently update those docs yourself unless the user's request already covers it.
+
 ## Verification
 
 - [ ] `name:` frontmatter matches the directory name exactly
 - [ ] `description:` contains a literal "Use when …" clause
 - [ ] Section set follows the house pattern above, or a deviation is explicitly called out and justified
 - [ ] No shared reference material was silently duplicated into a new cross-skill location
+- [ ] A row was added to `flex-using-agent-skills`'s routing table (or the skill was flagged to the user as missing one)
+- [ ] The user was told to run `SYNC_WORKSPACE.cmd`, or the `.claude/skills/` junction was confirmed to already cover it
