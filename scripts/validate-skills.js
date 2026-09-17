@@ -33,7 +33,7 @@ const USE_WHEN_PATTERN = /\buse (when|during|before|after)\b/i;
 const DESCRIPTION_SOFT_LIMIT = 1024;
 
 function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
   const fm = match[1];
   const nameMatch = fm.match(/^name:\s*(.*)$/m);

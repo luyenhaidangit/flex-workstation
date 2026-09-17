@@ -7,7 +7,7 @@ metadata:
   author: "flex-workstation"
   source: "local"
 user-invocable: true
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 ## User Input
