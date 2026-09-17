@@ -68,11 +68,11 @@ Follow these steps in order. Steps 1–7 are the design front-end (always apply 
 
 **Step 3 — Analyze the workflow.** Before proposing structure, work through the workflow analysis checklist (below). This is where a good skill is actually designed: the procedure and anti-patterns fall out of understanding the pain points and failure modes, not out of a template.
 
-**Step 4 — Propose the skill name.** Short, lowercase, hyphenated, verb-or-domain-led, and specific enough that its purpose is obvious from the name alone (`pr-review-guard`, not `code-helper`). Offer one strong recommendation, not a menu. Targeting `flex-agents/skills/`: prefix with `flex-` (see `references/flex-agents-conventions.md`), and the name must exactly match the directory you create — the validator checks this.
+**Step 4 — Propose the skill name.** Short, lowercase, hyphenated, verb-or-domain-led, and specific enough that its purpose is obvious from the name alone (`pr-review-guard`, not `code-helper`). Offer one strong recommendation, not a menu. Targeting `.agents/skills/` (this repo): prefix with `flex-` unless it's a ported lifecycle tool with its own prefix convention (see `references/flex-workspace-spec.md`), and the name must exactly match the directory you create.
 
-**Step 5 — Propose the structure.** A short outline of the sections and any reference files, so the user can redirect before you write the full thing. For a simple skill this is a few lines; for a complex one, note which parts will live in `references/` and whether any `scripts/` or `assets/` are warranted. Apply progressive disclosure — see `references/skill-anatomy.md`. **If the skill will live under `flex-agents/skills/`, this repo's own spec overrides that generic guidance — read `references/flex-agents-conventions.md` first and structure the outline to match `docs/skill-anatomy.md` instead.**
+**Step 5 — Propose the structure.** A short outline of the sections and any reference files, so the user can redirect before you write the full thing. For a simple skill this is a few lines; for a complex one, note which parts will live in `references/` and whether any `scripts/` or `assets/` are warranted. Apply progressive disclosure — see `references/skill-anatomy.md`. **If the skill will live under `.agents/skills/` (this repo), this repo's house style overrides that generic guidance — read `references/flex-workspace-spec.md` first and structure the outline to match its observed section set instead.**
 
-**Step 6 — Generate the full, production-ready skill.** Write the complete skill using the output contract in `references/output-template.md`. Every generated skill includes all the required sections — the decision framework, mandatory checks, anti-patterns, and output format are not optional and not to be skipped. **Exception: a skill targeting `flex-agents/skills/` uses the section set and frontmatter rules in `docs/skill-anatomy.md` (via `references/flex-agents-conventions.md`) instead of this generic contract, and must pass `node scripts/validate-skills.js` before delivery.**
+**Step 6 — Generate the full, production-ready skill.** Write the complete skill using the output contract in `references/output-template.md`. Every generated skill includes all the required sections — the decision framework, mandatory checks, anti-patterns, and output format are not optional and not to be skipped. **Exception: a skill targeting `.agents/skills/` (this repo) uses the section set and frontmatter rules in `references/flex-workspace-spec.md` instead of this generic contract.**
 
 **Step 7 — Provide 3 example prompts.** Show realistic, concrete things a user would type to invoke the new skill — the kind with file paths, real-sounding context, and casual phrasing — so the user can confirm it triggers on the right things.
 
@@ -185,7 +185,7 @@ Before handing over a generated skill, verify each:
 - Paste-ready — clean, self-contained, written as direct instructions to Claude.
 - Reasoned — important rules explain their "why."
 - Safe and honest — no malicious behavior; what it does matches what its description says.
-- Targeting `flex-agents/skills/`: also run the repo-specific checklist at the end of `references/flex-agents-conventions.md` (validator passes, name matches directory, description has a literal "Use when" clause, no duplicated reference material).
+- Targeting `.agents/skills/` (this repo): also run the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material).
 
 If any fail, revise before delivering.
 
@@ -195,8 +195,8 @@ Write the final skill in **English by default** — it is the most portable and 
 
 ## Reference files
 
-- `references/flex-agents-conventions.md` — this repo's own skill format spec (`docs/skill-anatomy.md`), which overrides `references/output-template.md` and `references/skill-anatomy.md` whenever the generated skill will live under `flex-agents/skills/`. Read this first, before Step 5, for any skill targeting this repo.
-- `references/output-template.md` — the exact structure and required sections every generated skill must follow **for skills outside this repo** (e.g. the user's personal `~/.claude/skills/`). Read this before writing any skill (Step 6) that isn't targeting `flex-agents/skills/`.
+- `references/flex-workspace-spec.md` — this repo's own house style for skills (where they live, the observed section set, frontmatter rules, reference-material placement), which overrides `references/output-template.md` and `references/skill-anatomy.md` whenever the generated skill will live under `.agents/skills/` (this repo, `flex-workstation`). Read this first, before Step 5, for any skill targeting this repo.
+- `references/output-template.md` — the exact structure and required sections every generated skill must follow **for skills outside this repo** (e.g. the user's personal `~/.claude/skills/`). Read this before writing any skill (Step 6) that isn't targeting `.agents/skills/`.
 - `references/codebase-conventions.md` — engineering rules to fold into any code-related skill (file placement, dependency direction, no hardcoding, avoiding god services and premature abstraction, extensibility, production-readiness). Read this when the skill being created touches code.
 - `references/skill-anatomy.md` — how skills are physically built: progressive disclosure / three-level loading, the SKILL.md + scripts/ + references/ + assets/ layout, domain organization, writing patterns, and the no-surprises principle. Read when proposing structure (Step 5) or when you need the underlying mechanics.
 - `references/evaluation-and-iteration.md` — the test → review → iterate loop: writing test cases, running the skill on them (Claude.ai-first, with subagent/Cowork/Claude Code variants), reviewing outputs with the user, and improving the skill without overfitting. Read at Steps 8–9.
