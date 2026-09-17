@@ -15,7 +15,7 @@ Two facts shape good triggering:
 
 The goal is a description that fires on the should-trigger cases and stays quiet on the near-misses.
 
-**Step 1 — Build a trigger-eval set.** Write ~20 realistic queries split between should-trigger and should-not-trigger:
+**Step 1 — Build a trigger-eval set.** Write ~20 realistic queries split between should-trigger and should-not-trigger. For a skill targeting `.agents/skills/` (this repo), commit the set to `.agents/skills/<skill-name>/evals/trigger-eval.json` per `evaluation-and-iteration.md` so it's a reusable baseline for the next optimization pass rather than a one-off scratch file:
 
 ```json
 [

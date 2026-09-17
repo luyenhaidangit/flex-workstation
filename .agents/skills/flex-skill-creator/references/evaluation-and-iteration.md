@@ -21,6 +21,8 @@ If you're tracking these in a file, a minimal shape is:
 }
 ```
 
+**Where to keep them, for a skill targeting `.agents/skills/` (this repo):** if the test/trigger-eval set is worth reusing on the next optimize pass rather than throwing away, commit it to `.agents/skills/<skill-name>/evals/` (e.g. `evals/test-cases.json`, `evals/trigger-eval.json`) alongside the skill it belongs to — not a scratch/tmp path. That gives the next iteration a real baseline instead of re-deriving test cases from scratch. Skip this for a one-off sanity check the user doesn't ask to keep, or for a skill targeting somewhere outside this repo (e.g. the user's personal `~/.claude/skills/`), which has no shared repo to commit into.
+
 ## Running the test cases (Claude.ai)
 
 Claude.ai has no subagents, so run tests **inline, one at a time**:
