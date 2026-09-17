@@ -1,12 +1,12 @@
 ---
-name: codebase-architect
+name: flex-codebase-architect
 description: >
   Enforce senior-engineer architectural discipline on code you write — both when
   changing a large existing codebase and when creating something from scratch.
-  Use this skill whenever you are about to add a feature, fix a bug, refactor,
+  Use when you are about to add a feature, fix a bug, refactor,
   create a new file/module/class, or modify existing code in a non-trivial
   project — even if the user does not explicitly ask for "clean code" or "good
-  architecture." Also use it when bootstrapping new ground where no sibling code
+  architecture." Also use when bootstrapping new ground where no sibling code
   exists to copy: starting a project or service, scaffolding a new module or
   bounded context, or building a client/wrapper for an external API or SDK
   (payment, messaging, social, LLM/AI providers). Trigger on phrases like

@@ -65,6 +65,7 @@ Select only skills that directly govern the task.
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, or decisions about persistent agent context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
+| Adding a feature, creating a new file/module/service, or scaffolding new ground in any stack — general architectural discipline (placement, no hardcoding, no god services, no premature abstraction) | `flex-codebase-architect` |
 | New feature without an existing business spec | `speckit-specify` |
 | Clarify an existing feature spec | `speckit-clarify` |
 | Create a feature plan | `speckit-plan` |
@@ -89,6 +90,10 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
   skill. Keep artifact ownership distinct rather than duplicating domain rules.
 - A task that creates, renames, or exposes a backend/domain/public-contract symbol
   adds `flex-naming-convention` to its primary engineering skill.
+- A task that adds a feature, refactors, or scaffolds new ground (any language) adds
+  `flex-codebase-architect` alongside the domain-specific engineering skill that also
+  applies (e.g. `flex-dotnet-engineering` for C#); when no domain-specific skill
+  applies, `flex-codebase-architect` alone is the primary skill.
 - A feature request starts with the applicable Speckit skill. A high-level request to
   “implement” a new feature starts at `speckit-specify`; do not skip the workspace's
   explicit Speckit gates.

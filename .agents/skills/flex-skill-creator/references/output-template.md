@@ -32,7 +32,7 @@ The generated `SKILL.md` itself uses YAML frontmatter (`name`, `description`) fo
 
 **12. Example User Prompts** — exactly 3 realistic prompts a user would type to invoke the skill, with concrete detail (file names, error text, real-sounding context, casual phrasing). These double as triggering documentation.
 
-**13. Full Skill Prompt** — the complete, paste-ready `SKILL.md` content, assembled from the sections above, ready to drop into a skill folder or skill-creation flow with no further editing.
+Write the file (Step 6) using these sections directly — on a platform with filesystem access (Claude Code, Codex, Antigravity), that file *is* the deliverable, and re-pasting its full text into the chat reply afterward is wasted tokens. Only inline the complete, paste-ready `SKILL.md` text in the reply when the target has no filesystem access (e.g. plain Claude.ai chat) or the user explicitly asks to see the text.
 
 ---
 
@@ -89,4 +89,4 @@ description: <pushy when-to-trigger + what-it-does, naming concrete phrasings>
 - **No filler.** If a sentence would be true of every skill, delete it.
 - **Scannable.** Short sections, single purpose each, so a future editor can find and change one rule without rereading everything.
 - **Length.** Keep the body under ~400 lines; push long per-variant material into `references/` and point to it.
-- **Self-contained Full Skill Prompt.** The user must be able to paste it and have a working skill with zero edits.
+- **Self-contained.** Whether written to a file or pasted inline, the `SKILL.md` content must work with zero further edits.

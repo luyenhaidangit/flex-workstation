@@ -31,7 +31,7 @@ description: <what it does>. Use when <concrete trigger clause>.
 ## Verification
 ```
 
-Use this shape by default for a skill targeting `.agents/skills/`, in place of the 13-section contract in `references/output-template.md`. A meta/routing skill whose real shape doesn't fit (like `flex-skill-creator` or `flex-using-agent-skills` themselves) may deviate — that's a documented exception, not a silent one: say so explicitly to the user and explain why.
+Use this shape by default for a skill targeting `.agents/skills/`, in place of the 12-section contract in `references/output-template.md`. A meta/routing skill whose real shape doesn't fit (like `flex-skill-creator` or `flex-using-agent-skills` themselves) may deviate — that's a documented exception, not a silent one: say so explicitly to the user and explain why.
 
 `## Common Rationalizations` and `## Red Flags` do the job that the generic template's "Anti-Patterns to Prevent" does — pair each with why it's wrong and the correct move, same as the generic guidance. `## Verification` is a checklist (`- [ ]` items), same intent as the generic "Mandatory Checks."
 

@@ -92,48 +92,7 @@ You may compress steps when the request is already detailed (e.g., the user past
 
 ## No-argument mode: Session retrospective
 
-When invoked with no argument and no described skill idea, do **not** ask "what skill do you want to create?" — instead run a session retrospective on the current conversation.
-
-**Goal**: find exchanges where the AI or a skill misread intent, did the wrong thing, or required correction, then translate each finding into a concrete improvement proposal for the responsible skill (or memory/CLAUDE.md).
-
-### Step 1 — Scan for misalignment signals
-
-Read the full conversation and collect every exchange that shows one of these signals:
-
-- **Explicit correction** — user said "không phải", "làm lại", "sai rồi", "that's not what I meant", "no don't", "undo that", or similar.
-- **Unsolicited action** — AI did something the user did not ask for: added abstraction, refactored surrounding code, added comments, created extra files, pushed without being asked.
-- **Wrong skill fired** — a skill triggered on a prompt it shouldn't have, or failed to trigger on one it should.
-- **Silent assumption** — AI guessed instead of asking, and the guess was wrong (evidenced by a follow-up correction).
-- **Repeated pattern** — the same type of correction or push-back appeared more than once in the session.
-
-Only flag exchanges where the user *actually reacted* (corrected, objected, had to redo). Do not flag cases where the AI deviated but the user accepted the result.
-
-### Step 2 — Categorize each finding
-
-For each flagged exchange, output:
-
-```
-Exchange: [brief quote or description of what happened]
-Caused by: [skill name, or "base AI behavior", or "CLAUDE.md rule"]
-Category: wrong-scope | over-engineering | misread-intent | wrong-skill-fired | silent-assumption | other
-Impact: [one sentence — what the user had to do to recover]
-```
-
-### Step 3 — Propose a targeted fix
-
-For each finding, propose the minimal change that would prevent recurrence:
-
-- **Which file** to edit (SKILL.md path, or memory file, or CLAUDE.md)
-- **What to add/change/remove** — be specific: a new anti-pattern bullet, a tightened "When NOT to use" clause, an added clarification-gate question, a reworded rule
-- **Why** this change prevents the specific misalignment (one sentence)
-
-Resist proposing sweeping rewrites. A single well-placed anti-pattern bullet often fixes a repeating failure mode.
-
-### Step 4 — Confirm and implement
-
-Present all findings and proposals in one pass. Ask the user which ones to implement. Then execute the chosen changes using the normal skill-editing flow (respecting the git-source rule: edit `.agents/skills/` not `~/.claude/skills/`).
-
-**Scope guard**: if the session shows no clear misalignment signals, say so briefly and offer to switch to normal skill-creation mode instead.
+When invoked with no argument and no described skill idea, do **not** ask "what skill do you want to create?" — instead run a session retrospective on the current conversation: scan for exchanges where the AI or a skill misread intent, then propose targeted fixes. This is a distinct, infrequently-used mode — see `references/session-retrospective.md` for the full procedure before acting on a bare invocation.
 
 ## The clarification gate
 
@@ -205,3 +164,4 @@ Write the final skill in **English by default** — it is the most portable and 
 - `references/skill-anatomy.md` — how skills are physically built: progressive disclosure / three-level loading, the SKILL.md + scripts/ + references/ + assets/ layout, domain organization, writing patterns, and the no-surprises principle. Read when proposing structure (Step 5) or when you need the underlying mechanics.
 - `references/evaluation-and-iteration.md` — the test → review → iterate loop: writing test cases, running the skill on them (Claude.ai-first, with subagent/Cowork/Claude Code variants), reviewing outputs with the user, and improving the skill without overfitting. Read at Steps 8–9.
 - `references/optimization-and-packaging.md` — tuning the `description` for reliable triggering (how triggering works, building trigger evals, the optimization loop) and packaging/updating a skill for installation. Read at Steps 10–11, and when updating an existing installed skill.
+- `references/session-retrospective.md` — the full no-argument-mode procedure (scan for misalignment signals, categorize, propose fixes). Read this only on a genuine bare invocation with no described skill idea.

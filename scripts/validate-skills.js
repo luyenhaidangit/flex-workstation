@@ -26,6 +26,7 @@ const ROUTING_TABLE_FILE = path.join(SKILLS_DIR, 'flex-using-agent-skills', 'SKI
 const SECTION_EXEMPT_SKILLS = {
   'flex-skill-creator': 'meta-skill for creating other skills; uses its own lifecycle-shaped sections',
   'flex-using-agent-skills': 'routing skill; uses a routing-table shape instead of the engineering-skill sections',
+  'flex-codebase-architect': 'ported upstream skill (Two Modes / Decision Framework / Worked Examples / Bundled Resources shape); not rewritten to the flex-* house section set to avoid gutting its own well-established structure',
 };
 
 const REQUIRED_SECTIONS = ['## Overview', '## When to Use', '## Common Rationalizations', '## Red Flags', '## Verification'];
