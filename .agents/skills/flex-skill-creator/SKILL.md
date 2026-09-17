@@ -1,6 +1,6 @@
 ---
 name: flex-skill-creator
-description: Creates, hardens, tests, evaluates, optimizes, or packages a Claude skill — especially skills for software development, codebase analysis, debugging, architecture review, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill drafted/refined/tested/optimized/packaged, or a repetitive workflow captured. Trigger on "make me a skill for X", "create a skill that does Y", "turn this workflow into a skill", "improve/test/benchmark my skill", "optimize the triggering of this skill", or any request (English or Vietnamese) to capture a workflow as a repeatable skill. Also trigger on bare invocation (no argument) to scan the session for AI/skill misalignments and propose targeted fixes. Enforces a clarify-first design process, then carries the skill through the full lifecycle — draft, test, review, iterate, optimize the description, package — producing a structured, opinionated, production-ready skill.
+description: Creates, hardens, tests, evaluates, optimizes, or packages a Claude skill — especially for software development, codebase analysis, debugging, architecture review, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved, or a repetitive workflow captured. Trigger on "make me a skill for X", "create a skill that does Y", "turn this workflow into a skill", "improve/test/benchmark my skill", "optimize the triggering of this skill", or any such request in English or Vietnamese. Also trigger on bare invocation (no argument) to scan the session for AI/skill misalignments and propose targeted fixes. Enforces a clarify-first design process, then carries the skill through the full lifecycle — draft, test, review, iterate, optimize the description, package — producing a structured, opinionated, production-ready skill.
 ---
 
 # Flex Skill Creator
@@ -56,13 +56,13 @@ Skill creation gets used by people across a wide range of technical familiarity 
 
 7. **No surprises, no harm.** A skill must never contain malware, exploit code, or anything that could compromise security, and its actual behavior must match what its description promises — a user reading the description should not be surprised by what it does. Decline requests to build misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activity. (Benign roleplay or persona skills are fine.)
 
-8. **Iterate on the real target, not the examples.** A skill is meant to be used across thousands of prompts; you test it on a handful only because that's fast. Improvements must generalize — resist overfitting fiddly fixes to the two or three examples in front of you. (Applies during the iterate loop; see `references/evaluation-and-iteration.md`.)
+8. **Iterate on the real target, not the examples.** A skill is meant to be used across thousands of prompts; you test it on a handful only because that's fast. Improvements must generalize — resist overfitting fiddly fixes to the two or three examples in front of you. (Applies during the iterate loop; see `references/evaluation-and-iteration.md`. This principle is restated there and echoed in `references/skill-anatomy.md`'s writing patterns — keep all three in sync if you change the framing.)
 
 ## Operating procedure
 
 Follow these steps in order. Steps 1–7 (plus 0 and 7.5 where they apply) are the design front-end (always apply the care). Steps 8–11 are the lifecycle back half — apply them when the user wants validation and rigor, and skip or compress them when the user just wants the artifact.
 
-**Step 0 — Check the catalog (skills targeting `.agents/skills/` only).** Before designing anything, scan the existing skills in `.agents/skills/` for overlap. Prefer extending an existing skill (a new section, a new reference file) over adding a near-duplicate, and be able to state the specific gap the new skill fills that no existing skill covers. Skip this step for a skill targeting somewhere outside this repo (e.g. the user's personal `~/.claude/skills/`) — there is no shared catalog to check.
+**Step 0 — Check the catalog (skills targeting `.agents/skills/` only).** Before designing anything, check for overlap. Start with the routing table in `.agents/skills/flex-using-agent-skills/SKILL.md` (`## Routing table`) — it's already a maintained intent→skill index, so scanning it is far cheaper than reading every `SKILL.md` in the catalog. Only open the full `SKILL.md` of a candidate overlap when the table suggests one. Prefer extending an existing skill (a new section, a new reference file) over adding a near-duplicate, and be able to state the specific gap the new skill fills that no existing skill covers. If the overlap is strong enough that the right move is merging into or retiring an existing skill rather than adding a new one, say so and follow "Consolidating or retiring a skill" below instead of proceeding to Step 1. Skip this step for a skill targeting somewhere outside this repo (e.g. the user's personal `~/.claude/skills/`) — there is no shared catalog to check.
 
 **Step 1 — Restate the intended purpose.** In one or two sentences, reflect back what you understand the skill is for, who uses it, and when. This catches misunderstandings before any work is wasted and gives the user a cheap correction point.
 
@@ -134,6 +134,16 @@ Resist proposing sweeping rewrites. A single well-placed anti-pattern bullet oft
 Present all findings and proposals in one pass. Ask the user which ones to implement. Then execute the chosen changes using the normal skill-editing flow (respecting the git-source rule: edit `.agents/skills/` not `~/.claude/skills/`).
 
 **Scope guard**: if the session shows no clear misalignment signals, say so briefly and offer to switch to normal skill-creation mode instead.
+
+## Consolidating or retiring a skill
+
+Skill creation isn't the only outcome of a catalog check. Reach for this instead of a new skill when:
+
+- **Step 0 finds real overlap** — two skills would fire on largely the same tasks. Merge the weaker one into the stronger: fold its distinctive rules in as a section or `references/` file, update its description if the merge widens scope, then delete the absorbed skill's directory and remove its routing-table row.
+- **A skill has gone stale** — its conventions no longer match the codebase, or a session retrospective (no-argument mode) repeatedly points at the same skill for wrong-scope or misread-intent findings that a targeted fix hasn't resolved after a couple of iterations.
+- **The user asks to retire a skill outright.**
+
+Retiring a skill means: delete `.agents/skills/<skill-name>/`, remove its row from `flex-using-agent-skills`'s routing table, and tell the user to rerun `SYNC_WORKSPACE.cmd` so the stale `.claude/skills/` junction entry clears. Don't merge or delete silently — state which skill is being absorbed or removed and why, the same way you'd confirm a new skill's name before generating it.
 
 ## The clarification gate
 
