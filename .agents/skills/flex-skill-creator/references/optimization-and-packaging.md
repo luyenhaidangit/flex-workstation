@@ -30,17 +30,7 @@ Make them concrete and specific — file paths, real context about the user's jo
 
 **Step 2 — Review the set with the user.** Bad eval queries produce a bad description, so let the user sign off, edit, toggle, add, or remove entries before optimizing.
 
-**Step 3 — Optimize.**
-- **If an automated loop script (`scripts.run_loop` or equivalent) is actually present and importable** in the current environment: run it, evaluating the current description on a held-out split, proposing improvements based on what failed, and re-evaluating — selecting the best by held-out test score to avoid overfitting:
-  ```bash
-  python -m scripts.run_loop \
-    --eval-set <trigger-eval.json> \
-    --skill-path <skill-path> \
-    --model <model-id-of-this-session> \
-    --max-iterations 5 --verbose
-  ```
-  Use the model ID powering the current session so the test matches what the user experiences. It runs each query a few times for a stable trigger rate and returns `best_description`. **Note: `flex-skill-creator` does not bundle its own `scripts/` directory — verify the script actually resolves before invoking it (e.g. via a quick `ls`/import check) instead of assuming it's there.**
-- **Otherwise (no automated loop available):** do it by hand: walk the eval set, predict for each whether the current description would trigger, find the misses, and rewrite the description to catch the should-triggers and exclude the near-misses — applying the pushiness and "Claude under-triggers" lessons above. Then re-walk the set to confirm. This is the default path for skills targeting `.agents/skills/` in this repo.
+**Step 3 — Optimize by hand.** This workspace has not ported the automated loop script (`scripts.run_loop`, from Anthropic's public skill-creator) — `flex-skill-creator` bundles no `scripts/` directory, so it never resolves here. Don't spend a step checking for it; go straight to the manual pass: walk the eval set, predict for each whether the current description would trigger, find the misses, and rewrite the description to catch the should-triggers and exclude the near-misses — applying the pushiness and "Claude under-triggers" lessons above. Then re-walk the set to confirm.
 
 **Step 4 — Apply.** Put the chosen description in the SKILL.md frontmatter and show the user a before/after (and the scores, if you have them).
 
@@ -48,13 +38,7 @@ Make them concrete and specific — file paths, real context about the user's jo
 
 **Note:** this is for producing an installable `.skill` bundle for a skill living outside this repo (e.g. the user's personal `~/.claude/skills/`). A skill targeting `.agents/skills/` in this repo lives and is distributed as tracked source (git + the `.claude/skills/` junction) — it is not packaged this way.
 
-If a packaging script (`scripts.package_skill` or equivalent) is actually present and importable in the current environment:
-
-```bash
-python -m scripts.package_skill <path/to/skill-folder>
-```
-
-This produces a `.skill` file. Point the user to its path so they can install it. If you have a `present_files`-style tool, present the `.skill` file directly. If no such script is available, tell the user so rather than assuming it exists, and offer to zip the folder directly as a fallback.
+This workspace has not ported `scripts.package_skill` either, for the same reason as above — skip checking for it. Zip the skill folder directly (`zip -r <skill-name>.skill <path/to/skill-folder>` or equivalent) and point the user to the resulting file's path so they can install it. If you have a `present_files`-style tool, present the `.skill` file directly.
 
 ## Updating an existing installed skill
 
