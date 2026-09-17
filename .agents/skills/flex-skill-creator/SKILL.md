@@ -189,7 +189,7 @@ Before handing over a generated skill, verify each:
 - Paste-ready — clean, self-contained, written as direct instructions to Claude.
 - Reasoned — important rules explain their "why."
 - Safe and honest — no malicious behavior; what it does matches what its description says.
-- Targeting `.agents/skills/` (this repo): also run the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material, routing-table row added per Step 7.5).
+- Targeting `.agents/skills/` (this repo): run `node scripts/validate-skills.js <skill-name>` and the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material, routing-table row added per Step 7.5).
 
 If any fail, revise before delivering.
 

@@ -2,7 +2,7 @@
 
 Read this whenever the skill being designed will live under `.agents/skills/` (this repo, `flex-workstation`) rather than being a standalone personal skill for the user's own `~/.claude/skills/`. This repo has its own house conventions that **override** `references/output-template.md` and `references/skill-anatomy.md` on the points below — those two files describe the generic Anthropic skill format; this repo follows a narrower, observed house style instead.
 
-There is currently **no automated validator** for this house style — treat every check below as a manual self-check.
+A real, mechanical check exists for the points below: `node scripts/validate-skills.js` (run from the workspace root, `flex-workstation/`), or `node scripts/validate-skills.js <skill-name>` for just one skill. It also runs automatically as a `PreToolUse` hook on `Write`/`Edit` to any `.agents/skills/**/SKILL.md` (`.claude/hooks/skill-format-guard.js`) — a `name:`/directory mismatch blocks the write; everything else below is advisory (printed as a warning, doesn't block). Run it yourself before delivering a new or edited skill rather than relying solely on the hook.
 
 ## Where skills actually live
 
@@ -37,7 +37,7 @@ Use this shape by default for a skill targeting `.agents/skills/`, in place of t
 
 ## Frontmatter rules
 
-- `name:` — plain (unquoted) YAML, lowercase-hyphenated, **must exactly match the directory name**. This is checkable by eye today (no automated check yet) — always diff the two before delivering.
+- `name:` — plain (unquoted) YAML, lowercase-hyphenated, **must exactly match the directory name**. The validator (and the `PreToolUse` hook) blocks on a mismatch — but still double-check by eye before delivering.
 - `description:` — plain YAML, one paragraph, must contain a literal **"Use when …"** (or "Use during…", "Use before/after…") clause naming concrete triggers, not just a summary of what the skill does.
 - Naming prefix: a skill customized for or specific to this Flex workspace/codebase gets the `flex-` prefix (e.g. `flex-dotnet-engineering`). A skill that is a ported lifecycle tool with its own external convention (Speckit) keeps that tool's prefix (`speckit-*`) instead — don't force `flex-` onto it.
 - Length: observed `flex-*` descriptions run 175–960 characters. `flex-codebase-architect` currently sits at 1352 characters using folded (`>`) frontmatter and a `name:` that doesn't match its directory (`codebase-architect` vs. the `flex-codebase-architect/` folder) — that's a known existing defect in this repo, not a pattern to copy.
@@ -63,6 +63,7 @@ Generating `SKILL.md` is not the last step for a skill targeting this repo. Befo
 
 ## Verification
 
+- [ ] `node scripts/validate-skills.js <skill-name>` passes with no errors (warnings are advisory — read them, but they don't block)
 - [ ] `name:` frontmatter matches the directory name exactly
 - [ ] `description:` contains a literal "Use when …" clause
 - [ ] Section set follows the house pattern above, or a deviation is explicitly called out and justified
