@@ -65,6 +65,7 @@ Select only skills that directly govern the task.
 | Angular UI in `flex-microfrontend`, including components, templates, forms, modals, and tables | `flex-frontend-engineering` |
 | Dockerfile, Docker Compose, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, or rollback | `flex-devops-engineering` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
+| Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, or decisions about persistent agent context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
 | New feature without an existing business spec | `speckit-specify` |
