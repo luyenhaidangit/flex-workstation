@@ -60,6 +60,8 @@ Skill creation gets used by people across a wide range of technical familiarity 
 
 8. **Iterate on the real target, not the examples.** A skill is meant to be used across thousands of prompts; you test it on a handful only because that's fast. Full rationale lives in `references/evaluation-and-iteration.md` ("Generalize from the feedback") — that's the canonical copy; don't restate it elsewhere.
 
+9. **Portable by default.** Domain logic (the actual how-to-do-the-work content) should read the same if someone copies the skill folder into an unrelated repo — don't bake in the current project's specific paths, service names, or tool choices just because they were on screen while writing it. The one declared exception is a skill whose whole point is this specific repo (Step 0/4 already decide that); even there, keep the repo-specific wiring (paths, routing-table rows, install steps) isolated in its own section or `references/` file rather than mixed through the domain logic, so a reader can tell at a glance which parts travel and which don't.
+
 ## Operating procedure
 
 Follow these steps in order. Steps 1–7 (plus 0 and 7.5 where they apply) are the design front-end (always apply the care). Steps 8–11 are the lifecycle back half — apply them when the user wants validation and rigor, and skip or compress them when the user just wants the artifact.
@@ -223,6 +225,7 @@ Before handing over a generated skill, verify each:
 - Maintainable — scannable, single-purpose sections, obvious where new rules go.
 - Paste-ready — clean, self-contained, written as direct instructions to Claude.
 - Reasoned — important rules explain their "why."
+- Portable — no current-project path, service name, or tool assumption leaked into the domain logic unless the skill explicitly targets this repo; any such glue that does belong is isolated in its own section or `references/` file, not scattered through the core instructions.
 - Safe and honest — no malicious behavior; what it does matches what its description says.
 - Targeting `.agents/skills/` (this repo): run `node scripts/validate-skills.js <skill-name>` and the checklist in `references/flex-workspace-spec.md` (name matches directory, description has a literal "Use when" clause, no duplicated reference material, routing-table row added per Step 7.5).
 
