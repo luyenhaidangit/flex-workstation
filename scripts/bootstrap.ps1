@@ -72,41 +72,6 @@ function Install-ClaudeCodeNative {
     bash -lc "curl -fsSL https://claude.ai/install.sh | bash"
 }
 
-function Sync-AgentSkills {
-    $projectRoot = Resolve-Path "$PSScriptRoot\.."
-    $agentsSkillsDir = Join-Path $projectRoot ".agents\skills"
-    $claudeSkillsDir = Join-Path $projectRoot ".claude\skills"
-
-    # .agents/skills is the tracked source of truth (checked out by git).
-    # .claude/skills mirrors it via junctions so Claude Code sees the same skills.
-    if (-not (Test-Path $agentsSkillsDir)) {
-        Write-Warn "No skills found at $agentsSkillsDir - skipping agent skill sync"
-        return
-    }
-
-    New-Item -ItemType Directory -Force -Path $claudeSkillsDir | Out-Null
-
-    $synced = 0
-    foreach ($skill in Get-ChildItem $agentsSkillsDir -Directory) {
-        $linkPath = Join-Path $claudeSkillsDir $skill.Name
-        if (Test-Path $linkPath) {
-            $existing = Get-Item -LiteralPath $linkPath -Force
-            $isJunction = $existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint
-            if ($isJunction) {
-                # Junction already points at .agents/skills/<name>; nothing to do
-                $synced++
-                continue
-            }
-            # Stale real copy from an older checkout; replace with a junction
-            Remove-Item -LiteralPath $linkPath -Recurse -Force
-        }
-        New-Item -ItemType Junction -Path $linkPath -Target $skill.FullName | Out-Null
-        $synced++
-    }
-
-    Write-Ok "Agent skills synced: $synced skills (.agents/skills source, .claude/skills junctions)"
-}
-
 function Initialize-WorkspaceProjectConfig {
     $projectRoot = Resolve-Path "$PSScriptRoot\.."
     $projectRootClaudePath = Join-Path $projectRoot "CLAUDE.md"
@@ -290,8 +255,7 @@ Set-WslConfig
 
 Initialize-WorkspaceProjectConfig
 
-Write-Step "Syncing shared agent skills (.agents/skills source, .claude/skills junctions)"
-Sync-AgentSkills
+& "$PSScriptRoot\sync-skills.ps1"
 
 & "$PSScriptRoot\sync-repositories.ps1" -PullExisting
 

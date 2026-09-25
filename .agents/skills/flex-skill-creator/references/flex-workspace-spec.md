@@ -58,8 +58,9 @@ Generating `SKILL.md` is not the last step for a skill targeting this repo. Befo
 
 1. **Create it at `.agents/skills/<skill-name>/`** — never under `.claude/skills/` or a standalone `flex-agents/` path.
 2. **Add a row to the routing table** in `.agents/skills/flex-using-agent-skills/SKILL.md` (`## Routing table`), naming the task/artifact this skill governs. Without this row the skill is dead weight — nothing will ever select it.
-3. **Tell the user to run `SYNC_WORKSPACE.cmd`** (or confirm the junction already covers it) so `.claude/skills/` picks up the new directory for Claude Code.
-4. **If the change alters workspace structure or onboarding** (new category of skill, new convention), flag that `docs/architecture/system-map.md` or `docs/setup/onboarding.md` may need a matching update, per `AGENTS.md`'s documentation rule — don't silently update those docs yourself unless the user's request already covers it.
+3. **Run `scripts/sync-skills.ps1` yourself** (repo root — a thin wrapper around the portable implementation in `flex-skill-creator/scripts/sync-skills.ps1`, with this workspace's paths filled in) so `.claude/skills/` picks up the new directory for Claude Code immediately — it's local-only and idempotent, no need to hand this back to the user. It also clears any stale junction left over from a retired skill. A plain content edit to an existing skill needs no re-sync: `.claude/skills/<name>` is a junction (a live link into `.agents/skills/<name>`, not a copy), so the edit is visible immediately everywhere.
+4. **Codex and Antigravity need no mirror** — both read `.agents/skills/` directly (see `docs/architecture/system-map.md`); only Claude Code hardcodes its own `.claude/skills/` directory, which is why it's the one tool that needs a junction. If a future tool is added that also hardcodes its own skills path, add one more `-MirrorDir` value to the root wrapper's call into `flex-skill-creator/scripts/sync-skills.ps1` and add the folder to the root `.gitignore` next to the existing `.claude/skills/` entry — the generic script already supports multiple mirrors, don't invent a second sync mechanism or fork the script.
+5. **If the change alters workspace structure or onboarding** (new category of skill, new convention), flag that `docs/architecture/system-map.md` or `docs/setup/onboarding.md` may need a matching update, per `AGENTS.md`'s documentation rule — don't silently update those docs yourself unless the user's request already covers it.
 
 ## Verification
 
@@ -69,4 +70,4 @@ Generating `SKILL.md` is not the last step for a skill targeting this repo. Befo
 - [ ] Section set follows the house pattern above, or a deviation is explicitly called out and justified
 - [ ] No shared reference material was silently duplicated into a new cross-skill location
 - [ ] A row was added to `flex-using-agent-skills`'s routing table (or the skill was flagged to the user as missing one)
-- [ ] The user was told to run `SYNC_WORKSPACE.cmd`, or the `.claude/skills/` junction was confirmed to already cover it
+- [ ] `scripts/sync-skills.ps1` was run (or the `.claude/skills/` junction was confirmed to already cover it) — not just left as a task for the user
