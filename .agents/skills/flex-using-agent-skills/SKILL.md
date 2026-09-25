@@ -67,6 +67,7 @@ Select only skills that directly govern the task.
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, or decisions about persistent agent context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
+| Brainstorm what feature/improvement to build next in an existing repo, or a gap analysis, with no idea decided yet | `flex-feature-discovery` |
 | New feature without an existing business spec | `speckit-specify` |
 | Clarify an existing feature spec | `speckit-clarify` |
 | Create a feature plan | `speckit-plan` |
