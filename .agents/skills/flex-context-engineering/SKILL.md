@@ -87,9 +87,22 @@ If two rules conflict — root vs. nested `CLAUDE.md`, a `.claude/rules/` file v
 Triggered by an explicit request to review or improve a specific project's context (e.g. "review context của flex-database", or this skill invoked with a project name as argument) — distinct from the generic guidance above, this mode runs an active audit against one target and reports findings before touching any file.
 
 1. **Resolve the target.** If the current repo hosts multiple sub-projects (a monorepo, or nested repos tracked in a manifest — in `flex-workstation` that's `workstation.json`), match the given name against them. Otherwise the target is the current repo's own root `AGENTS.md`/`CLAUDE.md`. If the name is ambiguous or no match exists, list the candidates and ask — don't guess.
-2. **Read every rules file that exists for that target** — `AGENTS.md`, `CLAUDE.md`, and any `.claude/rules/*.md` — in full. Don't review from memory or a partial read.
-3. **Run the Verification checklist below against the content**, plus an evidence check: does every listed command still run as written, does every referenced path/file still exist, is anything duplicated or contradicting between layers (root vs. nested, `.claude/rules/` vs. `AGENTS.md`)? Per point 4 above, flag only what evidence supports — don't invent hypothetical rules.
-4. **Report concrete findings**: file, line/section, what's wrong, why it matters, and a specific fix — same shape as `flex-skill-creator`'s "Auditing an existing skill" mode, for consistency across the workspace.
+2. **Read every rules file that exists for that target** — `AGENTS.md`, `CLAUDE.md`, and any `.claude/rules/*.md` — in full. Don't review from memory or a partial read. If none exist yet, say so plainly and point to `## Templates` below as the starting point — don't produce a review of something that isn't there.
+3. **Run the Verification checklist below against the content**, plus an evidence check: does every listed command still run as written, does every referenced path/file still exist, is anything duplicated or contradicting between layers (root vs. nested, `.claude/rules/` vs. `AGENTS.md`)? The checklist below catches bloat and staleness, not gaps — also check completeness against Core Process §2's four high-ROI categories (exact runnable commands, `NEVER` boundaries, one real code example, explicit ask-don't-assume triggers) and name which are missing outright. Per point 4 above, flag only what evidence supports — don't invent hypothetical rules.
+4. **Report concrete findings** using the template below — file, line/section, what's wrong, why it matters, and a specific fix, same underlying shape as `flex-skill-creator`'s "Auditing an existing skill" mode for consistency across the workspace.
+
+   ```
+   ## Context Review — <project>
+
+   ### Missing (high-ROI gaps)
+   - <category absent — commands / NEVER boundaries / code example / ask-trigger> — fix: <what to add>
+
+   ### Excess / Stale
+   - <file:section> — <what's wrong> — fix: <what to cut or correct>
+
+   ### Verdict
+   - <keep as-is | trim | rewrite section X | no rules file yet — scaffold from templates/>
+   ```
 5. **Ask which findings to implement** before editing anything — a review pass often surfaces more than the user wants fixed today.
 6. **On approval, edit the target's own rules files directly** (its `AGENTS.md`/`CLAUDE.md`/`.claude/rules/`) — this is the context file itself, not the project's source code, so it stays in scope even when the request is otherwise workstation-only. Re-run the Verification checklist after editing to confirm the fix lands.
 
