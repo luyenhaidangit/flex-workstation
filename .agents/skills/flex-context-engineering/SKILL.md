@@ -1,6 +1,6 @@
 ---
 name: flex-context-engineering
-description: Sets up or repairs an agent's rules files (AGENTS.md, CLAUDE.md, .claude/rules/) so agents get the right context without bloat. Use when a repo has no rules file, when CLAUDE.md/AGENTS.md have drifted apart or grown past ~200 lines, when an agent keeps missing project conventions, or when deciding where a new instruction belongs (rules file vs. skill vs. hook).
+description: Sets up or repairs an agent's rules files (AGENTS.md, CLAUDE.md, .claude/rules/) so agents get the right context without bloat. Use when a repo has no rules file, when CLAUDE.md/AGENTS.md have drifted apart or grown past ~200 lines, when an agent keeps missing project conventions, when deciding where a new instruction belongs (rules file vs. skill vs. hook), or when a request asks to review or improve a specific named project's context.
 ---
 
 # Context Engineering
@@ -81,6 +81,17 @@ Three commands to use during setup and review:
 - `/doctor` — suggests trims to a committed `CLAUDE.md` (cuts directory trees, dependency lists, generic architecture — keeps gotchas, reasons, and anything that overrides tool defaults)
 
 If two rules conflict — root vs. nested `CLAUDE.md`, a `.claude/rules/` file vs. `AGENTS.md` — the agent may pick either arbitrarily. Periodically re-read the full stack (root, nested, `.claude/rules/`) and remove the stale or contradicting one. In a monorepo, use `claudeMdExcludes` in `.claude/settings.local.json` to keep out another team's `CLAUDE.md`.
+
+## Reviewing a Named Project
+
+Triggered by an explicit request to review or improve a specific project's context (e.g. "review context của flex-database", or this skill invoked with a project name as argument) — distinct from the generic guidance above, this mode runs an active audit against one target and reports findings before touching any file.
+
+1. **Resolve the target.** Match the given name against a repo cloned inside `flex-workstation` per `workstation.json`, or the workstation root itself if the user means its own `AGENTS.md`/`CLAUDE.md`. If the name is ambiguous or no match exists, list the candidates and ask — don't guess.
+2. **Read every rules file that exists for that target** — `AGENTS.md`, `CLAUDE.md`, and any `.claude/rules/*.md` — in full. Don't review from memory or a partial read.
+3. **Run the Verification checklist below against the content**, plus an evidence check: does every listed command still run as written, does every referenced path/file still exist, is anything duplicated or contradicting between layers (root vs. nested, `.claude/rules/` vs. `AGENTS.md`)? Per point 4 above, flag only what evidence supports — don't invent hypothetical rules.
+4. **Report concrete findings**: file, line/section, what's wrong, why it matters, and a specific fix — same shape as `flex-skill-creator`'s "Auditing an existing skill" mode, for consistency across the workspace.
+5. **Ask which findings to implement** before editing anything — a review pass often surfaces more than the user wants fixed today.
+6. **On approval, edit the target's own rules files directly** (its `AGENTS.md`/`CLAUDE.md`/`.claude/rules/`) — this is the context file itself, not the project's source code, so it stays in scope even when the request is otherwise workstation-only. Re-run the Verification checklist after editing to confirm the fix lands.
 
 ## Templates
 
