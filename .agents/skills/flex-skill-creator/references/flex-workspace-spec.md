@@ -7,7 +7,7 @@ A real, mechanical check exists for the points below: `node scripts/validate-ski
 ## Where skills actually live
 
 - **Source of truth:** `.agents/skills/<skill-name>/` — tracked by git, shared across Codex, Antigravity, and Claude Code.
-- `.claude/skills/` is a **junction** to `.agents/skills/`, created by `SYNC_WORKSPACE.cmd`. It is gitignored — never edit through it, and never create a skill directly there.
+- `.claude/skills/` is a **junction** to `.agents/skills/`, created directly by `scripts/sync-skills.ps1` (repo root) — `SYNC_WORKSPACE.cmd` also produces this as part of its full bootstrap, but `scripts/sync-skills.ps1` is the fast, side-effect-free way to trigger it after creating or retiring a single skill (see "Wiring a new or changed skill" below). It is gitignored — never edit through it, and never create a skill directly there.
 - There is **no `flex-agents/` repository** in this workspace's manifest (`workstation.json`). It may still exist as a stray local directory on some machines, but it is not bootstrap-managed and is not the skill source — do not read or write to it.
 
 ## House section set (observed, not enforced)
