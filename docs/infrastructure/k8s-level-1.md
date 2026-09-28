@@ -36,7 +36,14 @@ Học theo đúng thứ tự vì bài sau dùng lại kiến thức bài trướ
 ## Quy ước
 
 - Toàn bộ lệnh chạy trong **terminal WSL** (Ubuntu, bash), không chạy trong PowerShell.
-- Tạo một thư mục riêng trong WSL để chứa file YAML: `mkdir -p ~/k8s-lab && cd ~/k8s-lab`. Đặt trong filesystem của WSL (`~`), **không** đặt dưới `/mnt/c` vì chậm. Không đặt trong repo này và không commit.
+- File YAML của các bài lab để trong repo `flex-environment`, thư mục **`k8s/lab/`** (tạo mới, tách khỏi các manifest thật như `k8s/flex-api-gateway.yaml`). Không để trong repo `flex-workstation` này.
+- Quy trình làm việc giữa Windows và WSL:
+  1. Trên Windows: viết YAML trong `flex-environment/k8s/lab/`, rồi commit và push.
+  2. Trong WSL: vào bản clone của repo (ví dụ `cd ~/flex-environment`, thay bằng đường dẫn thực tế của bạn), chạy `bash pull.sh` (chỉ chạy `git pull`, không đụng container).
+  3. Trong WSL: `kubectl apply -f k8s/lab/<file>.yaml`.
+
+  Bản clone trong WSL nên nằm ở filesystem của WSL (`~`), **không** ở `/mnt/c` vì chậm. Các lệnh `apply -f <file>` trong tài liệu này ngầm hiểu bạn đang đứng ở `k8s/lab/`.
+- Repo `flex-environment` trên GitHub, nên **không commit Secret thật**. Ở Bài 5, Secret được tạo bằng lệnh `kubectl create secret`, không viết thành file YAML.
 - Lệnh có `port-forward`, `minikube service` hoặc `minikube tunnel` chạy liên tục. Hãy mở một cửa sổ terminal WSL thứ hai cho chúng.
 - Trình duyệt trên Windows mở được `http://localhost:8080` cho các port mà WSL đang lắng nghe (WSL2 tự chuyển tiếp localhost). Nếu không mở được, xem [Phụ lục D](#phụ-lục-d-lưu-ý-riêng-khi-dùng-wsl).
 
@@ -539,6 +546,8 @@ kubectl describe pod <tên-pod>    # xem phần Liveness, Readiness, Limits, Req
 
 Sau mỗi thử nghiệm, đưa file về giá trị đúng và `apply` lại.
 
+**Đối chiếu với manifest thật:** mở `flex-environment/k8s/flex-api-gateway.yaml` và tự chỉ ra từng phần bạn đã học: ConfigMap, Secret, Deployment với 2 replica, `envFrom`, `resources`, `startupProbe`/`readinessProbe`/`livenessProbe`, và Service. Chú ý hai điểm mới so với bài: `startupProbe` cho app khởi động chậm (tối đa khoảng 120 giây), và `envFrom` nạp cả ConfigMap lẫn Secret thành biến môi trường. Chỉ đọc hiểu ở Level 1, chưa cần deploy file này (nó cần image riêng và Secret thật).
+
 **Tự kiểm tra:**
 
 1. Khác biệt giữa readiness và liveness về hậu quả khi thất bại?
@@ -716,7 +725,8 @@ kubectl explain <loại>.spec        # tra cấu trúc trường ngay trong term
 | `minikube start` báo thiếu RAM hoặc bị treo | WSL2 mặc định chỉ được dùng khoảng 50% RAM máy | Tạo `%UserProfile%\.wslconfig` trên Windows (xem bên dưới), rồi `wsl --shutdown` |
 | Mở `http://localhost:8080` trên Windows không được | Port-forward chưa chạy, hoặc localhost forwarding của WSL tắt | Kiểm tra `curl localhost:8080` **trong WSL** trước. Nếu WSL gọi được mà Windows không, kiểm tra `localhostForwarding` trong `.wslconfig` |
 | `kubectl` báo `connection refused` sau khi mở lại máy | Cluster đã dừng cùng WSL | `minikube start` |
-| Đọc và ghi file YAML rất chậm | Thư mục nằm dưới `/mnt/c` | Chuyển về `~/k8s-lab` |
+| `kubectl apply` báo không tìm thấy file | WSL chưa pull bản mới nhất, hoặc đang đứng sai thư mục | `bash pull.sh` ở thư mục gốc repo, rồi `cd k8s/lab` |
+| Đọc và ghi file YAML rất chậm | Bản clone nằm dưới `/mnt/c` | Clone lại repo vào `~` trong WSL |
 
 Cấu hình `%UserProfile%\.wslconfig` để cấp thêm RAM cho WSL:
 
@@ -727,7 +737,7 @@ memory=6GB
 
 Sau khi sửa, chạy `wsl --shutdown` trong PowerShell rồi mở lại WSL. Chọn mức `memory` sao cho Windows vẫn còn đủ RAM để chạy.
 
-Mẹo: chạy `code .` trong thư mục `~/k8s-lab` để sửa YAML bằng VS Code qua Remote WSL.
+Mẹo: nếu không muốn push rồi pull mỗi lần sửa YAML, chạy `code .` trong bản clone ở WSL để sửa trực tiếp bằng VS Code qua Remote WSL, `apply` ngay, và chỉ commit khi bài lab đã chạy đúng.
 
 ---
 
