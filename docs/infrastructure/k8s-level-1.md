@@ -35,25 +35,49 @@ Học theo đúng thứ tự vì bài sau dùng lại kiến thức bài trướ
 
 ## Quy ước
 
-- Lệnh chạy trong **PowerShell** trên Windows. Nội dung `kubectl` giống nhau trên mọi hệ điều hành.
-- Tạo một thư mục riêng để chứa file YAML, ví dụ `C:\k8s-lab`. **Không** đặt trong repo này và không commit.
-- Lệnh có `port-forward` hoặc `minikube service` chạy liên tục. Hãy mở một cửa sổ terminal thứ hai cho chúng.
+- Toàn bộ lệnh chạy trong **terminal WSL** (Ubuntu, bash), không chạy trong PowerShell.
+- Tạo một thư mục riêng trong WSL để chứa file YAML: `mkdir -p ~/k8s-lab && cd ~/k8s-lab`. Đặt trong filesystem của WSL (`~`), **không** đặt dưới `/mnt/c` vì chậm. Không đặt trong repo này và không commit.
+- Lệnh có `port-forward`, `minikube service` hoặc `minikube tunnel` chạy liên tục. Hãy mở một cửa sổ terminal WSL thứ hai cho chúng.
+- Trình duyệt trên Windows mở được `http://localhost:8080` cho các port mà WSL đang lắng nghe (WSL2 tự chuyển tiếp localhost). Nếu không mở được, xem [Phụ lục D](#phụ-lục-d-lưu-ý-riêng-khi-dùng-wsl).
 
 ---
 
 ## Bài 0: Chuẩn bị môi trường
 
-**Cần có:** Windows 11 (bản Home dùng được), khoảng 4 GB RAM trống, Docker Desktop (backend WSL2).
+**Giả định:** WSL2 với distro Ubuntu 22.04/24.04, CPU amd64, còn khoảng 4 GB RAM trống cho WSL. Kiểm tra phiên bản WSL bằng `wsl -l -v` trong PowerShell, cột `VERSION` phải là `2`.
 
-```powershell
-winget install Docker.DockerDesktop
-winget install Kubernetes.minikube
-winget install Kubernetes.kubectl
+**Bước 1. Docker chạy được trong WSL.** Chọn một trong hai cách, miễn `docker ps` chạy được trong terminal WSL:
+
+- **Đã có Docker Desktop:** bật *Settings → Resources → WSL Integration* cho distro Ubuntu của bạn.
+- **Chưa có:** cài Docker Engine trực tiếp trong WSL. Cách này cần **systemd**:
+  ```bash
+  ps -p 1 -o comm=        # phải in ra: systemd
+  ```
+  Nếu không in `systemd`, thêm vào `/etc/wsl.conf` rồi chạy `wsl --shutdown` trong PowerShell và mở lại WSL:
+  ```ini
+  [boot]
+  systemd=true
+  ```
+  Sau đó cài Docker:
+  ```bash
+  curl -fsSL https://get.docker.com | sh
+  sudo usermod -aG docker $USER      # đóng và mở lại terminal để có hiệu lực
+  docker ps
+  ```
+
+**Bước 2. Cài kubectl và minikube trong WSL:**
+
+```bash
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && rm kubectl
+
+curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
 ```
 
-Mở Docker Desktop và đợi nó chạy xong, sau đó mở terminal mới:
+**Bước 3. Tạo cluster:**
 
-```powershell
+```bash
 minikube start --driver=docker
 kubectl get nodes
 kubectl cluster-info
@@ -64,12 +88,13 @@ Kết quả mong đợi: có đúng 1 node tên `minikube`, `STATUS` là `Ready`
 **Hiểu sâu:**
 
 - `minikube` tạo cluster, `kubectl` là công cụ để **nói chuyện với cluster**. Đây là hai công cụ khác nhau.
-- Với driver Docker, node `minikube` thực chất là một container Docker. Kiểm tra bằng `docker ps`.
-- `kubectl` đọc file `~/.kube/config` để biết cluster nào cần gọi. Xem bằng `kubectl config get-contexts`.
+- Với driver Docker, node `minikube` thực chất là một container Docker. Kiểm tra bằng `docker ps`. Như vậy cluster của bạn nằm trong container, bên trong WSL, bên trong Windows.
+- `kubectl` đọc file `~/.kube/config` (trong WSL) để biết cluster nào cần gọi. Xem bằng `kubectl config get-contexts`.
+- Sau khi tắt WSL hoặc khởi động lại máy, cluster dừng. Chạy lại `minikube start`, dữ liệu vẫn còn.
 
 **Dừng và xoá cluster khi không dùng:**
 
-```powershell
+```bash
 minikube stop      # tắt, giữ dữ liệu
 minikube delete    # xoá hẳn
 ```
@@ -111,7 +136,7 @@ kubectl apply -f app.yaml
 
 **Thực hành:** xem chính các thành phần đó đang chạy dưới dạng pod.
 
-```powershell
+```bash
 kubectl get pods -n kube-system
 ```
 
@@ -147,7 +172,7 @@ spec:
 
 Bốn trường `apiVersion`, `kind`, `metadata`, `spec` có mặt trong mọi manifest Kubernetes.
 
-```powershell
+```bash
 kubectl apply -f pod.yaml
 kubectl get pods -o wide          # thấy IP của pod và node đang chạy
 kubectl describe pod web          # đọc phần Events ở cuối
@@ -211,7 +236,7 @@ spec:
             - containerPort: 80
 ```
 
-```powershell
+```bash
 kubectl apply -f deployment.yaml
 kubectl get deployment,rs,pods
 ```
@@ -225,14 +250,14 @@ Chú ý tên pod có dạng `web-<hash-replicaset>-<hash-pod>`, thể hiện qua
 1. **Tự phục hồi:** mở terminal thứ hai chạy `kubectl get pods -w`. Ở terminal đầu, xoá một pod: `kubectl delete pod <tên-pod>`. Pod mới xuất hiện ngay.
 2. **Scale:** `kubectl scale deployment web --replicas=5`, rồi giảm về 2.
 3. **Rolling update:**
-   ```powershell
+   ```bash
    kubectl set image deployment/web nginx=nginx:1.28
    kubectl rollout status deployment/web
    kubectl get rs      # ReplicaSet cũ còn lại với 0 pod, ReplicaSet mới có đủ pod
    ```
    Pod được thay dần từng phần (mặc định `maxSurge` và `maxUnavailable` là 25%), nên luôn có pod đang phục vụ.
 4. **Update lỗi, rồi rollback:**
-   ```powershell
+   ```bash
    kubectl set image deployment/web nginx=nginx:9.9.9
    kubectl get pods            # pod mới ImagePullBackOff, pod cũ VẪN chạy
    kubectl rollout undo deployment/web
@@ -272,7 +297,7 @@ spec:
       targetPort: 80
 ```
 
-```powershell
+```bash
 kubectl apply -f service.yaml
 kubectl get svc web
 kubectl describe svc web          # xem dòng Endpoints: danh sách IP:port của các pod
@@ -280,7 +305,7 @@ kubectl describe svc web          # xem dòng Endpoints: danh sách IP:port củ
 
 **Gọi Service từ bên trong cluster** bằng một pod tạm:
 
-```powershell
+```bash
 kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- http://web
 ```
 
@@ -288,7 +313,7 @@ Tên `web` được CoreDNS phân giải thành IP của Service. Tên đầy đ
 
 **Quan sát cân bằng tải:** gửi nhiều request rồi xem pod nào nhận:
 
-```powershell
+```bash
 kubectl run tmp --rm -it --image=busybox:1.36 --restart=Never -- sh -c "for i in 1 2 3 4 5 6; do wget -qO- http://web > /dev/null; done"
 kubectl logs -l app=web --prefix --tail=10
 ```
@@ -297,7 +322,7 @@ Access log xuất hiện ở nhiều pod khác nhau, chứng tỏ request đư�
 
 **Truy cập từ máy bạn:**
 
-```powershell
+```bash
 kubectl port-forward svc/web 8080:80
 ```
 
@@ -364,7 +389,7 @@ Sửa `deployment.yaml`, thêm hai phần vào `spec.template.spec`: biến môi
                 path: index.html
 ```
 
-```powershell
+```bash
 kubectl apply -f configmap.yaml
 kubectl apply -f deployment.yaml
 kubectl exec deploy/web -- printenv APP_MODE
@@ -378,15 +403,15 @@ kubectl port-forward svc/web 8080:80      # mở http://localhost:8080
 
 **Thực hành với Secret:**
 
-```powershell
+```bash
 kubectl create secret generic db-secret --from-literal=password=MatKhau123
 kubectl get secret db-secret -o yaml
 ```
 
 Giá trị nằm ở dạng base64. Giải mã:
 
-```powershell
-[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("<giá-trị-trong-yaml>"))
+```bash
+kubectl get secret db-secret -o jsonpath='{.data.password}' | base64 -d
 ```
 
 **Lưu ý quan trọng:** base64 **không phải mã hoá**, ai đọc được Secret là giải mã được. Secret chỉ tách dữ liệu nhạy cảm ra khỏi image và manifest chung, và có thể được kiểm soát quyền truy cập riêng (RBAC). Không commit manifest chứa Secret thật vào Git.
@@ -438,7 +463,7 @@ spec:
         claimName: data-pvc
 ```
 
-```powershell
+```bash
 kubectl apply -f pvc-demo.yaml
 kubectl get pvc,pv                                   # PVC ở trạng thái Bound
 kubectl exec writer -- sh -c "echo xin-chao > /data/hello.txt"
@@ -500,7 +525,7 @@ Dọn dẹp: `kubectl delete -f pvc-demo.yaml`.
               memory: 128Mi
 ```
 
-```powershell
+```bash
 kubectl apply -f deployment.yaml
 kubectl get pods            # cột READY 1/1
 kubectl describe pod <tên-pod>    # xem phần Liveness, Readiness, Limits, Requests
@@ -527,7 +552,7 @@ Sau mỗi thử nghiệm, đưa file về giá trị đúng và `apply` lại.
 
 **Thực hành:**
 
-```powershell
+```bash
 kubectl create namespace dev
 kubectl create namespace staging
 
@@ -541,7 +566,7 @@ kubectl get pods -A                    # tất cả namespace
 
 Đặt namespace mặc định để khỏi gõ `-n` liên tục:
 
-```powershell
+```bash
 kubectl config set-context --current --namespace=dev
 ```
 
@@ -568,7 +593,7 @@ kubectl config set-context --current --namespace=dev
 
 **Thực hành:**
 
-```powershell
+```bash
 minikube addons enable ingress
 kubectl get pods -n ingress-nginx       # đợi controller Running
 ```
@@ -595,10 +620,10 @@ spec:
                   number: 80
 ```
 
-```powershell
+```bash
 kubectl apply -f ingress.yaml
-minikube tunnel                          # giữ terminal mở (driver Docker trên Windows)
-curl.exe -H "Host: web.local" http://127.0.0.1
+minikube tunnel                          # giữ terminal mở, có thể hỏi mật khẩu sudo
+curl -H "Host: web.local" http://127.0.0.1
 ```
 
 Ở đây bạn giả lập tên miền bằng header `Host`, không cần sửa file hosts.
@@ -621,7 +646,7 @@ Tự dựng, không nhìn lại bài cũ. Nếu bí thì mới tra cứu.
 
 - [ ] Truy cập được trang web qua `port-forward`.
 - [ ] Từ một pod tạm, kết nối được database qua tên `db`:
-  ```powershell
+  ```bash
   kubectl run psql -n capstone --rm -it --image=postgres:16 --restart=Never --env PGPASSWORD=<mật-khẩu> -- psql -h db -U postgres -c "select 1"
   ```
 - [ ] Tạo bảng và thêm dữ liệu, xoá pod `db`, khi pod mới lên dữ liệu vẫn còn.
@@ -635,9 +660,9 @@ Tự dựng, không nhìn lại bài cũ. Nếu bí thì mới tra cứu.
 
 ## Phụ lục A: Thử nhiều node trên một máy
 
-Để thấy pod được phân bổ và di chuyển giữa các node, tạo cluster 3 node (khoảng 6 GB RAM trống):
+Để thấy pod được phân bổ và di chuyển giữa các node, tạo cluster 3 node. Cần khoảng 6 GB RAM cho WSL, xem cách tăng ở [Phụ lục D](#phụ-lục-d-lưu-ý-riêng-khi-dùng-wsl):
 
-```powershell
+```bash
 minikube start -p multi --nodes 3 --driver=docker
 kubectl get nodes                     # multi, multi-m02, multi-m03
 kubectl apply -f deployment.yaml
@@ -646,7 +671,7 @@ kubectl get pods -o wide              # cột NODE cho thấy pod rải trên nh
 
 Mô phỏng bảo trì node:
 
-```powershell
+```bash
 kubectl drain multi-m03 --ignore-daemonsets --delete-emptydir-data
 kubectl get pods -o wide              # pod trên node đó được chuyển sang node khác
 kubectl uncordon multi-m03
@@ -667,7 +692,7 @@ Xoá cluster thử nghiệm: `minikube delete -p multi`.
 
 ## Phụ lục C: Lệnh kubectl cần thuộc
 
-```powershell
+```bash
 kubectl get <loại> [-o wide] [-A] [-n <ns>] [-l key=value] [-w]
 kubectl describe <loại> <tên>
 kubectl logs <pod> [-f] [--previous] [-l app=web --prefix]
@@ -682,6 +707,28 @@ kubectl explain <loại>.spec        # tra cấu trúc trường ngay trong term
 
 `kubectl explain` rất hữu ích: khi không nhớ trường YAML, tra ngay trong terminal thay vì tìm trên mạng.
 
+## Phụ lục D: Lưu ý riêng khi dùng WSL
+
+| Triệu chứng | Nguyên nhân thường gặp | Cách xử lý |
+| --- | --- | --- |
+| `permission denied` khi chạy `docker` | User chưa thuộc group `docker` | `sudo usermod -aG docker $USER`, rồi đóng và mở lại terminal |
+| `Cannot connect to the Docker daemon` | Docker chưa chạy (Engine trong WSL thiếu systemd, hoặc Docker Desktop chưa bật) | `sudo systemctl start docker`, hoặc bật Docker Desktop và WSL Integration |
+| `minikube start` báo thiếu RAM hoặc bị treo | WSL2 mặc định chỉ được dùng khoảng 50% RAM máy | Tạo `%UserProfile%\.wslconfig` trên Windows (xem bên dưới), rồi `wsl --shutdown` |
+| Mở `http://localhost:8080` trên Windows không được | Port-forward chưa chạy, hoặc localhost forwarding của WSL tắt | Kiểm tra `curl localhost:8080` **trong WSL** trước. Nếu WSL gọi được mà Windows không, kiểm tra `localhostForwarding` trong `.wslconfig` |
+| `kubectl` báo `connection refused` sau khi mở lại máy | Cluster đã dừng cùng WSL | `minikube start` |
+| Đọc và ghi file YAML rất chậm | Thư mục nằm dưới `/mnt/c` | Chuyển về `~/k8s-lab` |
+
+Cấu hình `%UserProfile%\.wslconfig` để cấp thêm RAM cho WSL:
+
+```ini
+[wsl2]
+memory=6GB
+```
+
+Sau khi sửa, chạy `wsl --shutdown` trong PowerShell rồi mở lại WSL. Chọn mức `memory` sao cho Windows vẫn còn đủ RAM để chạy.
+
+Mẹo: chạy `code .` trong thư mục `~/k8s-lab` để sửa YAML bằng VS Code qua Remote WSL.
+
 ---
 
 ## Đánh giá cuối Level 1
@@ -694,3 +741,5 @@ Bạn sẵn sàng sang Level 2 khi trả lời được, không cần tra cứu:
 4. Dữ liệu database nên nằm ở đâu để không mất khi pod bị tạo lại?
 
 **Tiếp theo:** [k8s-level-2.md](k8s-level-2.md) hướng dẫn tự dựng cluster thật bằng kubeadm. Lúc này bạn sẽ hiểu các thành phần (containerd, CNI, kubelet, control-plane) mà minikube đã cài sẵn giúp bạn.
+
+**Lưu ý khi làm Level 2 trên WSL:** Level 2 giả định 3 máy riêng, mỗi máy có hostname và IP tĩnh riêng. Các distro WSL2 dùng chung một máy ảo và cùng địa chỉ IP, nên không dựng được cluster kubeadm nhiều node trên WSL. Trên WSL bạn chỉ dựng được **single-node** (cần bật systemd), còn muốn thực hành nhiều node thì dùng Phụ lục A hoặc tạo VM riêng.
