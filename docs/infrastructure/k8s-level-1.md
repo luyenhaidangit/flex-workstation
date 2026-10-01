@@ -53,24 +53,26 @@ Học theo đúng thứ tự vì bài sau dùng lại kiến thức bài trướ
 
 **Giả định:** WSL2 với distro Ubuntu 22.04/24.04, CPU amd64, còn khoảng 4 GB RAM trống cho WSL. Kiểm tra phiên bản WSL bằng `wsl -l -v` trong PowerShell, cột `VERSION` phải là `2`.
 
-**Bước 1. Docker chạy được trong WSL.** Chọn một trong hai cách, miễn `docker ps` chạy được trong terminal WSL:
+**Bước 1. Docker chạy được trong WSL.** Cài Docker Engine trực tiếp trong WSL, miễn `docker ps` chạy được trong terminal WSL. Cách này cần **systemd**:
 
-- **Đã có Docker Desktop:** bật *Settings → Resources → WSL Integration* cho distro Ubuntu của bạn.
-- **Chưa có:** cài Docker Engine trực tiếp trong WSL. Cách này cần **systemd**:
-  ```bash
-  ps -p 1 -o comm=        # phải in ra: systemd
-  ```
-  Nếu không in `systemd`, thêm vào `/etc/wsl.conf` rồi chạy `wsl --shutdown` trong PowerShell và mở lại WSL:
-  ```ini
-  [boot]
-  systemd=true
-  ```
-  Sau đó cài Docker:
-  ```bash
-  curl -fsSL https://get.docker.com | sh
-  sudo usermod -aG docker $USER      # đóng và mở lại terminal để có hiệu lực
-  docker ps
-  ```
+```bash
+ps -p 1 -o comm=        # phải in ra: systemd
+```
+
+Nếu không in `systemd`, thêm vào `/etc/wsl.conf` rồi chạy `wsl --shutdown` trong PowerShell và mở lại WSL:
+
+```ini
+[boot]
+systemd=true
+```
+
+Sau đó cài Docker:
+
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER      # đóng và mở lại terminal để có hiệu lực
+docker ps
+```
 
 **Bước 2. Cài kubectl và minikube trong WSL:**
 
