@@ -245,7 +245,7 @@ Report completion to the user with:
 
 - **Mandatory sections**: Must be completed for every feature
 - **Optional sections**: Include only when relevant to the feature
-- When a section doesn't apply, remove it entirely (don't leave as "N/A")
+- When a section doesn't apply, write `Không áp dụng` instead of removing it — the active Vietnamese spec template keeps every section present for AI/automation stability (see `docs/speckit/template-guidelines.md`). Never delete an optional section.
 
 ### For AI Generation
 

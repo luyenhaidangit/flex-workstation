@@ -112,6 +112,11 @@ You **MUST** consider the user input before proceeding (if not empty).
     an artifact domain not covered by the selected skills; record when no specialist
     skill applies.
 
+3b. **Sync spec status**: Read the `**Trạng thái**` field in `FEATURE_DIR/spec.md`'s
+    header. If it reads `Bản nháp` or `Hoàn thành` while `tasks.md` still has at least
+    one unchecked `- [ ]` task, update it to `Đang triển khai`. Change only that field's
+    value; do not touch any other header line or section.
+
 4. **Project Setup Verification**:
    - Run this step only when tasks.md contains an explicit Setup task that requires creating or verifying ignore files or tool ignore configuration.
    - Limit verification and changes to the files and technologies named in that task.
@@ -152,6 +157,9 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Confirm the implementation follows the technical plan
    - Confirm all selected specialist-skill checks were completed or any approved
      exception is recorded in the relevant artifact
+   - If every task in `tasks.md` is now marked `[X]`, update the `**Trạng thái**`
+     field in `FEATURE_DIR/spec.md`'s header to `Hoàn thành`. Leave it as
+     `Đang triển khai` if any task remains unchecked.
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 

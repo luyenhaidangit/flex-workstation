@@ -62,7 +62,7 @@ Mỗi task PHẢI:
 - Có file path cụ thể hoặc command cụ thể.
 - Có phạm vi nhỏ, có thể hoàn thành trong một lần làm việc.
 - Có đầu ra kiểm chứng được qua diff, test, command, log, UI/manual check hoặc artifact.
-- Trace được về `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
+- Trace được về `MVP`/`US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
 - Ghi rõ dependency task ID nếu phụ thuộc task khác, ví dụ `(phụ thuộc T012, T013)`.
 - Nếu task sửa file có sẵn, description phải nêu rõ class, method, section, endpoint group hoặc config key cần sửa.
 - Không dùng mô tả mơ hồ như "implement logic", "xử lý nghiệp vụ", "cập nhật các file liên quan".
@@ -138,6 +138,7 @@ Nếu `contracts/` có API/event contract:
 
 Khi sinh `tasks.md`, phải đảm bảo:
 
+- Mỗi `MVP-###` trong `spec.md` §3 có FR hoặc task tương ứng (tránh scope creep và MVP bị bỏ sót).
 - Mỗi user story trong `spec.md` có ít nhất một phase riêng.
 - Mỗi acceptance criteria quan trọng có task implementation hoặc validation tương ứng.
 - Mỗi requirement P1/P2 hoặc requirement ảnh hưởng code/data/API/permission có task tương ứng.
@@ -367,6 +368,7 @@ Independent Test KHÔNG ĐƯỢC để placeholder chung chung như "kiểm tra 
 
 | Source | Covered by tasks |
 |--------|------------------|
+| MVP-001 | T012, T013, T014, T015, T016, T017, T018 |
 | US1 | T012, T013, T014, T015, T016, T017, T018 |
 | FR-001 | T014, T015 |
 | AC-001 | T011, Independent Test US1 |

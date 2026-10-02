@@ -21,13 +21,15 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 
 ## Spec Template
 
-- Spec template chỉ mô tả WHY/WHAT; HOW thuộc plan kỹ thuật. ID trong spec dùng ASCII để dễ search/copy: `MT`, `US`, `AC`, `FR`, `BR`, `SEC`, `NFR`, `SC`.
+- Spec template chỉ mô tả WHY/WHAT; HOW thuộc plan kỹ thuật. ID trong spec dùng ASCII để dễ search/copy: `MVP`, `MT`, `US`, `AC`, `FR`, `BR`, `SEC`, `NFR`, `SC`.
 - Spec template cần có phạm vi MVP, mapping `US`/`AC` về `FR`, và trạng thái dữ liệu/lỗi phổ biến để tránh scope creep và giúp task/test traceable.
 - Spec template cần có người phụ trách, stakeholder xác nhận, và quy tắc nghiệp vụ `BR` để làm rõ ai quyết định scope/rule. Hai trường metadata mặc định dùng `git config user.name`.
+- `Trạng thái` ở header chuyển tự động theo lifecycle, không sửa tay: `Bản nháp` (`/speckit-specify` tạo spec) → `Đang triển khai` (`/speckit-implement` bắt đầu chạy task) → `Hoàn thành` (`/speckit-implement` xác nhận toàn bộ task trong `tasks.md` đã `[X]`).
 - Spec template cần tách phân quyền/bảo mật, audit/lịch sử thay đổi, và checklist sẵn sàng lập plan kỹ thuật để tránh chuyển sang `/plan` khi spec còn mơ hồ.
 - Spec template cần có kết quả Documentation Impact Gate do `/speckit-docbiz` quản lý. Đánh giá này luôn bắt buộc trước plan, nhưng chỉ yêu cầu cập nhật tài liệu khi luồng, vai trò, quy tắc, thực thể/vòng đời, phạm vi hoặc compliance có tác động đáng kể tới BA/stakeholder.
 - Không xóa section tùy chọn trong spec template; ghi `Không áp dụng` để giữ cấu trúc ổn định cho AI/automation.
 - `FR` cần có priority `[P1]`/`[P2]`/`[P3]` và trace ngược về `US`/`AC`; `Thực thể dữ liệu` đứng trước phân quyền/audit để làm rõ đối tượng nghiệp vụ trước khi xác định quyền.
+- §19 (điều kiện sẵn sàng lập plan) phải có mục kiểm tra Documentation Impact Gate ở §20 không còn ở trạng thái CHƯA ĐÁNH GIÁ, để gate bắt buộc của `/speckit-docbiz` (xem AGENTS.md) hiển thị ngay trong spec, không chỉ nằm ở bước hard-stop của `/speckit-plan`.
 
 ## Plan Template
 
@@ -73,15 +75,15 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 
 ## Tasks Template
 
-- Tasks template phải giữ cấu trúc phase theo Spec Kit nhưng task sinh ra phải atomic, có ID tuần tự `T001`, có path/command cụ thể, có đầu ra kiểm chứng được và trace được về `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
+- Tasks template phải giữ cấu trúc phase theo Spec Kit nhưng task sinh ra phải atomic, có ID tuần tự `T001`, có path/command cụ thể, có đầu ra kiểm chứng được và trace được về `MVP`/`US`/`FR`/`AC`/`BR`/`SEC`/`NFR` khi áp dụng.
 - `[P]` trong tasks template chỉ nghĩa là parallelizable, không liên quan tới priority `P1`/`P2`/`P3`; không đánh dấu `[P]` cho task sửa cùng file hoặc phụ thuộc task khác.
 - `/speckit-tasks` không được giữ task ví dụ, placeholder như `[Entity]`/`[endpoint]`/`[file]`, hoặc `TXXX` trong output cuối; task không có file path cụ thể là không hợp lệ trừ task validate/review có command rõ ràng.
-- Tasks template cần có coverage requirements để đảm bảo mỗi user story, acceptance criteria quan trọng, requirement P1/P2, business rule, permission rule, entity, contract và constraint trong plan có task hoặc validation tương ứng.
+- Tasks template cần có coverage requirements để đảm bảo mỗi MVP scope item, user story, acceptance criteria quan trọng, requirement P1/P2, business rule, permission rule, entity, contract và constraint trong plan có task hoặc validation tương ứng.
 - Với feature backend/enterprise, tasks template cần sinh task cho migration, permission, contract, observability, audit/logging, feature flag, rollout/rollback khi `plan.md` đánh dấu liên quan; không đẩy toàn bộ security/observability xuống Polish.
 - Mỗi user story trong tasks template phải có `Independent Test` cụ thể, kể cả manual validation; không dùng placeholder chung chung như "kiểm tra hoạt động đúng".
 - Foundational phase trong tasks template chỉ chứa task dùng chung cho ít nhất 2 user stories, điều kiện bắt buộc cho mọi story, schema/base infrastructure, hoặc contract/security foundation toàn feature; task story-specific phải nằm trong phase của story tương ứng.
 - Tasks template cần có rule xử lý conflict file tổng hợp như endpoint/router/module: nếu nhiều stories cùng sửa một file, phải tách file theo use case hoặc ghi rõ integration/dependency task.
-- Task có phụ thuộc rõ phải ghi dependency task ID; mỗi user story cần có `Definition of Done`, và output cuối nên có `Traceability Matrix` map `US`/`FR`/`AC`/`BR`/`SEC`/`NFR` sang task.
+- Task có phụ thuộc rõ phải ghi dependency task ID; mỗi user story cần có `Definition of Done`, và output cuối nên có `Traceability Matrix` map `MVP`/`US`/`FR`/`AC`/`BR`/`SEC`/`NFR` sang task.
 - Tasks template cần có rule riêng cho data/migration safety và API/event contract: không gộp migration schema với business handler, có backward compatibility/backfill/rollback note khi cần, và contract quan trọng có implementation/test task tương ứng.
 - Không sinh test task hình thức; test task phải map với acceptance criteria, contract, business rule, permission rule hoặc regression risk cụ thể.
 - Chỉ sinh task tài liệu khi `plan.md` xác định cập nhật còn lại sau implementation, và task phải nêu tài liệu hiện hữu cùng section cụ thể; không dùng path placeholder hoặc tạo file mới theo mặc định.

@@ -7,6 +7,12 @@
 **Stakeholder xác nhận**: {{GIT_USER_NAME}}  
 **Đầu vào**: [Tóm tắt mong muốn người dùng trong 1-2 câu]
 
+<!--
+  Trạng thái chuyển tự động theo lifecycle, không tự sửa tay:
+  Bản nháp (khi /speckit-specify tạo spec) -> Đang triển khai (/speckit-implement bắt đầu
+  chạy task) -> Hoàn thành (/speckit-implement xác nhận toàn bộ task trong tasks.md đã [X]).
+-->
+
 ---
 
 ## Nguyên tắc phạm vi
@@ -378,6 +384,7 @@ Nếu có, hệ thống PHẢI ghi nhận:
 - [ ] Phân quyền/bảo mật đã rõ hoặc được đánh dấu là câu hỏi mở.
 - [ ] Ngoài phạm vi đã rõ.
 - [ ] Các câu hỏi mở quan trọng đã được trả lời hoặc được chấp nhận là rủi ro.
+- [ ] Đánh giá tác động tài liệu nghiệp vụ (§20) đã được thực hiện, không còn ở trạng thái CHƯA ĐÁNH GIÁ.
 
 ---
 
