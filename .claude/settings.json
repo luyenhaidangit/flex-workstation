@@ -14,6 +14,10 @@
           {
             "type": "command",
             "command": "rtk hook claude"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-guard.js\""
           }
         ]
       },
@@ -24,6 +28,10 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/skill-format-guard.js\"",
             "if": "Write(.agents/skills/**/SKILL.md)"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-guard.js\""
           }
         ]
       },
@@ -34,6 +42,10 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/skill-format-guard.js\"",
             "if": "Edit(.agents/skills/**/SKILL.md)"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/secret-guard.js\""
           }
         ]
       }

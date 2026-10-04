@@ -12,6 +12,10 @@ working on files. This skill selects the workflow; it does not replace the selec
 skill's instructions or duplicate general behavior already defined in `AGENTS.md` or
 `CLAUDE.md`.
 
+As a meta/routing skill, it intentionally departs from the house section set in
+`flex-workspace-spec.md` (no `Overview`/`Core Process`/`Red Flags`) — the routing
+table and combination rules below serve that purpose instead.
+
 ## Mandatory routing rule
 
 Before reading, analyzing, reviewing, or changing workspace or repository files:
@@ -96,9 +100,9 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
   skill. Keep artifact ownership distinct rather than duplicating domain rules.
 - A task that creates, renames, or exposes a backend/domain/public-contract symbol
   adds `flex-naming-convention` to its primary engineering skill.
-- A feature request starts with the applicable Speckit skill. A high-level request to
-  “implement” a new feature starts at `speckit-specify`; do not skip the workspace's
-  explicit Speckit gates.
+- A feature request without an existing spec routes to `speckit-specify` as the
+  lifecycle owner. Gate enforcement between Speckit steps is defined in `AGENTS.md`,
+  not repeated here.
 - An active Speckit workflow is not an exclusive route. Use the Speckit integration
   rules to add only the specialist skills that govern its concrete artifacts.
 - A task editing rules or skills uses `flex-context-engineering` or
@@ -121,6 +125,15 @@ Routing result
 
 Keep this report brief. If the user asked only a conversational question and no file
 or tool action is needed, answer directly without routing chatter.
+
+## Common Rationalizations
+
+| Rationalization | Why it's wrong | Correct move |
+| --- | --- | --- |
+| "This task looks trivial, routing is overkill." | Trivial-looking tasks are exactly where a missing or wrong skill goes unnoticed — the mandatory rule has no size exception. | Run the routing rule anyway; the report can collapse to one line. |
+| "I already selected a skill earlier in this session." | Reuse is only valid while scope is unchanged; the artifact, repository, or lifecycle can shift without feeling like a new task. | Check scope against the reuse rule above before skipping re-route. |
+| "No skill matches exactly, I'll use the closest one." | Forcing an unrelated skill applies instructions written for a different artifact and produces confidently wrong guidance. | Record that no skill applies and continue under `AGENTS.md`/`CLAUDE.md` instead. |
+| "I'll read the skill's instructions after I start editing." | Routing exists to apply a skill's constraints before the first edit, not to retrofit them afterward. | Read and apply every selected skill fully before any file or tool work begins. |
 
 ## Verification
 

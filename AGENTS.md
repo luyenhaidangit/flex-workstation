@@ -14,6 +14,7 @@
 - Nếu có điều chưa rõ, dừng lại, nêu tên cụ thể điểm mù đó, rồi mới hỏi.
 - Nếu có nhiều cách hiểu, trình bày các lựa chọn; không tự chọn mà không thông báo.
 - Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
+- Luôn hỏi trước khi: thêm/xóa/đổi `branch` hoặc `url` trong `workstation.json`, sửa `hooks`/`permissions` trong `.claude/settings.json`, hoặc sửa một skill dùng chung ảnh hưởng nhiều repo con — vì tác động vượt ra ngoài phạm vi 1 file đang sửa.
 
 ### Đơn giản là ưu tiên
 - Chỉ viết code đủ giải quyết yêu cầu. Không thêm tính năng suy đoán.
@@ -96,40 +97,14 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
-| `rtk` | Proxy CLI giảm 60–99% token output; xem `tooling/RTK.md` |
+| `rtk` | Proxy CLI giảm 60–90% token output; chi tiết và native-tool-priority xem `tooling/RTK.md` |
 | `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
 
-### rtk
-
-Khi native tool có sẵn, **luôn dùng native tool thay vì rtk + Bash**:
-
-| Thao tác | Native tool | Không dùng |
-| --- | --- | --- |
-| Tìm nội dung | **Grep tool** | `grep` / `rtk grep` qua Bash — timeout 120s trên workspace lớn |
-| Tìm file | **Glob tool** | `rtk ls` qua Bash |
-| Đọc file | **Read tool** | `rtk read` qua Bash |
-
-`rtk` chỉ dùng cho `git` và shell ops không có native tool thay thế. Cấm bọc trong `powershell -Command` hoặc gọi PowerShell cmdlet.
-
-## Cấu trúc project
-
-```text
-flex-workstation/
-├── docs/            # Tài liệu workspace (system-map, onboarding, speckit)
-├── tooling/         # Tài liệu công cụ workspace (RTK.md, ...)
-├── scripts/         # Bootstrap và tooling scripts
-├── .agents/         # Skill source chung cho Codex, Antigravity và Claude Code
-├── .claude/         # Cấu hình Claude Code (settings.json, hooks, commands)
-├── .codex/          # Cấu hình Codex CLI
-├── workstation.json # Manifest repo được clone khi bootstrap
-├── CLAUDE.md        # Context cho Claude Code
-├── AGENTS.md        # Context chung cho Codex, Antigravity và Claude Code
-└── <repo-con>/      # Repo con độc lập, ignore bởi Git của workstation
-```
+`rtk` chỉ dùng cho `git` và shell ops không có native tool thay thế; cấm bọc trong `powershell -Command` hoặc gọi PowerShell cmdlet — chi tiết đầy đủ nằm ở `tooling/RTK.md`, không lặp lại ở đây.
 
 ## Quy tắc làm việc
 
-- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo.
+- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo (chặn tự động qua `.claude/hooks/secret-guard.js` trên Write/Edit và `git commit`).
 - Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.

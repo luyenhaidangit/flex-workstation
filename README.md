@@ -16,7 +16,6 @@ flex-workstation/
 ├── scripts/         # Bootstrap và tooling scripts
 ├── .agents/         # Skill source chung cho Codex, Antigravity và Claude Code
 ├── .claude/         # Cấu hình Claude Code
-├── .agents/         # Cấu hình Codex agent
 ├── .codex/          # Cấu hình Codex CLI
 ├── workstation.json # Manifest repo được clone khi bootstrap
 ├── CLAUDE.md        # Context cho Claude Code
@@ -66,11 +65,9 @@ Khai báo repo cần có trong workspace tại `workstation.json`:
 
 - [CLAUDE.md](CLAUDE.md): quy ước khi làm việc trong `flex-workstation`.
 - [TASKS.md](TASKS.md): theo dõi spec Speckit đang chạy song song.
-- [SPEC.md](SPEC.md): quy ước đặt tên thư mục, file, skill và namespace.
 - [docs/setup/onboarding.md](docs/setup/onboarding.md): bootstrap máy mới và cách mở workspace.
 - [docs/architecture/system-map.md](docs/architecture/system-map.md): bản đồ workspace, runtime AI tooling và tổng quan kiến trúc hệ thống.
 - [docs/architecture/liquibase-sql-first.md](docs/architecture/liquibase-sql-first.md): quy ước triển khai PostgreSQL/pgvector bằng Liquibase SQL-first trong `flex-database`.
 - [docs/speckit/workflow.md](docs/speckit/workflow.md): luồng sử dụng Speckit.
 - [docs/speckit/template-guidelines.md](docs/speckit/template-guidelines.md): quy ước thiết kế và bảo trì template Speckit.
 - [docs/speckit/maintenance.md](docs/speckit/maintenance.md): ghi chú bảo trì Speckit/runtime.
-- [docs/projects.md](docs/projects.md): danh sách project được theo dõi.
