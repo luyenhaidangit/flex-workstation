@@ -68,6 +68,7 @@ Select only skills that directly govern the task.
 | C#/.NET, ASP.NET Core, EF Core, dependency injection, tests, architecture, or service implementation | `flex-dotnet-engineering` |
 | Angular UI in `flex-microfrontend`, including components, templates, forms, modals, and tables | `flex-frontend-engineering` |
 | Dockerfile, Docker Compose, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, or rollback | `flex-devops-engineering` |
+| Production error, outage, 5xx, unhealthy container, or a request to check logs/state on a prod server (SSH via WSL) | `flex-prod-troubleshooting` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, decisions about persistent agent context, or a request to review/improve a specific project's context | `flex-context-engineering` |
@@ -98,6 +99,9 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
 - Infrastructure work that also changes application code or database schema uses
   `flex-devops-engineering` plus the applicable frontend, .NET, database, or naming
   skill. Keep artifact ownership distinct rather than duplicating domain rules.
+- A production incident uses `flex-prod-troubleshooting` to diagnose; once the cause
+  needs an infrastructure, code, or schema change, add the skill that owns that
+  artifact (e.g. `flex-devops-engineering`) rather than fixing under diagnosis rules.
 - A task that creates, renames, or exposes a backend/domain/public-contract symbol
   adds `flex-naming-convention` to its primary engineering skill.
 - A feature request without an existing spec routes to `speckit-specify` as the
