@@ -1,0 +1,10 @@
+[
+  { "query": "thêm repo flex-reporting vào workstation để SYNC_WORKSPACE clone luôn", "should_trigger": true },
+  { "query": "tạo folder flex-k8s xong, workstation cũng cần quản lý repo này", "should_trigger": true },
+  { "query": "flex-exchange-service không được pull khi chạy sync, báo origin differs", "should_trigger": true },
+  { "query": "repo flex-foo hiện lên untracked trong git status của workstation", "should_trigger": true },
+  { "query": "thêm một service .NET mới vào flex-auth-service", "should_trigger": false },
+  { "query": "chạy SYNC_WORKSPACE.cmd để pull toàn bộ repo", "should_trigger": false },
+  { "query": "xóa repo flex-agents khỏi workstation", "should_trigger": false },
+  { "query": "thêm MinIO vào docker-compose.infra.yml của flex-environment", "should_trigger": false }
+]

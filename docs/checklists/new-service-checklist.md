@@ -13,7 +13,7 @@ Tham chiếu: [system-map.md](../architecture/system-map.md) (bản đồ worksp
 ## 1. Tạo & đăng ký repo
 
 - [ ] Tạo repo trên GitHub (hoặc git host tương ứng), clone vào root `flex-workstation/` với đúng tên thư mục sẽ dùng.
-- [ ] Thêm entry vào `workstation.json` → `repositories.items` (`name` + `url`, không kèm token/credential trong URL).
+- [ ] Thêm entry vào `workstation.json` → `repositories.items` (`name` + `url`, không kèm token/credential trong URL; `url` phải khớp từng ký tự với `git remote get-url origin`). Có thể chạy `scripts/add-repo.ps1 -Name <repo> -Url <url>` để sửa đồng thời `workstation.json`, `.gitignore`, `.ignore`.
 - [ ] Thêm `/<repo-con>/` vào `.gitignore` và `!/<repo-con>/` vào `.ignore` của workstation (mỗi repo khai báo riêng, không có quy tắc chung); verify `git status` không báo repo là untracked.
 
 ## 2. Khởi tạo cấu trúc project bên trong repo con

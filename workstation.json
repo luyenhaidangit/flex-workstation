@@ -28,11 +28,11 @@
       },
       {
         "name": "flex-exchange-service",
-        "url": "https://github.com/luyenhaidangit/flex-exchange-service"
+        "url": "https://github.com/luyenhaidangit/flex-exchange-service.git"
       },
       {
         "name": "flex-k8s",
-        "url": "https://github.com/luyenhaidangit/flex-k8s"
+        "url": "https://github.com/luyenhaidangit/flex-k8s.git"
       }
     ]
   }

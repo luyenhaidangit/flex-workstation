@@ -52,8 +52,8 @@ Các repo con được clone vào trong root này nhưng là Git repo độc l�
 | `flex-environment` | `https://github.com/luyenhaidangit/flex-environment` |
 | `flex-agent-service` | `https://github.com/luyenhaidangit/flex-agent-service.git` |
 | `flex-database` | `https://github.com/luyenhaidangit/flex-database` |
-| `flex-exchange-service` | `https://github.com/luyenhaidangit/flex-exchange-service` |
-| `flex-k8s` | `https://github.com/luyenhaidangit/flex-k8s` |
+| `flex-exchange-service` | `https://github.com/luyenhaidangit/flex-exchange-service.git` |
+| `flex-k8s` | `https://github.com/luyenhaidangit/flex-k8s.git` |
 
 Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch` là tùy chọn; nếu không có, script clone theo default branch của remote và pull theo branch hiện tại của repo local. `flex-agents` có thể vẫn tồn tại local nhưng không còn nằm trong manifest nên bootstrap không clone hoặc pull repo này.
 
