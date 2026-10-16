@@ -17,7 +17,7 @@ This skill is specific to this workspace. It does not scaffold the repo's conten
 - A new project folder was just created under the workstation root and must be managed.
 - A repo is in `workstation.json` but untracked in `git status`, hidden from search, or skipped by `SYNC_WORKSPACE.cmd`.
 
-Do not use it to remove a repo, change an existing entry's `url`/`branch`, or sync/pull repos — those need their own confirmation.
+Do not use it to remove a repo, repoint an entry at a different remote, change an existing entry's `branch`, or sync/pull repos — those need their own confirmation. Correcting an entry's `url` to the exact form the local `origin` reports is in scope.
 
 ## Core Process
 
@@ -27,11 +27,11 @@ Do not use it to remove a repo, change an existing entry's `url`/`branch`, or sy
 
 - `name` — equals the folder name and is valid as a Windows file name.
 - `url` — if the folder already exists, take it from `git -C <name> remote get-url origin`. Only when there is no repo yet, infer it from existing entries (same owner and style) and say it is an inference.
-- `branch` — omit unless the user wants a non-default branch.
+- `branch` — omit unless the user wants a non-default branch; pass it as `-Branch`.
 
 ### 2. Register the required touchpoints
 
-Run `scripts/add-repo.ps1 -Name <name> -Url <url>`. It rejects a duplicate name, embedded credentials, and a URL that differs from the local `origin`; it appends to `workstation.json`, `.gitignore` and `.ignore` as raw text so line endings and other entries stay untouched, and it checks the JSON before writing. Hand-edit only if the script cannot run, following `references/touchpoints.md`.
+Run `scripts/add-repo.ps1 -Name <name> -Url <url> [-Branch <branch>]`. It rejects embedded credentials and a URL that differs from the local `origin`; it edits `workstation.json`, `.gitignore` and `.ignore` as raw text so line endings and other entries stay untouched, and checks the JSON before writing. It is safe to re-run: a file that already has the entry is skipped, so it also completes a half-registered repo (listed in the manifest but missing from the ignore files). If the entry exists with a url that differs from `origin`, it rewrites that url to the `origin` form (`[FIX]`); with no local `origin` to prove the right form it refuses. Hand-edit only if the script cannot run, following `references/touchpoints.md`.
 
 ### 3. Update the documentation touchpoints
 
@@ -61,7 +61,7 @@ List the files changed. Say whether the remote exists (`git ls-remote <url>` is 
 ## Red Flags
 
 - Editing an existing entry's `url` or `branch` while "just adding" a repo.
-- Rewriting a whole file and producing a noisy diff or mixed line endings.
+- Rewriting a whole file and producing a noisy diff or mixed line endings (check with `git ls-files --eol`).
 - Adding a submodule or subtree instead of a manifest entry.
 - Calling the repo "managed" without checking `.ignore`, `git status` and the `origin` match.
 - Committing or pushing the workstation change without being asked.
@@ -72,5 +72,6 @@ List the files changed. Say whether the remote exists (`git ls-remote <url>` is 
 - [ ] `scripts/add-repo.ps1` succeeded (or the manual edit followed `references/touchpoints.md`).
 - [ ] `system-map.md` lists the repo in the tree, manifest table and projects table.
 - [ ] Manifest URL equals `origin`; `git status` shows no untracked repo folder.
+- [ ] `git diff` touches only the intended lines and `git ls-files --eol` shows unchanged line endings.
 - [ ] No sync/clone/pull command ran without being requested.
 - [ ] Remaining manual steps were reported.

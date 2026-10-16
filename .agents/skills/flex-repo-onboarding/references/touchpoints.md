@@ -6,17 +6,16 @@ Source of truth for the steps is `docs/checklists/new-service-checklist.md` (sec
 
 | File | Entry | Automated by `scripts/add-repo.ps1` |
 | --- | --- | --- |
-| `workstation.json` | `{ "name", "url" }` appended to `repositories.items` | yes |
-| `.gitignore` | `/<name>/` in the "Nested Flex repositories" block | yes |
-| `.ignore` | `!/<name>/` so AI search still reaches the repo | yes |
+| `workstation.json` | `{ "name", "url" }` (plus optional `"branch"`) appended to `repositories.items` | yes |
+| `.gitignore` | `/<name>/` appended at the end of the file | yes |
+| `.ignore` | `!/<name>/` appended at the end, so AI search still reaches the repo | yes |
 
 ## Documentation — drift, not breakage (manual)
 
-| File | Entry |
-| --- | --- |
-| `docs/architecture/system-map.md` | Folder tree (section 2), "Manifest repo" table (section 3), "Projects" table (section 4) |
-| `docs/setup/onboarding.md` | Nothing: its tree ends with `+-- ...` by design. Touch it only if the bootstrap flow changes |
-| `README.md` | A link only if the new repo brings a doc that belongs in the index |
+The files and sections to update are listed in `docs/checklists/new-service-checklist.md` section 4; follow that. What it does not say:
+
+- `system-map.md` section 4 ("Projects") ends each row with an evidence tag in the status column: `Confirmed` (cite the file that proves it, e.g. ``Confirmed — xem `<repo>/README.md` ``) or `Inferred`. Copy the style of a neighboring row and take role and technology from the new repo's own README; use `Inferred` when only guessing.
+- `docs/setup/onboarding.md` needs no row per repo — its tree ends with `+-- ...` by design.
 
 ## Not touchpoints
 

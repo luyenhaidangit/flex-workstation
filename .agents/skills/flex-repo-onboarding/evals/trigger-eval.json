@@ -6,5 +6,7 @@
   { "query": "thêm một service .NET mới vào flex-auth-service", "should_trigger": false },
   { "query": "chạy SYNC_WORKSPACE.cmd để pull toàn bộ repo", "should_trigger": false },
   { "query": "xóa repo flex-agents khỏi workstation", "should_trigger": false },
-  { "query": "thêm MinIO vào docker-compose.infra.yml của flex-environment", "should_trigger": false }
+  { "query": "thêm MinIO vào docker-compose.infra.yml của flex-environment", "should_trigger": false },
+  { "query": "tạo repo flex-reporting mới và scaffold sẵn project .NET Clean Architecture", "should_trigger": false },
+  { "query": "đổi branch của flex-database trong workstation.json sang develop", "should_trigger": false }
 ]
