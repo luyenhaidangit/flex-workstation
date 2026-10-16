@@ -30,6 +30,8 @@ flex-workstation/
 ├── flex-environment/     # Repo con độc lập - local/dev infrastructure stack
 ├── flex-agent-service/   # Repo con độc lập - nền tảng AI Agent đa tenant
 ├── flex-database/        # Repo con độc lập - migration/schema script dùng chung cho các database
+├── flex-exchange-service/ # Repo con độc lập - lõi khớp lệnh limit in-memory (demo REST API)
+├── flex-k8s/             # Repo con độc lập - manifest Kubernetes thuần cho môi trường Flex
 ├── AGENTS.md             # Context chung cho Codex, Antigravity và Claude Code
 ├── CLAUDE.md             # Adapter Claude Code import AGENTS.md
 ├── README.md             # Index và hướng dẫn tổng quan
@@ -50,6 +52,8 @@ Các repo con được clone vào trong root này nhưng là Git repo độc l�
 | `flex-environment` | `https://github.com/luyenhaidangit/flex-environment` |
 | `flex-agent-service` | `https://github.com/luyenhaidangit/flex-agent-service.git` |
 | `flex-database` | `https://github.com/luyenhaidangit/flex-database` |
+| `flex-exchange-service` | `https://github.com/luyenhaidangit/flex-exchange-service` |
+| `flex-k8s` | `https://github.com/luyenhaidangit/flex-k8s` |
 
 Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch` là tùy chọn; nếu không có, script clone theo default branch của remote và pull theo branch hiện tại của repo local. `flex-agents` có thể vẫn tồn tại local nhưng không còn nằm trong manifest nên bootstrap không clone hoặc pull repo này.
 
@@ -64,6 +68,8 @@ Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch
 | `flex-environment` | Local/dev infrastructure stack | Docker Compose | `Confirmed` — xem `flex-environment/docker-compose*.yml` |
 | `flex-agent-service` | Nền tảng AI Agent đa tenant (control plane + runtime) | .NET 9, SignalR | `Confirmed` — xem `specs/000008-agent-platform-mvp/plan.md` |
 | `flex-database` | Migration/schema script dùng chung cho các database (MySQL tenant, PostgreSQL shared); đang thay thế dần Oracle | SQL migration scripts; PostgreSQL/pgvector theo [Liquibase SQL-first](liquibase-sql-first.md) | `Confirmed` |
+| `flex-exchange-service` | Lõi khớp lệnh limit in-memory cho một mã chứng khoán, demo qua REST API và Swagger | .NET, ASP.NET Core | `Confirmed` — xem `flex-exchange-service/README.md`, `Flex.Exchange.sln` |
+| `flex-k8s` | Manifest Kubernetes cho môi trường Flex (mới khởi tạo, chưa triển khai workload) | YAML thuần, `kubectl` | `Confirmed` — xem `flex-k8s/README.md` |
 
 ## 5. Data Architecture
 

@@ -71,6 +71,7 @@ Select only skills that directly govern the task.
 | Production error, outage, 5xx, unhealthy container, or a request to check logs/state on a prod server (SSH via WSL) | `flex-prod-troubleshooting` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
+| Add a repo/project to the workstation manifest (`workstation.json`) and its ignore rules, or fix a repo that is not cloned or shows as untracked | `flex-repo-onboarding` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, decisions about persistent agent context, or a request to review/improve a specific project's context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
 | Brainstorm what feature/improvement to build next in an existing repo, or a gap analysis, with no idea decided yet | `flex-feature-discovery` |

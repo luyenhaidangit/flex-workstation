@@ -14,7 +14,7 @@ Tham chiếu: [system-map.md](../architecture/system-map.md) (bản đồ worksp
 
 - [ ] Tạo repo trên GitHub (hoặc git host tương ứng), clone vào root `flex-workstation/` với đúng tên thư mục sẽ dùng.
 - [ ] Thêm entry vào `workstation.json` → `repositories.items` (`name` + `url`, không kèm token/credential trong URL).
-- [ ] Xác nhận repo con nằm trong `.gitignore` của workstation (mẫu `<repo-con>/` — thường đã có quy tắc chung, chỉ cần verify không bị track nhầm vào git của workstation).
+- [ ] Thêm `/<repo-con>/` vào `.gitignore` và `!/<repo-con>/` vào `.ignore` của workstation (mỗi repo khai báo riêng, không có quy tắc chung); verify `git status` không báo repo là untracked.
 
 ## 2. Khởi tạo cấu trúc project bên trong repo con
 
@@ -40,7 +40,7 @@ Trong `flex-environment`:
 
 ## 4. Tài liệu workstation cần cập nhật
 
-- [ ] `docs/architecture/system-map.md`: thêm vào snapshot cây thư mục, bảng "Manifest repo" và bảng "Projects".
+- [ ] `docs/architecture/system-map.md`: thêm vào snapshot cây thư mục (§2), bảng "Manifest repo" (§3) và bảng "Projects" (§4).
 - [ ] `docs/setup/onboarding.md`: chỉ cập nhật nếu luồng bootstrap thực sự đổi (ví dụ thêm bước cài tool mới) — cây thư mục ví dụ trong file này không cần liệt kê đủ mọi repo (đã có `+-- ...`).
 - [ ] `README.md` (root workstation): thêm liên kết nếu có tài liệu mới cần lên index.
 
