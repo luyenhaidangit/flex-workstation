@@ -12,7 +12,7 @@ A real, mechanical check exists for the points below: `node scripts/validate-ski
 
 ## House section set (observed, not enforced)
 
-Every `flex-*` engineering skill in this repo (`flex-context-engineering`, `flex-database-engineering`, `flex-naming-convention`, `flex-devops-engineering`, `flex-dotnet-engineering`, `flex-frontend-engineering`) follows the same section shape:
+The `flex-*` engineering skills in this repo (see `.agents/skills/`, e.g. `flex-devops-engineering`, `flex-dotnet-engineering`) follow the same section shape:
 
 ```markdown
 ---
@@ -49,7 +49,7 @@ Use this shape by default for a skill targeting `.agents/skills/`, in place of t
 
 ## Before creating a new skill directory
 
-1. **Search the existing catalog** (`.agents/skills/`, currently ~20 skills) for overlap. Prefer extending an existing skill (a new section, a new reference file) over adding a near-duplicate. Name the specific gap the new skill fills that no existing skill covers.
+1. **Search the existing catalog** (`.agents/skills/`) for overlap. Prefer extending an existing skill (a new section, a new reference file) over adding a near-duplicate. Name the specific gap the new skill fills that no existing skill covers.
 2. **Check `flex-using-agent-skills`'s routing table.** A skill that isn't listed there is invisible under this workspace's mandatory routing rule (`AGENTS.md` → "Skill routing bắt buộc"): agents will never select it. Confirm the new skill will get a row before treating the work as done (see "Wiring a new or changed skill" below).
 
 ## Wiring a new or changed skill into the workspace

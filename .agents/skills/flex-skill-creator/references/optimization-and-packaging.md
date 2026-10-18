@@ -30,7 +30,7 @@ Make them concrete and specific — file paths, real context about the user's jo
 
 **Step 2 — Review the set with the user.** Bad eval queries produce a bad description, so let the user sign off, edit, toggle, add, or remove entries before optimizing.
 
-**Step 3 — Optimize by hand.** This workspace has not ported the automated loop script (`scripts.run_loop`, from Anthropic's public skill-creator) — `flex-skill-creator`'s `scripts/` holds `sync-skills.ps1` (workspace wiring only), not this one. Don't spend a step checking for it; go straight to the manual pass: walk the eval set, predict for each whether the current description would trigger, find the misses, and rewrite the description to catch the should-triggers and exclude the near-misses — applying the pushiness and "Claude under-triggers" lessons above. Then re-walk the set to confirm.
+**Step 3 — Optimize by hand.** The automated loop script (`scripts.run_loop`) is not ported — see the note in `evaluation-and-iteration.md` ("Platform variations"). Go straight to the manual pass: walk the eval set, predict for each whether the current description would trigger, find the misses, and rewrite the description to catch the should-triggers and exclude the near-misses — applying the pushiness and "Claude under-triggers" lessons above. Then re-walk the set to confirm.
 
 **Step 4 — Apply.** Put the chosen description in the SKILL.md frontmatter and show the user a before/after (and the scores, if you have them).
 
@@ -38,12 +38,12 @@ Make them concrete and specific — file paths, real context about the user's jo
 
 **Note:** this is for producing an installable `.skill` bundle for a skill living outside this repo (e.g. the user's personal `~/.claude/skills/`). A skill targeting `.agents/skills/` in this repo lives and is distributed as tracked source (git + the `.claude/skills/` junction) — it is not packaged this way.
 
-This workspace has not ported `scripts.package_skill` either — same story as Step 3 above, `flex-skill-creator`'s `scripts/` doesn't hold it — skip checking for it. Zip the skill folder directly (`zip -r <skill-name>.skill <path/to/skill-folder>` or equivalent) and point the user to the resulting file's path so they can install it. If you have a `present_files`-style tool, present the `.skill` file directly.
+`scripts.package_skill` is not ported either (same note as above). Zip the skill folder directly (`zip -r <skill-name>.skill <path/to/skill-folder>`, or `Compress-Archive` then rename to `.skill` on Windows without `zip`) and point the user to the resulting file's path so they can install it. If you have a `present_files`-style tool, present the `.skill` file directly.
 
 ## Updating an existing installed skill
 
 When the user wants to update a skill that's already installed (rather than create a new one):
 
 - **Preserve the original name.** Use the existing directory name and `name:` frontmatter field unchanged. If the installed skill is `research-helper`, the output is `research-helper.skill`, never `research-helper-v2`.
-- **Copy to a writeable location before editing.** The installed path may be read-only. Copy to e.g. `/tmp/<skill-name>/`, edit there, and package from the copy.
-- **Stage in `/tmp/` when packaging manually**, then move to the output directory — direct writes to protected paths may fail on permissions.
+- **Copy to a writeable location before editing.** The installed path may be read-only. Copy to a temp or scratchpad directory (e.g. `/tmp/<skill-name>/`, or the session scratchpad on Windows), edit there, and package from the copy.
+- **Stage in that temp directory when packaging manually**, then move to the output directory — direct writes to protected paths may fail on permissions.

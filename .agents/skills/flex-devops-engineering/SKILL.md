@@ -1,6 +1,6 @@
 ---
 name: flex-devops-engineering
-description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, or infrastructure production-readiness.
+description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, or infrastructure production-readiness.
 ---
 
 # Flex DevOps Engineering
@@ -32,6 +32,7 @@ engineering skill as an additional owner rather than duplicating its rules here.
   Elasticsearch, or monitoring services.
 - Managing environment variables, runtime configuration, credentials, volumes,
   health checks, logs, metrics, dashboards, alerts, rollout, or rollback.
+- Writing or reviewing Kubernetes manifests (Deployment, Service, probes, resources).
 - Investigating failed builds, unhealthy containers, deployment regressions,
   networking failures, port conflicts, or infrastructure drift.
 - Reviewing infrastructure for production readiness, recoverability, least
@@ -40,7 +41,8 @@ engineering skill as an additional owner rather than duplicating its rules here.
 Do not use this skill for a purely application-level change with no infrastructure
 or delivery artifact. Do not introduce Kubernetes, Terraform, Helm, or a new
 platform merely because it is common elsewhere; use the technology already present
-unless the user explicitly requests and justifies a platform change.
+unless the user explicitly requests and justifies a platform change. Do not add
+Kubernetes to a repo that does not already use it.
 
 ## Core Process
 
@@ -212,6 +214,24 @@ Never say "deployed" when only configuration was written or rendered.
   dependency availability matters.
 - Avoid fixed `container_name` unless repository integration requires it; Compose DNS
   should normally use the service name.
+
+### Kubernetes manifests
+
+- Follow the target repo's conventions for manifest layout and tooling (plain YAML vs
+  Kustomize/Helm); pin image tags and commit no secrets or kubeconfig.
+- Give every long-running container a `readinessProbe` (gates Service traffic) and a
+  `livenessProbe` (restarts a hung container); they answer different questions, so do
+  not reuse one failure threshold for both.
+- Add a `startupProbe` only when the app starts slowly or unpredictably (JVM/.NET
+  warm-up); it defers liveness so a slow boot is not killed. A fast-starting server
+  such as nginx does not need one.
+- Set `resources.requests` so the scheduler can place the pod; add `limits` only with
+  evidence, since a memory limit that is too low causes `OOMKilled`.
+- Use `ClusterIP` plus Ingress or `port-forward` by default; `NodePort` is for local
+  learning only.
+- `kubectl apply --dry-run=client` needs a reachable API server for discovery, and it
+  proves syntax only. Never report "deployed" until `kubectl rollout status` and a
+  real request succeed. Rollback with `kubectl rollout undo deployment/<name>`.
 
 ### HAProxy and network exposure
 
