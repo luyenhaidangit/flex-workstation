@@ -4,8 +4,8 @@ Lộ trình đi từ đơn giản đến nâng cao, mỗi giai đoạn **đưa t
 
 Tài liệu liên quan (không lặp lại nội dung ở đây):
 
-- [k8s-level-1.md](../../../docs/infrastructure/k8s-level-1.md): bài học chi tiết về Pod, Deployment, Service, ConfigMap, PVC, probe, namespace, Ingress trên minikube.
-- [k8s-level-2.md](../../../docs/infrastructure/k8s-level-2.md): dựng cluster nhiều node bằng kubeadm, add-on, CI/CD.
+- [k8s-level-1.md](k8s-level-1.md): bài học chi tiết về Pod, Deployment, Service, ConfigMap, PVC, probe, namespace, Ingress trên minikube.
+- [k8s-level-2.md](k8s-level-2.md): dựng cluster nhiều node bằng kubeadm, add-on, CI/CD.
 - Repo `flex-k8s/`: nơi chứa manifest và script, là sản phẩm đầu ra của lộ trình này.
 - `flex-environment/docker-compose.*.yml`: topology hiện tại, nguồn tham chiếu khi chuyển từng service.
 
@@ -59,7 +59,7 @@ Giai đoạn 0–4 chỉ cần laptop. Từ giai đoạn 6 trở đi mới cần
 
 **Mục tiêu:** hiểu vòng lặp *desired state*: bạn khai báo trạng thái mong muốn, controller liên tục kéo trạng thái thực tế về đúng như vậy.
 
-**Học:** theo [k8s-level-1.md](../../../docs/infrastructure/k8s-level-1.md), bài 0–4 và bài 7: kiến trúc control plane, Pod, Deployment/ReplicaSet, Service, probe, resources.
+**Học:** theo [k8s-level-1.md](k8s-level-1.md), bài 0–4 và bài 7: kiến trúc control plane, Pod, Deployment/ReplicaSet, Service, probe, resources.
 
 **Làm:**
 
@@ -187,7 +187,7 @@ flex-k8s/
 
 **Mục tiêu:** hiểu những thứ minikube che giấu: CNI, LoadBalancer trên bare-metal, storage phân tán, node lỗi.
 
-**Học và làm:** theo [k8s-level-2.md](../../../docs/infrastructure/k8s-level-2.md). Có hai hướng:
+**Học và làm:** theo [k8s-level-2.md](k8s-level-2.md). Có hai hướng:
 
 | Lựa chọn | Phù hợp khi |
 | --- | --- |
