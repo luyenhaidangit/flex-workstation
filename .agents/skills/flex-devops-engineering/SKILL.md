@@ -233,6 +233,41 @@ Never say "deployed" when only configuration was written or rendered.
   proves syntax only. Never report "deployed" until `kubectl rollout status` and a
   real request succeed. Rollback with `kubectl rollout undo deployment/<name>`.
 
+### Converting Compose to Kubernetes
+
+Convert incrementally and only on explicit request. Inventory first (image, ports, env,
+volumes, `depends_on`, healthcheck per service), then move one service at a time while
+the rest keeps running on Compose (hybrid), verifying each before the next.
+
+Map each Compose field to its Kubernetes object instead of translating line by line:
+
+| Compose | Kubernetes |
+| --- | --- |
+| `image` | `image:` in Deployment/StatefulSet, same pinned tag |
+| `ports` | `containerPort` plus a `ClusterIP` Service; public traffic via Ingress |
+| `environment` / `env_file` | ConfigMap for plain values, Secret for credentials (`envFrom`) |
+| Named volume | PVC (`volumeClaimTemplates` in a StatefulSet) |
+| Bind-mounted config file | ConfigMap mounted as a file |
+| `depends_on` | readiness probes, initContainer, or a Job that retries the real dependency |
+| `healthcheck` | split into `readinessProbe` and `livenessProbe` (+ `startupProbe` if slow) |
+| Reverse-proxy routes (e.g. HAProxy) | Ingress rules |
+| One-shot init service (`*-init`, migrations) | Job, idempotent |
+
+Conversion order and rules:
+
+1. Stateless services first (APIs, gateway, web UI); stateful ones (database, broker,
+   search, object storage) last, or leave them on Compose or managed. Prefer a
+   maintained operator for databases and brokers over a hand-written StatefulSet.
+2. Services left on Compose are reached from the cluster through a Service without
+   selector or `ExternalName`, so application config keeps the same hostname.
+3. Keep Compose service names as Service names so connection strings do not change.
+4. Never copy secret values from Compose or `.env` into manifests; create Secrets at
+   deploy time and commit only names/keys.
+5. Do not delete the Compose definition until the converted service has passed a real
+   request and its rollback (`rollout undo` or restarting the Compose service) is known.
+6. Heavy single-node services (Jenkins, Elasticsearch, GPU/LLM runtimes) are poor early
+   candidates; defer them and say why.
+
 ### HAProxy and network exposure
 
 - Prefer one controlled ingress path for HTTP/Web UIs.
