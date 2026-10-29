@@ -8,7 +8,7 @@ echo Them tham so -Check de chi kiem tra, khong thay doi gi.
 echo.
 
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\windows\sync-windows.ps1" %*
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0sync-windows.ps1" %*
 
 if errorlevel 1 (
     echo.
