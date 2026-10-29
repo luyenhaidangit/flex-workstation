@@ -1,4 +1,4 @@
-# Dong bo cau hinh Windows tu scripts\templates\windows: hosts, firewall; kiem tra .wslconfig.
+# Dong bo cau hinh Windows tu template canh script (scripts\windows): hosts, firewall; kiem tra .wslconfig.
 # Requires Administrator privileges to update C:\Windows\System32\drivers\etc\hosts
 # -Check: chi kiem tra, khong thay doi gi (khong can Administrator), exit 1 neu con thieu.
 param([switch]$Check)
@@ -20,7 +20,7 @@ if (-not $Check -and -not $currentPrincipal.IsInRole([Security.Principal.Windows
     exit $process.ExitCode
 }
 
-$templatePath = Join-Path $PSScriptRoot "templates\windows\hosts"
+$templatePath = Join-Path $PSScriptRoot "hosts"
 $targetHostsPath = Join-Path $env:SystemRoot "System32\drivers\etc\hosts"
 
 if (-not (Test-Path $templatePath)) {
@@ -100,7 +100,7 @@ Write-Host "==============================================="
 
 # ========== KIEM TRA .WSLCONFIG (chi doc; ap dung boi scripts\bootstrap.ps1) ==========
 Write-Host "`n========== KIEM TRA .WSLCONFIG ==========" -ForegroundColor Green
-$wslTemplatePath = Join-Path $PSScriptRoot "templates\windows\.wslconfig"
+$wslTemplatePath = Join-Path $PSScriptRoot ".wslconfig"
 $wslConfigPath = Join-Path $env:USERPROFILE ".wslconfig"
 $wslConfigContent = if (Test-Path $wslConfigPath) { Get-Content $wslConfigPath -Raw -Encoding UTF8 } else { '' }
 
