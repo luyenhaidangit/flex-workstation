@@ -165,9 +165,9 @@ function Set-WslConfig {
         return
     }
 
-    $templatePath = Join-Path $PSScriptRoot "templates\.wslconfig"
+    $templatePath = Join-Path $PSScriptRoot "templates\windows\.wslconfig"
     if (-not (Test-Path $templatePath)) {
-        $templatePath = Join-Path $PSScriptRoot "templates\wslconfig"
+        $templatePath = Join-Path $PSScriptRoot "templates\windows\wslconfig"
     }
 
     if (-not (Test-Path $templatePath)) {

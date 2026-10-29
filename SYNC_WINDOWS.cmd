@@ -2,12 +2,13 @@
 setlocal
 cd /d "%~dp0"
 
-echo flex-workstation / Sync Hosts & Firewall
-echo Dong bo cau hinh domain vao file hosts va mo quy tac Windows Firewall cho microservices.
+echo flex-workstation / Sync Windows (hosts, Firewall, .wslconfig)
+echo Dong bo domain vao file hosts, mo quy tac Windows Firewall cho microservices va kiem tra .wslconfig.
+echo Them tham so -Check de chi kiem tra, khong thay doi gi.
 echo.
 
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\sync-hosts.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\sync-windows.ps1" %*
 
 if errorlevel 1 (
     echo.

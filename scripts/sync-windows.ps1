@@ -1,10 +1,14 @@
+# Dong bo cau hinh Windows tu scripts\templates\windows: hosts, firewall; kiem tra .wslconfig.
 # Requires Administrator privileges to update C:\Windows\System32\drivers\etc\hosts
+# -Check: chi kiem tra, khong thay doi gi (khong can Administrator), exit 1 neu con thieu.
+param([switch]$Check)
 
 $ErrorActionPreference = 'Stop'
+$missing = $false
 
 # Auto-elevate to Administrator if not already elevated
 $currentPrincipal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if (-not $Check -and -not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Host "Yeu cau quyen Administrator de cap nhat file hosts hệ thong." -ForegroundColor Yellow
     Write-Host "Dang yeu cau quyen Administrator (UAC)..." -ForegroundColor Cyan
     
@@ -16,7 +20,7 @@ if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Adm
     exit $process.ExitCode
 }
 
-$templatePath = Join-Path $PSScriptRoot "templates\host"
+$templatePath = Join-Path $PSScriptRoot "templates\windows\hosts"
 $targetHostsPath = Join-Path $env:SystemRoot "System32\drivers\etc\hosts"
 
 if (-not (Test-Path $templatePath)) {
@@ -51,6 +55,11 @@ foreach ($line in $templateLines) {
         # Kiem tra neu hostname chua co trong file hosts hien tai
         $pattern = "\b" + [regex]::Escape($hostname) + "\b"
         if ($existingContent -notmatch $pattern) {
+            if ($Check) {
+                Write-Host "[THIEU] Domain chua co trong hosts: $trimmed" -ForegroundColor Yellow
+                $missing = $true
+                continue
+            }
             Add-Content -Path $targetHostsPath -Value "`n$trimmed" -Encoding UTF8 -Force
             Write-Host "[+] Da pride domain moi: $trimmed" -ForegroundColor Cyan
             $addedCount++
@@ -77,7 +86,10 @@ $rules = @(
 
 foreach ($r in $rules) {
     $existing = Get-NetFirewallRule -DisplayName $r.Name -ErrorAction SilentlyContinue
-    if (-not $existing) {
+    if (-not $existing -and $Check) {
+        Write-Host "[THIEU] Quy tac Firewall chua co: $($r.Name)" -ForegroundColor Yellow
+        $missing = $true
+    } elseif (-not $existing) {
         New-NetFirewallRule -DisplayName $r.Name -Direction Inbound -Protocol TCP -LocalPort $r.Port -Action Allow | Out-Null
         Write-Host "[+] Da tao quy tac Firewall: $($r.Name) (Port $($r.Port))" -ForegroundColor Cyan
     } else {
@@ -85,3 +97,23 @@ foreach ($r in $rules) {
     }
 }
 Write-Host "==============================================="
+
+# ========== KIEM TRA .WSLCONFIG (chi doc; ap dung boi scripts\bootstrap.ps1) ==========
+Write-Host "`n========== KIEM TRA .WSLCONFIG ==========" -ForegroundColor Green
+$wslTemplatePath = Join-Path $PSScriptRoot "templates\windows\.wslconfig"
+$wslConfigPath = Join-Path $env:USERPROFILE ".wslconfig"
+$wslConfigContent = if (Test-Path $wslConfigPath) { Get-Content $wslConfigPath -Raw -Encoding UTF8 } else { '' }
+
+foreach ($line in (Get-Content $wslTemplatePath -Encoding UTF8)) {
+    if ($line -notmatch '^\s*([^\[#=\s][^=]*?)\s*=\s*(.*?)\s*$') { continue }
+    $pattern = "(?m)^\s*" + [regex]::Escape($matches[1]) + "\s*=\s*" + [regex]::Escape($matches[2]) + "\s*$"
+    if ($wslConfigContent -match $pattern) {
+        Write-Host "[=] $line" -ForegroundColor Gray
+    } else {
+        Write-Host "[THIEU] $line chua co trong $wslConfigPath (chay scripts\bootstrap.ps1 de ap dung, roi 'wsl --shutdown')" -ForegroundColor Yellow
+        $missing = $true
+    }
+}
+Write-Host "================================================="
+
+if ($Check -and $missing) { exit 1 }
