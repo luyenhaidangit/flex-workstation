@@ -34,4 +34,5 @@
 127.0.0.1 prometheus.local
 127.0.0.1 grafana.local
 127.0.0.1 api.flex.internal
+127.0.0.1 app.flex.local
 127.0.0.1 view-localhost # view localhost server
