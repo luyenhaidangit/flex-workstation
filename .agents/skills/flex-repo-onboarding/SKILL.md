@@ -28,10 +28,11 @@ Do not use it to remove a repo, repoint an entry at a different remote, change a
 - `name` — equals the folder name and is valid as a Windows file name.
 - `url` — if the folder already exists, take it from `git -C <name> remote get-url origin`. Only when there is no repo yet, infer it from existing entries (same owner and style) and say it is an inference.
 - `branch` — omit unless the user wants a non-default branch; pass it as `-Branch`.
+- `scope` — one line on what the repo owns and which requests belong to it (role, stack, typical keywords). `flex-repo-scope` reads it to choose repos in a cloud session, so draft it from the repo's own README, say it is a draft, and pass it as `-Scope`. Without it the script warns and the gate falls back to `system-map.md`.
 
 ### 2. Register the required touchpoints
 
-Run `scripts/add-repo.ps1 -Name <name> -Url <url> [-Branch <branch>]`. It rejects embedded credentials and a URL that differs from the local `origin`; it edits `workstation.json`, `.gitignore` and `.ignore` as raw text so line endings and other entries stay untouched, and checks the JSON before writing. It is safe to re-run: a file that already has the entry is skipped, so it also completes a half-registered repo (listed in the manifest but missing from the ignore files). If the entry exists with a url that differs from `origin`, it rewrites that url to the `origin` form (`[FIX]`); with no local `origin` to prove the right form it refuses. Hand-edit only if the script cannot run, following `references/touchpoints.md`.
+Run `scripts/add-repo.ps1 -Name <name> -Url <url> [-Branch <branch>] [-Scope <scope>]`. It rejects embedded credentials and a URL that differs from the local `origin`; it edits `workstation.json`, `.gitignore` and `.ignore` as raw text so line endings and other entries stay untouched, and checks the JSON before writing. It is safe to re-run: a file that already has the entry is skipped, so it also completes a half-registered repo (listed in the manifest but missing from the ignore files). If the entry exists with a url that differs from `origin`, it rewrites that url to the `origin` form (`[FIX]`); with no local `origin` to prove the right form it refuses. For an existing entry without a scope, re-running with `-Scope` adds it; an existing scope is never overwritten. Hand-edit only if the script cannot run, following `references/touchpoints.md`.
 
 ### 3. Update the documentation touchpoints
 
@@ -69,6 +70,7 @@ List the files changed. Say whether the remote exists (`git ls-remote <url>` is 
 ## Verification
 
 - [ ] Name, URL and branch were confirmed with the user, or the inferred URL was flagged.
+- [ ] The entry has a `scope` (drafted from the README and flagged as a draft), or its absence was reported.
 - [ ] `scripts/add-repo.ps1` succeeded (or the manual edit followed `references/touchpoints.md`).
 - [ ] `system-map.md` lists the repo in the tree, manifest table and projects table.
 - [ ] Manifest URL equals `origin`; `git status` shows no untracked repo folder.

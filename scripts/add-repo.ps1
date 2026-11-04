@@ -2,6 +2,7 @@ param(
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][string]$Url,
     [string]$Branch,
+    [string]$Scope,
     [string]$Root = (Resolve-Path "$PSScriptRoot\..").Path
 )
 
@@ -45,6 +46,23 @@ if ($existing) {
         throw "$Name is already in workstation.json with a different url ($($existing.url)) and no local origin confirms $Url."
     }
     if ($Branch) { Write-Warning "-Branch ignored: $Name already exists in workstation.json." }
+    if ($Scope) {
+        if (-not $existing.scope) {
+            # Add scope right after the entry's url/branch line, as raw text.
+            $manifest = [System.IO.File]::ReadAllText($manifestPath)
+            $pattern = '("name"\s*:\s*"' + [regex]::Escape($Name) + '"\s*,\s*"url"\s*:\s*"[^"]*"(?:\s*,\s*"branch"\s*:\s*"[^"]*")?)'
+            $withScope = [regex]::Replace($manifest, $pattern, { param($m) $m.Groups[1].Value + ",$eol        `"scope`": " + ($Scope | ConvertTo-Json -Compress) })
+            $null = $withScope | ConvertFrom-Json
+            [System.IO.File]::WriteAllText($manifestPath, $withScope)
+            Write-Host "[OK] workstation.json: added scope for $Name."
+        }
+        elseif ($existing.scope -ne $Scope) {
+            Write-Warning "-Scope ignored: $Name already has a scope in workstation.json."
+        }
+    }
+    else {
+        if (-not $existing.scope) { Write-Warning "$Name has no scope in workstation.json; pass -Scope so flex-repo-scope can route to it." }
+    }
 }
 else {
     $lines = @("      {", "        `"name`": `"$Name`",")
@@ -54,6 +72,13 @@ else {
     }
     else {
         $lines += "        `"url`": `"$Url`""
+    }
+    if ($Scope) {
+        $lines[-1] += ","
+        $lines += "        `"scope`": $($Scope | ConvertTo-Json -Compress)"
+    }
+    else {
+        Write-Warning "$Name has no scope; pass -Scope so flex-repo-scope can route to it."
     }
     $lines += "      }"
     $entry = $lines -join $eol
