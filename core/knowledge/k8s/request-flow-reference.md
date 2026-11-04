@@ -13,6 +13,8 @@ Tài liệu liên quan:
 Browser (app.example.com)
   │  DNS
   ▼
+LB public (IP cố định, chia tải qua NodePort; truyền IP thật của client bằng header)
+  ▼
 Ingress Controller + WAF (TLS terminate, ModSecurity quét tấn công)
   │  VirtualServer match theo host
   ▼
@@ -41,6 +43,15 @@ Pod microservice (.NET) → DB / Kafka / Redis ...
 | Chart WAF riêng cho chat | Tách WAF cho luồng chat |
 | Ingress controller riêng cho WebSocket | Cần timeout/buffering khác với HTTP thường |
 | Chart theo nhóm app (Apps, AI, MCP...) | Tạo VirtualServerRoute trỏ vào K8s Service của từng microservice |
+
+## WAF trong Ingress
+
+- **Không phải tầng riêng.** ModSecurity là module nạp vào chính tiến trình nginx của Ingress: nginx vừa định tuyến vừa quét. Tầng riêng duy nhất đứng trước là LB public.
+- **Thứ tự trong một request:** nginx nhận và đọc header → ModSecurity kiểm tra header → nginx đọc body (có giới hạn kích thước) → ModSecurity kiểm tra body → khớp luật thì ghi log (`DetectionOnly`) hoặc chặn (`On`) → `proxy_pass` tới upstream. Chỉ request qua hết các bước này mới tới backend.
+- **Cách triển khai:** image nginx Ingress build kèm ModSecurity và OWASP CRS, nạp module qua `main-snippets`, bật `modsecurity on` ở `server-snippets` cho mọi host; host cần ngoại lệ thì đặt `modsecurity off` riêng.
+- **Cấu hình điển hình:** rule engine `DetectionOnly` khi mới triển khai rồi mới chuyển sang chặn; giới hạn body; chỉ cho các method cần dùng (còn lại trả `405`); rate limit tuỳ chọn ở chế độ monitor; lấy IP thật của client khi có LB phía trước (real IP); công tắc bật/tắt Redis để xử lý sự cố nhanh.
+- **Thành phần phụ (tuỳ quy mô):** scheduler kéo luật từ nơi tập trung, sidecar log (Fluentd) đẩy log WAF về SIEM, Redis cache/session. Đây là phần vận hành tập trung, không cần cho phần quét cốt lõi.
+- **Lưu ý:** chế độ chặn có thể khai báo ở nhiều nơi và mâu thuẫn nhau (ví dụ một biến ghi `block` nhưng rule engine vẫn là `DetectionOnly`); chế độ thực tế do rule engine quyết định, nên luôn kiểm tra giá trị này.
 
 ## Điểm đáng chú ý
 
