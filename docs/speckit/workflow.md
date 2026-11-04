@@ -204,7 +204,7 @@ specs/
     ├── plan.md              ← /speckit-plan
     ├── research.md          ← /speckit-plan (phase 0)
     ├── data-model.md        ← /speckit-plan (phase 1)
-    ├── repos.md             ← flex-repo-scope (cloud: repo con trong phạm vi; plan/implement đọc)
+    ├── repos.md             ← flex-repo-scope (repo con trong phạm vi; plan/implement đọc)
     ├── quickstart.md        ← /speckit-plan (phase 1)
     ├── contracts/           ← /speckit-plan (phase 1)
     ├── tasks.md             ← /speckit-tasks  (+converge appends)
