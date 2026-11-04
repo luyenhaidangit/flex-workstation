@@ -30,8 +30,10 @@ Read `repositories.items` in `workstation.json`: `name`, `url`, `scope`. List th
 | Group | Meaning | Action |
 | --- | --- | --- |
 | Edit | Code will be changed here | Attach and clone |
-| Read | Only a contract, config or example is needed | Prefer reading single files via the GitHub MCP file tool; clone only if many files are needed |
+| Read | Only a contract, config or example is needed | Attach with read access, then read single files via the GitHub MCP file tool; clone only if many files are needed |
 | Skip | Not related | Do nothing |
+
+A request that only asks for analysis, explanation or review (no change to make) puts every relevant repo in Read by default. The GitHub MCP file tool is denied for a repo that is not attached to the session, so Read still needs `add_repo` (read access), but it skips the clone. Promote a repo to Edit only when a change is actually going to be made.
 
 Match on what the change touches, not on the words used. A UI task that adds a field usually needs the frontend (Edit) and the backend service that serves it (Read or Edit); a schema change adds `flex-database` and the service that consumes it. When the request is ambiguous, ask instead of widening the set.
 
@@ -46,6 +48,8 @@ Repo plan
 ```
 
 Keep it short. Wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
+
+When a Speckit feature is active (a `specs/<feature>/` directory exists for the task), also write the plan to `specs/<feature>/repos.md` using the same Edit/Read/Skip table, and update it whenever the gate re-runs. `speckit-plan` and `speckit-implement` read this file as the repo scope of the feature. Do not put it in `spec.md`, which stays business-only.
 
 ### 4. Attach and clone, one repo at a time
 
@@ -75,6 +79,8 @@ Edits and commits for a child repo belong to that repo's own branch and pull req
 ## Verification
 
 - [ ] Plan listed Edit, Read and Skip with assumptions before any `add_repo`.
+- [ ] For an analysis-only request, no repo was cloned unless the user asked for changes.
+- [ ] With an active Speckit feature, `specs/<feature>/repos.md` matches the final plan.
 - [ ] Only repos declared in `workstation.json` were attached.
 - [ ] Each cloned repo sits at `<workstation root>/<name>` and was registered with `register_repo_root`.
 - [ ] Child-repo changes went to that repo's own branch, with the branch name confirmed.

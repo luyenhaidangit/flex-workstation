@@ -103,6 +103,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **IF EXISTS**: Read research.md for technical decisions and constraints
    - **IF EXISTS**: Read .specify/memory/constitution.md for governance constraints
    - **IF EXISTS**: Read quickstart.md for integration scenarios
+   - **IF EXISTS**: Read repos.md for the repos in scope; edit code only in `Edit` repos, and re-run `flex-repo-scope` (updating repos.md) if a task needs a repo not listed
 
 3a. **Route specialist skills**: Use `flex-using-agent-skills` once with the concrete
     file paths and artifact types in the loaded plan and tasks. Keep
