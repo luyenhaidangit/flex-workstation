@@ -26,10 +26,6 @@
 # End of section
 #
 # Flex
-127.0.0.1 portainer.local
-127.0.0.1 jenkins.local
-127.0.0.1 ai.local
-127.0.0.1 qdrant.local
 127.0.0.1 ollama.local
 127.0.0.1 prometheus.local
 127.0.0.1 grafana.local
