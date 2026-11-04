@@ -20,15 +20,15 @@ Tài liệu liên quan (không lặp lại nội dung ở đây):
 ## 2. Kiến trúc đích
 
 ```text
-Client (trình duyệt, app.flex.local)
+Client (trình duyệt, luyenhaidangit.project.local)
   │  1. DNS phân giải tên → IP của cổng vào
   ▼
-Cổng vào (LB ngoài cluster: HAProxy)
+Cổng vào (LB ngoài cluster: nginx)
   │  2. Nhận 80/443, chuyển vào NodePort của Ingress; health check node
   ▼
 Ingress Controller (namespace ingress)
   │  3. TLS terminate, (tuỳ chọn) WAF ModSecurity
-  │  4. VirtualServer khớp host app.flex.local
+  │  4. VirtualServer khớp host luyenhaidangit.project.local
   ▼
 Định tuyến theo path tới VirtualServerRoute của từng namespace
   ├─ /app             → flex-common   (tầng gateway: flex-api-gateway, flex-auth-service)
@@ -45,7 +45,7 @@ Pod .NET → PostgreSQL / Redis / RabbitMQ / MinIO
 | Lớp | Thành phần | Vai trò | Ghi chú |
 | --- | --- | --- | --- |
 | Phân giải tên | DNS (hosts khi học, DNS thật khi lên server) | Tên → IP của cổng vào | Chỉ trả IP, không chuyển traffic |
-| Cổng vào | HAProxy | IP cố định, nhận 80/443, chuyển vào NodePort, health check | Đã có trong `flex-environment` |
+| Cổng vào | nginx | IP cố định, nhận 80/443, chuyển vào NodePort | Đã có trong `flex-environment` (thay HAProxy) |
 | Ingress | NGINX Ingress Controller (CRD VirtualServer/VirtualServerRoute) | TLS, định tuyến host/path, WAF | Namespace `ingress`, Service dạng NodePort |
 | Định tuyến | VirtualServer (cha, theo host) + VirtualServerRoute (con, theo namespace) | Chia route để mỗi nhóm app tự quản route của mình | |
 | Workload | Deployment + Service ClusterIP | Chạy app, nhiều replica | Tên Service: `<ns>-<service>-svc` |
@@ -65,8 +65,8 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 
 | Hạng mục | Hiện trạng (đã xác nhận) | Kiến trúc đích |
 | --- | --- | --- |
-| DNS | `app.flex.local` → `127.0.0.1` trong `scripts/windows/hosts` | Giữ nguyên khi học; DNS thật khi lên server |
-| Cổng vào | HAProxy trong Docker Compose, nghe 80/443; ACL cho `portainer.local`, `jenkins.local`, `api.flex.internal`; host lạ trả 404 | Thêm ACL `app.flex.local` → NodePort của Ingress |
+| DNS | `luyenhaidangit.project.local` → `127.0.0.1` trong `scripts/windows/hosts` | Giữ nguyên khi học; DNS thật khi lên server |
+| Cổng vào | nginx trong Docker Compose, nghe 80/443; `server_name` cho `portainer.local`, `jenkins.local`, `ollama.local`, `api.flex.internal`, `luyenhaidangit.project.local`; host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
 | Ingress | Chưa có | NGINX Ingress Controller trong namespace `ingress` |
 | Cluster | minikube đã cài, đang dừng | minikube để học; kubeadm nhiều node ở giai đoạn 6 |
 | Manifest | `flex-k8s/manifests/nginx.yaml`, `flex-api-gateway.yaml` | Thêm namespace, VirtualServer, VirtualServerRoute |
@@ -77,7 +77,7 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 
 | Việc | Ai làm |
 | --- | --- |
-| DNS record, cấp IP, expose cổng vào | Hạ tầng (ở môi trường học: bạn tự làm bằng hosts và HAProxy) |
+| DNS record, cấp IP, expose cổng vào | Hạ tầng (ở môi trường học: bạn tự làm bằng hosts và nginx) |
 | TLS cert | Hạ tầng; dự án nhận Secret. Môi trường học dùng cert tự ký |
 | VirtualServer / VirtualServerRoute, Deployment, Service | Dự án (`flex-k8s`) |
 
@@ -87,10 +87,10 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | --- | --- | --- |
 | 1 | Dùng NGINX Ingress bản `nginxinc` (CRD VirtualServer) thay vì `ingress-nginx` với Ingress thường, để học đúng mô hình tham chiếu | Đề xuất, chưa chốt |
 | 2 | Cài controller bằng Helm, còn lại giữ YAML thuần (trái quy ước "không dùng Helm" của `flex-k8s` nên cần người dùng đồng ý) | Chờ xác nhận |
-| 3 | HAProxy làm LB đứng trước cluster; cần kiểm tra container HAProxy tới được IP minikube (mạng Docker khác nhau) | Chưa kiểm chứng |
+| 3 | nginx làm LB đứng trước cluster; cần kiểm tra container nginx tới được IP minikube (mạng Docker khác nhau; `host.docker.internal:<NodePort>` không dùng được với minikube driver Docker) | Chưa kiểm chứng |
 | 4 | Prefix path (`/app`) và tên namespace (`flex-common`, `flex-g1`, `flex-g2`) | Đề xuất |
 | 5 | WAF ModSecurity: cần image controller có module | Làm sau cùng |
 
 ## 8. Thứ tự dựng
 
-Namespace, backend giả (`whoami`) và Service, cài Ingress Controller, VirtualServer và VirtualServerRoute, nối HAProxy vào NodePort, TLS tự ký, redirect, WAF, rồi thay backend giả bằng service Flex thật. Từng bước có lệnh kiểm tra được mô tả trong [request-flow-reference.md](request-flow-reference.md) (mục giả lập) và [roadmap.md](roadmap.md) (giai đoạn 3).
+Namespace, backend giả (`whoami`) và Service, cài Ingress Controller, VirtualServer và VirtualServerRoute, nối nginx vào NodePort, TLS tự ký, redirect, WAF, rồi thay backend giả bằng service Flex thật. Từng bước có lệnh kiểm tra được mô tả trong [request-flow-reference.md](request-flow-reference.md) (mục giả lập) và [roadmap.md](roadmap.md) (giai đoạn 3).
