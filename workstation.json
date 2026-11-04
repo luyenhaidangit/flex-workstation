@@ -4,35 +4,43 @@
     "items": [
       {
         "name": "flex-auth-service",
-        "url": "https://github.com/luyenhaidangit/flex-auth-service"
+        "url": "https://github.com/luyenhaidangit/flex-auth-service",
+        "scope": "Service xác thực/ủy quyền (.NET): đăng nhập, token, phân quyền, user/role; đang migrate khỏi Oracle sang PostgreSQL"
       },
       {
         "name": "flex-api-gateway",
-        "url": "https://github.com/luyenhaidangit/flex-api-gateway.git"
+        "url": "https://github.com/luyenhaidangit/flex-api-gateway.git",
+        "scope": "API Gateway (.NET): route, proxy, cấu hình gateway, Dockerfile/Jenkinsfile của gateway"
       },
       {
         "name": "flex-microfrontend",
-        "url": "https://github.com/luyenhaidangit/flex-microfrontend"
+        "url": "https://github.com/luyenhaidangit/flex-microfrontend",
+        "scope": "Frontend client (Angular): màn hình, component, form, modal, bảng, SCSS, gọi API từ UI"
       },
       {
         "name": "flex-environment",
-        "url": "https://github.com/luyenhaidangit/flex-environment"
+        "url": "https://github.com/luyenhaidangit/flex-environment",
+        "scope": "Stack hạ tầng local/dev (Docker Compose): docker-compose*.yml, service phụ trợ, biến môi trường dev"
       },
       {
         "name": "flex-agent-service",
-        "url": "https://github.com/luyenhaidangit/flex-agent-service.git"
+        "url": "https://github.com/luyenhaidangit/flex-agent-service.git",
+        "scope": "Nền tảng AI Agent đa tenant (.NET 9, SignalR): control plane, runtime, agent, tenant"
       },
       {
         "name": "flex-database",
-        "url": "https://github.com/luyenhaidangit/flex-database"
+        "url": "https://github.com/luyenhaidangit/flex-database",
+        "scope": "Migration/schema dùng chung (Liquibase SQL-first): PostgreSQL, MySQL tenant, changelog, seed, index, constraint"
       },
       {
         "name": "flex-exchange-service",
-        "url": "https://github.com/luyenhaidangit/flex-exchange-service.git"
+        "url": "https://github.com/luyenhaidangit/flex-exchange-service.git",
+        "scope": "Lõi khớp lệnh limit in-memory (.NET): order, matching, REST API/Swagger demo"
       },
       {
         "name": "flex-k8s",
-        "url": "https://github.com/luyenhaidangit/flex-k8s.git"
+        "url": "https://github.com/luyenhaidangit/flex-k8s.git",
+        "scope": "Manifest Kubernetes thuần (YAML, kubectl): namespace, deployment, service, ingress cho môi trường Flex"
       }
     ]
   }
