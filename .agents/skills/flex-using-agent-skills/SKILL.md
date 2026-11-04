@@ -72,7 +72,7 @@ Select only skills that directly govern the task.
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
 | Add a repo/project to the workstation manifest (`workstation.json`) and its ignore rules, or fix a repo that is not cloned, is skipped by the sync script, or shows as untracked | `flex-repo-onboarding` |
-| Cloud session only (`CLAUDE_CODE_REMOTE=true`; skip on local) where a task needs code in child repos from `workstation.json` that are not on disk yet — choosing which repos to attach/clone | `flex-repo-scope` |
+| A task that reads or changes code in child repos from `workstation.json` — choosing which repos to read/edit without scanning all (local: print the plan only; cloud, `CLAUDE_CODE_REMOTE=true`: also attach/clone) | `flex-repo-scope` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, decisions about persistent agent context, or a request to review/improve a specific project's context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
 | Brainstorm what feature/improvement to build next in an existing repo, or a gap analysis, with no idea decided yet | `flex-feature-discovery` |

@@ -1,29 +1,34 @@
 ---
 name: flex-repo-scope
-description: Decides which Flex child repos a request actually needs before any is cloned or attached in a cloud session, using the `scope` field of each entry in workstation.json, and reports a clone plan for confirmation. Use when working in a cloud session where child repos listed in workstation.json are not yet on disk and the task would read or change code in one of them, or when a task turns out to need an additional child repo mid-way.
+description: Decides which Flex child repos a request actually needs to read or change, using the `scope` field of each entry in workstation.json, so agents do not scan every repo. In a cloud session it also attaches and clones the chosen repos; locally it only prints the plan. Use when a task would read or change code in a child repo listed in workstation.json, or when a task turns out to need an additional child repo mid-way.
 ---
 
 # Flex Repo Scope
 
 ## Overview
 
-`flex-workstation` is a coordination repo. Real code lives in independent child repos declared in `workstation.json`. A cloud session starts with only the workstation cloned, and each child repo must be attached (`add_repo`) and cloned on demand. Cloning all of them is slow and costs a permission prompt per repo, while cloning too few makes the agent edit blind. This skill chooses the smallest correct set and states it before acting.
+`flex-workstation` is a coordination repo. Real code lives in independent child repos declared in `workstation.json`. Scanning all of them wastes time and context. In a cloud session, which starts with only the workstation cloned, each child repo must also be attached (`add_repo`) and cloned on demand: cloning all of them is slow and costs a permission prompt per repo, while cloning too few makes the agent edit blind. This skill chooses the smallest correct set and states it before acting.
+
+| Mode | Detect | Steps |
+| --- | --- | --- |
+| Local | `CLAUDE_CODE_REMOTE` is not `true` | 1-3 only: choose repos and print the plan, then read or search only those folders. No `add_repo`, no clone, no wait for confirmation. |
+| Cloud | `CLAUDE_CODE_REMOTE=true` | All steps, including attach and clone. |
 
 The `scope` field in each `workstation.json` entry is the single source for what a repo owns. This skill reads it; it does not duplicate it.
 
 ## When to Use
 
-- A cloud session task names or implies code in a child repo (UI, auth, gateway, migration, k8s, ...) that is not on disk yet.
+- A task names or implies code in a child repo (UI, auth, gateway, migration, k8s, ...), whether or not it is on disk yet.
 - A task already in progress turns out to need another child repo (re-run the gate for the added repo only).
 - The user asks which repos a request touches.
 
-Do not use it for work entirely inside the workstation (docs, skills, `.claude/`), for local sessions where `SYNC_WORKSPACE.cmd` already cloned everything, or to add or change manifest entries (use `flex-repo-onboarding`).
+Do not use it for work entirely inside the workstation (docs, skills, `.claude/`) or to add or change manifest entries (use `flex-repo-onboarding`).
 
 ## Core Process
 
 ### 1. Read the scope map
 
-Read `repositories.items` in `workstation.json`: `name`, `url`, `scope`. List the folders already present under the workstation root and skip repos already cloned. If an entry has no `scope`, fall back to the Projects table in `docs/architecture/system-map.md` and say the entry lacks one.
+Read `repositories.items` in `workstation.json`: `name`, `url`, `scope`. List the folders already present under the workstation root; in cloud mode skip repos already cloned, in local mode a missing folder is reported as "not cloned, run `SYNC_WORKSPACE.cmd`" instead of being cloned. If an entry has no `scope`, fall back to the Projects table in `docs/architecture/system-map.md` and say the entry lacks one.
 
 ### 2. Classify each repo for this request
 
@@ -47,11 +52,11 @@ Repo plan
 - Assumptions: <inferences the user should correct>
 ```
 
-Keep it short. Wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
+Keep it short. In local mode, stop here and use the plan to read only the listed repos. In cloud mode, wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
 
 When a Speckit feature is active (a `specs/<feature>/` directory exists for the task), also write the plan to `specs/<feature>/repos.md` using the same Edit/Read/Skip table, and update it whenever the gate re-runs. `speckit-plan` and `speckit-implement` read this file as the repo scope of the feature. Do not put it in `spec.md`, which stays business-only.
 
-### 4. Attach and clone, one repo at a time
+### 4. Attach and clone, one repo at a time (cloud mode only)
 
 For each Edit repo: `add_repo` (with `access: push` only when the session must push), clone from the manifest `url` into `<workstation root>/<name>` so it stays ignored by the workstation's git, then `register_repo_root` so its own `CLAUDE.md` and skills load. If `add_repo` is denied, relay the reason and continue with what is available; do not work around the denial.
 

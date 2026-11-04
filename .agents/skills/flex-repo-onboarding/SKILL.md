@@ -28,7 +28,7 @@ Do not use it to remove a repo, repoint an entry at a different remote, change a
 - `name` — equals the folder name and is valid as a Windows file name.
 - `url` — if the folder already exists, take it from `git -C <name> remote get-url origin`. Only when there is no repo yet, infer it from existing entries (same owner and style) and say it is an inference.
 - `branch` — omit unless the user wants a non-default branch; pass it as `-Branch`.
-- `scope` — one line on what the repo owns and which requests belong to it (role, stack, typical keywords). `flex-repo-scope` reads it to choose repos in a cloud session, so draft it from the repo's own README, say it is a draft, and pass it as `-Scope`. Without it the script warns and the gate falls back to `system-map.md`.
+- `scope` — one line on what the repo owns and which requests belong to it (role, stack, typical keywords). `flex-repo-scope` reads it to choose repos (local and cloud), so draft it from the repo's own README, say it is a draft, and pass it as `-Scope`. Without it the script warns and the gate falls back to `system-map.md`.
 
 ### 2. Register the required touchpoints
 
