@@ -6,7 +6,7 @@ Source of truth for the steps is `docs/checklists/new-service-checklist.md` (sec
 
 | File | Entry | Automated by `scripts/add-repo.ps1` |
 | --- | --- | --- |
-| `workstation.json` | `{ "name", "url" }` (plus optional `"branch"`) appended to `repositories.items` | yes |
+| `workstation.json` | `{ "name", "url", "scope" }` (plus optional `"branch"`; `scope` is read by `flex-repo-scope`) appended to `repositories.items` | yes |
 | `.gitignore` | `/<name>/` appended at the end of the file | yes |
 | `.ignore` | `!/<name>/` appended at the end, so AI search still reaches the repo | yes |
 
