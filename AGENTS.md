@@ -5,6 +5,7 @@
 ## Ngôn ngữ
 
 - Dùng tiếng Việt có dấu trong trả lời, tài liệu và ghi chú.
+- Mọi văn bản hiển thị cho người dùng đều bằng tiếng Việt có dấu, kể cả thông báo routing và lời dẫn giữa các lần gọi tool. Tên skill và định danh kỹ thuật giữ nguyên.
 - Giữ nguyên tên file, thư mục, command, package, API, framework và thuật ngữ kỹ thuật bằng English khi đó là định danh kỹ thuật.
 
 ## Nguyên tắc làm việc
@@ -15,7 +16,7 @@
 - Nếu có nhiều cách hiểu, trình bày các lựa chọn; không tự chọn mà không thông báo.
 - Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
 - Hiện trạng hệ thống Flex (Nginx, Docker Compose, TLS, deploy...) phải lấy từ repo/config thực tế theo `scope` trong `workstation.json`, không suy ra từ mô tả skill hay kiến thức chung. Chưa đọc được thì nói rõ là chưa xác minh và đi đọc, không đoán rồi hỏi ngược người dùng.
-- Tin nhắn tham chiếu nội dung không có trong hội thoại ("như sau", "bên dưới" mà không đính kèm): hỏi lại một dòng trước khi dựng phương án.
+- Tin nhắn chỉ trỏ bằng đại từ hoặc vị trí ("như sau", "bên dưới", "file này") mà không đính kèm nội dung: hỏi lại một dòng trước khi dựng phương án. Nếu chủ đề gọi tên được và thuộc hệ thống Flex (WAF, Nginx, Compose...), đọc repo thực tế, nêu giả định rồi làm, không hỏi lại.
 - Luôn hỏi trước khi: thêm/xóa/đổi `branch` hoặc `url` trong `workstation.json`, sửa `hooks`/`permissions` trong `.claude/settings.json`, hoặc sửa một skill dùng chung ảnh hưởng nhiều repo con — vì tác động vượt ra ngoài phạm vi 1 file đang sửa.
 
 ### Đơn giản là ưu tiên
@@ -47,6 +48,7 @@ Trước mọi task liên quan đến file trong workspace, Agent phải:
 
 Các quy tắc bổ sung:
 - Không chọn trực tiếp domain skill, bỏ qua router — trừ khi `flex-using-agent-skills` chính nó hướng dẫn khác.
+- Tool đọc đầu tiên (`Read`/`Grep`/`Glob`) trong workspace cũng phải đi sau bước route, kể cả khi định hỏi lại người dùng.
 - Nếu không có skill phù hợp, thông báo cho người dùng rồi tiếp tục theo instruction chung.
 - Không gọi router đệ quy khi task chính là `flex-using-agent-skills`.
 - Trong cùng một workflow, tái sử dụng skill đã chọn nếu phạm vi task không thay đổi.

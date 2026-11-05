@@ -23,7 +23,7 @@ Before reading, analyzing, reviewing, or changing workspace or repository files:
 1. Identify the task's intent and primary artifact.
 2. Select the applicable skill or skills from the table below.
 3. Read and apply every selected skill before continuing.
-4. Announce the routing result concisely.
+4. Announce the routing result concisely, in the language required by the repo's `AGENTS.md`/`CLAUDE.md`.
 
 Do not invoke this skill recursively when the task is solely to review or update
 `flex-using-agent-skills`. Use `flex-skill-creator` instead.
@@ -129,7 +129,7 @@ Routing result
 - Re-route required: <yes only when scope has changed; otherwise no>
 ```
 
-Keep this report brief. If the user asked only a conversational question and no file
+Keep this report brief. Write it, including the field labels, in the language required by the repo's `AGENTS.md`/`CLAUDE.md`; keep skill names verbatim. If the user asked only a conversational question and no file
 or tool action is needed, answer directly without routing chatter.
 
 ## Common Rationalizations
