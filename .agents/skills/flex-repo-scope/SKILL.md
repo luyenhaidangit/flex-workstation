@@ -21,6 +21,7 @@ The `scope` field in each `workstation.json` entry is the single source for what
 - A task names or implies code in a child repo (UI, auth, gateway, migration, k8s, ...), whether or not it is on disk yet.
 - A task already in progress turns out to need another child repo (re-run the gate for the added repo only).
 - The user asks which repos a request touches.
+- A question, review or design discussion depends on how Flex currently runs (Nginx, Docker Compose, TLS, WAF, ingress, deploy, gateway), even with no change requested. Read the owning repo first; never infer current state from a skill description or general knowledge.
 
 Do not use it for work entirely inside the workstation (docs, skills, `.claude/`) or to add or change manifest entries (use `flex-repo-onboarding`).
 
@@ -38,7 +39,7 @@ Read `repositories.items` in `workstation.json`: `name`, `url`, `scope`. List th
 | Read | Only a contract, config or example is needed | Attach with read access, then read single files via the GitHub MCP file tool; clone only if many files are needed |
 | Skip | Not related | Do nothing |
 
-A request that only asks for analysis, explanation or review (no change to make) puts every relevant repo in Read by default. The GitHub MCP file tool is denied for a repo that is not attached to the session, so Read still needs `add_repo` (read access), but it skips the clone. Promote a repo to Edit only when a change is actually going to be made.
+A request that only asks for analysis, explanation or review (no change to make) puts every relevant repo in Read by default. The GitHub MCP file tool is denied for a repo that is not attached to the session, so Read still needs `add_repo` (read access), but it skips the clone. Promote a repo to Edit only when a change is actually going to be made. In Read mode do not `git clone`: read the needed files with the GitHub MCP file tool (`get_file_contents`), and clone only if many files must be read.
 
 Match on what the change touches, not on the words used. A UI task that adds a field usually needs the frontend (Edit) and the backend service that serves it (Read or Edit); a schema change adds `flex-database` and the service that consumes it. When the request is ambiguous, ask instead of widening the set.
 
@@ -71,6 +72,7 @@ Edits and commits for a child repo belong to that repo's own branch and pull req
 | "Clone everything so nothing is missing." | Slow, one prompt per repo, and most tasks touch one or two. Re-run the gate when a new need appears. |
 | "The folder name tells me what the repo does." | `scope` was written to disambiguate; read it, especially for `flex-environment` vs `flex-k8s`. |
 | "I can read the whole repo through the file API instead of cloning." | Fine for a few files; for edits or wide search it is slower and cannot run tests. Clone it. |
+| "It is only a design question, general knowledge is enough." | A design is only valid against the real topology. Attach the owning repo as Read, open the 1-3 relevant files, and state what was verified. Example: a WAF question needs `flex-environment` (`docker-compose.infra.yml`, `mounts/nginx/conf.d/`), not a guess. |
 | "The user said 'the frontend', so skip the plan." | The plan is how a wrong inference gets caught before a clone. One line is enough. |
 
 ## Red Flags

@@ -14,6 +14,8 @@
 - Nếu có điều chưa rõ, dừng lại, nêu tên cụ thể điểm mù đó, rồi mới hỏi.
 - Nếu có nhiều cách hiểu, trình bày các lựa chọn; không tự chọn mà không thông báo.
 - Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
+- Hiện trạng hệ thống Flex (Nginx, Docker Compose, TLS, deploy...) phải lấy từ repo/config thực tế theo `scope` trong `workstation.json`, không suy ra từ mô tả skill hay kiến thức chung. Chưa đọc được thì nói rõ là chưa xác minh và đi đọc, không đoán rồi hỏi ngược người dùng.
+- Tin nhắn tham chiếu nội dung không có trong hội thoại ("như sau", "bên dưới" mà không đính kèm): hỏi lại một dòng trước khi dựng phương án.
 - Luôn hỏi trước khi: thêm/xóa/đổi `branch` hoặc `url` trong `workstation.json`, sửa `hooks`/`permissions` trong `.claude/settings.json`, hoặc sửa một skill dùng chung ảnh hưởng nhiều repo con — vì tác động vượt ra ngoài phạm vi 1 file đang sửa.
 
 ### Đơn giản là ưu tiên

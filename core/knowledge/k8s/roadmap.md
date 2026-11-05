@@ -118,7 +118,7 @@ kubectl rollout undo deployment/nginx
 - Namespace `flex-dev`.
 - Thêm `flex-auth-service` (Deployment + Service), gateway gọi auth bằng tên Service.
 - Thêm `flex-microfrontend`: build Angular thành static, phục vụ bằng nginx image.
-- Bật ingress controller (`minikube addons enable ingress`), đối chiếu route trong `flex-environment/haproxy/` và viết Ingress tương ứng: `/` → microfrontend, `/api` → gateway.
+- Bật ingress controller (`minikube addons enable ingress`), đối chiếu route trong `flex-environment/mounts/nginx/conf.d/` và viết Ingress tương ứng: `/` → microfrontend, `/api` → gateway.
 - Thêm vào hosts: `flex.local` → IP minikube.
 
 **Thử phá:**

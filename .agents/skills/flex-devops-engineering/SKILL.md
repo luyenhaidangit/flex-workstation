@@ -1,6 +1,6 @@
 ---
 name: flex-devops-engineering
-description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, or infrastructure production-readiness.
+description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, or infrastructure production-readiness.
 ---
 
 # Flex DevOps Engineering
@@ -13,7 +13,7 @@ distinguish configuration validation from an actual successful deployment.
 
 This skill specializes generic delivery practices for Flex repositories, especially
 `flex-environment`: split Docker Compose files, the shared `flex_net` network,
-HAProxy ingress, Jenkins/JCasC, stateful infrastructure, monitoring, and operational
+Nginx reverse proxy, Jenkins/JCasC, stateful infrastructure, monitoring, and operational
 scripts. Existing repository instructions and nearby patterns govern exact names,
 paths, and commands.
 
@@ -24,7 +24,7 @@ engineering skill as an additional owner rather than duplicating its rules here.
 ## When to Use
 
 - Adding, changing, reviewing, or diagnosing a Dockerfile or Docker Compose service.
-- Changing HAProxy routes, exposed ports, container networks, service discovery, or
+- Changing Nginx routes, exposed ports, container networks, service discovery, or
   TLS/proxy configuration.
 - Creating or modifying Jenkins pipelines, JCasC, GitHub Actions, deployment scripts,
   quality gates, artifact publishing, or image promotion.
@@ -91,7 +91,7 @@ For each proposed change:
    conventions. Pin a concrete image version or immutable digest; never use
    `latest` or an omitted tag.
 3. Prefer internal service discovery on `flex_net`. Route user-facing HTTP/Web UIs
-   through HAProxy when repository policy requires it; expose host ports only for an
+   through Nginx when repository policy requires it; expose host ports only for an
    explicit local-debug or integration requirement.
 4. Give every stateful service persistent storage, ownership boundaries, and a
    recovery strategy. Treat bucket/database/queue initialization as idempotent.
@@ -147,7 +147,7 @@ evidence includes:
 docker compose config --quiet
 docker compose -f <compose-file> config --quiet
 docker build --check <context>
-haproxy -c -f <haproxy.cfg>
+nginx -t
 shellcheck <changed-script>
 ```
 
@@ -250,7 +250,7 @@ Map each Compose field to its Kubernetes object instead of translating line by l
 | Bind-mounted config file | ConfigMap mounted as a file |
 | `depends_on` | readiness probes, initContainer, or a Job that retries the real dependency |
 | `healthcheck` | split into `readinessProbe` and `livenessProbe` (+ `startupProbe` if slow) |
-| Reverse-proxy routes (e.g. HAProxy) | Ingress rules |
+| Reverse-proxy routes (e.g. Nginx) | Ingress rules |
 | One-shot init service (`*-init`, migrations) | Job, idempotent |
 
 Conversion order and rules:
@@ -268,7 +268,7 @@ Conversion order and rules:
 6. Heavy single-node services (Jenkins, Elasticsearch, GPU/LLM runtimes) are poor early
    candidates; defer them and say why.
 
-### HAProxy and network exposure
+### Nginx and network exposure
 
 - Prefer one controlled ingress path for HTTP/Web UIs.
 - Preserve forwarded headers, WebSocket/streaming behavior, timeouts, and TLS

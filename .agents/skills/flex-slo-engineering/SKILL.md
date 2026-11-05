@@ -65,7 +65,7 @@ since the perceived bottleneck and the actual one often differ:
 - **Client/frontend** — render blocking, redundant calls, missing loading
   state, payload size (Angular: see patterns already flagged in
   `flex-frontend-engineering`, e.g. reload-on-every-change-detection).
-- **Network/edge** — HAProxy routing, TLS handshake, connection reuse,
+- **Network/edge** — Nginx routing, TLS handshake, connection reuse,
   timeouts configured at the proxy vs. the service.
 - **API/application** — request handling time, thread/connection pool
   saturation, N+1 calls to downstream services, synchronous waits on I/O.

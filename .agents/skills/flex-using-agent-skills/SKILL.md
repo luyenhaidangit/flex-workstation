@@ -67,12 +67,12 @@ Select only skills that directly govern the task.
 | PostgreSQL schema, Liquibase changelog, migration, seed, index, constraint, database function, view, or trigger | `flex-database-engineering` |
 | C#/.NET, ASP.NET Core, EF Core, dependency injection, tests, architecture, or service implementation | `flex-dotnet-engineering` |
 | Angular UI in `flex-microfrontend`, including components, templates, forms, modals, and tables | `flex-frontend-engineering` |
-| Dockerfile, Docker Compose, HAProxy, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, or rollback | `flex-devops-engineering` |
+| Dockerfile, Docker Compose, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, or rollback | `flex-devops-engineering` |
 | Production error, outage, 5xx, unhealthy container, or a request to check logs/state on a prod server (SSH via WSL) | `flex-prod-troubleshooting` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
 | Add a repo/project to the workstation manifest (`workstation.json`) and its ignore rules, or fix a repo that is not cloned, is skipped by the sync script, or shows as untracked | `flex-repo-onboarding` |
-| A task that reads or changes code in child repos from `workstation.json` — choosing which repos to read/edit without scanning all (local: print the plan only; cloud, `CLAUDE_CODE_REMOTE=true`: also attach/clone) | `flex-repo-scope` |
+| A task that reads or changes code in child repos from `workstation.json`, **or a question/review/design about how Flex infrastructure or services currently work** (Nginx, Docker Compose, TLS, WAF, ingress, deploy, CI/CD, gateway) even if no code change is requested — choosing which repos to read/edit without scanning all (local: print the plan only; cloud, `CLAUDE_CODE_REMOTE=true`: also attach/clone) | `flex-repo-scope` |
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, decisions about persistent agent context, or a request to review/improve a specific project's context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
 | Brainstorm what feature/improvement to build next in an existing repo, or a gap analysis, with no idea decided yet | `flex-feature-discovery` |

@@ -18,7 +18,7 @@ named `flex-prod-<role>`. Real hosts, IPs, users and keys live only in WSL
 `references/ssh-config.example`.
 
 This skill owns the incident diagnosis procedure. Infrastructure changes that follow
-from the diagnosis (Compose, HAProxy, Jenkins, rollout) belong to
+from the diagnosis (Compose, Nginx, Jenkins, rollout) belong to
 `flex-devops-engineering`; code or schema fixes belong to the relevant engineering skill.
 
 ## When to Use
