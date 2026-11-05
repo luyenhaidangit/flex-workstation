@@ -73,7 +73,7 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | Cluster | minikube đã cài, đang dừng | minikube để học; kubeadm nhiều node ở giai đoạn 6 |
 | Manifest | `flex-k8s/manifests/nginx.yaml`, `flex-api-gateway.yaml` | Thêm namespace, VirtualServer, VirtualServerRoute |
 | Frontend | Chưa có service trong `docker-compose.app.yml` | Pod nginx phục vụ build Angular |
-| WAF | Chưa có | ModSecurity trong nginx Ingress, bật `DetectionOnly` trước (xem mục 8) |
+| WAF | Đã cấu hình ở nginx cổng vào Compose (`owasp/modsecurity-crs`, `DetectionOnly`; chưa chạy thử). Ingress k8s chưa có | Giai đoạn sau: ModSecurity trong nginx Ingress (xem mục 8) |
 | Log WAF | Kibana đã có, chưa có đường đẩy log WAF vào | Fluentd đẩy log WAF vào Kibana |
 
 ## 6. Ranh giới trách nhiệm
