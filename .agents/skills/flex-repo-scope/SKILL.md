@@ -53,7 +53,7 @@ Repo plan
 - Assumptions: <inferences the user should correct>
 ```
 
-Keep it short. In local mode, stop here and use the plan to read only the listed repos. In cloud mode, wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
+Print the plan before the first `add_repo`, even when every repo is Read-only, and attach only repos listed as Edit or Read. Keep it short. In local mode, stop here and use the plan to read only the listed repos. In cloud mode, wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
 
 When a Speckit feature is active (a `specs/<feature>/` directory exists for the task), also write the plan to `specs/<feature>/repos.md` using the same Edit/Read/Skip table, and update it whenever the gate re-runs. `speckit-plan` and `speckit-implement` read this file as the repo scope of the feature. Do not put it in `spec.md`, which stays business-only.
 
