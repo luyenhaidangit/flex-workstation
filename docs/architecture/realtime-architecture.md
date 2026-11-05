@@ -100,7 +100,7 @@ Gateway hoặc reverse proxy có thể đứng phía trước realtime service:
 Browser
    │
    ▼
-API Gateway / HAProxy
+API Gateway / Nginx
    │
    ▼
 Realtime Service
