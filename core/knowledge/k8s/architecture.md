@@ -23,12 +23,13 @@ Tài liệu liên quan (không lặp lại nội dung ở đây):
 Client (trình duyệt, luyenhaidangit.project.local)
   │  1. DNS phân giải tên → IP của cổng vào
   ▼
-Cổng vào (LB ngoài cluster: nginx)
-  │  2. Nhận 80/443, chuyển vào NodePort của Ingress; health check node
+Cổng vào (nginx ngoài cluster, image `owasp/modsecurity-crs`)
+  │  2. Nhận 80/443, TLS terminate
+  │  3. ModSecurity (WAF) chạy trong chính process nginx này, quét header rồi body; áp cho mọi host đi qua cổng vào
+  │  4. Chuyển HTTP vào NodePort của Ingress (host `/fss/`) hoặc tới container Compose (Jenkins, Portainer, Kibana, gateway)
   ▼
 Ingress Controller (namespace ingress)
-  │  3. TLS terminate; ModSecurity (WAF) chạy trong chính process nginx này, quét header rồi body
-  │  4. VirtualServer khớp host luyenhaidangit.project.local
+  │  5. VirtualServer khớp host luyenhaidangit.project.local
   ▼
 Định tuyến theo path tới VirtualServerRoute của từng namespace
   ├─ /app             → flex-common   (tầng gateway: flex-api-gateway, flex-auth-service)
@@ -45,10 +46,10 @@ Pod .NET → PostgreSQL / Redis / RabbitMQ / MinIO
 | Lớp | Thành phần | Vai trò | Ghi chú |
 | --- | --- | --- | --- |
 | Phân giải tên | DNS (hosts khi học, DNS thật khi lên server) | Tên → IP của cổng vào | Chỉ trả IP, không chuyển traffic |
-| Cổng vào | nginx | IP cố định, nhận 80/443, chuyển vào NodePort | Đã có trong `flex-environment` (thay HAProxy) |
-| Ingress | NGINX Ingress Controller (CRD VirtualServer/VirtualServerRoute) | TLS, định tuyến host/path, WAF | Namespace `ingress`, Service dạng NodePort |
-| WAF | ModSecurity + OWASP CRS (module trong nginx Ingress) | Quét header/body, `DetectionOnly` trước rồi mới chặn | Không phải tầng riêng; cần image Ingress có module |
-| Log | Fluentd (hoặc tương đương) → Kibana | Thu log WAF tập trung | Kibana đã có trong `flex-environment` (`/kibana/`) |
+| Cổng vào | nginx (image `owasp/modsecurity-crs`) | IP cố định, nhận 80/443, TLS terminate, chuyển vào NodePort hoặc container Compose | Có trong `flex-environment` (thay HAProxy); cũng là nơi đặt WAF |
+| WAF | ModSecurity + OWASP CRS (module trong nginx cổng vào) | Quét header/body, `DetectionOnly` trước rồi mới chặn | Không phải tầng riêng; đặt ở cổng vào vì Jenkins, Portainer, Kibana, gateway không đi qua Ingress |
+| Ingress | NGINX Ingress Controller (CRD VirtualServer/VirtualServerRoute) | Định tuyến host/path | Namespace `ingress`, Service dạng NodePort; nhận HTTP từ cổng vào, không làm TLS/WAF |
+| Log | Log audit JSON của ModSecurity (stdout nginx) → Kibana | Thu log WAF tập trung | Kibana đã có trong `flex-environment` (`/kibana/`); đường đẩy log chưa làm |
 | Định tuyến | VirtualServer (cha, theo host) + VirtualServerRoute (con, theo namespace) | Chia route để mỗi nhóm app tự quản route của mình | |
 | Workload | Deployment + Service ClusterIP | Chạy app, nhiều replica | Tên Service: `<ns>-<service>-svc` |
 | Dữ liệu | PostgreSQL, Redis, RabbitMQ, MinIO | Lưu trạng thái | Giai đoạn đầu giữ ở Docker Compose, chuyển sau (giai đoạn 5) |
@@ -68,13 +69,13 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | Hạng mục | Hiện trạng (đã xác nhận) | Kiến trúc đích |
 | --- | --- | --- |
 | DNS | `luyenhaidangit.project.local` → `127.0.0.1` trong `scripts/windows/hosts` | Giữ nguyên khi học; DNS thật khi lên server |
-| Cổng vào | nginx trong Docker Compose, nghe 80/443; `server_name` cho `ollama.local`, `api.flex.internal`, `luyenhaidangit.project.local` (Portainer, Jenkins, Kibana dưới `/portainer/`, `/jenkins/`, `/kibana/`); host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
+| Cổng vào | nginx trong Docker Compose (publish 80/443, trong container nghe 8080/8443), TLS terminate tại đây; `server_name` cho `ollama.local`, `api.flex.internal`, `luyenhaidangit.project.local` (Portainer, Jenkins, Kibana dưới `/portainer/`, `/jenkins/`, `/kibana/`); host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
 | Ingress | Chưa có | NGINX Ingress Controller trong namespace `ingress` |
 | Cluster | minikube đã cài, đang dừng | minikube để học; kubeadm nhiều node ở giai đoạn 6 |
 | Manifest | `flex-k8s/manifests/nginx.yaml`, `flex-api-gateway.yaml` | Thêm namespace, VirtualServer, VirtualServerRoute |
 | Frontend | Chưa có service trong `docker-compose.app.yml` | Pod nginx phục vụ build Angular |
-| WAF | Chưa có | ModSecurity trong nginx Ingress, bật `DetectionOnly` trước (xem mục 8) |
-| Log WAF | Kibana đã có, chưa có đường đẩy log WAF vào | Fluentd đẩy log WAF vào Kibana |
+| WAF | Đã soạn trong `flex-environment` (chưa deploy): image `owasp/modsecurity-crs:4.25.2-nginx-alpine-202610180210-lts`, `MODSEC_RULE_ENGINE=DetectionOnly`; đã chạy thử `nginx -t` và request mẫu trong Docker, chưa chạy trên production | ModSecurity ở nginx cổng vào, `DetectionOnly` trước (xem mục 8) |
+| Log WAF | Audit log JSON ra stdout của container nginx (không ghi body); Kibana đã có, chưa có đường đẩy vào | Đẩy log WAF vào Kibana (Fluentd hoặc tương đương) |
 
 ## 6. Ranh giới trách nhiệm
 
@@ -92,9 +93,13 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | 2 | Cài controller bằng Helm, còn lại giữ YAML thuần (trái quy ước "không dùng Helm" của `flex-k8s` nên cần người dùng đồng ý) | Chờ xác nhận |
 | 3 | nginx làm LB đứng trước cluster; cần kiểm tra container nginx tới được IP minikube (mạng Docker khác nhau; `host.docker.internal:<NodePort>` không dùng được với minikube driver Docker) | Chưa kiểm chứng |
 | 4 | Prefix path (`/app`) và tên namespace (`flex-common`, `flex-g1`, `flex-g2`) | Đề xuất |
-| 5 | WAF ModSecurity: cần image Ingress có module. Hướng A: tự build image NGINX Ingress + ModSecurity (sát kiến trúc tham chiếu); hướng B: dùng Ingress controller hỗ trợ ModSecurity sẵn cho giai đoạn học (cần kiểm tra bản còn được bảo trì) | Chưa chốt hướng; làm sau khi Ingress chạy |
-| 6 | Giữ IP thật của client: nginx cổng vào truyền header, Ingress bật real IP; nếu thiếu thì log WAF và ACL chỉ thấy IP của LB | Chưa làm |
+| 5 | WAF ModSecurity đặt ở nginx cổng vào (không ở Ingress) vì Jenkins, Portainer, Kibana và gateway không đi qua Ingress; dùng image `owasp/modsecurity-crs` ghim tag. Quyết định #1 không còn phụ thuộc ModSecurity | Đã chốt; cấu hình đã soạn, chưa deploy |
+| 6 | IP thật của client: production nhận traffic trực tiếp (không qua Cloudflare Tunnel) nên cần kiểm tra `client_ip` trong audit log là IP người dùng, không phải IP gateway Docker (thử local cho thấy `172.18.0.1`). Phía Ingress, nếu bật ACL/log theo IP, cổng vào cần truyền header và Ingress bật real IP | Chưa kiểm chứng trên production |
+| 7 | Tiêu chí chuyển `DetectionOnly` → `On`: thời gian quan sát, ngưỡng cảnh báo nhầm chấp nhận được, danh sách ngoại lệ, đo độ trễ trước/sau, công tắc tắt nhanh (`MODSEC_RULE_ENGINE=Off`) | Chưa chốt |
+| 8 | Route upload/WebSocket (Jenkins, Portainer): hiện dùng `ProcessPartial` để upload lớn không bị từ chối; chỉ `ollama.local` tắt WAF. Có cần `modsecurity off` cho route cụ thể hay không quyết định sau khi xem audit log thực tế | Chưa chốt |
 
 ## 8. Thứ tự dựng
 
-Namespace, backend giả (`whoami`) và Service, cài Ingress Controller, VirtualServer và VirtualServerRoute, nối nginx vào NodePort (kèm real IP), TLS tự ký, redirect, bật WAF ở `DetectionOnly`, đẩy log WAF vào Kibana, viết ngoại lệ cho false positive rồi mới chuyển sang chế độ chặn, rồi thay backend giả bằng service Flex thật. Từng bước có lệnh kiểm tra được mô tả trong [request-flow-reference.md](request-flow-reference.md) (mục giả lập) và [roadmap.md](roadmap.md) (giai đoạn 3).
+WAF không phụ thuộc K8s nên làm trước, độc lập với phần còn lại: deploy nginx cổng vào với ModSecurity ở `DetectionOnly`, kiểm tra IP thật trong audit log, đẩy log WAF vào Kibana, quan sát và viết ngoại lệ cho false positive rồi mới chuyển sang chế độ chặn (`On`).
+
+Phần K8s: namespace, backend giả (`whoami`) và Service, cài Ingress Controller, VirtualServer và VirtualServerRoute, nối nginx vào NodePort (kèm real IP), TLS tự ký, redirect, rồi thay backend giả bằng service Flex thật. Từng bước có lệnh kiểm tra được mô tả trong [request-flow-reference.md](request-flow-reference.md) (mục giả lập) và [roadmap.md](roadmap.md) (giai đoạn 3).
