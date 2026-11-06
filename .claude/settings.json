@@ -1,5 +1,6 @@
 {
   "model": "claude-sonnet-5-5",
+  "autoCompactWindow": 400000,
   "respectGitignore": false,
   "permissions": {
     "allow": [
