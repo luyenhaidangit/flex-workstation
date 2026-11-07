@@ -68,7 +68,7 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | Hạng mục | Hiện trạng (đã xác nhận) | Kiến trúc đích |
 | --- | --- | --- |
 | DNS | `luyenhaidangit.project.local` → `127.0.0.1` trong `scripts/windows/hosts` | Giữ nguyên khi học; DNS thật khi lên server |
-| Cổng vào | nginx trong Docker Compose, nghe 80/443; `server_name` cho `ollama.local`, `api.flex.internal`, `luyenhaidangit.project.local` (Portainer, Jenkins, Kibana dưới `/portainer/`, `/jenkins/`, `/kibana/`); host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
+| Cổng vào | nginx trong Docker Compose, nghe 80/443; `server_name` cho `luyenhaidangit.project.local` (chỉ máy local, `sites-available/local.conf`; Portainer, Jenkins, Kibana dưới `/portainer/`, `/jenkins/`, `/kibana/`) và `luyenhaidangit.pro` (server); host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
 | Ingress | Chưa có | NGINX Ingress Controller trong namespace `ingress` |
 | Cluster | minikube đã cài, đang dừng | minikube để học; kubeadm nhiều node ở giai đoạn 6 |
 | Manifest | `flex-k8s/manifests/nginx.yaml`, `flex-api-gateway.yaml` | Thêm namespace, VirtualServer, VirtualServerRoute |
