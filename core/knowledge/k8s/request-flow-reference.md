@@ -1,6 +1,6 @@
 # Luồng request tham chiếu: Ingress + WAF + nhiều namespace
 
-Ghi chú về một kiến trúc production thực tế dùng Kubernetes, làm mẫu để giả lập trên minikube. Nội dung là kiến thức chung, không gắn với một công ty cụ thể.
+Ghi chú về một kiến trúc production thực tế dùng Kubernetes, làm mẫu để giả lập trên k3s. Nội dung là kiến thức chung, không gắn với một công ty cụ thể.
 
 Tài liệu liên quan:
 
@@ -73,14 +73,14 @@ Pod microservice (.NET) → DB / Kafka / Redis ...
 
 Dấu hiệu repo không tự quản DNS/TLS: `enableExternalDNS: false`, không có external-dns, không có cert-manager (TLS secret phải tạo thủ công), cluster dùng chung với node ingress dành riêng.
 
-## Giả lập trên minikube
+## Giả lập trên k3s
 
 Cùng khái niệm, thu nhỏ; dùng `ingress-nginx` với Ingress thường thay cho CRD VirtualServer.
 
 | Bước | Việc | Kiểm tra |
 | --- | --- | --- |
-| 1 | Tạo cluster minikube (`flex-k8s/scripts/create-cluster.sh`) | `kubectl get nodes` |
-| 2 | Bật ingress: `minikube addons enable ingress` | Pod ingress-nginx Running |
+| 1 | Tạo cluster k3s (`flex-environment/setup/04-init-k3s.sh`) | `kubectl get nodes` |
+| 2 | Cài Ingress Controller (script tắt Traefik của k3s nên cluster chưa có), ví dụ `ingress-nginx` | Pod controller Running |
 | 3 | Tạo namespace `app-common`, `app-g1`, `app-g2` | `kubectl get ns` |
 | 4 | Deploy app giả (nginx hoặc `flex-api-gateway`), `replicas: 2`, kèm Service ClusterIP mỗi namespace | `kubectl get endpoints -n app-g1` |
 | 5 | Ingress với path `/app`, `/app/g1`, `/app/g2` trỏ tới Service tương ứng | `curl` từng path ra đúng app |
@@ -88,7 +88,7 @@ Cùng khái niệm, thu nhỏ; dùng `ingress-nginx` với Ingress thường tha
 | 7 | TLS Secret tự ký cho `flex.local`, thêm vào `/etc/hosts` | `curl -k https://flex.local/app` |
 | 8 | (Tuỳ chọn) ModSecurity qua annotation ingress-nginx để giả lập WAF | Payload tấn công bị chặn 403 |
 
-Phần thay thế khi giả lập: DNS → `/etc/hosts`; cert thật → cert tự ký; LB public → `minikube tunnel`. Kafka, Redis, DB, WebSocket controller riêng để sau (workload có state, giai đoạn 5).
+Phần thay thế khi giả lập: DNS → `/etc/hosts`; cert thật → cert tự ký; LB public → NodePort của controller, nginx cổng vào trỏ tới. Kafka, Redis, DB, WebSocket controller riêng để sau (workload có state, giai đoạn 5).
 
 ## Câu hỏi cần chốt trước khi dựng
 

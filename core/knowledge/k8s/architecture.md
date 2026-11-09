@@ -4,7 +4,7 @@ Tài liệu mô tả kiến trúc đích khi Flex chạy trên Kubernetes theo m
 
 Tài liệu liên quan (không lặp lại nội dung ở đây):
 
-- [request-flow-reference.md](request-flow-reference.md): luồng request của một kiến trúc production tham chiếu và cách giả lập trên minikube.
+- [request-flow-reference.md](request-flow-reference.md): luồng request của một kiến trúc production tham chiếu và cách giả lập trên k3s.
 - [roadmap.md](roadmap.md): thứ tự triển khai theo giai đoạn; kiến trúc này tương ứng giai đoạn 3 (nhiều service và Ingress) và giai đoạn 6 (cluster thật).
 - [k8s-level-1.md](k8s-level-1.md): Pod, Deployment, Service, Ingress cơ bản.
 - `flex-k8s/`: repo chứa manifest và script; `flex-environment/`: topology Docker Compose hiện tại.
@@ -70,7 +70,7 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | DNS | `luyenhaidangit.project.local` → `127.0.0.1` trong `scripts/windows/hosts` | Giữ nguyên khi học; DNS thật khi lên server |
 | Cổng vào | nginx trong Docker Compose, nghe 80/443; `server_name` cho `luyenhaidangit.project.local` (chỉ máy local, `sites-available/local.conf`; Portainer, Jenkins, Kibana dưới `/portainer/`, `/jenkins/`, `/kibana/`) và `luyenhaidangit.pro` (server); host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
 | Ingress | Chưa có | NGINX Ingress Controller trong namespace `ingress` |
-| Cluster | minikube đã cài, đang dừng | minikube để học; kubeadm nhiều node ở giai đoạn 6 |
+| Cluster | k3s 1 node đã cài trên server (`flex-environment/setup/04-init-k3s.sh`), chưa deploy workload | k3s để học; thêm worker hoặc kubeadm nhiều node ở giai đoạn 6 |
 | Manifest | `flex-k8s/manifests/nginx.yaml`, `flex-api-gateway.yaml` | Thêm namespace, VirtualServer, VirtualServerRoute |
 | Frontend | Chưa có service trong `docker-compose.app.yml` | Pod nginx phục vụ build Angular |
 | WAF | Đã cấu hình ở nginx cổng vào Compose (`owasp/modsecurity-crs`, `DetectionOnly`; chưa chạy thử). Ingress k8s chưa có | Giai đoạn sau: ModSecurity trong nginx Ingress (xem mục 8) |
@@ -90,7 +90,7 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | --- | --- | --- |
 | 1 | Dùng NGINX Ingress bản `nginxinc` (CRD VirtualServer) thay vì `ingress-nginx` với Ingress thường, để học đúng mô hình tham chiếu | Đề xuất, chưa chốt |
 | 2 | Cài controller bằng Helm, còn lại giữ YAML thuần (trái quy ước "không dùng Helm" của `flex-k8s` nên cần người dùng đồng ý) | Chờ xác nhận |
-| 3 | nginx làm LB đứng trước cluster; cần kiểm tra container nginx tới được IP minikube (mạng Docker khác nhau; `host.docker.internal:<NodePort>` không dùng được với minikube driver Docker) | Chưa kiểm chứng |
+| 3 | nginx làm LB đứng trước cluster; k3s chạy trực tiếp trên host nên nginx trong Docker tới NodePort qua `host.docker.internal` (đã có `extra_hosts: host-gateway` trong `docker-compose.nginx.yml`) | Đã cấu hình, chưa kiểm chứng với backend thật |
 | 4 | Prefix path (`/app`) và tên namespace (`flex-common`, `flex-g1`, `flex-g2`) | Đề xuất |
 | 5 | WAF ModSecurity: cần image Ingress có module. Hướng A: tự build image NGINX Ingress + ModSecurity (sát kiến trúc tham chiếu); hướng B: dùng Ingress controller hỗ trợ ModSecurity sẵn cho giai đoạn học (cần kiểm tra bản còn được bảo trì) | Chưa chốt hướng; làm sau khi Ingress chạy |
 | 6 | Giữ IP thật của client: nginx cổng vào truyền header, Ingress bật real IP; nếu thiếu thì log WAF và ACL chỉ thấy IP của LB | Chưa làm |

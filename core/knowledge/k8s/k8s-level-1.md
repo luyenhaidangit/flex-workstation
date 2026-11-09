@@ -1,6 +1,6 @@
 # Kubernetes Level 1: Hiểu và dùng Kubernetes trên máy cá nhân
 
-Level 1 dành cho người mới. Mục tiêu là **hiểu Kubernetes làm gì và dùng thành thạo các đối tượng cốt lõi**, chưa cần dựng hạ tầng. Bạn dùng một cluster giả lập chạy ngay trên máy (minikube), nên không cần server, VM hay các bước cài đặt như trong [k8s-level-2.md](k8s-level-2.md).
+Level 1 dành cho người mới. Mục tiêu là **hiểu Kubernetes làm gì và dùng thành thạo các đối tượng cốt lõi**, chưa cần dựng hạ tầng. Bạn dùng một cluster k3s 1 node chạy ngay trên máy (cài bằng một script), nên không cần VM hay các bước cài đặt thủ công như trong [k8s-level-2.md](k8s-level-2.md).
 
 Nguyên tắc học: **làm thật, quan sát, rồi cố tình làm hỏng để hiểu vì sao**. Mỗi bài có 4 phần: khái niệm, thực hành, hiểu sâu, thử phá.
 
@@ -44,7 +44,7 @@ Học theo đúng thứ tự vì bài sau dùng lại kiến thức bài trướ
 
   Bản clone trong WSL nên nằm ở filesystem của WSL (`~`), **không** ở `/mnt/c` vì chậm. Các lệnh `apply -f <file>` trong tài liệu này ngầm hiểu bạn đang đứng ở `k8s/lab/`.
 - Repo `flex-environment` trên GitHub, nên **không commit Secret thật**. Ở Bài 5, Secret được tạo bằng lệnh `kubectl create secret`, không viết thành file YAML.
-- Lệnh có `port-forward`, `minikube service` hoặc `minikube tunnel` chạy liên tục. Hãy mở một cửa sổ terminal WSL thứ hai cho chúng.
+- Lệnh `port-forward` chạy liên tục. Hãy mở một cửa sổ terminal WSL thứ hai cho nó.
 - Trình duyệt trên Windows mở được `http://localhost:8080` cho các port mà WSL đang lắng nghe (WSL2 tự chuyển tiếp localhost). Nếu không mở được, xem [Phụ lục D](#phụ-lục-d-lưu-ý-riêng-khi-dùng-wsl).
 
 ---
@@ -53,7 +53,7 @@ Học theo đúng thứ tự vì bài sau dùng lại kiến thức bài trướ
 
 **Giả định:** WSL2 với distro Ubuntu 22.04/24.04, CPU amd64, còn khoảng 4 GB RAM trống cho WSL. Kiểm tra phiên bản WSL bằng `wsl -l -v` trong PowerShell, cột `VERSION` phải là `2`.
 
-**Bước 1. Docker chạy được trong WSL.** Cài Docker Engine trực tiếp trong WSL, miễn `docker ps` chạy được trong terminal WSL. Cách này cần **systemd**:
+**Bước 1. Bật systemd trong WSL.** k3s chạy như một service systemd:
 
 ```bash
 ps -p 1 -o comm=        # phải in ra: systemd
@@ -66,46 +66,38 @@ Nếu không in `systemd`, thêm vào `/etc/wsl.conf` rồi chạy `wsl --shutdo
 systemd=true
 ```
 
-Sau đó cài Docker:
+**Bước 2. Cài k3s (kèm `kubectl`):** clone `flex-environment` vào `~` trong WSL (xem mục Quy ước) rồi chạy script:
 
 ```bash
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER      # đóng và mở lại terminal để có hiệu lực
-docker ps
+cd ~/flex-environment
+bash setup/04-init-k3s.sh
 ```
 
-**Bước 2. Cài kubectl và minikube trong WSL:**
+Script cài k3s 1 node, cấp kubeconfig cho user đang chạy và chờ node Ready. Chạy lại an toàn, `--check` chỉ kiểm tra.
+
+**Bước 3. Kiểm tra cluster:**
 
 ```bash
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && rm kubectl
-
-curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
-```
-
-**Bước 3. Tạo cluster:**
-
-```bash
-minikube start --driver=docker
 kubectl get nodes
 kubectl cluster-info
 ```
 
-Kết quả mong đợi: có đúng 1 node tên `minikube`, `STATUS` là `Ready`, `ROLES` là `control-plane`.
+Kết quả mong đợi: có đúng 1 node (tên là hostname của máy WSL), `STATUS` là `Ready`, `ROLES` có `control-plane`.
 
 **Hiểu sâu:**
 
-- `minikube` tạo cluster, `kubectl` là công cụ để **nói chuyện với cluster**. Đây là hai công cụ khác nhau.
-- Với driver Docker, node `minikube` thực chất là một container Docker. Kiểm tra bằng `docker ps`. Như vậy cluster của bạn nằm trong container, bên trong WSL, bên trong Windows.
+- Script cài cluster, `kubectl` là công cụ để **nói chuyện với cluster**. Đây là hai thứ khác nhau (k3s tạo sẵn lệnh `kubectl` trỏ tới chính nó).
+- k3s chạy thẳng trên máy như service `k3s` (kiểm tra bằng `sudo systemctl status k3s`), không nằm trong container Docker. Nó dùng containerd riêng, nên `docker images` không thấy image của cluster.
 - `kubectl` đọc file `~/.kube/config` (trong WSL) để biết cluster nào cần gọi. Xem bằng `kubectl config get-contexts`.
-- Sau khi tắt WSL hoặc khởi động lại máy, cluster dừng. Chạy lại `minikube start`, dữ liệu vẫn còn.
+- Service k3s tự chạy lại khi mở lại WSL (cần systemd), dữ liệu vẫn còn.
+- Script tắt Traefik và servicelb đi kèm k3s (Nginx của Flex giữ cổng 80/443), nên cluster chưa có Ingress Controller. Bài 9 sẽ dùng điều này.
 
 **Dừng và xoá cluster khi không dùng:**
 
 ```bash
-minikube stop      # tắt, giữ dữ liệu
-minikube delete    # xoá hẳn
+sudo systemctl stop k3s              # tắt, giữ dữ liệu (pod bị dừng cùng)
+sudo systemctl start k3s             # bật lại
+sudo /usr/local/bin/k3s-uninstall.sh # xoá hẳn, mất dữ liệu cluster
 ```
 
 ---
@@ -149,7 +141,7 @@ kubectl apply -f app.yaml
 kubectl get pods -n kube-system
 ```
 
-Bạn sẽ thấy `etcd-minikube`, `kube-apiserver-minikube`, `kube-scheduler-minikube`, `kube-controller-manager-minikube`, `kube-proxy-...`, `coredns-...`. Chính Kubernetes cũng chạy trên Kubernetes.
+Với k3s bạn chỉ thấy các add-on như `coredns-...`, `local-path-provisioner-...`, `metrics-server-...`. Các thành phần control-plane (API server, scheduler, controller-manager, etcd) **không phải pod**: k3s gói tất cả vào một tiến trình `k3s` chạy bằng systemd. Trong cluster kubeadm ở Level 2 chúng mới là các pod tĩnh (`kube-apiserver-...`, `etcd-...`) trong `kube-system`.
 
 **Tự kiểm tra:**
 
@@ -335,7 +327,7 @@ Access log xuất hiện ở nhiều pod khác nhau, chứng tỏ request đư�
 kubectl port-forward svc/web 8080:80
 ```
 
-Hoặc đổi `type: NodePort` trong `service.yaml`, `apply` lại, rồi chạy `minikube service web --url` (giữ terminal mở với driver Docker).
+Hoặc đổi `type: NodePort` trong `service.yaml`, `apply` lại, xem port bằng `kubectl get svc web` (cột `PORT(S)`, dạng `80:3xxxx/TCP`), rồi `curl http://localhost:<port>`.
 
 **Hiểu sâu: Service không "biết" pod nào cả**, nó chỉ chứa `selector`. Danh sách Endpoints được tự động cập nhật theo các pod khớp label và đang **Ready**.
 
@@ -439,7 +431,7 @@ Secret dùng giống ConfigMap: qua `env` với `secretKeyRef`, hoặc mount th�
 **Khái niệm:** filesystem của container **mất khi pod bị xoá**. Muốn giữ dữ liệu, dùng volume.
 
 - **PVC (PersistentVolumeClaim):** lời xin "cho tôi 1 GB ổ đĩa".
-- **StorageClass:** cách cấp ổ đĩa. Minikube có sẵn StorageClass `standard` tự cấp ổ khi có PVC.
+- **StorageClass:** cách cấp ổ đĩa. k3s có sẵn StorageClass `local-path` (mặc định) tự cấp ổ trên đĩa của node khi có PVC.
 
 **Thực hành:** tạo `pvc-demo.yaml`:
 
@@ -600,14 +592,9 @@ kubectl config set-context --current --namespace=dev
 
 **Khái niệm:** Service `NodePort` mở mỗi port cho từng app. Ingress cho phép **một cổng vào chung** (port 80/443) rồi định tuyến theo host hoặc path tới các Service khác nhau. Ingress cần một **Ingress Controller** để thực thi.
 
-> Ingress-nginx (controller mà minikube dùng) đã được công bố ngừng bảo trì, và Gateway API là hướng thay thế. Ở Level 1 bạn chỉ cần hiểu **khái niệm** Ingress. Bài này tuỳ chọn.
+> Ingress-nginx đã được công bố ngừng bảo trì, và Gateway API là hướng thay thế. Cluster k3s của Flex tắt Traefik nên **chưa có Ingress Controller**. Ở Level 1 bạn chỉ cần hiểu **khái niệm** Ingress. Bài này tuỳ chọn.
 
 **Thực hành:**
-
-```bash
-minikube addons enable ingress
-kubectl get pods -n ingress-nginx       # đợi controller Running
-```
 
 Tạo `ingress.yaml`:
 
@@ -633,11 +620,11 @@ spec:
 
 ```bash
 kubectl apply -f ingress.yaml
-minikube tunnel                          # giữ terminal mở, có thể hỏi mật khẩu sudo
-curl -H "Host: web.local" http://127.0.0.1
+kubectl get ingress                      # cột ADDRESS trống: chưa có Controller nào xử lý
+kubectl describe ingress web             # không có sự kiện nào từ controller
 ```
 
-Ở đây bạn giả lập tên miền bằng header `Host`, không cần sửa file hosts.
+Ingress được tạo thành công nhưng **không có tác dụng**, vì chỉ là một bản khai báo. Cài Ingress Controller (xem [roadmap.md](roadmap.md), giai đoạn 3) thì `ADDRESS` mới có giá trị và route mới chạy.
 
 **Tự kiểm tra:** Ingress và Ingress Controller khác nhau thế nào? Điều gì xảy ra nếu chỉ có Ingress mà không có Controller?
 
@@ -669,26 +656,37 @@ Tự dựng, không nhìn lại bài cũ. Nếu bí thì mới tra cứu.
 
 ---
 
-## Phụ lục A: Thử nhiều node trên một máy
+## Phụ lục A: Thử nhiều node
 
-Để thấy pod được phân bổ và di chuyển giữa các node, tạo cluster 3 node. Cần khoảng 6 GB RAM cho WSL, xem cách tăng ở [Phụ lục D](#phụ-lục-d-lưu-ý-riêng-khi-dùng-wsl):
+Để thấy pod được phân bổ và di chuyển giữa các node, cần cluster có **ít nhất 2 node**. k3s trên WSL chỉ có 1 node, nên cần thêm một máy (VM hoặc server) làm worker. Lấy token trên node đầu:
 
 ```bash
-minikube start -p multi --nodes 3 --driver=docker
-kubectl get nodes                     # multi, multi-m02, multi-m03
+sudo cat /var/lib/rancher/k3s/server/node-token
+```
+
+Trên máy thứ hai (Ubuntu), thay `<IP-node-đầu>` và `<token>`:
+
+```bash
+curl -sfL https://get.k3s.io | K3S_URL=https://<IP-node-đầu>:6443 K3S_TOKEN=<token> sh -
+```
+
+Trên node đầu kiểm tra và xem pod rải trên nhiều node:
+
+```bash
+kubectl get nodes
 kubectl apply -f deployment.yaml
 kubectl get pods -o wide              # cột NODE cho thấy pod rải trên nhiều node
 ```
 
-Mô phỏng bảo trì node:
+Mô phỏng bảo trì node (thay `<node-2>` bằng tên node thứ hai):
 
 ```bash
-kubectl drain multi-m03 --ignore-daemonsets --delete-emptydir-data
+kubectl drain <node-2> --ignore-daemonsets --delete-emptydir-data
 kubectl get pods -o wide              # pod trên node đó được chuyển sang node khác
-kubectl uncordon multi-m03
+kubectl uncordon <node-2>
 ```
 
-Xoá cluster thử nghiệm: `minikube delete -p multi`.
+Gỡ worker khi xong: chạy `sudo /usr/local/bin/k3s-agent-uninstall.sh` trên máy đó, rồi `kubectl delete node <node-2>`.
 
 ## Phụ lục B: Bảng lỗi thường gặp
 
@@ -722,11 +720,9 @@ kubectl explain <loại>.spec        # tra cấu trúc trường ngay trong term
 
 | Triệu chứng | Nguyên nhân thường gặp | Cách xử lý |
 | --- | --- | --- |
-| `permission denied` khi chạy `docker` | User chưa thuộc group `docker` | `sudo usermod -aG docker $USER`, rồi đóng và mở lại terminal |
-| `Cannot connect to the Docker daemon` | Docker chưa chạy (Engine trong WSL thiếu systemd, hoặc Docker Desktop chưa bật) | `sudo systemctl start docker`, hoặc bật Docker Desktop và WSL Integration |
-| `minikube start` báo thiếu RAM hoặc bị treo | WSL2 mặc định chỉ được dùng khoảng 50% RAM máy | Tạo `%UserProfile%\.wslconfig` trên Windows (xem bên dưới), rồi `wsl --shutdown` |
+| k3s khởi động chậm, pod `Pending` hoặc bị kill | WSL2 mặc định chỉ được dùng khoảng 50% RAM máy | Tạo `%UserProfile%\.wslconfig` trên Windows (xem bên dưới), rồi `wsl --shutdown` |
 | Mở `http://localhost:8080` trên Windows không được | Port-forward chưa chạy, hoặc localhost forwarding của WSL tắt | Kiểm tra `curl localhost:8080` **trong WSL** trước. Nếu WSL gọi được mà Windows không, kiểm tra `localhostForwarding` trong `.wslconfig` |
-| `kubectl` báo `connection refused` sau khi mở lại máy | Cluster đã dừng cùng WSL | `minikube start` |
+| `kubectl` báo `connection refused` sau khi mở lại máy | Service k3s chưa chạy (WSL chưa bật systemd, hoặc đã `stop`) | `sudo systemctl status k3s`, rồi `sudo systemctl start k3s` |
 | `kubectl apply` báo không tìm thấy file | WSL chưa pull bản mới nhất, hoặc đang đứng sai thư mục | `bash pull.sh` ở thư mục gốc repo, rồi `cd k8s/lab` |
 | Đọc và ghi file YAML rất chậm | Bản clone nằm dưới `/mnt/c` | Clone lại repo vào `~` trong WSL |
 
@@ -752,6 +748,6 @@ Bạn sẵn sàng sang Level 2 khi trả lời được, không cần tra cứu:
 3. Khi Service không kết nối được, bạn kiểm tra theo thứ tự nào?
 4. Dữ liệu database nên nằm ở đâu để không mất khi pod bị tạo lại?
 
-**Tiếp theo:** [k8s-level-2.md](k8s-level-2.md) hướng dẫn tự dựng cluster thật bằng kubeadm. Lúc này bạn sẽ hiểu các thành phần (containerd, CNI, kubelet, control-plane) mà minikube đã cài sẵn giúp bạn.
+**Tiếp theo:** [k8s-level-2.md](k8s-level-2.md) hướng dẫn tự dựng cluster thật bằng kubeadm. Lúc này bạn sẽ hiểu các thành phần (containerd, CNI, kubelet, control-plane) mà k3s đã cài sẵn giúp bạn.
 
-**Lưu ý khi làm Level 2 trên WSL:** Level 2 giả định 3 máy riêng, mỗi máy có hostname và IP tĩnh riêng. Các distro WSL2 dùng chung một máy ảo và cùng địa chỉ IP, nên không dựng được cluster kubeadm nhiều node trên WSL. Trên WSL bạn chỉ dựng được **single-node** (cần bật systemd), còn muốn thực hành nhiều node thì dùng Phụ lục A hoặc tạo VM riêng.
+**Lưu ý khi làm Level 2 trên WSL:** Level 2 giả định 3 máy riêng, mỗi máy có hostname và IP tĩnh riêng. Các distro WSL2 dùng chung một máy ảo và cùng địa chỉ IP, nên không dựng được cluster kubeadm nhiều node trên WSL. Trên WSL bạn chỉ dựng được **single-node** (cần bật systemd), còn muốn thực hành nhiều node thì dùng Phụ lục A (thêm máy riêng) hoặc tạo VM riêng.

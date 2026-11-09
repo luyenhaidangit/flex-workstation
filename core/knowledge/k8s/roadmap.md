@@ -4,7 +4,7 @@ Lộ trình đi từ đơn giản đến nâng cao, mỗi giai đoạn **đưa t
 
 Tài liệu liên quan (không lặp lại nội dung ở đây):
 
-- [k8s-level-1.md](k8s-level-1.md): bài học chi tiết về Pod, Deployment, Service, ConfigMap, PVC, probe, namespace, Ingress trên minikube.
+- [k8s-level-1.md](k8s-level-1.md): bài học chi tiết về Pod, Deployment, Service, ConfigMap, PVC, probe, namespace, Ingress trên k3s.
 - [k8s-level-2.md](k8s-level-2.md): dựng cluster nhiều node bằng kubeadm, add-on, CI/CD.
 - Repo `flex-k8s/`: nơi chứa manifest và script, là sản phẩm đầu ra của lộ trình này.
 - `flex-environment/docker-compose.*.yml`: topology hiện tại, nguồn tham chiếu khi chuyển từng service.
@@ -22,11 +22,11 @@ Tài liệu liên quan (không lặp lại nội dung ở đây):
 | GĐ | Chủ đề | Sản phẩm của Flex | Môi trường | Thời lượng gợi ý |
 | --- | --- | --- | --- | --- |
 | 0 | Nền tảng trước k8s | Hiểu đúng Compose đang chạy gì | Docker | 2–3 ngày |
-| 1 | Đối tượng cốt lõi | `nginx` chạy, scale, rolling update | minikube | 1 tuần |
-| 2 | Service .NET thật đầu tiên | `flex-api-gateway` trên k8s, gọi DB còn ở Compose | minikube + Compose | 1 tuần |
-| 3 | Nhiều service và ingress | auth-service + gateway + microfrontend, Ingress thay HAProxy | minikube | 1–2 tuần |
-| 4 | Đóng gói cấu hình theo môi trường | Kustomize `base` + `overlays/dev,staging` | minikube | 1 tuần |
-| 5 | Workload có trạng thái | Redis, RabbitMQ, PostgreSQL, Job migration Liquibase | minikube | 2 tuần |
+| 1 | Đối tượng cốt lõi | `nginx` chạy, scale, rolling update | k3s | 1 tuần |
+| 2 | Service .NET thật đầu tiên | `flex-api-gateway` trên k8s, gọi DB còn ở Compose | k3s + Compose | 1 tuần |
+| 3 | Nhiều service và ingress | auth-service + gateway + microfrontend, Ingress thay HAProxy | k3s | 1–2 tuần |
+| 4 | Đóng gói cấu hình theo môi trường | Kustomize `base` + `overlays/dev,staging` | k3s | 1 tuần |
+| 5 | Workload có trạng thái | Redis, RabbitMQ, PostgreSQL, Job migration Liquibase | k3s | 2 tuần |
 | 6 | Cluster thật nhiều node | k3s hoặc kubeadm 1 master + 2 worker | VM/server | 1–2 tuần |
 | 7 | CI/CD và GitOps | Jenkins build image, ArgoCD tự đồng bộ | cluster thật | 1–2 tuần |
 | 8 | Quan sát và tự co giãn | Prometheus/Grafana, log về ELK, HPA | cluster thật | 1–2 tuần |
@@ -95,7 +95,7 @@ kubectl rollout undo deployment/nginx
 - Dùng lại `flex-environment/k8s/flex-api-gateway.yaml` (đã có ConfigMap, 3 loại probe, resources) và chuyển vào `flex-k8s/manifests/`.
 - Đồng bộ tag image với `docker-compose.app.yml` (hiện manifest đang dùng `1.0.1-dev`, Compose dùng `1.0.12-dev`).
 - Tạo Secret bằng lệnh, không commit file: `kubectl create secret generic flex-api-gateway-secret --from-env-file=.env.local`.
-- Cho pod gọi DB/Redis/RabbitMQ đang chạy bằng Compose trên máy host qua `host.minikube.internal`. Làm sạch hơn bằng một Service `ExternalName` hoặc Service không selector kèm `EndpointSlice`, để code chỉ thấy tên `postgresdb` giống trong Compose.
+- Cho pod gọi DB/Redis/RabbitMQ đang chạy bằng Compose trên máy host qua IP của node (k3s chạy trực tiếp trên host, không có alias `host.minikube.internal`). Làm sạch hơn bằng một Service `ExternalName` hoặc Service không selector kèm `EndpointSlice`, để code chỉ thấy tên `postgresdb` giống trong Compose.
 
 **Thử phá:**
 
@@ -118,8 +118,8 @@ kubectl rollout undo deployment/nginx
 - Namespace `flex-dev`.
 - Thêm `flex-auth-service` (Deployment + Service), gateway gọi auth bằng tên Service.
 - Thêm `flex-microfrontend`: build Angular thành static, phục vụ bằng nginx image.
-- Bật ingress controller (`minikube addons enable ingress`), đối chiếu route trong `flex-environment/mounts/nginx/conf.d/` và viết Ingress tương ứng: `/` → microfrontend, `/api` → gateway.
-- Thêm vào hosts: `flex.local` → IP minikube.
+- Cài Ingress Controller (script `04-init-k3s.sh` tắt Traefik của k3s nên cluster chưa có), đối chiếu route trong `flex-environment/mounts/nginx/conf.d/` và viết Ingress tương ứng: `/` → microfrontend, `/api` → gateway.
+- Thêm vào hosts: `flex.local` → IP của node k3s.
 
 **Thử phá:**
 
@@ -185,7 +185,7 @@ flex-k8s/
 
 ## Giai đoạn 6: Cluster thật nhiều node
 
-**Mục tiêu:** hiểu những thứ minikube che giấu: CNI, LoadBalancer trên bare-metal, storage phân tán, node lỗi.
+**Mục tiêu:** hiểu những thứ cluster 1 node che giấu: CNI, LoadBalancer trên bare-metal, storage phân tán, node lỗi.
 
 **Học và làm:** theo [k8s-level-2.md](k8s-level-2.md). Có hai hướng:
 
