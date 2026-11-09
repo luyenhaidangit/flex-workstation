@@ -191,7 +191,7 @@ flex-k8s/
 
 | Lựa chọn | Phù hợp khi |
 | --- | --- |
-| **k3s** (`flex-environment/setup/install-k3s.sh`) | Muốn có cluster chạy nhanh, tài nguyên ít, gần với cách vận hành thật cho team nhỏ |
+| **k3s** (`flex-environment/setup/04-init-k3s.sh`) | Muốn có cluster chạy nhanh, tài nguyên ít, gần với cách vận hành thật cho team nhỏ |
 | **kubeadm** | Muốn hiểu từng thành phần control plane, chứng chỉ, containerd, CNI (phục vụ thi CKA) |
 
 Gợi ý: dựng kubeadm một lần để hiểu, sau đó dùng k3s cho môi trường Flex lâu dài.
