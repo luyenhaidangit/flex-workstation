@@ -24,6 +24,7 @@
 - Không tạo abstraction cho code chỉ dùng một lần.
 - Không thêm flexibility hay configurability chưa được yêu cầu.
 - Không viết error handling cho tình huống không thể xảy ra.
+- Người dùng đã chọn hoặc từ chối một biện pháp (ví dụ qua `AskUserQuestion`) thì không đưa lại biện pháp đó vào code, comment hay tài liệu dưới dạng bước bắt buộc; chỉ nêu rủi ro còn lại một lần.
 - Nếu nhận ra output của mình có thể rút gọn đáng kể, viết lại — không để lại code thừa.
 
 ### Thay đổi phẫu thuật
