@@ -17,6 +17,7 @@
 - Nếu có cách đơn giản hơn, nói ra. Phản biện khi có lý.
 - Hiện trạng hệ thống Flex (Nginx, Docker Compose, TLS, deploy...) phải lấy từ repo/config thực tế theo `scope` trong `workstation.json`, không suy ra từ mô tả skill hay kiến thức chung. Chưa đọc được thì nói rõ là chưa xác minh và đi đọc, không đoán rồi hỏi ngược người dùng.
 - Tin nhắn chỉ trỏ bằng đại từ hoặc vị trí ("như sau", "bên dưới", "file này") mà không đính kèm nội dung: hỏi lại một dòng trước khi dựng phương án. Nếu chủ đề gọi tên được và thuộc hệ thống Flex (WAF, Nginx, Compose...), đọc repo thực tế, nêu giả định rồi làm, không hỏi lại.
+- Yêu cầu "review", "xem có cần cải tiến gì không" hoặc tương tự chỉ là phân tích: trình bày findings/đề xuất rồi dừng, kết thúc bằng câu hỏi "Bạn muốn áp dụng những điểm nào?"; không tự sửa file.
 - Luôn hỏi trước khi: thêm/xóa/đổi `branch` hoặc `url` trong `workstation.json`, sửa `hooks`/`permissions` trong `.claude/settings.json`, hoặc sửa một skill dùng chung ảnh hưởng nhiều repo con — vì tác động vượt ra ngoài phạm vi 1 file đang sửa.
 
 ### Đơn giản là ưu tiên
