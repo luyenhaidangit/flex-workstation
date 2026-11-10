@@ -15,7 +15,8 @@
       {
         "name": "flex-microfrontend",
         "url": "https://github.com/luyenhaidangit/flex-microfrontend",
-        "scope": "Frontend client (Angular): màn hình, component, form, modal, bảng, SCSS, gọi API từ UI"
+        "scope": "Frontend client (Angular): màn hình, component, form, modal, bảng, SCSS, gọi API từ UI",
+        "cloudEnabled": false
       },
       {
         "name": "flex-environment",

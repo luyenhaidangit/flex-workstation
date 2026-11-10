@@ -76,7 +76,7 @@ Danh sách repo được clone khi sync nằm ở `workstation.json`, trong `rep
 }
 ```
 
-Trường `branch` là tùy chọn. Không đưa token hoặc credential vào URL trong manifest.
+Trường `branch` là tùy chọn. Không đưa token hoặc credential vào URL trong manifest. Danh sách đầy đủ các trường (gồm `scope` và `cloudEnabled`) nằm ở [workstation-manifest.md](workstation-manifest.md).
 
 ## Mở workstation và coding agent
 

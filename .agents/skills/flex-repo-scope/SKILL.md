@@ -29,7 +29,7 @@ Do not use it for work entirely inside the workstation (docs, skills, `.claude/`
 
 ### 1. Read the scope map
 
-Read `repositories.items` in `workstation.json`: `name`, `url`, `scope`. List the folders already present under the workstation root; in cloud mode skip repos already cloned, in local mode a missing folder is reported as "not cloned, run `SYNC_WORKSPACE.cmd`" instead of being cloned. If an entry has no `scope`, fall back to the Projects table in `docs/architecture/system-map.md` and say the entry lacks one.
+Read `repositories.items` in `workstation.json`: `name`, `url`, `scope`. List the folders already present under the workstation root; in cloud mode skip repos already cloned, in local mode a missing folder is reported as "not cloned, run `SYNC_WORKSPACE.cmd`" instead of being cloned. If an entry has no `scope`, fall back to the Projects table in `docs/architecture/system-map.md` and say the entry lacks one. In cloud mode, an entry with `"cloudEnabled": false` is off for cloud sessions: put it in Skip with the reason "cloudEnabled=false", do not attach or clone it, and if the request truly needs it, tell the user instead of enabling it yourself. A missing `cloudEnabled` means `true`; local mode ignores the field.
 
 ### 2. Classify each repo for this request
 
