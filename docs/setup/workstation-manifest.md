@@ -50,7 +50,7 @@
 
 ## Nạp sẵn repo ở cloud (Preload)
 
-Hook `SessionStart` (`.claude/hooks/setup-container.sh`, chỉ chạy khi `CLAUDE_CODE_REMOTE=true`) đọc manifest và in ra các repo có `cloudEnabled` khác `false` mà thư mục chưa tồn tại. Danh sách này vào context của Claude; theo `flex-repo-scope` (mục Preload), Claude chạy `add_repo` (read) → `git clone` vào `<workstation root>/<name>` → `register_repo_root` cho từng repo ngay đầu session.
+Hook `SessionStart` (`.claude/hooks/setup-container.sh`, chỉ chạy khi `CLAUDE_CODE_REMOTE=true`) đọc manifest và in ra các repo có `cloudEnabled` khác `false` mà thư mục chưa tồn tại. Hook chỉ chạy khi session `startup` hoặc `resume`, không chạy lại sau compact. Danh sách này vào context của Claude; theo `flex-repo-scope` (mục Preload), sau bước route Claude chạy song song `add_repo` (read) cho mọi repo → clone bằng lệnh mà `add_repo` trả về vào `<workstation root>/<name>` → `register_repo_root`, rồi báo kết quả một dòng.
 
 - Hook chỉ liệt kê, không clone: repo private cần quyền của tài khoản qua `add_repo`, token trong container không đủ.
 - Mỗi repo có thể kéo theo một lần duyệt quyền `add_repo` tùy giao diện.
