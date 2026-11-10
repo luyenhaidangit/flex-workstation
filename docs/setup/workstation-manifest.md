@@ -48,6 +48,14 @@
 - Không khai báo nghĩa là `true`; chỉ thêm trường khi muốn tắt.
 - Khi một yêu cầu cần repo đang tắt, agent báo cho người dùng thay vì tự bật lại. Muốn bật lại, xóa trường hoặc đặt `true`.
 
+## Nạp sẵn repo ở cloud (Preload)
+
+Hook `SessionStart` (`.claude/hooks/setup-container.sh`, chỉ chạy khi `CLAUDE_CODE_REMOTE=true`) đọc manifest và in ra các repo có `cloudEnabled` khác `false` mà thư mục chưa tồn tại. Danh sách này vào context của Claude; theo `flex-repo-scope` (mục Preload), Claude chạy `add_repo` (read) → `git clone` vào `<workstation root>/<name>` → `register_repo_root` cho từng repo ngay đầu session.
+
+- Hook chỉ liệt kê, không clone: repo private cần quyền của tài khoản qua `add_repo`, token trong container không đủ.
+- Mỗi repo có thể kéo theo một lần duyệt quyền `add_repo` tùy giao diện.
+- Muốn bỏ một repo khỏi danh sách nạp sẵn, đặt `"cloudEnabled": false`.
+
 ## Thêm repo mới
 
 Dùng `scripts/add-repo.ps1` hoặc skill `flex-repo-onboarding`; hai cách này cũng lo phần ignore rule. Sau khi thêm, xác minh `url` khớp origin của repo thật.

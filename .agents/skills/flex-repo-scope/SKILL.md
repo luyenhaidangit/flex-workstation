@@ -61,6 +61,10 @@ When a Speckit feature is active (a `specs/<feature>/` directory exists for the 
 
 For each Edit repo: `add_repo` (with `access: push` only when the session must push), clone from the manifest `url` into `<workstation root>/<name>` so it stays ignored by the workstation's git, then `register_repo_root` so its own `CLAUDE.md` and skills load. If `add_repo` is denied, relay the reason and continue with what is available; do not work around the denial.
 
+#### Preload (cloud mode only)
+
+When the SessionStart hook output lists "Preload repo cloud" repos (every manifest entry with `cloudEnabled` not `false` whose folder is missing), attach and clone all of them at the start of the session, before the first task, with `access: read`. This replaces steps 2-3 for those repos only; print the list as one line instead of the full plan. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
+
 ### 5. Keep changes in the right repo
 
 Edits and commits for a child repo belong to that repo's own branch and pull request. Ask for the branch name before pushing a child repo; the session branch designated for the workstation does not apply to it. Do not touch the workstation for a request that belongs to a child repo.
@@ -69,7 +73,7 @@ Edits and commits for a child repo belong to that repo's own branch and pull req
 
 | Rationalization | Reality |
 | --- | --- |
-| "Clone everything so nothing is missing." | Slow, one prompt per repo, and most tasks touch one or two. Re-run the gate when a new need appears. |
+| "Clone everything so nothing is missing." | Slow, one prompt per repo, and most tasks touch one or two. Re-run the gate when a new need appears. Exception: repos the SessionStart hook lists under Preload. |
 | "The folder name tells me what the repo does." | `scope` was written to disambiguate; read it, especially for `flex-environment` vs `flex-k8s`. |
 | "I can read the whole repo through the file API instead of cloning." | Fine for a few files; for edits or wide search it is slower and cannot run tests. Clone it. |
 | "It is only a design question, general knowledge is enough." | A design is only valid against the real topology. Attach the owning repo as Read, open the 1-3 relevant files, and state what was verified. Example: a WAF question needs `flex-environment` (`docker-compose.infra.yml`, `mounts/nginx/conf.d/`), not a guess. |
