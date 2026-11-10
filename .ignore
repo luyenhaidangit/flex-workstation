@@ -1,6 +1,5 @@
 # Negate lại các path .gitignore chặn, để Claude/AI tool vẫn search được vào repo con.
 !/flex-agent-service/
-!/flex-agents/
 !/flex-auth-service/
 !/flex-api-gateway/
 !/flex-database/

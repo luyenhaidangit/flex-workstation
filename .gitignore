@@ -25,7 +25,6 @@ Thumbs.db
 
 # Nested Flex repositories cloned by workstation sync
 /flex-agent-service/
-/flex-agents/
 /flex-auth-service/
 /flex-api-gateway/
 /flex-database/

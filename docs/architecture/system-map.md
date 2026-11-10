@@ -55,13 +55,11 @@ Các repo con được clone vào trong root này nhưng là Git repo độc l�
 | `flex-exchange-service` | `https://github.com/luyenhaidangit/flex-exchange-service.git` |
 | `flex-k8s` | `https://github.com/luyenhaidangit/flex-k8s.git` |
 
-Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch` là tùy chọn; nếu không có, script clone theo default branch của remote và pull theo branch hiện tại của repo local. `flex-agents` có thể vẫn tồn tại local nhưng không còn nằm trong manifest nên bootstrap không clone hoặc pull repo này.
-
+Nếu thêm repo mới, thêm entry vào `repositories.items`. Trường `branch` là tùy chọn; nếu không có, script clone theo default branch của remote và pull theo branch hiện tại của repo local.
 ## 4. Projects
 
 | Project | Vai trò | Công nghệ | Trạng thái |
 | --- | --- | --- | --- |
-| `flex-agents` | Repository skill/plugin cho coding agents | Markdown, runtime files | `Giữ local, không Bootstrap-managed` |
 | `flex-auth-service` | Service xác thực/ủy quyền | .NET / ASP.NET Core | `Inferred` — xem `flex-auth-service/Flex.Auth.sln`, `SPEC.md` |
 | `flex-api-gateway` | API Gateway | .NET, Dockerfile, Jenkinsfile | `Inferred` — xem `flex-api-gateway/Flex.ApiGateway.sln` |
 | `flex-microfrontend` | Frontend client | Angular, Node.js | `Confirmed` — xem `flex-microfrontend/README.md`, `package.json` |
