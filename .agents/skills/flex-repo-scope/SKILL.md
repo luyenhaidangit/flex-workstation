@@ -63,7 +63,7 @@ For each Edit repo: `add_repo` (with `access: push` only when the session must p
 
 #### Preload (cloud mode only)
 
-When the SessionStart hook output lists "Preload repo cloud" repos (every manifest entry with `cloudEnabled` not `false` whose folder is missing), attach and clone all of them right after the routing step and before the first task, with `access: read`. This replaces steps 2-3 for those repos only; print the list as one line instead of the full plan. The repos are independent, so run each phase for all of them at once instead of repo by repo: `add_repo` for every repo in one parallel batch, then the clone commands that the `add_repo` results return (they carry the session's credentials; the manifest `url` may not) in one Bash call, each into `<workstation root>/<name>`, then `register_repo_root` for every cloned repo in one parallel batch. End with one line of result: cloned repos, and denied repos with the reason. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
+When the SessionStart hook output lists "Preload repo cloud" repos (every manifest entry with `cloudEnabled` not `false` whose folder is missing), attach and clone all of them right after the routing step and before the first task, with `access: read`. Do this for every request, including analysis-only ones and questions about which repos are cloned, and do not ask for confirmation first: the hook list is the standing instruction, and the analysis-only rule of step 2 applies only to repos outside it. This replaces steps 2-3 for those repos only; print the list as one line instead of the full plan. The repos are independent, so run each phase for all of them at once instead of repo by repo: `add_repo` for every repo in one parallel batch, then the clone commands that the `add_repo` results return (they carry the session's credentials; the manifest `url` may not) in one Bash call, each into `<workstation root>/<name>`, then `register_repo_root` for every cloned repo in one parallel batch. End with one line of result: cloned repos, and denied repos with the reason. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
 
 ### 5. Keep changes in the right repo
 
@@ -90,7 +90,7 @@ Edits and commits for a child repo belong to that repo's own branch and pull req
 ## Verification
 
 - [ ] Plan listed Edit, Read and Skip with assumptions before any `add_repo`.
-- [ ] For an analysis-only request, no repo was cloned unless the user asked for changes.
+- [ ] For an analysis-only request, no repo was cloned unless the user asked for changes, except repos in the Preload list.
 - [ ] With an active Speckit feature, `specs/<feature>/repos.md` matches the final plan.
 - [ ] Only repos declared in `workstation.json` were attached.
 - [ ] Each cloned repo sits at `<workstation root>/<name>` and was registered with `register_repo_root`.

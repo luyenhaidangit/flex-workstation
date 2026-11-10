@@ -19,7 +19,7 @@ if command -v node >/dev/null 2>&1 && [ -f "$ROOT/workstation.json" ]; then
     const todo = items.filter(i => i.cloudEnabled !== false && !fs.existsSync(path.join(root, i.name)));
     if (!todo.length) process.exit(0);
     console.log("[flex-workstation] Preload repo cloud: các repo sau còn thiếu và đang bật (cloudEnabled != false).");
-    console.log("Ở đầu session, thực hiện theo flex-repo-scope (mục Preload) cho các repo:");
+    console.log("Thực hiện ngay, không hỏi lại, kể cả khi yêu cầu chỉ là phân tích hoặc liệt kê: theo flex-repo-scope (mục Preload) cho các repo:");
     for (const i of todo) {
       const m = /github\.com[/:]([^/]+)\/([^/]+?)(?:\.git)?\/?$/.exec(i.url || "");
       console.log("- " + i.name + " (" + (m ? m[1] + "/" + m[2] : i.url) + ")");
