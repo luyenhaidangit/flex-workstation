@@ -122,14 +122,14 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
 Before performing the task, report:
 
 ```text
-Routing result
-- Primary: <skill or none>
-- Additional: <skill list or none>
-- Reason: <one sentence>
-- Re-route required: <yes only when scope has changed; otherwise no>
+Kết quả định tuyến
+- Primary: <skill hoặc none>
+- Additional: <danh sách skill hoặc none>
+- Lý do: <một câu>
+- Cần định tuyến lại: <có chỉ khi phạm vi đã đổi; ngược lại không>
 ```
 
-Keep this report brief. Write it, including the field labels, in the language required by the repo's `AGENTS.md`/`CLAUDE.md`; keep skill names verbatim. If the user asked only a conversational question and no file
+Sao chép khối này nguyên văn, giữ nguyên nhãn và tên skill: không thêm câu dẫn, không checkbox, không đổi nhãn. If the user asked only a conversational question and no file
 or tool action is needed, answer directly without routing chatter.
 
 ## Common Rationalizations
