@@ -63,7 +63,7 @@ For each Edit repo: `add_repo` (with `access: push` only when the session must p
 
 #### Preload (cloud mode only)
 
-When the SessionStart hook output lists "Preload repo cloud" repos (every manifest entry with `cloudEnabled` not `false` whose folder is missing), attach and clone all of them at the start of the session, before the first task, with `access: read`. This replaces steps 2-3 for those repos only; print the list as one line instead of the full plan. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
+When the SessionStart hook output lists "Preload repo cloud" repos (every manifest entry with `cloudEnabled` not `false` whose folder is missing), attach and clone all of them right after the routing step and before the first task, with `access: read`. This replaces steps 2-3 for those repos only; print the list as one line instead of the full plan. The repos are independent, so run each phase for all of them at once instead of repo by repo: `add_repo` for every repo in one parallel batch, then the clone commands that the `add_repo` results return (they carry the session's credentials; the manifest `url` may not) in one Bash call, each into `<workstation root>/<name>`, then `register_repo_root` for every cloned repo in one parallel batch. End with one line of result: cloned repos, and denied repos with the reason. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
 
 ### 5. Keep changes in the right repo
 
