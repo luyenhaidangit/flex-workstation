@@ -3,6 +3,7 @@
 **Branch**: `[NNNNNN-ten-tinh-nang]`  
 **Ngày tạo**: [NGÀY]  
 **Trạng thái**: Bản nháp  
+**Ngày reconcile cuối**: Chưa reconcile  
 **Người phụ trách**: {{GIT_USER_NAME}}  
 **Stakeholder xác nhận**: {{GIT_USER_NAME}}  
 **Đầu vào**: [Tóm tắt mong muốn người dùng trong 1-2 câu]
@@ -11,6 +12,10 @@
   Trạng thái chuyển tự động theo lifecycle, không tự sửa tay:
   Bản nháp (khi /speckit-specify tạo spec) -> Đang triển khai (/speckit-implement bắt đầu
   chạy task) -> Hoàn thành (/speckit-implement xác nhận toàn bộ task trong tasks.md đã [X]).
+  "Đã thay thế bởi <NNNNNN-ten-tinh-nang>" là giá trị duy nhất được sửa tay, khi một feature
+  khác thay đổi hành vi của feature này.
+  Ngày reconcile cuối: ghi "YYYY-MM-DD — không đổi" hoặc "YYYY-MM-DD — đã cập nhật" sau bước
+  Spec reconciliation (xem docs/speckit/workflow.md).
 -->
 
 ---

@@ -76,6 +76,7 @@ Select only skills that directly govern the task.
 | `AGENTS.md`, `CLAUDE.md`, `.claude/rules/`, decisions about persistent agent context, a request to review/improve a specific project's context, or a session id (`session_...`) to review why an agent misread context | `flex-context-engineering` |
 | Create, review, evaluate, optimize, or package a skill | `flex-skill-creator` |
 | Brainstorm what feature/improvement to build next in an existing repo, or a gap analysis, with no idea decided yet | `flex-feature-discovery` |
+| Hunt or evaluate deals, sales, free-tier programs, credits, or coupons for VPS, cloud, hosting, domains, dev tools, or AI API credits | `flex-tech-deal-hunter` |
 | New feature without an existing business spec | `speckit-specify` |
 | Clarify an existing feature spec | `speckit-clarify` |
 | Create a feature plan | `speckit-plan` |

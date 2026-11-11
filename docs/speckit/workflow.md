@@ -10,8 +10,15 @@ Antigravity phải hiển thị các skill qua `/skills`. Không tạo một wor
 `/speckit` tự chạy toàn bộ chuỗi, vì mỗi phase bên dưới phải dừng sau completion
 report và chờ người dùng gọi phase tiếp theo.
 
-Mọi tác vụ đều bắt đầu từ workflow Speckit đầy đủ, với `$speckit-specify` hoặc
-`/speckit-specify` làm bước mô tả nghiệp vụ đầu tiên.
+Trước khi bắt đầu, phân loại task:
+
+- **Light Track** — bug nhỏ đã có test, hoặc refactor không đổi hành vi: làm trực
+  tiếp kèm test, không cần Speckit. Nếu phát hiện phải đổi hành vi nghiệp vụ, dừng và
+  chuyển sang Spec Track.
+- **Spec Track** — feature mới, thay đổi nhiều repo, hoặc thay đổi domain quan trọng:
+  đi workflow Speckit đầy đủ, với `$speckit-specify` hoặc `/speckit-specify` làm bước
+  mô tả nghiệp vụ đầu tiên.
+- Chưa rõ thuộc track nào thì hỏi người dùng.
 
 ## Sơ đồ luồng
 
@@ -50,6 +57,8 @@ flowchart TD
         gap_check{Còn gap\ngiữa code và spec?}
         converge["$speckit-converge hoặc /speckit-converge\nAppend task còn thiếu vào tasks.md"]
 
+        reconcile["Spec reconciliation\nSo hành vi thực tế với spec.md\nKhác → cập nhật spec (+ docbiz); không → ghi 'không đổi'"]
+
         specialist_review["Final specialist review\nRoute bằng flex-using-agent-skills\n→ áp dụng skill Flex phù hợp"]
 
         done(["✅ Feature hoàn thành"])
@@ -82,8 +91,9 @@ flowchart TD
 
     implement --> gap_check
     gap_check -->|Có| converge
-    gap_check -->|Không| specialist_review
+    gap_check -->|Không| reconcile
     converge --> implement
+    reconcile --> specialist_review
     specialist_review --> done
 ```
 
@@ -102,6 +112,7 @@ flowchart TD
 | 7 | `$speckit-analyze` / `/speckit-analyze` | **Optional** | — | Report cross-artifact (read-only) |
 | 8 | `$speckit-implement` / `/speckit-implement` | Core | — | Code, mark tasks `[X]` |
 | 9 | `$speckit-converge` / `/speckit-converge` | Core | — | Append task còn thiếu vào `tasks.md` |
+| 10 | Spec reconciliation (không có lệnh riêng) | Core · sau converged | `spec.md` và hành vi thực tế | `spec.md` cập nhật hoặc ghi "không đổi"; `Ngày reconcile cuối` |
 
 ## Ghi chú quan trọng
 
@@ -184,6 +195,21 @@ trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact.
 **`/speckit-converge` lặp với `/speckit-implement`**
 Converge chỉ **append** task bổ sung vào `tasks.md`, không sửa gì khác.
 Sau converge → chạy lại implement → converge cho đến khi báo "✅ Converged".
+
+**Spec reconciliation sau khi converged**
+
+`converge` chỉ append `tasks.md` và không sửa `spec.md`, nên hành vi đổi trong lúc
+implement sẽ làm spec lệch khỏi code (spec drift). Sau khi `✅ Converged` và trước
+final specialist review, người dùng yêu cầu so hành vi thực tế với `spec.md`:
+
+- Có khác: cập nhật phần bị ảnh hưởng của `spec.md`; nếu đổi luồng, vai trò, thực thể
+  hoặc phạm vi nghiệp vụ thì chạy lại `speckit-docbiz`.
+- Không khác: ghi "không đổi".
+- Cả hai trường hợp đều ghi `Ngày reconcile cuối` ở header `spec.md`.
+
+Spec của feature `Hoàn thành` là lịch sử; nguồn sự thật là code, test và `docs/business`.
+Khi một feature khác thay đổi hành vi của feature này, đặt `Trạng thái` thành
+`Đã thay thế bởi <feature-id>`.
 
 **Final specialist review sau khi converged**
 

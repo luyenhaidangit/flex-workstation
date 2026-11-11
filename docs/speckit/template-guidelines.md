@@ -24,7 +24,8 @@ Tài liệu này không phải template runtime và không được Speckit đ�
 - Spec template chỉ mô tả WHY/WHAT; HOW thuộc plan kỹ thuật. ID trong spec dùng ASCII để dễ search/copy: `MVP`, `MT`, `US`, `AC`, `FR`, `BR`, `SEC`, `NFR`, `SC`.
 - Spec template cần có phạm vi MVP, mapping `US`/`AC` về `FR`, và trạng thái dữ liệu/lỗi phổ biến để tránh scope creep và giúp task/test traceable.
 - Spec template cần có người phụ trách, stakeholder xác nhận, và quy tắc nghiệp vụ `BR` để làm rõ ai quyết định scope/rule. Hai trường metadata mặc định dùng `git config user.name`.
-- `Trạng thái` ở header chuyển tự động theo lifecycle, không sửa tay: `Bản nháp` (`/speckit-specify` tạo spec) → `Đang triển khai` (`/speckit-implement` bắt đầu chạy task) → `Hoàn thành` (`/speckit-implement` xác nhận toàn bộ task trong `tasks.md` đã `[X]`).
+- `Trạng thái` ở header chuyển tự động theo lifecycle, không sửa tay: `Bản nháp` (`/speckit-specify` tạo spec) → `Đang triển khai` (`/speckit-implement` bắt đầu chạy task) → `Hoàn thành` (`/speckit-implement` xác nhận toàn bộ task trong `tasks.md` đã `[X]`). Giá trị `Đã thay thế bởi <feature-id>` là ngoại lệ duy nhất được sửa tay.
+- `Ngày reconcile cuối` ở header ghi kết quả bước Spec reconciliation (`YYYY-MM-DD — không đổi` hoặc `YYYY-MM-DD — đã cập nhật`); mặc định `Chưa reconcile`.
 - Spec template cần tách phân quyền/bảo mật, audit/lịch sử thay đổi, và checklist sẵn sàng lập plan kỹ thuật để tránh chuyển sang `/plan` khi spec còn mơ hồ.
 - Spec template cần có kết quả Documentation Impact Gate do `/speckit-docbiz` quản lý. Đánh giá này luôn bắt buộc trước plan, nhưng chỉ yêu cầu cập nhật tài liệu khi luồng, vai trò, quy tắc, thực thể/vòng đời, phạm vi hoặc compliance có tác động đáng kể tới BA/stakeholder.
 - Không xóa section tùy chọn trong spec template; ghi `Không áp dụng` để giữ cấu trúc ổn định cho AI/automation.

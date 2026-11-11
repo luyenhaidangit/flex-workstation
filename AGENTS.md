@@ -60,6 +60,12 @@ Các quy tắc bổ sung:
 
 Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất kỳ implementation nào.
 
+### Phân loại task (trước bước 1)
+
+- **Light Track** — bug nhỏ đã có test, hoặc refactor không đổi hành vi: làm trực tiếp kèm test (bug: viết test tái hiện trước; refactor: giữ test hiện có xanh), không cần Speckit. Nếu trong lúc làm phát hiện phải đổi hành vi nghiệp vụ, dừng lại và chuyển sang Spec Track.
+- **Spec Track** — feature mới, thay đổi nhiều repo, hoặc thay đổi domain quan trọng: đi Speckit đầy đủ bên dưới.
+- Chưa rõ thuộc track nào: hỏi người dùng, không tự chọn.
+
 ### Cú pháp theo runtime
 
 | Runtime | Cú pháp gọi skill Speckit |
@@ -87,6 +93,7 @@ Thiết lập nguyên tắc: `$speckit-constitution` hoặc `/speckit-constituti
 | 7 | `$speckit-analyze` | `/speckit-analyze` | **Optional** — cross-artifact quality gate trước implement |
 | 8 | `$speckit-implement` | `/speckit-implement` | Thực thi tasks; tự dừng nếu checklist còn item chưa tick |
 | 9 | `$speckit-converge` | `/speckit-converge` | Nếu còn gap: append task bổ sung vào `tasks.md` → quay lại bước 8 |
+| 10 | Spec reconciliation (không có lệnh riêng; người dùng yêu cầu sau khi converged) | Cùng yêu cầu | So hành vi thực tế với `spec.md`: khác thì cập nhật `spec.md` (và `speckit-docbiz` nếu có tác động nghiệp vụ), không khác thì ghi "không đổi"; cả hai đều ghi `Ngày reconcile cuối` |
 
 Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho Codex, Antigravity và Claude Code.
 
@@ -96,7 +103,8 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 
 - Không tự chuyển sang bước tiếp theo — "Suggested next step" chỉ là thông tin, không tự thực thi.
 - `speckit-implement` chỉ chạy khi được gọi trực tiếp.
-- "Implement X" hay "thực hiện X" chỉ tương đương bước 1 (`speckit-specify`), không phải toàn pipeline.
+- "Implement X" hay "thực hiện X" thuộc Spec Track chỉ tương đương bước 1 (`speckit-specify`), không phải toàn pipeline.
+- Spec của feature đã `Hoàn thành` là lịch sử; nguồn sự thật là code, test và `docs/business`. Khi spec mâu thuẫn với chúng, tin code/test/docs và báo lệch, không làm theo spec.
 
 ## Tooling
 
