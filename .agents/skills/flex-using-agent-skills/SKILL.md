@@ -102,6 +102,9 @@ workspace instructions. Do not invent a skill name or force an unrelated skill.
 - Infrastructure work that also changes application code or database schema uses
   `flex-devops-engineering` plus the applicable frontend, .NET, database, or naming
   skill. Keep artifact ownership distinct rather than duplicating domain rules.
+- A question, review, or design about how Flex infrastructure currently works uses
+  `flex-repo-scope` to choose which repos to read, plus `flex-devops-engineering` to
+  analyze what it finds.
 - A production incident uses `flex-prod-troubleshooting` to diagnose; once the cause
   needs an infrastructure, code, or schema change, add the skill that owns that
   artifact (e.g. `flex-devops-engineering`) rather than fixing under diagnosis rules.
@@ -138,7 +141,7 @@ Chỉ khi người dùng hỏi đáp thuần, không đọc hay sửa file và k
 
 | Rationalization | Why it's wrong | Correct move |
 | --- | --- | --- |
-| "This task looks trivial, routing is overkill." | Trivial-looking tasks are exactly where a missing or wrong skill goes unnoticed — the mandatory rule has no size exception. | Run the routing rule anyway; the report can collapse to one line. |
+| "This task looks trivial, routing is overkill." | Trivial-looking tasks are exactly where a missing or wrong skill goes unnoticed — the mandatory rule has no size exception. | Run the routing rule anyway and print the full block; only the `Lý do` line may be brief. |
 | "I already selected a skill earlier in this session." | Reuse is only valid while scope is unchanged; the artifact, repository, or lifecycle can shift without feeling like a new task. | Check scope against the reuse rule above before skipping re-route. |
 | "No skill matches exactly, I'll use the closest one." | Forcing an unrelated skill applies instructions written for a different artifact and produces confidently wrong guidance. | Record that no skill applies and continue under `AGENTS.md`/`CLAUDE.md` instead. |
 | "I'll read the skill's instructions after I start editing." | Routing exists to apply a skill's constraints before the first edit, not to retrofit them afterward. | Read and apply every selected skill fully before any file or tool work begins. |
