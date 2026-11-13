@@ -22,7 +22,7 @@ Before reading, analyzing, reviewing, or changing workspace or repository files:
 
 1. Identify the task's intent and primary artifact.
 2. Select the applicable skill or skills from the table below.
-3. Báo kết quả định tuyến bằng đúng khối ở mục `Routing result`, bằng tiếng Việt có dấu, ngay sau khi chọn skill và trước mọi tool call khác. Lời dẫn giữa các lần gọi tool cũng phải là tiếng Việt nhưng không thay thế khối này; không viết bản tóm tắt định tuyến bằng tiếng Anh.
+3. Báo kết quả định tuyến bằng đúng khối ở mục `Routing result`, ngay sau khi chọn skill và trước mọi tool call khác; lời dẫn giữa các lần gọi tool cũng bằng tiếng Việt có dấu và không thay thế khối.
 4. Read and apply every selected skill before continuing.
 
 Do not invoke this skill recursively when the task is solely to review or update
@@ -89,9 +89,6 @@ Select only skills that directly govern the task.
 | Create or update the project constitution | `speckit-constitution` |
 | Convert approved tasks into GitHub issues | `speckit-taskstoissues` |
 
-If no installed skill directly applies, record that outcome and continue under the
-workspace instructions. Do not invent a skill name or force an unrelated skill.
-
 ## Combination rules
 
 - Any non-trivial code change adds `flex-codebase-architect` alongside the
@@ -141,10 +138,8 @@ Chỉ khi người dùng hỏi đáp thuần, không đọc hay sửa file và k
 
 | Rationalization | Why it's wrong | Correct move |
 | --- | --- | --- |
-| "This task looks trivial, routing is overkill." | Trivial-looking tasks are exactly where a missing or wrong skill goes unnoticed — the mandatory rule has no size exception. | Run the routing rule anyway and print the full block; only the `Lý do` line may be brief. |
 | "I already selected a skill earlier in this session." | Reuse is only valid while scope is unchanged; the artifact, repository, or lifecycle can shift without feeling like a new task. | Check scope against the reuse rule above before skipping re-route. |
 | "No skill matches exactly, I'll use the closest one." | Forcing an unrelated skill applies instructions written for a different artifact and produces confidently wrong guidance. | Record that no skill applies and continue under `AGENTS.md`/`CLAUDE.md` instead. |
-| "I'll read the skill's instructions after I start editing." | Routing exists to apply a skill's constraints before the first edit, not to retrofit them afterward. | Read and apply every selected skill fully before any file or tool work begins. |
 
 ## Verification
 
