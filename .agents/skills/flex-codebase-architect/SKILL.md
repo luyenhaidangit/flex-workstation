@@ -1,6 +1,10 @@
 ---
 name: flex-codebase-architect
 description: Enforce senior-engineer architectural discipline on code you write, in an existing codebase or from scratch. Use when adding a feature, fixing a bug, refactoring, creating a new file/module/class, modifying existing code in a non-trivial project, starting a new project or service, scaffolding a new module or bounded context, or building a client/wrapper for an external API or SDK (payment, messaging, social, LLM/AI providers) — even without an explicit ask for clean code or good architecture. Prevents hardcoding, god services, duplicate logic, premature abstraction, and tight coupling; keeps placement correct and the codebase easier to extend after the change than before it. Skip only for throwaway scripts, prototypes explicitly marked disposable, or single-line trivial edits.
+version: "1.0.0"
+metadata:
+  author: flex-workstation
+  tags: [architecture, code-quality, refactoring]
 ---
 
 # Codebase Architect

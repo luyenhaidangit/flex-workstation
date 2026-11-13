@@ -1,6 +1,10 @@
 ---
 name: flex-dotnet-engineering
 description: Design, implement, refactor, review, diagnose, and performance-harden production .NET and C# systems using maintainable, secure, observable, and evidence-driven conventions. Use for .sln, .slnx, .csproj, C# source, ASP.NET Core APIs, workers, class libraries, EF Core, dependency injection, async and concurrency, caching, messaging, distributed or multi-tenant systems, testing, CI/CD, architecture decisions, code reviews, clean-code requests, performance work, and production-readiness assessments. Use when a user asks for .NET best practices, conventions, Clean Architecture, maintainability, scalability, reliability, security, or a concrete implementation or review of those concerns.
+version: "1.0.0"
+metadata:
+  author: flex-workstation
+  tags: [dotnet, csharp, aspnet-core, ef-core]
 ---
 
 # .NET Engineering
