@@ -46,7 +46,8 @@
 Trước mọi task liên quan đến file trong workspace, Agent phải:
 1. Đọc và làm theo `flex-using-agent-skills`
 2. Xác định tất cả skill áp dụng
-3. Đọc và áp dụng từng skill trước khi bắt đầu
+3. In khối `Kết quả định tuyến` (mẫu ở mục `Routing result` của `flex-using-agent-skills`) ngay sau khi chọn skill, trước mọi tool call khác; lời dẫn giữa các tool call không thay thế khối này
+4. Đọc và áp dụng từng skill trước khi bắt đầu
 
 Các quy tắc bổ sung:
 - Không chọn trực tiếp domain skill, bỏ qua router — trừ khi `flex-using-agent-skills` chính nó hướng dẫn khác.
