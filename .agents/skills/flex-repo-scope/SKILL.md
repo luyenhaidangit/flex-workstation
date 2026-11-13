@@ -53,7 +53,7 @@ Kế hoạch repo
 - Giả định: <inferences the user should correct>
 ```
 
-Print this block verbatim (Vietnamese heading and `Giả định` label; `Edit`/`Read`/`Skip` stay as identifiers that `repos.md` and `speckit-implement` rely on), not a prose summary, before the first `add_repo`, even when every repo is Read-only, and attach only repos listed as Edit or Read. Keep each line short. In local mode, stop here and use the plan to read only the listed repos. In cloud mode, wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
+Print this block verbatim (Vietnamese heading and `Giả định` label; `Edit`/`Read`/`Skip` stay as identifiers that `repos.md` and `speckit-implement` rely on), not a prose summary such as "Kế hoạch: chỉ đọc flex-k8s, không sửa file nào…" (that drops the labels and does not count), before the first `add_repo`, even when every repo is Read-only, and attach only repos listed as Edit or Read. Keep each line short. In local mode, stop here and use the plan to read only the listed repos. In cloud mode, wait for correction only when an assumption is uncertain or the set is larger than two repos; otherwise proceed.
 
 When a Speckit feature is active (a `specs/<feature>/` directory exists for the task), also write the plan to `specs/<feature>/repos.md` using the same Edit/Read/Skip table, and update it whenever the gate re-runs. `speckit-plan` and `speckit-implement` read this file as the repo scope of the feature. Do not put it in `spec.md`, which stays business-only.
 

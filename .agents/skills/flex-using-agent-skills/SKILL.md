@@ -130,7 +130,19 @@ Kết quả định tuyến
 - Cần định tuyến lại: <có chỉ khi phạm vi đã đổi; ngược lại không>
 ```
 
-Sao chép khối này nguyên văn, giữ nguyên nhãn và tên skill: không thêm câu dẫn, không checkbox, không đổi nhãn.
+Sao chép khối này nguyên văn, giữ nguyên nhãn và tên skill: không thêm câu dẫn, không checkbox, không đổi nhãn. Đây là khuôn cố định gồm 5 dòng riêng biệt, không phải dàn ý để diễn đạt lại.
+
+Đúng (điền giá trị, giữ nguyên 5 dòng và 4 nhãn):
+
+```text
+Kết quả định tuyến
+- Primary: flex-repo-scope
+- Additional: flex-devops-engineering
+- Lý do: Review cách cài ArgoCD hiện tại cần đọc repo thực tế rồi đánh giá hạ tầng.
+- Cần định tuyến lại: không
+```
+
+Sai: gộp thành một câu văn xuôi như "Định tuyến chọn flex-repo-scope làm repo chính và flex-devops-engineering bổ sung…". Câu đó mất nhãn, đổi "skill" thành "repo" và không được tính là đã báo kết quả định tuyến.
 
 Chỉ khi người dùng hỏi đáp thuần, không đọc hay sửa file và không gọi tool nào, mới trả lời thẳng không cần khối định tuyến. Yêu cầu review, phân tích hoặc giải thích dựa trên file trong workspace vẫn phải có khối.
 
