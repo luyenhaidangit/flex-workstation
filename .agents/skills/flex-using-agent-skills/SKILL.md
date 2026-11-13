@@ -23,7 +23,7 @@ Before reading, analyzing, reviewing, or changing workspace or repository files:
 1. Identify the task's intent and primary artifact.
 2. Select the applicable skill or skills from the table below.
 3. Read and apply every selected skill before continuing.
-4. Announce the routing result concisely, in the language required by the repo's `AGENTS.md`/`CLAUDE.md`.
+4. Báo kết quả định tuyến bằng đúng khối ở mục `Routing result`, bằng tiếng Việt có dấu. Mọi lời dẫn giữa các lần gọi tool cũng phải là tiếng Việt; không viết bản tóm tắt định tuyến bằng tiếng Anh.
 
 Do not invoke this skill recursively when the task is solely to review or update
 `flex-using-agent-skills`. Use `flex-skill-creator` instead.
@@ -130,8 +130,9 @@ Kết quả định tuyến
 - Cần định tuyến lại: <có chỉ khi phạm vi đã đổi; ngược lại không>
 ```
 
-Sao chép khối này nguyên văn, giữ nguyên nhãn và tên skill: không thêm câu dẫn, không checkbox, không đổi nhãn. If the user asked only a conversational question and no file
-or tool action is needed, answer directly without routing chatter.
+Sao chép khối này nguyên văn, giữ nguyên nhãn và tên skill: không thêm câu dẫn, không checkbox, không đổi nhãn.
+
+Nếu người dùng chỉ hỏi đàm thoại và không cần thao tác file/tool, trả lời thẳng, không cần khối định tuyến.
 
 ## Common Rationalizations
 
