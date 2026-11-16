@@ -1,6 +1,5 @@
 {
-  "mcpServers": {},
-  "_disabled_mcpServers": {
+  "mcpServers": {
     "flex-exchange-db": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "${FLEX_EXCHANGE_DB_URL}"]
