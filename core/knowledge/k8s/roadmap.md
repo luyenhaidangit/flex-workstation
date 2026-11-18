@@ -66,7 +66,7 @@ Giai đoạn 0–4 chỉ cần laptop. Từ giai đoạn 6 trở đi mới cần
 ```bash
 cd flex-k8s
 bash scripts/create-cluster.sh
-kubectl apply -f manifests/nginx.yaml
+kubectl apply -f manifests/nginx/
 kubectl scale deployment/nginx --replicas=4
 kubectl set image deployment/nginx nginx=nginx:1.28-alpine
 kubectl rollout status deployment/nginx
@@ -276,8 +276,8 @@ Add-on: MetalLB, ingress controller, metrics-server, StorageClass (local-path ho
 | GĐ | Trạng thái | Ghi chú |
 | --- | --- | --- |
 | 0 | ☐ | |
-| 1 | ◐ | `flex-k8s/manifests/nginx.yaml` đã có, chưa apply |
-| 2 | ◐ | Manifest gateway đã có ở `flex-environment/k8s/` |
+| 1 | ◐ | `flex-k8s/manifests/nginx/` đã có, chưa apply |
+| 2 | ◐ | Manifest gateway đã có ở `flex-k8s/manifests/flex-api-gateway/` |
 | 3 | ☐ | |
 | 4 | ☐ | |
 | 5 | ☐ | |

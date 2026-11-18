@@ -71,7 +71,7 @@ Quy ước tên Service: `<namespace>-<service>-svc` (ví dụ `flex-g1-flex-api
 | Cổng vào | nginx trong Docker Compose, nghe 80/443; `server_name` cho `luyenhaidangit.project.local` (chỉ máy local, `sites-available/local.conf`; Portainer, Jenkins, Kibana dưới `/portainer/`, `/jenkins/`, `/kibana/`) và `luyenhaidangit.pro` (server); host lạ bị đóng kết nối (HTTP `444`, HTTPS từ chối handshake) | `luyenhaidangit.project.local` hiện có `location /fss/` trỏ tạm tới `host.docker.internal:30080` (chưa có backend); đổi sang NodePort của Ingress khi dựng xong |
 | Ingress | Chưa có | NGINX Ingress Controller trong namespace `ingress` |
 | Cluster | k3s 1 node đã cài trên server (`flex-environment/setup/04-init-k3s.sh`), chưa deploy workload | k3s để học; thêm worker hoặc kubeadm nhiều node ở giai đoạn 6 |
-| Manifest | `flex-k8s/manifests/nginx.yaml`, `flex-api-gateway.yaml` | Thêm namespace, VirtualServer, VirtualServerRoute |
+| Manifest | `flex-k8s/manifests/nginx/`, `flex-k8s/manifests/flex-api-gateway/` | Thêm namespace, VirtualServer, VirtualServerRoute |
 | Frontend | Chưa có service trong `docker-compose.app.yml` | Pod nginx phục vụ build Angular |
 | WAF | Đã cấu hình ở nginx cổng vào Compose (`owasp/modsecurity-crs`, `DetectionOnly`; chưa chạy thử). Ingress k8s chưa có | Giai đoạn sau: ModSecurity trong nginx Ingress (xem mục 8) |
 | Log WAF | Kibana đã có, chưa có đường đẩy log WAF vào | Fluentd đẩy log WAF vào Kibana |
