@@ -18,5 +18,13 @@
   { "query": "write a Python script that validates JSON schemas against a spec", "should_trigger": false },
   { "query": "run the unit tests in the migration-reviewer microservice and tell me if they pass", "should_trigger": false },
   { "query": "package a zip of the build artifacts for this release", "should_trigger": false },
-  { "query": "optimize the SQL query in this migration for performance", "should_trigger": false }
+  { "query": "optimize the SQL query in this migration for performance", "should_trigger": false },
+  { "group": "edge", "query": "thêm 1 skill kiểm tra Liquibase changelog, nhớ đăng ký vào router luôn", "should_trigger": true },
+  { "group": "edge", "query": "skill flex-devops-engineering dài quá, cắt gọn giúp tôi và xem có trùng trigger với skill khác không", "should_trigger": true },
+  { "group": "edge", "query": "mấy skill của mình có cái nào trùng nhau không? gộp lại giúp tôi", "should_trigger": true },
+  { "group": "edge", "query": "xem lại phiên này, skill nào hiểu sai ý tôi rồi", "should_trigger": true },
+  { "group": "edge", "query": "quy trình này tôi chỉ làm đúng một lần thôi, có nên thành skill không?", "should_trigger": true },
+  { "group": "edge", "query": "hướng dẫn 'luôn trả lời tiếng Việt' nên đặt trong AGENTS.md hay làm thành skill?", "should_trigger": false },
+  { "group": "edge", "query": "rút gọn AGENTS.md xuống dưới 200 dòng giúp tôi", "should_trigger": false },
+  { "group": "edge", "query": "dùng flex-dotnet-engineering review file OrderService.cs giúp tôi", "should_trigger": false }
 ]

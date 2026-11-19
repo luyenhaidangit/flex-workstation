@@ -33,6 +33,8 @@ description: <what it does>. Use when <concrete trigger clause>.
 
 Use this shape by default for a skill targeting `.agents/skills/`, in place of the 13-section contract in `references/output-template.md`. A meta/routing skill whose real shape doesn't fit (like `flex-skill-creator` or `flex-using-agent-skills` themselves) may deviate — that's a documented exception, not a silent one: say so explicitly to the user and explain why.
 
+A skill that produces a report, file, or routing block must also have a domain section defining that output literally, with an example (the router's `Routing result` block is the model), so two runs yield the same shape. Scale the rest to the skill's size: a one-workflow skill may drop `Common Rationalizations` and `Red Flags` if it has no real failure mode to record.
+
 `## Common Rationalizations` and `## Red Flags` do the job that the generic template's "Anti-Patterns to Prevent" does — pair each with why it's wrong and the correct move, same as the generic guidance. `## Verification` is a checklist (`- [ ]` items), same intent as the generic "Mandatory Checks."
 
 ## Frontmatter rules
@@ -40,7 +42,7 @@ Use this shape by default for a skill targeting `.agents/skills/`, in place of t
 - `name:` — plain (unquoted) YAML, lowercase-hyphenated, **must exactly match the directory name**. The validator (and the `PreToolUse` hook) blocks on a mismatch — but still double-check by eye before delivering.
 - `description:` — plain YAML, one paragraph, must contain a literal **"Use when …"** (or "Use during…", "Use before/after…") clause naming concrete triggers, not just a summary of what the skill does.
 - Naming prefix: a skill customized for or specific to this Flex workspace/codebase gets the `flex-` prefix (e.g. `flex-dotnet-engineering`). A skill that is a ported lifecycle tool with its own external convention (Speckit) keeps that tool's prefix (`speckit-*`) instead — don't force `flex-` onto it.
-- Length: observed `flex-*` descriptions run 175–960 characters.
+- Length: `scripts/validate-skills.js` is the only place the description and body limits live; run it instead of quoting numbers from memory.
 
 ## Reference material placement
 
@@ -61,6 +63,7 @@ Generating `SKILL.md` is not the last step for a skill targeting this repo. Befo
 3. **Run `scripts/sync-skills.ps1` yourself** (repo root — a thin wrapper around the portable implementation in `flex-skill-creator/scripts/sync-skills.ps1`, with this workspace's paths filled in) so `.claude/skills/` picks up the new directory for Claude Code immediately — it's local-only and idempotent, no need to hand this back to the user. It also clears any stale junction left over from a retired skill. A plain content edit to an existing skill needs no re-sync: `.claude/skills/<name>` is a junction (a live link into `.agents/skills/<name>`, not a copy), so the edit is visible immediately everywhere.
 4. **Codex and Antigravity need no mirror** — both read `.agents/skills/` directly (see `docs/architecture/system-map.md`); only Claude Code hardcodes its own `.claude/skills/` directory, which is why it's the one tool that needs a junction. If a future tool is added that also hardcodes its own skills path, add one more `-MirrorDir` value to the root wrapper's call into `flex-skill-creator/scripts/sync-skills.ps1` and add the folder to the root `.gitignore` next to the existing `.claude/skills/` entry — the generic script already supports multiple mirrors, don't invent a second sync mechanism or fork the script.
 5. **If the change alters workspace structure or onboarding** (new category of skill, new convention), flag that `docs/architecture/system-map.md` or `docs/setup/onboarding.md` may need a matching update, per `AGENTS.md`'s documentation rule — don't silently update those docs yourself unless the user's request already covers it.
+6. **If a tool is missing** (`pwsh` for the sync script, `node` for the validator, as can happen in a Linux cloud session), say which step did not run and why, and do not report the skill as wired or validated. Create the junction by hand only if the user asks.
 
 ## Verification
 
@@ -68,6 +71,7 @@ Generating `SKILL.md` is not the last step for a skill targeting this repo. Befo
 - [ ] `name:` frontmatter matches the directory name exactly
 - [ ] `description:` contains a literal "Use when …" clause
 - [ ] Section set follows the house pattern above, or a deviation is explicitly called out and justified
+- [ ] A skill that produces a report/file/block has a literal output format with an example
 - [ ] No shared reference material was silently duplicated into a new cross-skill location
 - [ ] A row was added to `flex-using-agent-skills`'s routing table (or the skill was flagged to the user as missing one)
 - [ ] `scripts/sync-skills.ps1` was run (or the `.claude/skills/` junction was confirmed to already cover it) — not just left as a task for the user

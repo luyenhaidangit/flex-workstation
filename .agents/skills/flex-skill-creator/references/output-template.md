@@ -1,6 +1,6 @@
 # Output Template — what every generated skill must contain
 
-When you generate a skill (Step 6 of the operating procedure), produce **two things**: a short design summary for the user to read in chat, and the actual `SKILL.md` artifact. Both follow the structure below. Do not skip any required section — a missing decision framework, mandatory-checks section, anti-patterns section, or output format is a defect, not a stylistic choice.
+When you generate a skill (Step 6 of the operating procedure), produce **two things**: a short design summary for the user to read in chat, and the actual `SKILL.md` artifact. Both follow the structure below. Scale the sections to the skill's size: a single-workflow skill without scripts needs only Purpose, When to Use/Not to Use, Operating Procedure, and Mandatory Checks. For a non-trivial skill, a missing decision framework, anti-patterns section, or output format is a defect, not a stylistic choice. Any skill that produces a report or file always needs an output format.
 
 The generated `SKILL.md` itself uses YAML frontmatter (`name`, `description`) followed by a Markdown body. The sections below map onto that body.
 
@@ -30,7 +30,7 @@ The generated `SKILL.md` itself uses YAML frontmatter (`name`, `description`) fo
 
 **11. Output Format** — the exact shape of what the skill produces (template, schema, file type, section headers). Show the literal structure. A skill without a defined output produces inconsistent freeform results.
 
-**12. Example User Prompts** — exactly 3 realistic prompts a user would type to invoke the skill, with concrete detail (file names, error text, real-sounding context, casual phrasing). These double as triggering documentation.
+**12. Example User Prompts** — exactly 3 realistic prompts a user would type to invoke the skill, with concrete detail (file names, error text, real-sounding context, casual phrasing). Show them in the chat reply to confirm triggering; they are not part of the `SKILL.md` file.
 
 **13. Full Skill Prompt** — the complete, paste-ready `SKILL.md` content, assembled from the sections above, ready to drop into a skill folder or skill-creation flow with no further editing.
 
@@ -73,11 +73,6 @@ description: <pushy when-to-trigger + what-it-does, naming concrete phrasings>
 
 ## Output format
 <literal template / schema / file shape>
-
-## Example prompts
-1. "<concrete, casual, detailed user prompt>"
-2. "<different phrasing / context>"
-3. "<edge or uncommon case>"
 ```
 
 ---

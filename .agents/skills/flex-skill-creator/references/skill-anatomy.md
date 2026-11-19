@@ -22,13 +22,13 @@ Most skills are just a `SKILL.md`. Add bundled resources only when they earn the
 Skills load in three tiers, and good design exploits this to keep context lean:
 
 1. **Metadata** (name + description) — *always* in context (~100 words). This is the only thing Claude sees when deciding whether to use the skill, so the description carries the entire triggering burden.
-2. **SKILL.md body** — loaded *whenever the skill triggers* (aim for under ~400–500 lines). This is the core instructions.
+2. **SKILL.md body** — loaded *whenever the skill triggers* (aim for under ~400 lines). This is the core instructions.
 3. **Bundled resources** — loaded *only when needed*. A reference file is read on demand; a script can be executed without its source ever entering context. This tier is effectively unlimited.
 
 These word/line counts are approximate — go longer when the content genuinely needs it. The point is the *shape*: cheap-and-always-present metadata, focused body, heavy detail deferred.
 
 **Design implications:**
-- Keep the body scannable and under ~400–500 lines. If you're pushing that limit, add a layer of hierarchy: move detail into `references/` and leave a clear one-line pointer telling the model when to go read it.
+- Keep the body scannable and under ~400 lines. If you're pushing that limit, add a layer of hierarchy: move detail into `references/` and leave a clear one-line pointer telling the model when to go read it.
 - Reference files should be pointed to explicitly from SKILL.md, each with a note on *when* to read it.
 - For a large reference file (>300 lines), put a short table of contents at the top.
 - A script the skill always runs the same way belongs in `scripts/` — it executes without loading its code into context, which is both faster and cheaper than re-deriving the logic each time.

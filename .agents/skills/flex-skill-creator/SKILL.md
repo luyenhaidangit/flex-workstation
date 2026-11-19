@@ -1,6 +1,6 @@
 ---
 name: flex-skill-creator
-description: Creates, hardens, tests, evaluates, optimizes, or packages a Claude skill — especially for software development, codebase analysis, debugging, architecture review, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved, or a repetitive workflow captured. Trigger on "make me a skill for X", "create a skill that does Y", "turn this workflow into a skill", "improve/test/benchmark my skill", "optimize the triggering of this skill", or any such request in English or Vietnamese. Also trigger on bare invocation (no argument) for a session retrospective, on a request to audit one named existing skill standalone, or on "audit/health-check all skills" for a catalog sweep.
+description: Creates, hardens, tests, evaluates, optimizes, audits, or packages a Claude skill (in .agents/skills/ or a personal skills folder), especially for software development, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved or audited, or a repetitive workflow captured. Trigger on "make me a skill for X", "turn this workflow into a skill", "improve/test/optimize my skill", "tạo/review/sửa skill", on bare invocation (no argument) for a session retrospective, and on "audit/health-check all skills" for a catalog sweep. Do not use for editing AGENTS.md/CLAUDE.md rules (use flex-context-engineering) or for performing the task itself instead of capturing it as a skill.
 ---
 
 # Flex Skill Creator
@@ -37,10 +37,13 @@ Your job is to figure out **where the user is in this loop** and jump in there. 
 
 - The user wants you to *perform* the task right now (review this code, debug this error), not to build a reusable skill for it. Just do the task.
 - The user wants a one-off prompt they will use once and throw away. A skill is overhead that only pays off across many uses.
+- The request is about where an instruction belongs (rules file vs. skill vs. hook) or about editing `AGENTS.md`/`CLAUDE.md`/`.claude/rules/`. That is `flex-context-engineering`'s job; come back here only once it decides the instruction should be a skill.
 
 ## Communicating with the user
 
-Skill creation gets used by people across a wide range of technical familiarity — from seasoned engineers to people who recently learned what a terminal is. Read the context cues and match your language. Terms like "evaluation" and "benchmark" are usually fine; for things like "JSON," "assertion," or "subagent," wait for signs the user knows them, or add a one-line explanation. When in doubt, briefly define the term. This skill defaults its conversational replies to the user's language (Vietnamese if they write in Vietnamese), while the skill artifact itself is written in English — see "Language handling."
+Skill creation gets used by people across a wide range of technical familiarity — from seasoned engineers to people who recently learned what a terminal is. Read the context cues and match your language. Terms like "evaluation" and "benchmark" are usually fine; for things like "JSON," "assertion," or "subagent," wait for signs the user knows them, or add a one-line explanation. When in doubt, briefly define the term. Language rules (Vietnamese for everything the user reads, English for the skill body) are in "Language handling."
+
+**House-style deviation:** this meta-skill intentionally does not follow the `flex-workspace-spec.md` section set (no `Overview`/`Common Rationalizations`/`Red Flags`/`Verification`). Its sections map to a procedure with several entry modes, which that set does not fit; the Quality bar and Decision framework play the Verification and Red Flags roles.
 
 ## Core principles
 
@@ -60,7 +63,7 @@ Skill creation gets used by people across a wide range of technical familiarity 
 
 8. **Iterate on the real target, not the examples.** A skill is meant to be used across thousands of prompts; you test it on a handful only because that's fast. Full rationale lives in `references/evaluation-and-iteration.md` ("Generalize from the feedback") — that's the canonical copy; don't restate it elsewhere.
 
-9. **Portable by default.** Domain logic (the actual how-to-do-the-work content) should read the same if someone copies the skill folder into an unrelated repo — don't bake in the current project's specific paths, service names, or tool choices just because they were on screen while writing it. The one declared exception is a skill whose whole point is this specific repo (Step 0/4 already decide that); even there, keep the repo-specific wiring (paths, routing-table rows, install steps) isolated in its own section or `references/` file rather than mixed through the domain logic, so a reader can tell at a glance which parts travel and which don't.
+9. **Portable by default.** Domain logic (the actual how-to-do-the-work content) should read the same if someone copies the skill folder into an unrelated repo — don't bake in the current project's specific paths, service names, or tool choices just because they were on screen while writing it. The one declared exception is a skill whose whole point is this specific repo (Step 0 and Step 4 decide the target); even there, keep the repo-specific wiring (paths, routing-table rows, install steps) isolated in its own `references/` file rather than mixed through the domain logic, so a reader can tell at a glance which parts travel and which don't. This skill follows that rule itself: the wiring checklist lives only in `references/flex-workspace-spec.md`.
 
 ## Operating procedure
 
@@ -78,15 +81,15 @@ Follow these steps in order. Steps 1–7 (plus 0 and 7.5 where they apply) are t
 
 **Step 5 — Propose the structure.** A short outline of the sections and any reference files, so the user can redirect before you write the full thing. For a simple skill this is a few lines; for a complex one, note which parts will live in `references/` and whether any `scripts/` or `assets/` are warranted. Apply progressive disclosure — see `references/skill-anatomy.md`. **If the skill will live under `.agents/skills/` (this repo), this repo's house style overrides that generic guidance — read `references/flex-workspace-spec.md` first and structure the outline to match its observed section set instead.**
 
-**Step 6 — Generate the full, production-ready skill.** Write the complete skill using the output contract in `references/output-template.md`. Every generated skill includes all the required sections — the decision framework, mandatory checks, anti-patterns, and output format are not optional and not to be skipped. **Exception: a skill targeting `.agents/skills/` (this repo) uses the section set and frontmatter rules in `references/flex-workspace-spec.md` instead of this generic contract.**
+**Step 6 — Generate the full, production-ready skill.** Write the complete skill using the output contract in `references/output-template.md`, scaled to the skill's size (see "Skill size" in the Decision framework). A non-trivial skill includes the decision framework, mandatory checks, anti-patterns, and output format; a single-workflow skill keeps only the sections that carry real rules. **Exception: a skill targeting `.agents/skills/` (this repo) uses the section set and frontmatter rules in `references/flex-workspace-spec.md` instead of this generic contract.**
 
-**Step 7 — Provide 3 example prompts.** Show realistic, concrete things a user would type to invoke the new skill — the kind with file paths, real-sounding context, and casual phrasing — so the user can confirm it triggers on the right things.
+**Step 7 — Provide 3 example prompts.** Show realistic, concrete things a user would type to invoke the new skill — the kind with file paths, real-sounding context, and casual phrasing — so the user can confirm it triggers on the right things. Show them in the chat reply only; do not write them into the skill file (they cost tier-2 tokens on every activation and add no instruction).
 
-**Step 7.5 — Wire it into the workspace (skills targeting `.agents/skills/` only).** Generating the file is not the finish line here: create the directory at `.agents/skills/<skill-name>/`, add a row to `flex-using-agent-skills`'s routing table naming the task/artifact the new skill governs (a skill missing from that table is invisible — this workspace's routing rule in `AGENTS.md` means nothing gets selected outside it), then run `scripts/sync-skills.ps1` (repo root — a thin wrapper with this workspace's paths filled in) yourself (it's local-only and reversible — no need to wait on the user) so the `.claude/skills/` junction exists immediately; confirm it printed the new skill as synced. A plain edit to an existing skill's content needs no re-sync — the junction is a live link, not a copy. If the change alters workspace structure or onboarding, flag that `docs/architecture/system-map.md` or `docs/setup/onboarding.md` may need a matching update rather than silently editing them yourself. See `references/flex-workspace-spec.md` for the full checklist. Skip the workstation-specific wiring above for a skill targeting somewhere outside this repo — but if that repo also serves multiple agent tools where more than one hardcodes its own skills path, apply the generalized version of the same pattern instead of leaving skills to drift; see `references/skill-sync-pattern.md`.
+**Step 7.5 — Wire it into the workspace (skills targeting `.agents/skills/` only).** Generating the file is not the finish line: a skill missing from the router's table is never selected. Follow "Wiring a new or changed skill into the workspace" in `references/flex-workspace-spec.md` (directory, routing-table row, `scripts/sync-skills.ps1`, docs flag) — that file is the single copy of the checklist. For a skill targeting another repo that serves several agent tools with hardcoded skill paths, use `references/skill-sync-pattern.md` instead.
 
-**Step 8 — Offer to test it.** Propose 2–3 realistic test prompts and, with the user's OK, run the skill on them to see real output. On Claude.ai this is done inline (no subagents). Full procedure and platform differences are in `references/evaluation-and-iteration.md`.
+**Step 8 — Offer to test it.** Propose 2–3 realistic test prompts and, with the user's OK, run the skill on them to see real output. Include one value-add run: the same prompt without the skill, to confirm the skill beats zero-shot. On Claude.ai this is done inline (no subagents). Full procedure and platform differences are in `references/evaluation-and-iteration.md`.
 
-**Step 9 — Review and iterate.** Show the user the outputs, gather feedback, and rewrite the skill to fix what's weak — generalizing rather than overfitting. Rerun and repeat until the user is satisfied. See `references/evaluation-and-iteration.md`.
+**Step 9 — Review and iterate.** Show the user the outputs, gather feedback, and rewrite the skill to fix what's weak — generalizing rather than overfitting. Rerun the new cases and every case that passed before the edit (regression), and repeat until the user is satisfied. Before delivery, run the independent adversarial review described in "Quality bar." See `references/evaluation-and-iteration.md`.
 
 **Step 10 — Optimize the description (optional).** Once the body is solid, offer to tune the `description:` for reliable triggering. See `references/optimization-and-packaging.md`.
 
@@ -100,7 +103,7 @@ When invoked with no argument and no described skill idea, do **not** ask "what 
 
 **Goal**: find exchanges where the AI or a skill misread intent, did the wrong thing, or required correction, then translate each finding into a concrete improvement proposal for the responsible skill (or memory/CLAUDE.md).
 
-### Step 1 — Scan for misalignment signals
+### R1 — Scan for misalignment signals
 
 Read the full conversation and collect every exchange that shows one of these signals:
 
@@ -112,18 +115,18 @@ Read the full conversation and collect every exchange that shows one of these si
 
 Only flag exchanges where the user *actually reacted* (corrected, objected, had to redo). Do not flag cases where the AI deviated but the user accepted the result.
 
-### Step 2 — Categorize each finding
+### R2 — Categorize each finding
 
-For each flagged exchange, output:
+For each flagged exchange, output (labels in Vietnamese; the `Loại` values stay as identifiers):
 
 ```
-Exchange: [brief quote or description of what happened]
-Caused by: [skill name, or "base AI behavior", or "CLAUDE.md rule"]
-Category: wrong-scope | over-engineering | misread-intent | wrong-skill-fired | silent-assumption | other
-Impact: [one sentence — what the user had to do to recover]
+Sự việc: [trích ngắn hoặc mô tả điều đã xảy ra]
+Nguyên nhân: [tên skill, hoặc "hành vi mặc định của AI", hoặc "quy tắc CLAUDE.md"]
+Loại: wrong-scope | over-engineering | misread-intent | wrong-skill-fired | silent-assumption | other
+Tác động: [một câu — người dùng phải làm gì để khắc phục]
 ```
 
-### Step 3 — Propose a targeted fix
+### R3 — Propose a targeted fix
 
 For each finding, propose the minimal change that would prevent recurrence:
 
@@ -133,7 +136,7 @@ For each finding, propose the minimal change that would prevent recurrence:
 
 Resist proposing sweeping rewrites. A single well-placed anti-pattern bullet often fixes a repeating failure mode.
 
-### Step 4 — Confirm and implement
+### R4 — Confirm and implement
 
 Present all findings and proposals in one pass. Ask the user which ones to implement. Then execute the chosen changes using the normal skill-editing flow (respecting the git-source rule: edit `.agents/skills/` not `~/.claude/skills/`).
 
@@ -145,20 +148,20 @@ Triggered by a request to review, audit, or find improvements in one named skill
 
 1. Read the skill's `SKILL.md` and every file it references — don't review from memory or a partial read.
 2. If it targets `.agents/skills/`, run `node scripts/validate-skills.js <skill-name>` for the mechanical checks.
-3. Walk the "Quality bar" checklist below against the skill as it stands, plus `references/flex-workspace-spec.md`'s Verification checklist if it targets this repo (routing-table row present, `evals/` exists if the skill's own domain recommends eval sets, description length and "Use when" clause, no silently duplicated reference material).
-4. Report concrete findings only — file, section, what's wrong, why it matters, and a specific fix. Skip praise for things that are merely fine; a finding-free section needs no line.
+3. Judge the skill against the five criteria in `references/audit-rubric.md` (trigger precision, context efficiency, instruction clarity, tool and script safety, output determinism), plus `references/flex-workspace-spec.md`'s Verification checklist if it targets this repo. Take the adversarial stance described there: assume defects exist and look for them.
+4. Report findings only, in Vietnamese, each with severity (Blocker / Major / Minor), file and section, what is wrong, why it matters, and replacement text or a diff. Skip praise for things that are merely fine; a finding-free section needs no line.
 5. Ask which findings to implement before touching any files. A full audit often surfaces more than the user wants fixed today.
 
-This mode starts from the "Quality bar" section and works backward to specific edits — it skips Steps 1–5 of the operating procedure entirely (there's no new name or structure to propose).
+This mode skips Steps 1–5 of the operating procedure entirely (there's no new name or structure to propose).
 
 ## Catalog-wide health check
 
 Triggered by an explicit request to audit, health-check, or "review all" skills in `.agents/skills/` — the same idea as "Auditing an existing skill" above, but run over every skill instead of one.
 
 1. Run `node scripts/validate-skills.js` with no argument (validates the whole catalog) for the mechanical checks.
-2. For each skill, check the same drift patterns this skill's own house style calls out: missing `evals/` despite the skill's domain recommending them, description length outside the observed 175–960 character range, a missing routing-table row in `flex-using-agent-skills`, a description missing a literal "Use when" clause, and reference material duplicated instead of pointed-to.
-3. Group findings by skill, most actionable first. Skip a skill entirely if it has no findings — don't manufacture filler to look thorough.
-4. Present all findings in one pass, same shape as the no-argument mode's Step 2–3, and ask which to implement before editing anything — a catalog-wide audit touches many files, so confirm scope first.
+2. For each skill, check the same drift patterns this skill's own house style calls out: missing `evals/` despite the skill's domain recommending them, description length outside the range `validate-skills.js` accepts (the validator is the only place the limit lives), a missing routing-table row in `flex-using-agent-skills`, a description missing a literal "Use when" clause, and reference material duplicated instead of pointed-to.
+3. Group findings by skill, most actionable first, with the severity scale from `references/audit-rubric.md`. Skip a skill entirely if it has no findings — don't manufacture filler to look thorough.
+4. Present all findings in one pass, same shape as the retrospective's R2–R3, and ask which to implement before editing anything — a catalog-wide audit touches many files, so confirm scope first.
 
 Keep this to the mechanical/structural checks above, not a content rewrite of each skill's domain logic — a finding that needs deeper rework is a separate, per-skill conversation (use "Auditing an existing skill" for that one skill) once this pass surfaces it as a candidate.
 
@@ -170,7 +173,9 @@ Skill creation isn't the only outcome of a catalog check. Reach for this instead
 - **A skill has gone stale** — its conventions no longer match the codebase, or a session retrospective (no-argument mode) repeatedly points at the same skill for wrong-scope or misread-intent findings that a targeted fix hasn't resolved after a couple of iterations.
 - **The user asks to retire a skill outright.**
 
-Retiring a skill means: delete `.agents/skills/<skill-name>/`, remove its row from `flex-using-agent-skills`'s routing table, and run `scripts/sync-skills.ps1` (repo root) yourself to clear the now-stale `.claude/skills/` junction (it detects and removes junctions with no matching source, so this is safe to run directly). Don't merge or delete silently — state which skill is being absorbed or removed and why, the same way you'd confirm a new skill's name before generating it.
+Retiring a skill means: delete `.agents/skills/<skill-name>/`, remove its row from `flex-using-agent-skills`'s routing table, and re-run the sync step in `references/flex-workspace-spec.md` to clear the stale `.claude/skills/` junction.
+
+Deleting a directory and editing the shared router affect every task in the workspace, so get explicit approval first: ask with `AskUserQuestion`, listing the skill to be absorbed or removed, the reason, and the routing row that will go. Perform the deletion only after the user chooses to proceed; if they decline, leave everything as it is.
 
 ## The clarification gate
 
@@ -212,6 +217,8 @@ A skill that skips this analysis tends to produce the "generic advice" failure: 
 - **Bundle a script vs. inline instructions:** If a deterministic, repetitive sub-task would otherwise be re-derived on every run, put it in `scripts/` and have the skill call it. If it's judgment-heavy or varies each time, keep it as instructions.
 - **Strict vs. flexible default:** Default to flexible (advise, explain, let the user decide) *unless* the task has correctness or safety invariants — security, data loss, irreversible operations — where strict (block/refuse) is the safer default. State which mode the generated skill uses and why.
 - **Opinionated default vs. asking the user every time:** If there's a clearly better choice for the common case, bake it in as a default and let the user override. Only surface a choice when both options are genuinely reasonable and context-dependent.
+- **Skill size:** A skill with one workflow and no scripts keeps only Overview/When to Use/Core Process/Verification (or the generic equivalents). Add a decision framework, rationalizations/red flags, or an output format only when a real failure mode or a report/file output needs it, because every extra section is loaded on each activation. A skill that produces a report or file always gets an output format with a literal example.
+- **Value-add:** If a test shows the skill's output is not clearly better than the same prompt without it, tell the user the skill is redundant and recommend not shipping it.
 - **Scope:** When a request is broad ("a skill for backend development"), narrow it to a sharp, useful slice rather than building a sprawling skill that does everything weakly. Recommend the slice and say why.
 
 ## Quality bar (self-check before delivering)
@@ -220,7 +227,7 @@ Before handing over a generated skill, verify each:
 
 - Specific, not generic — every rule changes behavior; cut anything universally true.
 - Actionable, not theoretical — the model can follow it without guessing.
-- Structured — all required sections present (none skipped, especially decision framework, mandatory checks, anti-patterns, output format).
+- Structured — the sections its size calls for are present (see "Skill size"), and any skill producing a report or file has an output format with an example.
 - Reusable — works across many prompts, not overfit to one example.
 - Maintainable — scannable, single-purpose sections, obvious where new rules go.
 - Paste-ready — clean, self-contained, written as direct instructions to Claude.
@@ -231,17 +238,23 @@ Before handing over a generated skill, verify each:
 
 If any fail, revise before delivering.
 
+**Independent adversarial review.** The author reviewing its own draft tends to approve it. After the self-check, review the skill once more as a hostile reviewer who assumes defects exist and scores it with `references/audit-rubric.md`. Where subagents exist (Claude Code), spawn a fresh `Agent` with no design context, only the skill path and the rubric path, and have it report findings. Where they don't, run the rubric as a separate pass and label the result "self-review, not independent" in the delivery message. Fix every Blocker and Major finding, or tell the user why one stays.
+
 ## Tracking changes
 
 Don't add a `CHANGELOG.md` or a version field to a skill — git history over `.agents/skills/<skill-name>/` is the changelog. When you edit a skill for a specific reason (a no-argument-mode fix, an audit finding, a triggering tweak), say so in the commit message so `git log --follow SKILL.md` stays a readable record of why the skill looks the way it does.
 
 ## Language handling
 
-Write the final skill in **English by default** — it is the most portable and the convention these tools expect. If the user writes to you in Vietnamese (or mixes Vietnamese and English), fully understand the Vietnamese request and respond conversationally in their language if that's natural, but still produce the skill artifact in English — *unless the user explicitly asks for the skill itself in Vietnamese*, in which case honor that.
+Two languages, split by audience:
+
+- **Skill file (SKILL.md, references, evals):** English by default, the convention the catalog and these tools expect, unless the user explicitly asks for the skill itself in Vietnamese.
+- **Everything the user reads** (design summary, questions, audit and retrospective reports, finding labels, delivery message): Vietnamese with diacritics, as `AGENTS.md` requires. Keep skill names, file names, commands and other technical identifiers in English.
 
 ## Reference files
 
 - `references/flex-workspace-spec.md` — this repo's own house style for skills (where they live, the observed section set, frontmatter rules, reference-material placement, the routing/wiring checklist), which overrides `references/output-template.md` and `references/skill-anatomy.md` whenever the generated skill will live under `.agents/skills/` (this repo, `flex-workstation`). Read this first, before Step 5, for any skill targeting this repo.
+- `references/audit-rubric.md` — the five-criterion rubric, severity scale (Blocker/Major/Minor), adversarial stance, and finding format. Read when auditing a skill (named or catalog-wide) and for the pre-delivery review in the Quality bar.
 - `references/skill-sync-pattern.md` — the generalized, repo-agnostic version of `flex-workstation`'s own source-of-truth + per-tool-mirror + sync-script pattern. Read this at Step 7.5 when the skill targets a different repo that also serves multiple agent tools with hardcoded skill paths.
 - `references/output-template.md` — the exact structure and required sections every generated skill must follow **for skills outside this repo** (e.g. the user's personal `~/.claude/skills/`). Read this before writing any skill (Step 6) that isn't targeting `.agents/skills/`.
 - `references/codebase-conventions.md` — engineering rules to fold into any code-related skill (file placement, dependency direction, no hardcoding, avoiding god services and premature abstraction, extensibility, production-readiness). Read this when the skill being created touches code.

@@ -64,6 +64,12 @@ After improving the skill:
 
 Keep going until the user says they're happy, the feedback is all positive/empty, or you've stopped making meaningful progress. Then optionally expand the test set and try once more at a larger scale to catch overfitting.
 
+## Value-add, regression, and independent review
+
+- **Value-add check.** For each test prompt, also run it once without the skill. If the skill's output is not clearly better, the skill is redundant: say so and recommend not shipping it. This single comparison works inline, no subagents needed.
+- **Regression check.** When editing an existing skill, rerun every case that passed before the edit (the committed `evals/test-cases.json` and `evals/trigger-eval.json`), not only the new ones. An edit that fixes one case and breaks an old one is a failed edit.
+- **Independent review.** The author running its own tests is the weakest form of review. Where subagents exist, have a fresh `Agent` run the cases and the audit rubric (`audit-rubric.md`) without the design context; otherwise label the result "self-review, not independent."
+
 ## Platform variations
 
 **Claude Code / Cowork (have subagents):** the richer harness becomes available. For each test case you can spawn two subagents in the same turn — one *with* the skill, one *without* (the baseline) — so the comparison is independent. Organize results under a `<skill-name>-workspace/` sibling directory, by iteration (`iteration-1/`, `eval-0/`, ...). You can then grade objective assertions and aggregate a quantitative benchmark (pass rate, time, tokens). This workspace has not ported Anthropic's public skill-creator scripts (`eval-viewer/generate_review.py`, `scripts.run_loop`, `scripts.package_skill`) — `flex-skill-creator`'s `scripts/` holds only `sync-skills.ps1` (workspace wiring). Don't spend a step checking for them; present the raw outputs directly in the conversation for the human to inspect *before* you start critiquing them yourself.

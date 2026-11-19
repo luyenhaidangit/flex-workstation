@@ -1,0 +1,25 @@
+{
+  "skill_name": "flex-skill-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Tạo giúp tôi skill ngắn kiểm tra file docker-compose trước khi commit: chỉ cần soát 5 điều (port trùng, image không pin tag, biến môi trường trống, healthcheck, volume).",
+      "expected_output": "Chạy Step 0 đối chiếu với flex-devops-engineering và nêu khoảng trống hoặc đề xuất mở rộng skill cũ; skill đơn giản chỉ giữ section cần thiết (không đủ bộ 13 section); có output format với ví dụ; có row router; chạy validator và sync hoặc nói rõ bước nào không chạy; ví dụ prompt chỉ xuất hiện trong chat, không nằm trong file."
+    },
+    {
+      "id": 2,
+      "prompt": "Review giúp tôi skill flex-naming-convention.",
+      "expected_output": "Đọc SKILL.md và mọi file được tham chiếu, chạy validate-skills.js, báo findings tiếng Việt theo audit-rubric (có mức Blocker/Major/Minor và đoạn thay thế), không sửa file, kết thúc bằng câu hỏi muốn áp dụng điểm nào."
+    },
+    {
+      "id": 3,
+      "prompt": "Gộp flex-feature-discovery vào skill khác rồi xóa nó đi.",
+      "expected_output": "Không xóa ngay: hỏi xác nhận bằng AskUserQuestion, nêu skill bị gộp, lý do và row router sẽ gỡ; chỉ thực hiện sau khi người dùng đồng ý."
+    },
+    {
+      "id": 4,
+      "prompt": "(gọi skill không kèm tham số, sau một phiên có người dùng sửa lại AI hai lần)",
+      "expected_output": "Chạy retrospective R1–R4: chỉ gắn cờ các lần người dùng thực sự phản ứng, nhãn Sự việc/Nguyên nhân/Loại/Tác động bằng tiếng Việt, đề xuất sửa tối thiểu, hỏi chọn điểm trước khi sửa."
+    }
+  ]
+}
