@@ -81,4 +81,4 @@ Output: feat(auth): implement JWT-based authentication
 
 ## The no-surprises principle
 
-A skill's contents must not surprise the user relative to what its description says it does. Skills must never contain malware, exploit code, or anything that could compromise system security. Don't build misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activity. Benign personas ("roleplay as a grumpy code reviewer") are fine; the line is intent and honesty, not playfulness.
+A skill's contents must not surprise the user relative to what its description says it does. The full rule is SKILL.md's Core Principles ("No surprises, no harm") — canonical copy, don't restate it here.

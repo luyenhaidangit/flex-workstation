@@ -1,6 +1,6 @@
 ---
 name: flex-skill-creator
-description: Creates, hardens, tests, evaluates, optimizes, audits, or packages a Claude skill (in .agents/skills/ or a personal skills folder), especially for software development, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved or audited, or a repetitive workflow captured. Trigger on "make me a skill for X", "turn this workflow into a skill", "improve/test/optimize my skill", "tạo/review/sửa skill", on bare invocation (no argument) for a session retrospective, and on "audit/health-check all skills" for a catalog sweep. Do not use for editing AGENTS.md/CLAUDE.md rules (use flex-context-engineering) or for performing the task itself instead of capturing it as a skill.
+description: Creates, hardens, tests, evaluates, optimizes, audits, merges, retires, or packages a Claude skill (in .agents/skills/ or a personal skills folder), especially for software development, code review, and technical documentation. Use when the user wants a new skill designed, an existing skill improved, audited, merged or removed, or a repetitive workflow captured. Trigger on "make me a skill for X", "turn this workflow into a skill", "improve/test/optimize my skill", "tạo/review/sửa/gộp/xóa skill", on bare invocation (no argument) or a request to review which skill misread intent in this session (session retrospective), and on "audit/health-check all skills" for a catalog sweep. Do not use for editing AGENTS.md/CLAUDE.md rules (use flex-context-engineering) or for performing the task itself instead of capturing it as a skill.
 ---
 
 # Flex Skill Creator
@@ -161,7 +161,7 @@ Triggered by an explicit request to audit, health-check, or "review all" skills 
 1. Run `node scripts/validate-skills.js` with no argument (validates the whole catalog) for the mechanical checks.
 2. For each skill, check the same drift patterns this skill's own house style calls out: missing `evals/` despite the skill's domain recommending them, description length outside the range `validate-skills.js` accepts (the validator is the only place the limit lives), a missing routing-table row in `flex-using-agent-skills`, a description missing a literal "Use when" clause, and reference material duplicated instead of pointed-to.
 3. Group findings by skill, most actionable first, with the severity scale from `references/audit-rubric.md`. Skip a skill entirely if it has no findings — don't manufacture filler to look thorough.
-4. Present all findings in one pass, same shape as the retrospective's R2–R3, and ask which to implement before editing anything — a catalog-wide audit touches many files, so confirm scope first.
+4. Present all findings in one pass using the finding format in `references/audit-rubric.md` (each with replacement text or a diff), and ask which to implement before editing anything — a catalog-wide audit touches many files, so confirm scope first.
 
 Keep this to the mechanical/structural checks above, not a content rewrite of each skill's domain logic — a finding that needs deeper rework is a separate, per-skill conversation (use "Auditing an existing skill" for that one skill) once this pass surfaces it as a candidate.
 
@@ -173,9 +173,9 @@ Skill creation isn't the only outcome of a catalog check. Reach for this instead
 - **A skill has gone stale** — its conventions no longer match the codebase, or a session retrospective (no-argument mode) repeatedly points at the same skill for wrong-scope or misread-intent findings that a targeted fix hasn't resolved after a couple of iterations.
 - **The user asks to retire a skill outright.**
 
-Retiring a skill means: delete `.agents/skills/<skill-name>/`, remove its row from `flex-using-agent-skills`'s routing table, and re-run the sync step in `references/flex-workspace-spec.md` to clear the stale `.claude/skills/` junction.
+Retiring a skill means: delete `.agents/skills/<skill-name>/`, remove its row from `flex-using-agent-skills`'s routing table, and confirm `.claude/skills/` still links to `.agents/skills/` (see `references/flex-workspace-spec.md`; the whole-directory link needs no re-sync).
 
-Deleting a directory and editing the shared router affect every task in the workspace, so get explicit approval first: ask with `AskUserQuestion`, listing the skill to be absorbed or removed, the reason, and the routing row that will go. Perform the deletion only after the user chooses to proceed; if they decline, leave everything as it is.
+Deleting a directory and editing the shared router affect every task in the workspace, so get explicit approval first: ask with `AskUserQuestion` (or directly in chat if that tool is unavailable), listing the skill to be absorbed or removed, the reason, and the routing row that will go. Perform the deletion only after the user chooses to proceed; if they decline, leave everything as it is.
 
 ## The clarification gate
 

@@ -6,11 +6,12 @@
   removes links whose source skill no longer exists.
 
   This is the portable implementation of the pattern documented in
-  ../references/skill-sync-pattern.md. flex-workstation's own
-  scripts/sync-skills.ps1 (repo root) is a thin wrapper around this file
-  with this repo's own paths filled in — copy this file into another repo's
-  scripts/ and pass -SourceDir/-MirrorDir for its own layout instead of
-  duplicating the logic.
+  ../references/skill-sync-pattern.md. It is NOT used by flex-workstation
+  itself: that repo links the whole .claude/skills directory to
+  .agents/skills with its own scripts/sync-skills.ps1 (repo root). Copy this
+  file into another repo's scripts/ and pass -SourceDir/-MirrorDir for its
+  own layout. The mirror must be a separate real directory; the script
+  refuses a mirror that is a link to, or the same folder as, the source.
 
 .PARAMETER SourceDir
   The tracked skills directory that is the source of truth (each immediate
@@ -64,8 +65,19 @@ function Sync-SkillMirror {
         return
     }
 
+    # Per-skill sync deletes any real folder it finds in the mirror. If the mirror
+    # is itself a link into the source (or the same folder), "real folder" means
+    # the source skill, so refuse instead of destroying it.
+    if (Test-Path -LiteralPath $Mirror) {
+        $mirrorItem = Get-Item -LiteralPath $Mirror -Force
+        $mirrorIsLink = [bool]($mirrorItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint)
+        $sameFolder = (Resolve-Path -LiteralPath $Mirror).Path -ieq (Resolve-Path -LiteralPath $Source).Path
+        if ($mirrorIsLink -or $sameFolder) {
+            throw "Refusing to sync: '$Mirror' is already a link or resolves to '$Source'. Per-skill sync would delete the source skill folders."
+        }
+    }
+
     New-Item -ItemType Directory -Force -Path $Mirror | Out-Null
-    $isWindows = $env:OS -eq "Windows_NT"
 
     $sourceNames = @{}
     $synced = 0
@@ -83,7 +95,7 @@ function Sync-SkillMirror {
             # Stale real copy from an older checkout; replace with a link
             Remove-Item -LiteralPath $linkPath -Recurse -Force
         }
-        if ($isWindows) {
+        if ($env:OS -eq "Windows_NT") {
             New-Item -ItemType Junction -Path $linkPath -Target $skill.FullName | Out-Null
         }
         else {

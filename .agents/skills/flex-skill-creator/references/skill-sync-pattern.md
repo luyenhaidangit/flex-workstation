@@ -1,8 +1,8 @@
 # Skill Sync Pattern — one source, many tool mirrors
 
-Read this when a skill targets a repo **other than `flex-workstation`** (Step 7.5's workstation-specific wiring is skipped there) but that repo still serves more than one agent tool, and at least one of them hardcodes its own skills directory — Claude Code always reads `.claude/skills/` relative to the project root; it cannot be pointed elsewhere. This is the generalized version of the pattern `flex-workstation` itself uses (`.agents/skills/` + `scripts/sync-skills.ps1`, see `flex-workspace-spec.md`'s "Wiring a new or changed skill into the workspace").
+Read this when a skill targets a repo **other than `flex-workstation`** (Step 7.5's workstation-specific wiring is skipped there) but that repo still serves more than one agent tool, and at least one of them hardcodes its own skills directory — Claude Code always reads `.claude/skills/` relative to the project root; it cannot be pointed elsewhere. This is a per-skill variant of the source-of-truth + mirror idea. `flex-workstation` itself uses the simpler whole-directory form (one link, `.claude/skills` → `.agents/skills`, see `flex-workspace-spec.md`) and does not run the script described here; use this pattern when the mirror directory must stay a real directory that holds one link per skill.
 
-The portable implementation already exists at `scripts/sync-skills.ps1` right next to this file (in this skill's own folder) — it's parameterized (`-SourceDir`, `-MirrorDir`, repeatable), so most repos need zero code changes, just the right arguments. `flex-workstation`'s own `scripts/sync-skills.ps1` (repo root) is a two-line wrapper that calls this same file with `.agents/skills` / `.claude/skills` filled in — that wrapper is the reference example for step 5 below.
+The portable implementation is `scripts/sync-skills.ps1` right next to this file (in this skill's own folder) — it's parameterized (`-SourceDir`, `-MirrorDir`, repeatable), so most repos need zero code changes, just the right arguments. It refuses a mirror that is a link to, or the same folder as, the source, because it deletes real folders it finds in the mirror.
 
 ## The problem
 
@@ -20,5 +20,5 @@ Every tool that hardcodes its own skills path forces a choice: duplicate each sk
 
 1. Decide that repo's own `SourceDir` and `MirrorDir` values (step 1–2 above) — `.agents/skills` / `.claude/skills` are `flex-workstation`'s own naming choice, not a universal convention.
 2. Copy `scripts/sync-skills.ps1` (next to this file) into that repo's own scripts location as-is — it takes `-SourceDir` and one or more `-MirrorDir` values, so it needs no code changes for a different layout.
-3. Add a small wrapper in that repo (a few lines, same shape as `flex-workstation`'s root `scripts/sync-skills.ps1`) that calls the copied script with that repo's own paths filled in, so the rest of that repo's tooling can invoke it with no arguments.
+3. Add a small wrapper in that repo (a few lines) that calls the copied script with that repo's own paths filled in, so the rest of that repo's tooling can invoke it with no arguments.
 4. Ignore the mirror directories in that repo's `.gitignore` and run the wrapper once to confirm it creates the expected links.

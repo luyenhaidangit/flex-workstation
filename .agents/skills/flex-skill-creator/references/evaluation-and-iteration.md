@@ -31,7 +31,7 @@ Claude.ai has no subagents, so run tests **inline, one at a time**:
 2. Follow its instructions to complete the test prompt yourself, producing the real output.
 3. If the output is a file the user needs to see (a `.docx`, `.xlsx`, chart, etc.), save it to the filesystem and tell them where, so they can open and inspect it.
 
-This is less rigorous than an independent agent running the skill blind — you wrote it and you're running it, so you have full context — but it's a solid sanity check, and the human review step compensates. Skip baseline ("without skill") runs and skip quantitative benchmarking on Claude.ai; they rely on independent baseline comparisons that aren't meaningful when you're both author and runner.
+This is less rigorous than an independent agent running the skill blind — you wrote it and you're running it, so you have full context — but it's a solid sanity check, and the human review step compensates. Skip multi-run quantitative benchmarking on Claude.ai; it relies on independent runs that aren't meaningful when you're both author and runner. Still do one lightweight inline "without skill" vs "with skill" comparison per test prompt (see "Value-add, regression, and independent review" below) and label it a self-comparison.
 
 ## Reviewing outputs with the user
 

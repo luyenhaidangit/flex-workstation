@@ -11,7 +11,7 @@ Assume the skill has defects and look for them. The author of a skill, and an ag
 | Criterion | Questions to answer from the files |
 | --- | --- |
 | Trigger precision | Does `description` state what, when (positive triggers), and when not (negative triggers)? Compare it with the routing-table rows and neighbouring descriptions in `flex-using-agent-skills`: would two skills fire on the same prompt? Which phrasing would cause a false positive or a miss? |
-| Context efficiency | Does `SKILL.md` stay within the line limit that `validate-skills.js` enforces? Does it restate what the model already knows, or copy content that lives in a `references/` file or another skill? Are long tables and checklists in `references/`? |
+| Context efficiency | Does `SKILL.md` stay within the ~400-line guideline (no script checks it, so count)? Does it restate what the model already knows, or copy content that lives in a `references/` file or another skill? Are long tables and checklists in `references/`? |
 | Instruction clarity | Do any two rules contradict? Is the step order unambiguous, including step numbering across modes? Are there vague verbs ("try to", "if appropriate") instead of IF/THEN conditions and a definition of done? Is there a fallback for missing input or a failing tool? |
 | Tool and script safety | Does any command delete, overwrite, push, or edit shared files without asking the user first? Does a script read external data (web, logs, repo text) and let it steer actions, which opens a prompt-injection path? Are secrets kept out? |
 | Output determinism | Is the output format literal, with an example? Could two runs produce different shapes of the same report? Are the labels in the language `AGENTS.md` requires for user-visible text? |
