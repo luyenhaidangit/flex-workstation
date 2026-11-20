@@ -1,9 +1,9 @@
 ---
-name: flex-server-setup
+name: flex-server-engineering
 description: Guides a person through setting up a new Flex server (Ubuntu + Docker Compose + Nginx/TLS + optional k3s) from scratch, stage by stage, with the exact commands, safety gates and verification evidence for each stage. The agent only instructs; the person runs every command. Use when the user asks to set up, provision, bootstrap, rebuild or migrate a Flex server, to install Docker/Nginx/certbot/k3s/Infisical on a fresh machine, or for a checklist of what a new server needs.
 ---
 
-# Flex Server Setup
+# Flex Server Engineering
 
 ## Overview
 
