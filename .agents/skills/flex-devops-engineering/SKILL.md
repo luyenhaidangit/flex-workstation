@@ -1,6 +1,6 @@
 ---
 name: flex-devops-engineering
-description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, or infrastructure production-readiness.
+description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, infrastructure production-readiness, or provisioning a new server.
 ---
 
 # Flex DevOps Engineering
@@ -37,6 +37,8 @@ engineering skill as an additional owner rather than duplicating its rules here.
   networking failures, port conflicts, or infrastructure drift.
 - Reviewing infrastructure for production readiness, recoverability, least
   privilege, observability, or operational safety.
+- Setting up, provisioning, bootstrapping, rebuilding, or migrating a new Flex server
+  (see "Provisioning a new server").
 
 Do not use this skill for a purely application-level change with no infrastructure
 or delivery artifact. Do not introduce Kubernetes, Terraform, Helm, or a new
@@ -297,6 +299,15 @@ Conversion order and rules:
 - Alerts need an owner, threshold, evaluation window, and actionable runbook; an alert
   that nobody can act on is noise.
 - Verify disk/volume growth, retention, and backup for stateful infrastructure.
+
+### Provisioning a new server
+
+Read `references/server-setup.md` before answering. It is a guide-only runbook: the
+agent hands over commands stage by stage (base packages, Docker, secrets, Nginx/TLS,
+optional Infisical and k3s, firewall, stack start) and the person runs them. Do not
+SSH into a server being provisioned, and never accept a secret, private key, or real
+IP in chat. Compare each command with `flex-environment` (`SETUP_SERVER.md`,
+`setup/*.sh`) and `flex-k8s` first; the repo wins on any difference.
 
 ## Common Rationalizations
 

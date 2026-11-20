@@ -1,17 +1,12 @@
----
-name: flex-server-engineering
-description: Guides a person through setting up a new Flex server (Ubuntu + Docker Compose + Nginx/TLS + optional k3s) from scratch, stage by stage, with the exact commands, safety gates and verification evidence for each stage. The agent only instructs; the person runs every command. Use when the user asks to set up, provision, bootstrap, rebuild or migrate a Flex server, to install Docker/Nginx/certbot/k3s/Infisical on a fresh machine, or for a checklist of what a new server needs.
----
-
-# Flex Server Engineering
+# Server Setup (guide-only runbook)
 
 ## Overview
 
-Walks a person through standing up a Flex server in a fixed order, one stage at a time. The source of truth for what the stack needs is `flex-environment` (`SETUP_SERVER.md`, `setup/0*-init-*.sh`, `docker-compose*.yml`, `AGENTS.md`) and `flex-k8s`. This skill carries the commands and the safety gates so the person can follow without opening every file, but the repo wins whenever the two disagree (see Step 1).
+Walks a person through standing up a Flex server in a fixed order, one stage at a time. The source of truth for what the stack needs is `flex-environment` (`SETUP_SERVER.md`, `setup/0*-init-*.sh`, `docker-compose*.yml`, `AGENTS.md`) and `flex-k8s`. This reference carries the commands and the safety gates so the person can follow without opening every file, but the repo wins whenever the two disagree (see Step 1).
 
 **Mode: guide-only.** The agent does not SSH into any server and does not run mutating commands on one. It reads the repos, explains, and hands over commands for the person to run, then interprets the output the person pastes back. Reason: a fresh server receives private keys, secrets, certificates and an admin signup page; a wrong or unreviewed command there is hard to undo and may leak a credential into a transcript.
 
-This skill does not diagnose incidents on a running production server (use `flex-prod-troubleshooting`) and does not own Compose/Nginx/Jenkins design rules (use `flex-devops-engineering`).
+Loaded from `flex-devops-engineering` when the task is to provision a new server. It does not diagnose incidents on a running production server (use `flex-prod-troubleshooting`); Compose, Nginx, Jenkins and secret rules stay in `flex-devops-engineering`'s main file.
 
 ## When to Use
 
@@ -19,13 +14,13 @@ This skill does not diagnose incidents on a running production server (use `flex
 - A checklist or review of whether a new server is ready for the Flex stack.
 - A person is mid-setup and pastes an error or output from one of the stages below.
 
-Do not use it to change an existing production service, deploy a new app version, or rotate secrets; those are `flex-devops-engineering` tasks with their own authority checks.
+Do not use it to change an existing production service, deploy a new app version, or rotate secrets; those follow the main `flex-devops-engineering` process with its own authority checks.
 
 ## Core Process
 
 ### 1. Verify against the repo before giving any command
 
-Read the current files first; do not rely on this skill's text for current state. Use `flex-repo-scope` (Read mode) to get `flex-environment` and `flex-k8s`, then open:
+Read the current files first; do not rely on this reference's text for current state. Use `flex-repo-scope` (Read mode) to get `flex-environment` and `flex-k8s`, then open:
 
 - `flex-environment/SETUP_SERVER.md` and `AGENTS.md` (section "Runtime Targets" says which compose files are populated and which are empty placeholders; `temp/` holds old configs awaiting migration).
 - `flex-environment/setup/01..04-init-*.sh` header comments (flags such as `--check`, `--env`, `--staging`).
@@ -265,7 +260,7 @@ End the whole run with the server readiness checklist taken from `SETUP_SERVER.m
 | Rationalization | Reality |
 | --- | --- |
 | "I can just SSH in and run it for them." | Guide-only is a deliberate boundary: a fresh server holds keys and an admin signup page. Hand over commands; the person runs them. |
-| "This skill lists the commands, no need to open the repo." | The skill can drift from `SETUP_SERVER.md` and the scripts. Step 1 comes first, and the repo wins. |
+| "This reference lists the commands, no need to open the repo." | The reference can drift from `SETUP_SERVER.md` and the scripts. Step 1 comes first, and the repo wins. |
 | "Run `restart.sh` to start everything." | It runs `git pull` and `docker compose down`, stopping every container. Use `docker compose up -d` on a new server. |
 | "Infisical can be opened to the Internet, we'll sign up later." | Whoever reaches `/admin/signup` first becomes admin. Create the admin through the SSH tunnel before publishing the route. |
 | "Config renders, so the server is ready." | `compose config` and `--check` prove syntax and prerequisites, not readiness. Collect health output and the external port scan. |
@@ -279,11 +274,11 @@ End the whole run with the server readiness checklist taken from `SETUP_SERVER.m
 - Skipping `--check` or the DNS precondition before requesting a certificate.
 - Reporting "server ready" without pasted health and port-scan evidence.
 - Opening 6443, 10250 or NodePorts to the Internet.
-- Copying repo state from this skill's text without having read the repo in Step 1.
+- Copying repo state from this reference's text without having read the repo in Step 1.
 
 ## Verification
 
-- [ ] Step 1 ran: `flex-environment` and `flex-k8s` were read and every difference from this skill was reported.
+- [ ] Step 1 ran: `flex-environment` and `flex-k8s` were read and every difference from this reference was reported.
 - [ ] Target facts (OS, architecture, RAM/disk, domains, k3s needed) were stated before stage 0 ended.
 - [ ] Every stage used the stage block and one command per `bash` block.
 - [ ] No command was run on a server by the agent, and no secret value appeared in the chat.
