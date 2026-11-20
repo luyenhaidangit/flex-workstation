@@ -11,7 +11,7 @@ Loaded from `flex-devops-engineering` when the task is to provision a new server
 ## When to Use
 
 - "Setup server mới", "dựng lại server", "cài Docker/Nginx/TLS/k3s trên máy trắng", "chuyển sang server khác".
-- A checklist or review of whether a new server is ready for the Flex stack.
+- A checklist or review of whether a server is ready for the Flex stack (stage 10 works on its own for an existing server).
 - A person is mid-setup and pastes an error or output from one of the stages below.
 
 Do not use it to change an existing production service, deploy a new app version, or rotate secrets; those follow the main `flex-devops-engineering` process with its own authority checks.
@@ -34,7 +34,7 @@ Ask only what is unknown (one batch): server role (new dev/staging/prod), provid
 
 ### 3. Run the stages in order, one at a time
 
-Present one stage, its commands, the expected result and the gate. Wait for the person's output before the next stage. Each command goes in its own fenced `bash` block. Stages 0-3 are the base; 4-9 depend on what the target needs.
+Present one stage, its commands, the expected result and the gate. Wait for the person's output before the next stage. Each command goes in its own fenced `bash` block. Stages 0-3 are the base; 4-9 depend on what the target needs; 10 is the review checklist.
 
 #### Stage 0: Machine facts and sizing
 
@@ -241,6 +241,95 @@ Expect long-running services `Up` and `healthy`, init containers (`postgres-boot
 
 CI/CD (optional): GitHub secrets `SERVER_HOST`, `SERVER_USER`, `SERVER_SSH_KEY` on `flex-environment`, set with `gh secret set <name>`. The workflow triggers on `push` and `pull_request` to `main` and runs `restart.sh` on the server, so ask whether pull requests should be able to deploy.
 
+#### Stage 10: Readiness check (review checklist)
+
+Self-contained and read-only: use it right after stage 9, or alone when someone asks "server ổn chưa / sẵn sàng chưa" about a server that already exists. Skip groups that do not apply (no k3s, no Infisical). The person runs each command (one per `bash` block, as in Step 3) and pastes the output; the agent marks the row. Commands marked † are standard Linux/OpenSSL/curl commands, not taken from the repo and not yet run on this server; say so when handing them over. Never `cat` a secret: names, modes and counts only.
+
+**A. Machine**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| A1 | OS and architecture | `lsb_release -rs && uname -m` | Ubuntu; architecture matches every pinned image |
+| A2 | Memory, swap, disk | `free -h && df -h /` | Recorded; swap present on a small-RAM host; disk not near full |
+| A3 | Elasticsearch kernel setting (if used) | `sysctl vm.max_map_count` | `262144` |
+| A4 | Clock in sync † | `timedatectl show -p NTPSynchronized` | `NTPSynchronized=yes` (TLS and JWT depend on time) |
+
+**B. Access**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| B1 | Deploy user, not root | `id` | User `ubuntu`, in groups `sudo` and `docker` |
+| B2 | GitHub access | `ssh -T git@github.com` | Greets the account, no `Permission denied` |
+| B3 | Repo location | `ls -d ~/flex-environment` | Exists (CI runs `cd ~/flex-environment`) |
+| B4 | SSH hardening † (recommended, not in repo) | `sudo sshd -T \| grep -E 'permitrootlogin\|passwordauthentication'` | Password login off; root login off or key-only |
+
+**C. Docker and stack**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| C1 | Docker and Compose | `docker --version && docker compose version` | Both print versions |
+| C2 | Compose renders | `docker compose config --quiet` | Exit 0 (syntax only) |
+| C3 | Images pinned † | `docker compose config \| grep -E 'image:.*(:latest\|[^:]$)'` | No output |
+| C4 | Containers healthy | `docker compose ps` | Long-running `Up`/`healthy`; init containers `Exited (0)` |
+| C5 | Data persists | `docker volume ls` | Named volumes exist for every stateful service |
+
+**D. Secrets and configuration (names, modes and counts only)**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| D1 | Secret file modes | `ls -l ~/.ssh/id_ed25519 ~/.secrets ./.secrets` | `-rw-------`; all files from stage 3 present |
+| D2 | `JENKINS_HOST_HOME` | `grep '^JENKINS_HOST_HOME=' .env` | The deploy user's home, not the dev machine's |
+| D3 | App env files exist | `ls -l mounts/flex-api-gateway/.env mounts/flex-auth-service/.env` | Both exist, mode 600 |
+| D4 | JWT key identical in both | `grep -h '^JwtSettings__SecretKey=' mounts/flex-api-gateway/.env mounts/flex-auth-service/.env \| uniq \| wc -l` | `1` (prints no value) |
+| D5 | Production passwords overridden | `grep -E '^(POSTGRES_PASSWORD\|MYSQL_ROOT_PASSWORD\|RABBITMQ_DEFAULT_PASS\|ELASTIC_PASSWORD\|MINIO_ROOT_PASSWORD)=' .env \| cut -d= -f1` | Every name used by the running stack is listed (defaults are not acceptable) |
+| D6 | No secrets or private keys tracked by Git † | `git ls-files \| grep -E '(^\|/)\.secrets/\|\.key$\|(^\|/)\.env$\|wallet'` | No output on a production checkout |
+
+**E. DNS and TLS (repeat per served domain: `luyenhaidangit.pro`, `www.`, and each of `portainer.`, `infisical.`, `flex.`, `api.` in use)**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| E1 | A record points here | `nslookup <domain>` | `Address:` equals the server IP |
+| E2 | No stray IPv6 | `nslookup -type=AAAA <domain>` | No AAAA unless IPv6 is served |
+| E3 | Cert issued | `sudo certbot certificates` | Cert listed, every served name in its domains |
+| E4 | Cert actually served, SAN and expiry † | `echo \| openssl s_client -connect <domain>:443 -servername <domain> 2>/dev/null \| openssl x509 -noout -dates -subject -ext subjectAltName` | Not expired, `notAfter` more than 30 days away (certbot renews inside 30 days), SAN covers the name |
+| E5 | Auto-renewal | `systemctl list-timers \| grep certbot` | A timer is scheduled |
+| E6 | Renewal works | `sudo certbot renew --dry-run` | Succeeds |
+| E7 | HTTP redirects to HTTPS † | `curl -sI http://<domain>` | `301` to `https://` (ACME path stays HTTP) |
+| E8 | `www` redirects to root † | `curl -sI https://www.luyenhaidangit.pro` | `301` to the root domain |
+| E9 | Health route | `curl -I https://<domain>/healthz` | `200` |
+| E10 | Nginx config and environment | `docker compose exec nginx nginx -t` | `syntax is ok`; `.env.nginx` selects `NGINX_ENV=prod` |
+| E11 | Not the self-signed or dev cert † | `curl -sS -o /dev/null -w '%{ssl_verify_result}\n' https://<domain>/healthz` | `0` (a mkcert or self-signed cert fails here) |
+
+**F. Network exposure**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| F1 | What listens locally | `ss -tlnp` | Only intended services; compare with the port table in stage 8 |
+| F2 | Closed from outside (run from another machine) | `nc -zv -w 5 <IP-server> <port>` for 5432, 3306, 6379, 5672, 15672, 9200, 6443, 10250, 30080 | `timed out` for each; only 80, 443 and SSH answer |
+| F3 | Provider firewall | Ask the person; it cannot be read from the host | Recorded as "xác nhận bởi chủ server", never as verified without F2 |
+
+**G. Kubernetes (only if stage 7 was done)**
+
+| # | Check | Command | Expected |
+| --- | --- | --- | --- |
+| G1 | Node and pods | `kubectl get nodes` then `kubectl get pods -A` | Node `Ready`; pods `Running` |
+| G2 | Reachable on the NodePort | `curl -i http://localhost:30080/` | Responds (nginx page) |
+| G3 | Gateway secret exists | `kubectl get secret flex-api-gateway-secret -o jsonpath='{.data}' \| jq 'keys'` | Lists key names only, never values |
+
+**H. Recovery and operations**
+
+| # | Check | How | Expected |
+| --- | --- | --- | --- |
+| H1 | Infisical `ENCRYPTION_KEY` backed up off the server | Ask the person (do not read the file) | Confirmed; otherwise a blocker |
+| H2 | Database backup and a tested restore | Ask for the last `pg_dump` and restore date | Both exist; otherwise "chưa xác minh" |
+| H3 | `jenkins_data` backup before any Jenkins change | Ask | Exists before `publish-jenkins.sh` runs |
+| H4 | CI secrets set (run on the person's machine) | `gh secret list -R luyenhaidangit/flex-environment` | `SERVER_HOST`, `SERVER_USER`, `SERVER_SSH_KEY` |
+| H5 | No secret leaked into logs | `docker compose logs --tail 100 <service>` and skim | No credentials in output |
+
+Blockers (any one makes the verdict "chưa sẵn sàng"): expired cert or a served name missing from the SAN, a database/broker/Elasticsearch port reachable from outside, default production passwords, unhealthy long-running containers, JWT keys that differ, or no off-server `ENCRYPTION_KEY` backup. Everything else is reported as a finding with its severity, not hidden.
+
+Report with the block defined under "Output Format".
+
 ## Output Format
 
 For each stage, reply in Vietnamese with this block, then the commands (each in its own `bash` block):
@@ -253,7 +342,18 @@ Giai đoạn <n>: <tên>
 - Chốt an toàn: <điều phải xác nhận trước khi sang giai đoạn sau>
 ```
 
-End the whole run with the server readiness checklist taken from `SETUP_SERVER.md` ("Checklist cài mới"), one line per item, marked `[x]` only for evidence the person actually pasted back, otherwise `[ ]` with the reason (`chưa xác minh`, `chưa chạy`).
+End the whole run, and answer any "is this server ready" review, with the stage 10 checklist and this report. Mark a row passed only for output the person actually pasted back; otherwise it is `chưa xác minh` or `chưa chạy` with the reason.
+
+```text
+Báo cáo sẵn sàng server
+- Mục tiêu: <server, vai trò, domain>
+- Kết quả: <đạt>/<tổng> mục đạt, <n> không đạt, <m> chưa xác minh
+- Không đạt: <mã mục — bằng chứng — cách khắc phục>
+- Chưa xác minh: <mã mục — lý do>
+- Kết luận: Sẵn sàng | Chưa sẵn sàng (blocker: <mã mục>)
+```
+
+Example: `- Không đạt: E4 — notAfter còn 12 ngày, www.luyenhaidangit.pro không có trong SAN — chạy lại setup/02-init-nginx.sh --env prod sau khi có DNS www`.
 
 ## Common Rationalizations
 

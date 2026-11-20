@@ -37,8 +37,8 @@ engineering skill as an additional owner rather than duplicating its rules here.
   networking failures, port conflicts, or infrastructure drift.
 - Reviewing infrastructure for production readiness, recoverability, least
   privilege, observability, or operational safety.
-- Setting up, provisioning, bootstrapping, rebuilding, or migrating a new Flex server
-  (see "Provisioning a new server").
+- Setting up, provisioning, bootstrapping, rebuilding, or migrating a Flex server, or
+  reviewing whether one is ready (see "Provisioning a new server").
 
 Do not use this skill for a purely application-level change with no infrastructure
 or delivery artifact. Do not introduce Kubernetes, Terraform, Helm, or a new
@@ -304,7 +304,9 @@ Conversion order and rules:
 
 Read `references/server-setup.md` before answering. It is a guide-only runbook: the
 agent hands over commands stage by stage (base packages, Docker, secrets, Nginx/TLS,
-optional Infisical and k3s, firewall, stack start) and the person runs them. Do not
+optional Infisical and k3s, firewall, stack start, readiness checklist) and the person
+runs them. The readiness checklist (stage 10) also answers "is this server ready" on
+its own for an existing server. Do not
 SSH into a server being provisioned, and never accept a secret, private key, or real
 IP in chat. Compare each command with `flex-environment` (`SETUP_SERVER.md`,
 `setup/*.sh`) and `flex-k8s` first; the repo wins on any difference.
