@@ -1,6 +1,6 @@
 ---
 name: flex-devops-engineering
-description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, or infrastructure production-readiness.
+description: Designs, implements, reviews, diagnoses, and safely operates Flex infrastructure and delivery workflows. Use when working with Dockerfiles, Docker Compose, Kubernetes manifests, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, secrets, container networking, health checks, observability, rollout, rollback, server review or hardening, or infrastructure production-readiness.
 ---
 
 # Flex DevOps Engineering
@@ -297,6 +297,15 @@ Conversion order and rules:
 - Alerts need an owner, threshold, evaluation window, and actionable runbook; an alert
   that nobody can act on is noise.
 - Verify disk/volume growth, retention, and backup for stateful infrastructure.
+
+## Server Review
+
+For a request to review, audit, or health-check a server (periodic check, pre-launch,
+or after a suspected exposure), read `references/server-review-checklist.md` and follow
+it: read-only commands, evidence per item, `Đạt` / `Chưa đạt` / `Chưa xác minh` results,
+and a ranked action list. A review reports what should be done and asks which fixes to
+apply; it does not change the server. Diagnosing a live incident is
+`flex-prod-troubleshooting`, not this review.
 
 ## Common Rationalizations
 
