@@ -69,6 +69,7 @@ Select only skills that directly govern the task.
 | Angular UI in `flex-microfrontend`, including components, templates, forms, modals, and tables | `flex-frontend-engineering` |
 | Dockerfile, Docker Compose, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, or rollback | `flex-devops-engineering` |
 | Production error, outage, 5xx, unhealthy container, or a request to check logs/state on a prod server (SSH via WSL) | `flex-prod-troubleshooting` |
+| Setting up, provisioning, bootstrapping, rebuilding, or migrating a new Flex server (Ubuntu, Docker, Nginx/TLS, k3s, Infisical), or a readiness checklist for a new server | `flex-server-setup` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
 | Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
 | Add a repo/project to the workstation manifest (`workstation.json`) and its ignore rules, or fix a repo that is not cloned, is skipped by the sync script, or shows as untracked | `flex-repo-onboarding` |
