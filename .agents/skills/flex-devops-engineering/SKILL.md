@@ -300,6 +300,14 @@ Conversion order and rules:
   that nobody can act on is noise.
 - Verify disk/volume growth, retention, and backup for stateful infrastructure.
 
+## Lessons Learned
+
+Read `references/lessons-learned.md` before diagnosing networking, DNS, ArgoCD, or k3s
+failures, and match the symptom against known incidents before guessing a cause. After
+resolving a new incident, append an entry there (symptom, root cause, read-only
+verification, fix, lesson) and prefer a declarative fix in the repository over a manual
+`kubectl` change.
+
 ## Common Rationalizations
 
 | Rationalization | Reality |
@@ -352,6 +360,8 @@ Conversion order and rules:
       topology, or recovery steps.
 - [ ] Final reporting separates configuration, validation, deployment, health, and
       residual risk with command evidence.
+- [ ] `references/lessons-learned.md` was checked for a matching symptom, and updated
+      if this work uncovered a new incident cause.
 
 ## Example Prompts
 
