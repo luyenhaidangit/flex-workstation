@@ -70,6 +70,7 @@ Select only skills that directly govern the task.
 | Dockerfile, Docker Compose, Nginx, Jenkins, CI/CD, deployment scripts, environment configuration, container networking, health checks, observability, rollout, rollback, or setting up/provisioning/rebuilding/migrating a new Flex server | `flex-devops-engineering` |
 | Production error, outage, 5xx, unhealthy container, or a request to check logs/state on a prod server (SSH via WSL) | `flex-prod-troubleshooting` |
 | Backend/domain/public-contract naming | `flex-naming-convention` |
+| Draw or document system architecture as C4 Mermaid diagrams (context, container, component, deployment, dynamic) written to `core/architecture/` | `flex-c4-architecture` |
 | Cross-service system performance audit, SLI/SLO definition, error budget, or tracing a slow/unreliable user journey end-to-end | `flex-slo-engineering` |
 | Add a repo/project to the workstation manifest (`workstation.json`) and its ignore rules, or fix a repo that is not cloned, is skipped by the sync script, or shows as untracked | `flex-repo-onboarding` |
 | A task that reads or changes code in child repos from `workstation.json`, **or a question/review/design about how Flex infrastructure or services currently work** (Nginx, Docker Compose, TLS, WAF, ingress, deploy, CI/CD, gateway) even if no code change is requested — choosing which repos to read/edit without scanning all (local: print the plan only; cloud, `CLAUDE_CODE_REMOTE=true`: also attach/clone) | `flex-repo-scope` |
