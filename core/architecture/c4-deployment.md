@@ -34,6 +34,7 @@ C4Deployment
   Rel(dnginx, jenkins, "Proxy host jenkins", "HTTP")
   Rel(jenkins, openbao, "Đọc secret qua JCasC, token chỉ đọc", "HTTP")
   Rel(jenkins, github, "Seed Job poll flex-environment, checkout repo", "SSH")
+  Rel(jenkins, github, "Multibranch quét flex-api-gateway bằng github-token", "HTTPS, GitHub API")
   Rel(knginx, gateway, "/api/", "HTTP")
   Rel(knginx, argocd, "/argocd", "HTTP")
   Rel(argocd, github, "Đồng bộ manifests/", "HTTPS")
@@ -51,6 +52,7 @@ C4Deployment
 | --- | --- | --- | --- |
 | nginx Docker (WAF) → NodePort `30080` | Dùng chung (Docker) | `Confirmed` (khai báo) | `flex-k8s/README.md` mục "Cài Argo CD", `flex-environment/AGENTS.md` mục 3, 4 |
 | Jenkins: host `jenkins.luyenhaidangit.pro` (không còn tiền tố `/jenkins`), secret đọc từ OpenBao, job tạo bởi Seed Job từ `mounts/jenkins/jobs/*.groovy` | Dùng chung (Docker) | `Confirmed by user` | `docker-compose.infra.yml`, `mounts/jenkins/jenkins.yaml`, `mounts/jenkins/seeds/seed.groovy`; người dùng đã chạy thành công Seed Job (build #2) và thấy folder `misa` |
+| Jenkins GitHub: plugin `github`, `github-branch-source`; credential `github-token` (khoá `github_username`, `github_token` trong secret `flex/github`); `misa/flex-api-gateway` khai báo Multibranch, chỉ nhận nhánh `main`, không build PR | Dùng chung (Docker) | `Declared` (chưa chạy thử) | `plugins/plugins.txt`, `jenkins.yaml`, `jobs/misa.groovy`, `mounts/openbao/secrets.list`; chưa build lại image, chưa chạy Seed Job với cấu hình này |
 | OpenBao (thay Infisical): project compose `flex-secrets` riêng, UI qua host `bao.luyenhaidangit.pro`, cổng `127.0.0.1:8200` | Dùng chung (Docker) | `Confirmed` (khai báo) | `docker-compose.openbao.yml`, `mounts/nginx/sites/prod/bao.luyenhaidangit.pro.conf`; sealed sau mỗi lần container khởi động lại, phải unseal tay |
 | Mắt Bão (DNS) | Ngoài hệ thống | `Confirmed` (khai báo) | `setup/02-init-nginx.sh` hỏi đã thêm bản ghi DNS ở Mắt Bão trước khi cấp chứng chỉ |
 | nginx k8s: 2 replica, `/api/` → gateway, `/argocd` → Argo CD | Riêng Flex (k3s) | `Confirmed` (khai báo) | `manifests/nginx/{deployment,configmap}.yaml` |

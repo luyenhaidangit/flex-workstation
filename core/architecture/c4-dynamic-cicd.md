@@ -29,6 +29,7 @@ C4Dynamic
   Rel(dev, apprepo, "Push code", "Git")
   Rel(dev, jenkins, "Bấm Build with Parameters", "HTTPS")
   Rel(jenkins, apprepo, "Checkout nhánh main", "SSH")
+  Rel(jenkins, apprepo, "Multibranch quét flex-api-gateway bằng github-token", "HTTPS, GitHub API")
   Rel(jenkins, registry, "Build và push image", "HTTPS")
   Rel(dev, k8srepo, "Sửa tag image trong flex-k8s, push", "Git")
   Rel(dev, argocd, "Bấm Sync", "HTTPS")
@@ -46,8 +47,8 @@ C4Dynamic
 | Bước | Hành động | Thuộc về | Tự động? | Bằng chứng |
 | --- | --- | --- | --- | --- |
 | 0 | Seed Job poll `flex-environment` (~5 phút một lần và mỗi lần Jenkins khởi động), tạo hoặc cập nhật folder và job từ `mounts/jenkins/jobs/*.groovy`; job bị bỏ khỏi DSL chỉ bị DISABLE, không bị xóa | Docker dùng chung (Jenkins) | Tự động | `seeds/seed.groovy` (`triggers { scm }`, `queue('seed')`, `removedJobAction('DISABLE')`) |
-| 1 | Push code lên GitHub | Repo ứng dụng | Thủ công | Jenkins job lấy nhánh `main` |
-| 2 | Chạy build với tham số `TARGET_ENV` (dev/uat/prod), `MAJOR`, `MINOR`, `PROD_PATCH`, `DEPLOY` | Docker dùng chung (Jenkins) | Thủ công | `Jenkinsfile` không có `triggers`, pipeline trong `misa.groovy` không có webhook hay polling (chỉ Seed Job có poll SCM) |
+| 1 | Push code lên GitHub | Repo ứng dụng | Thủ công | Jenkins job lấy nhánh `main`; `flex-api-gateway` là Multibranch chỉ nhận `main` |
+| 2 | Chạy build với tham số `TARGET_ENV` (dev/uat/prod), `MAJOR`, `MINOR`, `PROD_PATCH`, `DEPLOY`. Với `flex-api-gateway` (Multibranch), bấm Scan Repository hoặc Build with Parameters trên nhánh `main`; lần quét đầu tự build một lần với tham số mặc định | Docker dùng chung (Jenkins) | Thủ công (`flex-api-gateway`: lần quét đầu tự động) | `Jenkinsfile` không có `triggers`; `misa.groovy` không có webhook hay `periodicFolderTrigger` cho cả hai kiểu job (chỉ Seed Job có poll SCM) |
 | 3 | Checkout, tính `VERSION` | Docker dùng chung (Jenkins) | Tự động | stage `Checkout`, `Prepare` |
 | 4 | `docker build` rồi tag và push `<user>/<app>:<VERSION>` lên Docker Hub (chỉ khi `DEPLOY=true`) | Docker dùng chung (Jenkins) | Tự động | stage `Image`, `Publish`, credential `dockerhub-creds` |
 | 5 | Sửa `image:` trong `flex-k8s/manifests/<app>/deployment.yaml` rồi push | Repo `flex-k8s` | **Thủ công** | README `flex-k8s` mục "Cập nhật nhanh" |
@@ -65,6 +66,9 @@ Cách deploy thay thế bước 6 đến 8: chạy `bash restart.sh [app]` trong
 - **Stage Build, Test, Quality & Security chỉ in "Nothing to do"** trong cả hai Jenkinsfile, nên pipeline hiện chưa có kiểm tra chất lượng nào trước khi push image.
 - **Vị trí Jenkins**: Docker host dùng chung; cấu hình nằm ở `flex-environment/docker-compose.infra.yml` và `mounts/jenkins/`. Người dùng đã chạy thành công Seed Job (build #2) và thấy folder `misa`; chưa chạy thử pipeline ứng dụng.
 - **Phụ thuộc OpenBao**: credential `github-ssh` và `dockerhub-creds` do JCasC đọc từ OpenBao lúc Jenkins khởi động. OpenBao còn sealed hoặc secret còn `CHANGE_ME` thì biến secret thành chuỗi rỗng hoặc sai, Seed Job không checkout được (đã gặp lỗi `error in libcrypto` khi key sai định dạng). Thứ tự đúng: unseal OpenBao, điền secret, rồi mới khởi động Jenkins.
+- **`flex-api-gateway` chuyển sang Multibranch** (khai báo trong `misa.groovy`, chưa chạy thử): chỉ nhận nhánh `main`, không build PR nên chưa có trạng thái build trên PR; quét repo bằng credential `github-token`, checkout bằng `github-ssh`; không có `periodicFolderTrigger` và chưa cấu hình webhook. Hai repo còn lại vẫn là `pipelineJob` chạy tay.
+- **Multibranch tự build lần quét đầu**: `Jenkinsfile` có `DEPLOY=true` mặc định, nên lần quét đầu build `main` và push một image `<VERSION>` lên Docker Hub mà không cần bấm. Khi thêm webhook, mỗi push vào `main` cũng sẽ tự build và push như vậy, khác với bước 2 hiện là thủ công. Muốn build PR thì phải thêm điều kiện chặn `Publish` cho PR trong `Jenkinsfile` của từng repo trước.
+- **Phụ thuộc OpenBao (GitHub)**: khoá `github_username`, `github_token` phải được thêm tay vào secret `flex/github` (service `openbao-sync` không thêm khoá mới vào secret đã có); thiếu thì credential `github-token` là chuỗi rỗng.
 - **Chưa xác minh**: pipeline `flex-ai-gateway` (khai báo trong `misa.groovy` nhưng repo này không có trong `workstation.json`).
 - **`flex-exchange-service`** có `.github/workflows/ci.yml` riêng, mình chưa đọc nên không vẽ.
 
