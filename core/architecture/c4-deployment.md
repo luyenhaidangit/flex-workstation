@@ -1,19 +1,20 @@
 # C4 Deployment - Flex (server đang dựng)
 
-Nguồn: `flex-environment/AGENTS.md`, `flex-environment/docker-compose.{nginx,tools,secrets}.yml`, `flex-k8s/README.md`, `flex-k8s/manifests/`, `flex-k8s/argocd/`, cùng xác nhận của người dùng về phân tách Docker dùng chung và k8s riêng từng project. Chỉ đọc cấu hình trong repo, chưa kiểm tra server thật (`kubectl`, `docker ps`), nên đây là topology khai báo, chưa phải trạng thái chạy.
+Nguồn: `flex-environment/AGENTS.md`, `flex-environment/docker-compose.{nginx,tools,infra,openbao}.yml`, `flex-environment/mounts/jenkins/`, `flex-environment/mounts/nginx/sites/prod/`, `flex-k8s/README.md`, `flex-k8s/manifests/`, `flex-k8s/argocd/`, cùng xác nhận của người dùng về phân tách Docker dùng chung và k8s riêng từng project. Chỉ đọc cấu hình trong repo, chưa kiểm tra server thật (`kubectl`, `docker ps`), nên đây là topology khai báo, chưa phải trạng thái chạy.
 
 ```mermaid
 C4Deployment
   title Deployment Diagram - Flex (server đang dựng, chưa production)
 
   Person(user, "Người dùng / Developer", "Truy cập qua trình duyệt")
-  System_Ext(github, "GitHub", "Repo flex-k8s (nhánh main)")
+  System_Ext(github, "GitHub", "Repo flex-k8s, flex-environment, repo ứng dụng")
+  System_Ext(matbao, "Mắt Bão", "Nhà đăng ký domain, giữ bản ghi DNS")
 
   Deployment_Node(server, "Ubuntu server", "x86_64, 3,8 GiB RAM, không swap") {
-    Deployment_Node(docker, "Docker host: dùng chung toàn công ty", "Docker Compose, flex-platform, mạng flex_net") {
+    Deployment_Node(docker, "Docker host: dùng chung toàn công ty", "Docker Compose: flex-platform, flex-secrets; mạng flex_net") {
       Container(dnginx, "nginx + WAF", "ModSecurity CRS", "TLS, cổng 80/443, route theo host")
-      Container(infisical, "Infisical", "docker-compose.secrets.yml", "Quản lý secret, có thể đang tắt")
-      Container(jenkins, "Jenkins", "Jenkins LTS, JCasC", "CI: build và push image")
+      Container(openbao, "OpenBao", "OpenBao 2.4.0, KV flex", "Kho secret, sealed sau mỗi lần khởi động lại")
+      Container(jenkins, "Jenkins", "Jenkins LTS, JCasC, Job DSL", "CI: build và push image; job khai báo bằng code")
     }
     Deployment_Node(k3s, "k3s: cụm riêng của project Flex", "1 node, NodePort 30080") {
       Deployment_Node(nsdefault, "namespace default", "Kubernetes") {
@@ -26,16 +27,20 @@ C4Deployment
     }
   }
 
+  Rel(user, matbao, "Phân giải domain", "DNS")
   Rel(user, dnginx, "Truy cập", "HTTPS")
   Rel(dnginx, knginx, "Proxy mọi path", "HTTP, NodePort 30080")
-  Rel(dnginx, infisical, "Proxy host infisical", "HTTP")
+  Rel(dnginx, openbao, "Proxy host bao", "HTTP")
+  Rel(dnginx, jenkins, "Proxy host jenkins", "HTTP")
+  Rel(jenkins, openbao, "Đọc secret qua JCasC, token chỉ đọc", "HTTP")
+  Rel(jenkins, github, "Seed Job poll flex-environment, checkout repo", "SSH")
   Rel(knginx, gateway, "/api/", "HTTP")
   Rel(knginx, argocd, "/argocd", "HTTP")
   Rel(argocd, github, "Đồng bộ manifests/", "HTTPS")
 
   UpdateElementStyle(dnginx, $bgColor="#7f8c8d", $borderColor="#5d6d6e")
   UpdateElementStyle(jenkins, $bgColor="#7f8c8d", $borderColor="#5d6d6e")
-  UpdateElementStyle(infisical, $bgColor="#7f8c8d", $borderColor="#5d6d6e")
+  UpdateElementStyle(openbao, $bgColor="#7f8c8d", $borderColor="#5d6d6e")
 ```
 
 **Chú giải màu**: xám = hạ tầng Docker dùng chung toàn công ty; xanh (mặc định) = thành phần riêng của project Flex chạy trong k3s. Ranh giới dùng chung / riêng Flex là cạnh nginx + WAF → nginx k3s qua NodePort `30080`.
@@ -45,8 +50,9 @@ C4Deployment
 | Thành phần | Thuộc về | Trạng thái | Bằng chứng |
 | --- | --- | --- | --- |
 | nginx Docker (WAF) → NodePort `30080` | Dùng chung (Docker) | `Confirmed` (khai báo) | `flex-k8s/README.md` mục "Cài Argo CD", `flex-environment/AGENTS.md` mục 3, 4 |
-| Jenkins | Dùng chung (Docker) | `Confirmed by user` | Xác nhận của người dùng; cấu hình JCasC ở `flex-environment/temp/` |
-| Infisical | Dùng chung (Docker) | `Cần làm rõ` | Có file riêng và host `infisical.luyenhaidangit.pro`, nhưng `restart.sh` ghi tạm tắt để giải phóng RAM |
+| Jenkins: host `jenkins.luyenhaidangit.pro` (không còn tiền tố `/jenkins`), secret đọc từ OpenBao, job tạo bởi Seed Job từ `mounts/jenkins/jobs/*.groovy` | Dùng chung (Docker) | `Confirmed by user` | `docker-compose.infra.yml`, `mounts/jenkins/jenkins.yaml`, `mounts/jenkins/seeds/seed.groovy`; người dùng đã chạy thành công Seed Job (build #2) và thấy folder `misa` |
+| OpenBao (thay Infisical): project compose `flex-secrets` riêng, UI qua host `bao.luyenhaidangit.pro`, cổng `127.0.0.1:8200` | Dùng chung (Docker) | `Confirmed` (khai báo) | `docker-compose.openbao.yml`, `mounts/nginx/sites/prod/bao.luyenhaidangit.pro.conf`; sealed sau mỗi lần container khởi động lại, phải unseal tay |
+| Mắt Bão (DNS) | Ngoài hệ thống | `Confirmed` (khai báo) | `setup/02-init-nginx.sh` hỏi đã thêm bản ghi DNS ở Mắt Bão trước khi cấp chứng chỉ |
 | nginx k8s: 2 replica, `/api/` → gateway, `/argocd` → Argo CD | Riêng Flex (k3s) | `Confirmed` (khai báo) | `manifests/nginx/{deployment,configmap}.yaml` |
 | `flex-api-gateway`: 1 replica, image `1.0.1-dev`, chỉ nginx được vào cổng 8080 | Riêng Flex (k3s) | `Confirmed` (khai báo) | `manifests/flex-api-gateway/{deployment,networkpolicy}.yaml` |
 | Argo CD v3.5.7, non-HA, application `flex` sync thủ công | Riêng Flex (k3s) | `Confirmed` (khai báo) | `argocd/install/`, `argocd/application.yaml` |
@@ -59,5 +65,5 @@ C4Deployment
 - **`flex-auth-service` chưa có trong cluster**: README `flex-k8s` ghi route `/api/*` trả 502/503 cho tới khi triển khai.
 - **Frontend**: chưa thấy workload frontend trong `flex-k8s`; nginx k8s chỉ route `/api/` và `/argocd`. Chưa rõ frontend chạy ở đâu.
 - **Cảnh báo bảo mật còn mở** (theo README): NodePort `30080` cần firewall host chặn Internet; `/argocd` đang cho mọi IP, chỉ có đăng nhập admin bảo vệ.
-- **Stack dev cũ** (PostgreSQL, MySQL, Redis, RabbitMQ, MinIO, Elasticsearch, Ollama, Prometheus, Grafana) nằm ở `flex-environment/temp/`; `infra`, `app`, `monitoring` trên server hiện là file rỗng, chờ migrate nên chưa vẽ.
+- **Stack dev cũ** (PostgreSQL, MySQL, Redis, RabbitMQ, MinIO, Elasticsearch, Ollama, Prometheus, Grafana) nằm ở `flex-environment/temp/`; `app` và `monitoring` hiện là `services: {}`, còn `infra` chỉ có Jenkins; phần còn lại chờ migrate nên chưa vẽ.
 - Địa chỉ IP, cổng SSH và domain nội bộ không ghi vào tài liệu này.
