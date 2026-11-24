@@ -58,6 +58,16 @@ C4Deployment
 | Argo CD v3.5.7, non-HA, application `flex` sync thủ công | Riêng Flex (k3s) | `Confirmed` (khai báo) | `argocd/install/`, `argocd/application.yaml` |
 | Portainer, netshoot | Dùng chung (Docker), không vẽ cạnh | Không vẽ | Portainer chỉ nghe `127.0.0.1:9000` trên server (SSH tunnel), có host riêng ở site prod |
 
+## Cập nhật Jenkins
+
+Cập nhật chính Jenkins là thao tác thủ công, không có job tự build lại Jenkins trong Jenkins (người dùng đã chọn giữ như vậy). `plugins.txt` pin version 10 plugin chính; plugin phụ thuộc không pin (quyết định của người dùng).
+
+| Sửa | Cách áp dụng | Bằng chứng |
+| --- | --- | --- |
+| `mounts/jenkins/Dockerfile`, `plugins/plugins.txt`, `JENKINS_VERSION` | Chạy tay `bash publish-jenkins.sh` (build, push Docker Hub, recreate container); sao lưu volume `jenkins_data` trước khi chạy trên production | `publish-jenkins.sh`, `flex-environment/AGENTS.md` mục "Boundaries" |
+| `mounts/jenkins/jenkins.yaml` | Không build lại: reload JCasC hoặc restart container `jenkins` | `docker-compose.infra.yml` (mount `:ro`) |
+| `mounts/jenkins/seeds/`, `mounts/jenkins/jobs/*.groovy` | Không build lại: Seed Job tự poll `main` mỗi ~5 phút | `seeds/seed.groovy` |
+
 ## Chưa vẽ / cần xác minh
 
 - **Trạng thái chạy thật**: README `flex-k8s` còn ghi "chưa apply lên cluster nào" nhưng cũng mô tả Argo CD đang truy cập qua `flex.luyenhaidangit.pro/argocd`. Cần `kubectl get pods -A` và `docker ps` trên server để chốt.
