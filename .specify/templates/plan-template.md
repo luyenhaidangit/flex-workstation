@@ -1,376 +1,156 @@
 # Kế hoạch triển khai: [TÍNH NĂNG]
 
-**Branch**: `[NNNNNN-ten-tinh-nang]` | **Ngày**: [NGÀY] | **Đặc tả**: [link]
+**Branch**: `[NNNNNN-ten-tinh-nang]` | **Ngày**: [NGÀY] | **Chế độ Spec**: [Full / Compact] | **Đặc tả**: [spec.md](./spec.md)  
+**Đầu vào**: `/specs/[NNNNNN-ten-tinh-nang]/spec.md` và phạm vi repo tại `repos.md` (nếu chạm repo con)
 
-**Đầu vào**: Đặc tả tính năng từ `/specs/[NNNNNN-ten-tinh-nang]/spec.md`
-
-**Ghi chú**: Template này được điền bởi lệnh `/speckit-plan`. Xem `.specify/templates/plan-template.md` để biết workflow tạo kế hoạch.
+<!-- Chế độ Compact (1 repo, không đổi DB dùng chung, không breaking public contract): nhúng thẳng research, entity/data và quickstart gọn ngay trong file plan.md này, không cần sinh file rời research.md / data-model.md / quickstart.md trừ khi thực sự phức tạp. Chế độ Full: sinh đầy đủ các file Phase 0/1. Giữ nguyên các heading; phần không liên quan ghi "Không áp dụng — <lý do 1 dòng>". -->
 
 ## Tóm tắt
 
-**Yêu cầu chính từ spec**: [Tóm tắt US/FR/MVP quan trọng]
-
-**Hướng tiếp cận kỹ thuật dự kiến**: [Cách tiếp cận ban đầu, sẽ được xác nhận sau Phase 0 research]
-
-**Kết quả sau research**: [Cập nhật sau khi hoàn thành research.md hoặc ghi "Chưa thực hiện"]
+- **Yêu cầu chính từ spec**: [Tóm tắt US/FR/MVP trọng tâm]
+- **Hướng tiếp cận kỹ thuật**: [Giải pháp kiến trúc được chọn]
+- **Kết quả research**: [Tóm tắt từ `research.md` hoặc ghi trực tiếp nếu ở chế độ `Compact`]
 
 ## Phạm vi kỹ thuật
 
-<!--
-  Xác định rõ phần code/config/data nào sẽ thay đổi trong phase này.
-  Phần ngoài phạm vi kỹ thuật phải khớp với MVP và "Ngoài phạm vi" trong spec.
-  Không dùng section này để mở rộng scope nghiệp vụ.
--->
-
-**Trong phạm vi**:
-- [Module/service/app/API/job/config sẽ được thay đổi]
-- [Luồng kỹ thuật cần bổ sung để đáp ứng MVP]
-
-**Ngoài phạm vi kỹ thuật**:
-- [Phần không làm trong phase này hoặc ghi "Không áp dụng"]
-- [Tích hợp/migration/automation chưa thực hiện ở phase này nếu có]
+- **Trong phạm vi**: [Repo/service/module/API/config sẽ thay đổi — phải khớp `repos.md` và MVP trong `spec.md`]
+- **Ngoài phạm vi kỹ thuật**: [Phần chủ đích không làm ở phase này hoặc "Không áp dụng"]
 
 ## Bối cảnh kỹ thuật
 
-<!--
-  CẦN THỰC HIỆN: Thay nội dung section này bằng chi tiết kỹ thuật thật của project.
-  Cấu trúc dưới đây là gợi ý để hỗ trợ quá trình lặp và review.
--->
-
-**Ngôn ngữ/Phiên bản**: [ví dụ: .NET/C# version, Node.js version hoặc CẦN LÀM RÕ]
-
-**Service/App liên quan**: [Tên service/app/module bị ảnh hưởng hoặc CẦN LÀM RÕ]
-
-**Convention skill áp dụng**: [Skill quy ước cần nạp khi implement, map theo từng service/app nếu feature chạm nhiều repo — ví dụ: `flex-agent-service` (.NET) → `flex-dotnet-engineering`; `flex-microfrontend` (Angular) → `flex-frontend-engineering`. Ghi CẦN LÀM RÕ nếu chưa xác định được skill phù hợp, hoặc Không áp dụng nếu repo/stack chưa có skill convention]
-
-**Phụ thuộc chính**: [Framework/package/internal SDK/service hiện có hoặc CẦN LÀM RÕ]
-
-**Lưu trữ**: [SQL Server/PostgreSQL/MySQL/Redis/ElasticSearch/file hoặc Không áp dụng]
-
-**Kiểm thử**: [xUnit/NUnit/Jest/integration test/manual test hoặc CẦN LÀM RÕ]
-
-**Nền tảng chạy**: [Linux container, Windows service, Kubernetes, IIS, worker, browser hoặc CẦN LÀM RÕ]
-
-**Đơn vị deploy**: [Service/app/job/package cần deploy hoặc CẦN LÀM RÕ]
-
-**Loại project**: [ví dụ: web-service/admin-web/worker/library/cli hoặc CẦN LÀM RÕ]
-
-**Mục tiêu hiệu năng**: [theo domain, ví dụ: phản hồi thao tác chính trong 3 giây hoặc CẦN LÀM RÕ]
-
-**Ràng buộc**: [theo domain, ví dụ: <200ms p95, <100MB memory, offline-capable hoặc CẦN LÀM RÕ]
-
-**Quy mô/Phạm vi**: [theo domain, ví dụ: 10k users, 1M LOC, 50 screens hoặc CẦN LÀM RÕ]
+- **Ngôn ngữ / Framework**: [Ví dụ: .NET 8 / ASP.NET Core, Angular 17... hoặc `CẦN LÀM RÕ`]
+- **Service / Repo liên quan**: [Đối chiếu `repos.md` (`Edit` / `Read`)]
+- **Convention skill áp dụng**: [Map theo từng repo — vd: `flex-agent-service` → `flex-dotnet-engineering`, `flex-codebase-architect`; `flex-microfrontend` → `flex-frontend-engineering`]
+- **Lưu trữ & Phụ thuộc chính**: [PostgreSQL / Redis / SDK nội bộ... hoặc `Không áp dụng`]
+- **Kiểm thử & Đơn vị deploy**: [xUnit / Karma / container / job...]
+- **Mục tiêu hiệu năng & Ràng buộc**: [Theo NFR/SC hoặc chuẩn hiện hữu]
 
 ## Kiểm tra constitution
 
-*GATE: Phải đạt trước Phase 0 research. Kiểm tra lại sau Phase 1 design.*
+*GATE: Đánh giá trước Phase 0 và xác nhận lại sau Phase 1 design.*
 
-| Gate | Trạng thái ban đầu | Trạng thái sau design | Ghi chú |
-|------|--------------------|------------------------|---------|
-| [Tên gate từ constitution] | Pass/Fail/Không áp dụng | Pass/Fail/Không áp dụng | [Lý do hoặc việc cần xử lý] |
+| Gate | Trạng thái ban đầu | Trạng thái sau design | Ghi chú / Dẫn chứng |
+|------|--------------------|-----------------------|---------------------|
+| Scope & Traceability Gate | Pass/Fail | Pass/Fail | [Khớp MVP, US/FR/BR/SEC/NFR có mapping] |
+| Test & Security Gate | Pass/Fail/Không áp dụng | Pass/Fail/Không áp dụng | [Chiến lược test theo rủi ro & phân quyền] |
+| Compatibility & DB Placement (VI) | Pass/Fail/Không áp dụng | Pass/Fail/Không áp dụng | [DB đích, repo migration, backward compatibility] |
+| Observability & Complexity Gate | Pass/Fail/Không áp dụng | Pass/Fail/Không áp dụng | [Log/metric không lộ secret, thiết kế tối giản] |
+| Specialist Skill Gate | Pass/Fail | Pass/Fail | [Đã route và áp dụng skill chuyên môn phù hợp] |
 
-## Câu hỏi kỹ thuật cần research
+## Câu hỏi kỹ thuật & Quyết định thiết kế
 
-<!--
-  Những điểm kỹ thuật chưa chắc chắn cần xử lý trong Phase 0.
-  Không để câu hỏi mở nếu nó chặn thiết kế hoặc task generation.
--->
+<!-- Mọi TQ chặn thiết kế/task phải được giải quyết trước /speckit-tasks (tại đây với Compact, hoặc chi tiết trong research.md với Full). -->
 
-- **TQ-001**: [CẦN LÀM RÕ: Có cần migration/backfill không?]
-- **TQ-002**: [CẦN LÀM RÕ: Dùng flow/module hiện có hay tạo extension point mới?]
-- **TQ-003**: [CẦN LÀM RÕ: Contract hiện tại có cần giữ backward compatibility không?]
+| Mã | Vấn đề / Quyết định | Lựa chọn | Lý do chọn | Phương án đã loại |
+|----|---------------------|----------|------------|-------------------|
+| DEC-001 | [Vấn đề kỹ thuật 1] | [Giải pháp chọn] | [Vì sao phù hợp codebase] | [Phương án khác & lý do loại] |
 
 ## Thiết kế tổng quan
 
-<!--
-  Mô tả luồng kỹ thuật ở mức high-level để reviewer hiểu feature gắn vào hệ thống như thế nào.
-  Không liệt kê task chi tiết ở đây.
--->
-
-**Luồng chính**:
-1. [Bước kỹ thuật chính 1]
-2. [Bước kỹ thuật chính 2]
-3. [Bước kỹ thuật chính 3]
-
-**Component/module tham gia**:
-- [Module/service/app 1]: [Vai trò trong luồng]
-- [Module/service/app 2]: [Vai trò trong luồng]
-
-**Điểm mở rộng/thay đổi chính**:
-- [Điểm thay đổi 1]
-- [Điểm thay đổi 2]
-
-**Luồng thay thế/lỗi chính**:
-- [Luồng lỗi/quyền/timeout/retry nếu có hoặc "Không áp dụng"]
-
-**Thay đổi boundary giữa service/module**:
-- [Boundary thay đổi hoặc "Không áp dụng"]
-
-**Idempotency/Concurrency**:
-- [Cách xử lý thao tác lặp, retry, concurrent update hoặc "Không áp dụng"]
+- **Luồng xử lý chính**: [Các bước kỹ thuật ngắn gọn 1 → 2 → 3]
+- **Component / Module tham gia & Boundary**: [Module nào giữ trách nhiệm gì; thay đổi ranh giới nếu có]
+- **Luồng lỗi & Idempotency / Concurrency**: [Xử lý retry, thao tác lặp, cập nhật đồng thời hoặc "Không áp dụng"]
 
 ## Traceability từ spec sang thiết kế kỹ thuật
 
-<!--
-  Mỗi US/FR quan trọng trong spec phải có hướng xử lý kỹ thuật và cách kiểm thử tương ứng.
-  Bắt buộc mapping cho P1/P2 hoặc FR ảnh hưởng code/data/API/permission.
-  FR không tác động kỹ thuật ghi "Không áp dụng".
--->
-
-| Spec ID | Ưu tiên | Trạng thái | Hướng xử lý kỹ thuật | Module/Path dự kiến | API/Contract | Data/Entity | Kiểm thử |
-|---------|---------|------------|----------------------|---------------------|--------------|-------------|----------|
-| US-001 / FR-001 | P1 | Đủ rõ / Cần làm rõ | [Cách đáp ứng yêu cầu ở mức thiết kế] | [path/module] | [endpoint/event/contract hoặc Không áp dụng] | [entity/table/file hoặc Không áp dụng] | [unit/integration/contract/e2e] |
-| US-001 / FR-002 | P1 | Đủ rõ / Cần làm rõ | [Cách đáp ứng yêu cầu ở mức thiết kế] | [path/module] | [endpoint/event/contract hoặc Không áp dụng] | [entity/table/file hoặc Không áp dụng] | [unit/integration/contract/e2e] |
+| Spec ID (`MVP`/`US`/`FR`/`BR`/`SEC`/`NFR`) | Ưu tiên | Hướng xử lý kỹ thuật | Module / Path dự kiến | API / Contract | Data / Entity | Kiểm thử |
+|---|---|---|---|---|---|---|
+| US-001 / FR-001 | P1 | [Thiết kế] | [path thật] | [endpoint/event hoặc Không áp dụng] | [entity/table hoặc Không áp dụng] | [unit/integration/e2e] |
 
 ## Phân tích tác động
 
-<!--
-  Ghi rõ ảnh hưởng tới các phần hiện có để reviewer đánh giá rủi ro trước khi sinh task.
-  Ghi "Không áp dụng" cho dòng không liên quan; không xóa dòng có thể xảy ra.
--->
-
-| Khu vực | Tác động dự kiến | Tương thích ngược/Rủi ro | Cách kiểm tra |
-|---------|------------------|--------------------------|---------------|
-| Database/Migration | [Có thay schema/data/migration không] | [Rủi ro dữ liệu hoặc Không áp dụng] | [Cách verify migration/data] |
-| API/Contract | [Endpoint/event/payload thay đổi hoặc Không áp dụng] | [Backward compatibility] | [Contract test/consumer check] |
-| Permission/Security | [Quyền, tenant, department, member scope] | [Rủi ro truy cập sai dữ liệu] | [Permission test] |
-| Logging/Audit | [Log/audit thay đổi hoặc Không áp dụng] | [Thiếu truy vết khi lỗi] | [Kiểm tra log/audit record] |
-| UI/UX | [Màn hình/flow thay đổi hoặc Không áp dụng] | [Rủi ro gián đoạn flow hiện có] | [Manual/e2e test] |
-| Job/Worker/Integration | [Tác động async/integration hoặc Không áp dụng] | [Retry/idempotency/timeout] | [Integration test] |
+| Khu vực | Tác động dự kiến | Tương thích ngược / Rủi ro | Cách kiểm tra |
+|---------|------------------|----------------------------|---------------|
+| Database / Migration | [Mô tả hoặc Không áp dụng] | [Rủi ro dữ liệu] | [Cách verify] |
+| API / Contract | [Mô tả hoặc Không áp dụng] | [Backward compatibility] | [Contract/consumer check] |
+| Permission / Security | [Mô tả hoặc Không áp dụng] | [Rủi ro lộ/sai phạm vi] | [Permission test] |
+| Logging / Audit | [Mô tả hoặc Không áp dụng] | [Thiếu truy vết / lộ secret] | [Log/audit check] |
+| UI / UX | [Mô tả hoặc Không áp dụng] | [Gián đoạn luồng cũ] | [UI/manual/e2e check] |
+| Job / Worker / Integration | [Mô tả hoặc Không áp dụng] | [Timeout/retry/idempotency] | [Integration check] |
 
 ## API/Contract Detail
 
-<!--
-  Dùng khi feature có thay đổi API, event, webhook, payload, OpenAPI, hoặc public contract.
-  Nếu không có thay đổi contract, ghi "Không áp dụng".
--->
+<!-- Nếu không đổi API/event/webhook/public contract, ghi 1 dòng: "Không áp dụng — không thay đổi contract." và bỏ bảng. -->
 
-**Có thay đổi contract không**: [Có/Không áp dụng]
+**Có thay đổi contract không**: [Có / Không áp dụng — lý do ngắn]
 
 | Contract | Loại | Thay đổi | Backward compatible | Consumer bị ảnh hưởng |
-|----------|------|----------|---------------------|------------------------|
-| [Endpoint/Event/Webhook hoặc "Không áp dụng"] | API/Event/Webhook | [Mô tả thay đổi] | Có/Không/Không áp dụng | [Client/service/job hoặc Không áp dụng] |
+|----------|------|----------|---------------------|-----------------------|
+| [Endpoint/Event hoặc Không áp dụng] | API/Event | [Mô tả] | Có/Không | [Consumer] |
 
 ## Permission Matrix
 
-<!--
-  Dùng khi feature có phân quyền theo role, tenant, department, member, scope, hoặc trạng thái.
-  Nếu không liên quan, ghi "Không áp dụng".
--->
+<!-- Nếu không có phân quyền theo role/tenant/scope riêng, ghi 1 dòng: "Không áp dụng — lý do ngắn." -->
 
-| Vai trò/Scope | Xem | Tạo | Sửa | Xóa | Duyệt/Xử lý | Ghi chú |
-|---------------|-----|-----|-----|-----|-------------|---------|
-| [Role/scope hoặc "Không áp dụng"] | Có/Không | Có/Không | Có/Không | Có/Không | Có/Không | [Điều kiện] |
+| Vai trò / Scope | Xem | Tạo | Sửa | Xóa | Duyệt/Xử lý | Điều kiện / Ghi chú |
+|-----------------|-----|-----|-----|-----|-------------|---------------------|
+| [Role hoặc Không áp dụng] | Có/Không | Có/Không | Có/Không | Có/Không | Có/Không | [Điều kiện] |
 
 ## Dữ liệu & Migration
 
-<!--
-  Bắt buộc điền rõ khi tính năng có thay đổi dữ liệu/schema hoặc cần xử lý dữ liệu hiện có.
-  Nếu không liên quan, ghi "Không áp dụng" và nêu lý do ngắn.
--->
+<!-- Bắt buộc đối chiếu docs/architecture/system-map.md và tiền lệ spec khi có DB/schema (Constitution VI). Ghi 1 dòng "Không áp dụng — không chạm DB/schema" nếu không liên quan. -->
 
-**Có thay đổi dữ liệu/schema không**: [Có/Không áp dụng]
-
-**Database đích**: [Database/schema cụ thể dữ liệu này thuộc về — dùng chung hiện có / riêng của service / cần tạo mới. Đối chiếu `docs/architecture/system-map.md` (mục Projects, Data Architecture) và spec tiền lệ, không mặc định chọn theo thói quen. Hoặc "Không áp dụng"]
-
-**Repo chứa migration**: [Repo thực thi migration này kèm dẫn chứng (system-map.md hoặc spec tiền lệ cụ thể) hoặc "Không áp dụng"]
-
-**Migration**:
-- [Mô tả migration hoặc "Không áp dụng"]
-
-**Backfill/Cleanup**:
-- [Phạm vi dữ liệu cần xử lý hoặc "Không áp dụng"]
-
-**Tương thích dữ liệu cũ**:
-- [Cách hệ thống xử lý dữ liệu đã tồn tại hoặc "Không áp dụng"]
-
-**Rủi ro dữ liệu**:
-- [Mất dữ liệu, sai quyền, duplicate, dirty data hoặc "Không áp dụng"]
-
-**Cách xác minh**:
-- [Query/checklist/smoke test xác minh dữ liệu hoặc "Không áp dụng"]
-
-## Quyết định kỹ thuật
-
-<!--
-  Tóm tắt quyết định cuối cùng từ research.md để plan.md tự đủ ngữ cảnh review.
-  Không cần lặp toàn bộ phân tích; chỉ ghi quyết định, lý do và phương án đã loại.
--->
-
-| Quyết định | Lựa chọn | Lý do chọn | Phương án đã loại | Lý do loại |
-|------------|----------|------------|-------------------|------------|
-| [DEC-001] | [Cách tiếp cận được chọn] | [Vì sao phù hợp với spec/codebase] | [Cách khác hoặc Không áp dụng] | [Vì sao không chọn] |
-| [DEC-002] | [Cách tiếp cận được chọn] | [Vì sao phù hợp với spec/codebase] | [Cách khác hoặc Không áp dụng] | [Vì sao không chọn] |
+- **Có thay đổi dữ liệu/schema không**: [Có / Không áp dụng]
+- **Database đích & Repo chứa migration**: [Tên DB + tên repo kèm dẫn chứng `system-map.md`/spec tiền lệ, hoặc "Không áp dụng"]
+- **Chi tiết Migration / Backfill / Tương thích dữ liệu cũ**: [Mô tả ngắn hoặc tham chiếu `data-model.md`]
+- **Rủi ro & Cách xác minh dữ liệu**: [Query/smoke check hoặc "Không áp dụng"]
 
 ## Chiến lược kiểm thử
 
-<!--
-  Xác định các lớp test cần có. Không viết test case chi tiết ở đây.
-  Ghi "Không áp dụng" cho lớp test không liên quan.
--->
-
-**Unit test**:
-- [Logic/module cần unit test hoặc "Không áp dụng"]
-
-**Integration test**:
-- [Luồng cần test qua DB/service/integration hoặc "Không áp dụng"]
-
-**Contract test**:
-- [API/event/payload cần kiểm tra compatibility hoặc "Không áp dụng"]
-
-**Permission/security test**:
-- [Case quyền hợp lệ/không hợp lệ hoặc "Không áp dụng"]
-
-**E2E/manual test**:
-- [Luồng người dùng chính cần xác nhận hoặc "Không áp dụng"]
-
-**Regression test**:
-- [Luồng hiện có có nguy cơ bị ảnh hưởng hoặc "Không áp dụng"]
+- **Unit test**: [Module/rule cần test hoặc "Không áp dụng — lý do"]
+- **Integration / Contract test**: [Luồng DB/API/service cần test hoặc "Không áp dụng — lý do"]
+- **Permission / Security test**: [Case hợp lệ & bị từ chối hoặc "Không áp dụng"]
+- **E2E / Manual / Quickstart validation**: [Kịch bản chạy kiểm chứng đầu-cuối — nhúng thẳng lệnh kiểm tra tại đây nếu dùng chế độ `Compact`, hoặc tham chiếu `quickstart.md`]
+- **Regression test**: [Luồng hiện hữu cần giữ xanh]
 
 ## Tác động tài liệu nghiệp vụ
 
-- **Kết quả Documentation Impact Gate**: [CÓ CẬP NHẬT / KHÔNG CẦN CẬP NHẬT]
-- **Tham chiếu đánh giá**: `spec.md` §20
+- **Kết quả Documentation Impact Gate (`spec.md` §20)**: [CÓ CẬP NHẬT / KHÔNG CẦN CẬP NHẬT]
 - **Tài liệu hiện hữu đã cập nhật**: [Path + section, hoặc "Không áp dụng"]
-- **Cập nhật còn lại sau implementation**: [Task có path/section cụ thể, hoặc "Không áp dụng"]
-
-Không tạo task tài liệu mặc định. Nếu implementation làm thay đổi luồng nghiệp vụ đã
-được đánh giá, cập nhật `spec.md` rồi chạy lại `/speckit-docbiz` trước khi sinh task
-tương ứng.
+- **Cập nhật còn lại sau implementation**: [Path + section cụ thể nếu cần sinh task, hoặc "Không áp dụng"]
 
 ## Cấu trúc project
 
-### Tài liệu cho feature này
+### Artifacts của feature
+`specs/[NNNNNN-ten-tinh-nang]/`: `spec.md`, `plan.md`, `repos.md` *(nếu chạm repo con)*, `tasks.md` *(sinh bởi `/speckit-tasks`)*, và ở chế độ `Full`: `research.md`, `data-model.md`, `contracts/`, `quickstart.md`.
+
+### Source code (thay bằng path thật của repo trong phạm vi)
 
 ```text
-specs/[NNNNNN-ten-tinh-nang]/
-├── plan.md              # File này (output của lệnh /speckit-plan)
-├── research.md          # Output Phase 0 (lệnh /speckit-plan)
-├── data-model.md        # Output Phase 1 (lệnh /speckit-plan)
-├── quickstart.md        # Output Phase 1 (lệnh /speckit-plan)
-├── contracts/           # Output Phase 1 (lệnh /speckit-plan)
-└── tasks.md             # Output Phase 2 (lệnh /speckit-tasks - KHÔNG tạo bởi /speckit-plan)
+# [XÓA NẾU KHÔNG DÙNG] Thay thế hoàn toàn khối mẫu này bằng cây thư mục/file thật sẽ tạo hoặc sửa:
+<repo-name>/
+├── src/...
+└── tests/...
 ```
 
-### Source code (repository root)
-
-<!--
-  CẦN THỰC HIỆN: Thay cây placeholder bên dưới bằng layout thật cho feature.
-  Chọn cấu trúc gần nhất với repo hiện tại, xóa phần không dùng, và thay bằng path thật.
-  Plan cuối cùng không được giữ nhãn Option hoặc cây thư mục mẫu/generic.
--->
-
-```text
-# [XÓA NẾU KHÔNG DÙNG] Option 1: .NET/backend service
-src/
-├── [ServiceName]/
-│   ├── Controllers/
-│   ├── Services/
-│   ├── Repositories/
-│   ├── Models/
-│   └── ...
-
-tests/
-├── [ServiceName].UnitTests/
-├── [ServiceName].IntegrationTests/
-└── [ServiceName].ContractTests/
-
-# [XÓA NẾU KHÔNG DÙNG] Option 2: Monorepo app/service/worker
-apps/
-├── admin-web/
-├── gov-api/
-└── worker/
-
-packages/
-└── shared/
-
-tests/
-├── unit/
-├── integration/
-└── contract/
-```
-
-**Quyết định cấu trúc**: [Ghi lại cấu trúc đã chọn và tham chiếu các thư mục thật ở trên]
+**Quyết định cấu trúc**: [Giải thích ngắn vị trí đặt file mới/sửa khớp kiến trúc hiện có của repo]
 
 ## Rollout & Rollback
 
-<!--
-  Bắt buộc điền khi có migration, thay API contract, thay permission, thay job runtime,
-  hoặc thay đổi có thể ảnh hưởng dữ liệu/người dùng hiện có.
-  Nếu không cần rollout đặc biệt, ghi "Không áp dụng" và nêu lý do.
--->
-
-**Kế hoạch rollout**: [Các bước deploy/bật feature/migration/backfill hoặc "Không áp dụng"]
-
-**Tương thích ngược**: [Cách giữ tương thích với client/job/data cũ hoặc "Không áp dụng"]
-
-**Feature flag/config**: [Flag/config dùng để bật tắt hoặc "Không áp dụng"]
-
-**Thực thi migration/backfill khi rollout**:
-- [Chạy trước deploy / sau deploy / qua job riêng / Không áp dụng]
-
-**Rollback code/config**:
-- [Cách quay lại version/flag/config cũ hoặc "Không áp dụng"]
-
-**Rollback dữ liệu/migration**:
-- [Có thể rollback không? Nếu không, dùng forward-fix thế nào?]
-
-**Điều kiện kích hoạt rollback**:
-- [Error rate, lỗi dữ liệu, lỗi quyền, lỗi contract hoặc "Không áp dụng"]
+- **Kế hoạch rollout & Feature flag/config**: [Thứ tự deploy/migration/flag hoặc "Không áp dụng — deploy tiêu chuẩn"]
+- **Rollback code/config**: [Cách revert nhanh]
+- **Rollback dữ liệu/migration & Điều kiện kích hoạt**: [Rollback script hoặc phương án forward-fix; ngưỡng lỗi kích hoạt]
 
 ## Observability & Debug
 
-<!--
-  Xác định cách biết tính năng hoạt động đúng sau release và cách debug khi lỗi.
-  Tập trung vào log field, trace/correlation, metric, alert, và quick check vận hành.
--->
-
-**Log cần có**:
-- [Tên event/log + field chính, ví dụ: traceId, tenantId, userId, entityId, action, result]
-
-**Dữ liệu không được log**:
-- [Token, secret, API key, dữ liệu nhạy cảm, nội dung người dùng hoặc "Không áp dụng"]
-
-**Metric cần theo dõi**:
-- [Latency/error rate/count/business metric hoặc "Không áp dụng"]
-
-**Trace/Correlation**:
-- [traceId/correlationId/requestId/jobId cần truyền qua các bước hoặc "Không áp dụng"]
-
-**Cách kiểm tra sau release**:
-- [Query log, dashboard, health check, smoke test hoặc "Không áp dụng"]
-
-**Tình huống debug chính**:
-- [Lỗi quyền, timeout, dữ liệu lệch, migration lỗi, integration lỗi hoặc "Không áp dụng"]
+- **Log / Metric / Trace cần có**: [Event, correlation field (`traceId`, `tenantId`, `userId`...) hoặc "Không áp dụng"]
+- **Dữ liệu KHÔNG ĐƯỢC log**: [Token, secret, API key, credential, PII]
+- **Cách kiểm tra sau release**: [Health check / smoke command / log query]
 
 ## Theo dõi độ phức tạp
 
-> **Chỉ điền nếu kiểm tra constitution có vi phạm cần biện minh**
+> Chỉ điền khi có ngoại lệ vi phạm Constitution cần biện minh; mặc định ghi `Không có vi phạm.`
 
-| Vi phạm | Vì sao cần | Phương án đơn giản hơn bị loại vì |
-|---------|------------|-----------------------------------|
-| [ví dụ: project thứ 4] | [nhu cầu hiện tại] | [vì sao 3 project không đủ] |
-| [ví dụ: Repository pattern] | [vấn đề cụ thể] | [vì sao truy cập DB trực tiếp không đủ] |
+| ID / Nguyên tắc | Vì sao cần | Phương án đơn giản hơn bị loại vì | Người phê duyệt & Hạn xử lý |
+|-----------------|------------|-----------------------------------|-----------------------------|
+| Không áp dụng | — | — | — |
 
 ## Checklist sẵn sàng cho `/speckit-tasks`
 
-<!--
-  Chỉ chuyển sang sinh tasks khi plan đã đủ chi tiết để tạo task độc lập, kiểm thử được.
-  Nếu một điểm chưa rõ nhưng vẫn đi tiếp, ghi rủi ro hoặc câu hỏi mở tương ứng.
--->
-
-- [ ] Phạm vi kỹ thuật trong/ngoài phase này đã rõ.
-- [ ] Câu hỏi kỹ thuật chặn thiết kế/task generation đã được resolve trong research hoặc ghi rủi ro rõ ràng.
-- [ ] Thiết kế tổng quan đã mô tả luồng chính, component/module tham gia, điểm thay đổi và boundary nếu có.
-- [ ] Các tình huống idempotency/concurrency/retry đã được đánh giá hoặc ghi `Không áp dụng`.
-- [ ] Mỗi `US`/`FR` P1/P2 hoặc FR ảnh hưởng code/data/API/permission có mapping sang module/path, API/contract, data/entity và kiểm thử.
-- [ ] Tác động tới database, API contract, permission, logging/audit và integration đã được đánh giá hoặc ghi `Không áp dụng`.
-- [ ] Các contract/API/event thay đổi đã có consumer bị ảnh hưởng và cách kiểm tra compatibility.
-- [ ] Dữ liệu/migration/backfill/compatibility đã rõ hoặc ghi `Không áp dụng`.
-- [ ] Database đích và repo chứa migration đã được xác định, đối chiếu `docs/architecture/system-map.md`, hoặc ghi `Không áp dụng` (Constitution VI).
-- [ ] Quyết định kỹ thuật chính đã có lý do chọn và phương án bị loại.
-- [ ] Chiến lược kiểm thử đã bao phủ unit, integration, contract, permission/security, E2E/manual và regression khi liên quan.
-- [ ] Rollout, rollback code/config, rollback dữ liệu/migration, feature flag/config và backward compatibility đã rõ hoặc ghi `Không áp dụng`.
-- [ ] Observability/debug plan có log field, dữ liệu không được log, metric/trace và cách kiểm tra sau release.
-- [ ] Không còn cây thư mục mẫu/generic; toàn bộ path trong cấu trúc source code là path thật trong repository.
-- [ ] Constitution gate không còn blocker trước khi chuyển sang `/speckit-tasks`.
+- [ ] Phạm vi kỹ thuật và `repos.md` (nếu chạm repo con) đã rõ, khớp MVP của `spec.md`.
+- [ ] Mọi câu hỏi kỹ thuật chặn thiết kế/task đã được chốt (trong `research.md` hoặc bảng quyết định ở trên).
+- [ ] Mỗi `US`/`FR`/`BR`/`SEC`/`NFR` quan trọng đã map sang module/path, contract, data và kiểm thử.
+- [ ] Database đích và repo chứa migration đã đối chiếu `docs/architecture/system-map.md` (hoặc ghi `Không áp dụng`).
+- [ ] Chiến lược kiểm thử, rollout/rollback và observability (kèm danh mục cấm log secret) đã rõ.
+- [ ] Khối cấu trúc source code đã thay hoàn toàn bằng path thật (không còn `# [XÓA NẾU KHÔNG DÙNG]`).
+- [ ] Bảng Kiểm tra constitution không còn blocker chưa được phê duyệt.

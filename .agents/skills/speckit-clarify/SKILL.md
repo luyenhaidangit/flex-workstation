@@ -67,12 +67,11 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 
 Execution steps:
 
-1. Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly` from repo root **once** (combined `--json --paths-only` mode / `-Json -PathsOnly`). Parse minimal JSON payload fields:
+1. Run `node scripts/speckit-cli.js check-prereqs --paths-only --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root **once**. Parse JSON payload fields:
    - `FEATURE_DIR`
    - `FEATURE_SPEC`
    - (Optionally capture `IMPL_PLAN`, `TASKS` for future chained flows.)
-   - If JSON parsing fails, abort and instruct user to re-run `/speckit-specify` or verify feature branch environment.
-   - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+   - If resolution fails, abort and instruct user to re-run `/speckit-specify` or pass the feature ID explicitly.
 
 2. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
 
@@ -286,10 +285,10 @@ Report completion (after questioning loop ends or early termination):
 - Sections touched (list names).
 - Spec quality checklist status (if `FEATURE_DIR/checklists/requirements.md` was re-validated): show before/after gate-complete counts (e.g., "Spec Quality Checklist: 12/16 → 15/16 items complete") and list any checkbox or `Status:` changes, including newly checked, regressions, and approved exceptions. If any items remain unchecked, list them as areas needing attention.
 - Coverage summary table listing each taxonomy category with Status: Resolved (was Partial/Missing and addressed), Deferred (exceeds question quota or better suited for planning), Clear (already sufficient), Outstanding (still Partial/Missing but low impact).
-- If any Outstanding or Deferred remain, recommend whether to proceed to `/speckit-plan` or run `/speckit-clarify` again later post-plan.
-- Suggested next command.
+- If any Outstanding or Deferred remain, recommend whether to run `/speckit-clarify` again or proceed to `/speckit-docbiz` (mandatory Documentation Impact Gate whenever `spec.md §20` is `CHƯA ĐÁNH GIÁ` or the business scope changed) before `/speckit-plan`.
+- Suggested next command (`/speckit-docbiz` if `spec.md §20` needs initial/updated evaluation, otherwise `/speckit-plan`).
 
-**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-plan` or any other command. Report completion and wait for the user to explicitly invoke the next step.
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-docbiz`, `/speckit-plan`, or any other command. Report completion and wait for the user to explicitly invoke the next step.
 
 ## Done When
 

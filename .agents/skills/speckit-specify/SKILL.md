@@ -1,13 +1,12 @@
 ---
 name: "speckit-specify"
-description: "Create or update the feature specification from a natural language feature description."
+description: "Create or update the business feature specification from a natural-language feature description. Use when starting a new feature without an existing business spec or when invoking /speckit-specify or $speckit-specify."
 argument-hint: "Describe the feature you want to specify"
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
   author: "github-spec-kit"
   source: "templates/commands/specify.md"
 user-invocable: true
-disable-model-invocation: true
 ---
 
 
@@ -116,15 +115,16 @@ Given that feature description, do this:
    - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` only for a new feature directory; for an existing directory, use its current `spec.md` as the starting point.
    - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
    - Replace `{{GIT_USER_NAME}}` in `SPEC_FILE` with `git config user.name` for both metadata fields; use `Chưa xác định` if unavailable. User-provided values take precedence.
+   - Classify `**Chế độ Spec**` in `SPEC_FILE` header: set `Compact` when the feature fits within a single repository, requires no shared database schema migration, and introduces no breaking public contract; otherwise set `Full` (user-provided mode overrides).
    - Replace `[Tóm tắt mong muốn người dùng trong 1-2 câu]` in `SPEC_FILE` with a concise 1-2 sentence summary of the user's intent distilled from the feature description — not the raw input. Capture the core goal and scope only; omit file paths, command syntax, and meta-instructions.
-   - Persist the resolved path to `.specify/feature.json`:
+   - Persist the resolved path via `node scripts/speckit-cli.js paths --feature "<resolved feature dir>" --pin --update-shared --json` (which updates both gitignored `.specify/feature.local.json` for parallel local sessions and `.specify/feature.json` for shared CLI fallback):
      ```json
      {
        "feature_directory": "<resolved feature dir>"
      }
      ```
-     Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
-     This allows downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
+     Write the actual resolved directory path value (for example, `specs/000043-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
+     This allows downstream commands (`/speckit-docbiz`, `/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
 
    **IMPORTANT**:
    - You must only create one feature per `/speckit-specify` invocation
@@ -178,10 +178,11 @@ Given that feature description, do this:
       - Update the summary counts, review status, conclusion, and permitted next step after each review iteration.
 
    c. **Handle Validation Results**:
-      - **If all Blocker and High items pass**: Set the checklist result to `Pass` and allow `$speckit-clarify` or `$speckit-plan`.
+      - **If all Blocker and High items pass**: Set the checklist result to `Pass` and allow `/speckit-clarify` (if ambiguities remain) or `/speckit-docbiz` (mandatory Documentation Impact Gate before `/speckit-plan` whenever `spec.md §20` is `CHƯA ĐÁNH GIÁ`).
       - **If no Blocker fails but High items have approved exceptions**: Set the result to `Pass có điều kiện`; document every exception and its approved owner/deadline.
-      - **If any Blocker fails**: Set the result to `Fail`, do not proceed to clarification or planning, and update the spec before re-validating.
+      - **If any Blocker fails**: Set the result to `Fail`, do not proceed to clarification, `docbiz`, or planning, and update the spec before re-validating.
       - If non-blocking items fail, update the spec and re-run validation up to three iterations; document any remaining approved exception.
+      - Run `node scripts/speckit-cli.js validate --feature "<SPECIFY_FEATURE_DIRECTORY>" --stage specify` to mechanically confirm zero unfilled tokens and zero uninspected `[Status: Chưa kiểm]` items remain.
 
    d. **Clarification Markers**:
       - Treat `[NEEDS CLARIFICATION]` and `[CẦN LÀM RÕ]` markers that affect scope, security, data, permission, contract, or user experience as Blocker failures.
@@ -226,11 +227,11 @@ Check if `.specify/extensions.yml` exists in the project root.
 
 Report completion to the user with:
 - `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
-- `SPEC_FILE` — the spec file path
+- `SPEC_FILE` — the spec file path and chosen `Chế độ Spec` (`Compact` or `Full`)
 - Checklist results summary
-- Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
+- Readiness for the next phase: `/speckit-clarify` if ambiguities remain, otherwise `/speckit-docbiz` (mandatory Documentation Impact Gate before `/speckit-plan`)
 
-**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-clarify`, `/speckit-plan`, or any other command. Report completion and wait for the user to explicitly invoke the next step.
+**HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-clarify`, `/speckit-docbiz`, `/speckit-plan`, or any other command. Report completion and wait for the user to explicitly invoke the next step.
 
 **NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
 

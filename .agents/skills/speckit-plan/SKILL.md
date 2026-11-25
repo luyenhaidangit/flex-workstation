@@ -61,9 +61,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/powershell/setup-plan.ps1 -Json` from repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. If script fails or spec file (`spec.md`) is missing, abort immediately and instruct user to run `/speckit-specify` first (do not create or plan without a spec). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `node scripts/speckit-cli.js setup-plan --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root and parse JSON for `FEATURE_SPEC`, `IMPL_PLAN`, `SPECS_DIR`, `REPOS_FILE`, `REPOS_EXISTS`, `SPEC_MODE`, and `BRANCH`. Notice that `setup-plan` deterministically verifies `spec.md` exists and `spec.md §20` (`Documentation Impact Gate`) is no longer `CHƯA ĐÁNH GIÁ` — if it exits non-zero, stop immediately and instruct the user to run `/speckit-specify` or `/speckit-docbiz` as indicated.
 
-2. **Load context**: Verify FEATURE_SPEC exists on disk and read FEATURE_SPEC and `.specify/memory/constitution.md`. Verify `FEATURE_SPEC` contains a completed `## 20. Đánh giá tác động tài liệu nghiệp vụ` from `/speckit-docbiz` after the most recent spec update. If the section is missing or marked `CHƯA ĐÁNH GIÁ`, stop and instruct the user to run `/speckit-docbiz`; do not plan until the Documentation Impact Gate has a result. Load IMPL_PLAN template (already copied). If `FEATURE_DIR/repos.md` exists, read it as the repo scope of the feature (Edit/Read/Skip); if the plan needs a child repo not listed there, re-run `flex-repo-scope` for that repo and update the file. If the feature touches database/schema/migration, also read `docs/architecture/system-map.md` (Projects, Data Architecture sections) before filling "Dữ liệu & Migration" — per Constitution VI, the target database and the repo that owns its migration script must be analyzed and cited, never assumed by habit (e.g. defaulting to the service repo being implemented).
+2. **Load context & Repo Scope**: Read `FEATURE_SPEC` and `.specify/memory/constitution.md`, plus the `IMPL_PLAN` template (already copied if new).
+   - **Repo Scope Gate**: If `REPOS_EXISTS` is `true`, read `REPOS_FILE` (`specs/<id>/repos.md`) as the repo scope (`Edit`/`Read`/`Skip`). If `REPOS_EXISTS` is `false` and the feature touches any child repo in `workstation.json` (or if the plan needs an unlisted child repo), **run `flex-repo-scope` now and write/update `FEATURE_DIR/repos.md`** before filling `plan.md`.
+   - If the feature touches database/schema/migration, also read `docs/architecture/system-map.md` (Projects, Data Architecture sections) before filling "Dữ liệu & Migration" — per Constitution VI, the target database and the repo that owns its migration script must be analyzed and cited, never assumed by habit.
 
 3. **Route specialist skills**: Use `flex-using-agent-skills` once with the technical
    context and planned artifacts. Keep `speckit-plan` as the active lifecycle skill;
@@ -71,14 +73,15 @@ You **MUST** consider the user input before proceeding (if not empty).
    guidance before making architecture, data, API, security, or test decisions. Do
    not route `speckit-plan` again.
 
-4. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
-   - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
-   - Copy the completed Documentation Impact Gate result from `spec.md` §20 into `Tác động tài liệu nghiệp vụ`; name every existing document and section that still needs work after implementation
-   - Fill Constitution Check section from constitution
-   - Evaluate gates (ERROR if violations unjustified)
-   - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
-   - Phase 1: Generate data-model.md, contracts/, quickstart.md
-   - Re-evaluate Constitution Check post-design
+4. **Execute plan workflow** (respecting `SPEC_MODE` from `spec.md` — `Compact` vs `Full`):
+   - Fill Technical Context, `Chế độ Spec`, and copy the completed Documentation Impact Gate result from `spec.md` §20 into `Tác động tài liệu nghiệp vụ` (naming any existing document + section that still needs post-implementation updates).
+   - Fill Constitution Check section from constitution and evaluate gates (ERROR if violations unjustified).
+   - **If `SPEC_MODE == Compact`** (single child repo, no shared DB schema migration, no breaking public contract): record research decisions, entity changes, contracts, and quickstart validation commands **inline inside `plan.md`** without creating separate `research.md`, `data-model.md`, or `quickstart.md` files unless complexity genuinely requires splitting.
+   - **If `SPEC_MODE == Full`**:
+     - Phase 0: Generate `research.md` (resolve all `NEEDS CLARIFICATION` / `TQ-###`).
+     - Phase 1: Generate `data-model.md`, `contracts/`, and `quickstart.md`.
+   - Re-evaluate Constitution Check post-design and tick completed items in `Checklist sẵn sàng cho /speckit-tasks`.
+   - Run `node scripts/speckit-cli.js validate --feature "<SPECS_DIR>" --stage plan` to confirm zero leftover sample trees (`# [XÓA NẾU KHÔNG DÙNG]`), zero unfilled tokens, and valid `repos.md` coverage.
 
 ## Mandatory Post-Execution Hooks
 

@@ -79,17 +79,13 @@ of the code relative to the feature's artifacts — no git, no branch comparison
 
 ## Operating Constraints
 
-**APPEND-ONLY, NEVER REWRITE**: The command's **only** write is appending a new
-`## Phase N: Convergence` section to `tasks.md`. It MUST NOT:
+**TWO-OUTCOME CONTRACT (`tasks_appended` vs `converged` closeout)**:
 
-- modify `spec.md` or `plan.md` in any way;
-- rewrite, renumber, reorder, or delete any existing task (including tasks from a prior
-  Convergence phase);
-- modify, create, or delete any application code — completing the appended tasks is the
-  job of `/speckit-implement`.
-
-When the codebase already satisfies everything, the command MUST leave `tasks.md`
-**byte-for-byte unchanged** (no empty Convergence header) and report a clean result.
+- **When gaps or specialist-review violations remain (`tasks_appended`)**: the command's **only** write is appending a new `## Phase N: Convergence` section to `tasks.md`. It MUST NOT:
+  - modify `spec.md` or `plan.md` in any way;
+  - rewrite, renumber, reorder, or delete any existing task (including tasks from a prior Convergence phase);
+  - modify, create, or delete any application code — completing the appended tasks is the job of `/speckit-implement`.
+- **When zero gaps remain AND Final Specialist Review passes (`converged` closeout)**: leave `tasks.md` **byte-for-byte unchanged** (no empty Convergence header), perform **Spec Reconciliation** against `spec.md`, record `**Ngày reconcile cuối**` and update `**Trạng thái**: Hoàn thành` in `spec.md` header so the feature closes cleanly in one step.
 
 **Constitution Authority**: The project constitution (`.specify/memory/constitution.md`) is
 **non-negotiable**. Code that violates a MUST principle is the highest-severity finding and
@@ -100,16 +96,9 @@ skip constitution checks gracefully rather than failing.
 
 ### 1. Initialize Convergence Context
 
-Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
-
-- SPEC = FEATURE_DIR/spec.md
-- PLAN = FEATURE_DIR/plan.md
-- TASKS = FEATURE_DIR/tasks.md
-- CONSTITUTION = `.specify/memory/constitution.md` (if present)
-If `spec.md`, `plan.md`, or `tasks.md` is missing, STOP with a clear, actionable message naming the
-prerequisite command to run (`/speckit-specify` for a missing spec, `/speckit-plan` for a missing plan,
-`/speckit-tasks` for missing tasks). Do not produce partial output.
-For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+Run `node scripts/speckit-cli.js check-prereqs --require-tasks --include-tasks --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) once from repo root and parse `FEATURE_DIR`, `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`, and `AVAILABLE_DOCS`. Load `.specify/memory/constitution.md` if present.
+If `spec.md`, `plan.md`, or `tasks.md` is missing, STOP with a clear, actionable message naming the prerequisite command to run (`/speckit-specify`, `/speckit-plan`, or `/speckit-tasks`). Do not produce partial output.
+When `/speckit-implement` ran earlier in the same conversation, prefer delegating the code inspection in Step 4 to a fresh read-only `research` subagent (when available) to avoid self-grading bias.
 
 ### 2. Load Artifacts (Progressive Disclosure)
 
@@ -234,22 +223,25 @@ Append to the **end** of `tasks.md`, per the append contract:
 4. Never reuse or renumber existing IDs. If a prior Convergence phase exists, add a new,
    separately-numbered one below it — do not touch the old one.
 
-**If there are no actionable findings** (`converged` outcome):
+**If there are no spec/plan/task gaps** (`converged` closeout branch):
 
-- Do **not** modify `tasks.md` at all — no empty phase header.
-- Report: **"✅ Converged — the implementation satisfies the spec, plan, and tasks."**
-- Include the summary counts of what was checked.
+1. **Final Specialist Review Gate**: Route the feature's changed source artifacts once via `flex-using-agent-skills` (keeping `speckit-converge` as lifecycle owner) to select applicable Flex specialist skills (e.g. `flex-dotnet-engineering`, `flex-database-engineering`, `flex-frontend-engineering`, `flex-naming-convention`, `flex-codebase-architect`). Verify the implemented files against each selected skill's `Verification` checklist:
+   - If any Blocker or High specialist-skill violation is found, do **not** close the feature: record each violation as a `contradicts` / `partial` finding (with `source-ref` naming the specialist skill) and execute the `tasks_appended` branch above (`## Phase N: Convergence`) so `/speckit-implement` resolves it.
+2. **Spec Reconciliation & Header Closeout** (only when 0 spec/plan/task gaps AND 0 Blocker/High specialist violations):
+   - Do **not** modify `tasks.md` at all — no empty phase header.
+   - Compare actual implemented behavior against `spec.md`:
+     - If minor implementation-time adjustments occurred within approved scope, update only the affected section(s) of `spec.md` and set `**Ngày reconcile cuối**: YYYY-MM-DD — đã cập nhật` in `spec.md` header (if business flow, role, entity, or scope changed materially, warn the user to run `/speckit-docbiz` before PR).
+     - If behavior matches `spec.md` without change, set `**Ngày reconcile cuối**: YYYY-MM-DD — không đổi`.
+   - Update `**Trạng thái**` in `spec.md` header to `Hoàn thành` (ensuring `**Ngày reconcile cuối**` line exists right beneath `**Trạng thái**` if absent in an older spec).
+   - Run `node scripts/speckit-cli.js validate --feature "<FEATURE_DIR>" --stage converge --verify-closed` to mechanically verify all tasks are `[X]` and header closeout metadata is complete.
+   - Report: **"✅ Converged & Closed — implementation, spec reconciliation, and specialist review all passed."** Include summary counts and specialist skills verified.
 
 ### 8. Provide Next Actions (Handoff)
 
 - On `tasks_appended`: state how many tasks were appended under which phase, and recommend
   running `/speckit-implement` to complete them; note that a follow-up converge
   run will find fewer or no remaining items.
-- On `converged`: report that the feature has converged against its specified scope,
-  then require a separate final review task. That task must begin with
-  `flex-using-agent-skills` and apply every specialist skill selected for the changed
-  artifacts before the feature is considered complete or ready for PR. Convergence
-  does not replace this engineering-quality gate.
+- On `converged`: report reconciliation status (`không đổi` / `đã cập nhật`), specialist skills verified, and confirm the feature is `Hoàn thành` and ready to open PR (or recommend `/speckit-docbiz` first if reconciliation changed material business behavior).
 
 **HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-implement` or any other command. Report completion and wait for the user to explicitly invoke the next step.
 

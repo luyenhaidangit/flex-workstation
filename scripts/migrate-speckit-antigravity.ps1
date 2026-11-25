@@ -59,6 +59,7 @@ $protectedPaths = @(
     ".specify\extensions.yml",
     ".specify\memory\constitution.md",
     ".specify\feature.json",
+    ".specify\feature.local.json",
     ".specify\workflows",
     ".specify\integrations\claude.manifest.json",
     ".specify\integrations\speckit.manifest.json"

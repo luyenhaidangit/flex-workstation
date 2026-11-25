@@ -61,39 +61,17 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. Run `node scripts/speckit-cli.js check-prereqs --require-tasks --include-tasks --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root and parse `FEATURE_DIR`, `AVAILABLE_DOCS`, and `CHECKLISTS`. All paths must be absolute.
 
-2. **Check checklists status** (if FEATURE_DIR/checklists/ exists):
-   - Scan all checklist files in the checklists/ directory
-   - For each checklist, count:
-     - Total items: All lines matching `- [ ]` or `- [X]` or `- [x]`
-     - Completed items: Lines matching `- [X]` or `- [x]`
-     - Incomplete items: Lines matching `- [ ]`
-   - A checked item with `Status: Không áp dụng` is complete and MUST NOT block this gate. A checked `Status: Fail (ngoại lệ đã phê duyệt)` is also complete: the status keeps the risk visible, while its approved exception records the authorization. Only unchecked items are incomplete.
-   - Create a status table:
-
-     ```text
-     | Checklist | Total | Completed | Incomplete | Status |
-     |-----------|-------|-----------|------------|--------|
-     | ux.md     | 12    | 12        | 0          | ✓ PASS |
-     | test.md   | 8     | 5         | 3          | ✗ FAIL |
-     | security.md | 6   | 6         | 0          | ✓ PASS |
-     ```
-
-   - Calculate overall status:
-     - **PASS**: All checklists have 0 incomplete items
-     - **FAIL**: One or more checklists have incomplete items
-
-   - **If any checklist is incomplete**:
+2. **Check checklists status** (using `CHECKLISTS` returned by `speckit-cli.js`, or scanning `FEATURE_DIR/checklists/` if present):
+   - For each checklist, inspect `total`, `completed`, `incomplete`, `uninspectedCount` (`[Status: Chưa kiểm]`), and `status`:
+   - A checked item with `Status: Không áp dụng` is complete and MUST NOT block this gate. A checked `Status: Fail (ngoại lệ đã phê duyệt)` is also complete: the status keeps the risk visible, while its approved exception records the authorization. Unchecked `- [ ]` items or items left at `[Status: Chưa kiểm]` are incomplete.
+   - Render the status table (`Checklist | Total | Completed | Incomplete | Status`).
+   - **If any checklist has `status == FAIL` (`incomplete > 0` or `uninspectedCount > 0`)**:
      - Display the table with incomplete item counts
-     - **STOP** and ask: "Some checklists are incomplete. Do you want to proceed with implementation anyway? (yes/no)"
-     - Wait for user response before continuing
-     - If user says "no" or "wait" or "stop", halt execution
-     - If user says "yes" or "proceed" or "continue", proceed to step 3
-
-   - **If all checklists are complete**:
-     - Display the table showing all checklists passed
-     - Automatically proceed to step 3
+     - **STOP** and ask in Vietnamese: `"Một số checklist chưa hoàn tất (còn mục chưa tick hoặc Chưa kiểm). Bạn có muốn tiếp tục triển khai không? (có/không)"`
+     - Wait for user response before continuing; halt if user replies `"không"` / `"no"` / `"stop"`, proceed to step 3 only if user explicitly confirms `"có"` / `"yes"` / `"tiếp tục"`.
+   - **If all checklists pass**: display the table and proceed to step 3 automatically.
 
 3. Load and analyze the implementation context:
    - **REQUIRED**: Read tasks.md for the complete task list and execution plan
@@ -158,9 +136,10 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Confirm the implementation follows the technical plan
    - Confirm all selected specialist-skill checks were completed or any approved
      exception is recorded in the relevant artifact
-   - If every task in `tasks.md` is now marked `[X]`, update the `**Trạng thái**`
-     field in `FEATURE_DIR/spec.md`'s header to `Hoàn thành`. Leave it as
-     `Đang triển khai` if any task remains unchecked.
+   - Keep `**Trạng thái**` in `FEATURE_DIR/spec.md`'s header as `Đang triển khai`
+     (final transition to `Hoàn thành` and `Ngày reconcile cuối` happens in
+     `/speckit-converge` once 0 gaps, Spec Reconciliation, and Final Specialist
+     Review closeout all pass per Constitution §8).
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 

@@ -1,20 +1,18 @@
 <!--
 BÁO CÁO TÁC ĐỘNG ĐỒNG BỘ
 ==================
-Thay đổi phiên bản: 1.2.1 -> 1.3.0
+Thay đổi phiên bản: 1.3.0 -> 1.4.0
 Section đã sửa:
-  - Cổng chất lượng (Section 7): bổ sung Specialist Skill Gate
-  - Definition of Done (Section 8): yêu cầu hoàn tất final specialist review sau converge
+  - Nguyên tắc II (Spec trước code) & Section 8 (Definition of Done): bổ sung chế độ Compact Spec Track, kiểm tra tĩnh qua scripts/speckit-cli.js và gộp Spec Reconciliation + Final Specialist Review + chốt Trạng thái: Hoàn thành vào nhánh converged của speckit-converge
 Đã thêm: Không có section mới
 Đã bỏ: Không có
-Lý do: Speckit kiểm tra code theo spec/plan/tasks, nhưng không tự bảo đảm các chuẩn kỹ thuật
-  của skill Flex phù hợp đã được áp dụng. Gate mới bắt buộc luôn route và chỉ áp dụng skill
-  chuyên môn liên quan trước khi kết luận feature hoàn thành.
+Lý do: Giảm ~60% chi phí token template, xóa ma sát cho feature nhỏ 1 repo bằng chế độ Compact, và khép kín bước kết sổ cuối pipeline vốn dễ bị bỏ sót.
 Template đã cập nhật:
-  ✅ .specify/templates/plan-template.md — không cần đổi; routing diễn ra trong speckit-plan trước khi điền plan
-  ✅ .specify/templates/spec-template.md — không cần đổi; scope nghiệp vụ không thay đổi
-  ✅ .specify/templates/tasks-template.md — không cần đổi; implementation đọc paths/artifacts để route
-  ✅ .specify/templates/checklist-template.md — không cần đổi; final review theo specialist skill không phải checklist template
+  ✅ .specify/templates/plan-template.md — bổ sung Chế độ Spec (Compact nhúng thẳng research/data/quickstart), bắt buộc repos.md
+  ✅ .specify/templates/spec-template.md — bổ sung Chế độ Spec, gọn hóa §19 và hướng dẫn inline
+  ✅ .specify/templates/tasks-template.md — tách quy tắc sinh task sang references/task-generation-rules.md
+  ✅ .specify/templates/requirements-template.md — mặc định [Status: Chưa kiểm], đồng bộ bước /speckit-docbiz
+  ✅ .specify/templates/checklist-template.md — tinh gọn khung output
   ⚠ .specify/templates/constitution-template.md — là template generic, không mang nội dung đặc thù workstation
     (tương tự dòng sub-repo ở Nguyên tắc V), không cập nhật theo chủ đích
   ✅ .specify/templates/commands/*.md — không tồn tại trong workspace này
@@ -26,7 +24,7 @@ TODO hoãn lại: Không có
 
 | Phiên bản | Trạng thái | Phê chuẩn | Sửa đổi gần nhất | Chủ sở hữu |
 |-----------|-----------|-----------|-------------------|------------|
-| 1.3.0 | Active | 2026-07-05 | 2026-08-15 | Nhóm Flex |
+| 1.4.0 | Active | 2026-07-05 | 2026-11-26 | Nhóm Flex |
 
 ---
 
@@ -106,7 +104,7 @@ Khi có mâu thuẫn giữa các artifact, thứ tự ưu tiên PHẢI là:
 
 ### II. Spec trước code
 
-**Quy định**: Mọi tính năng PHẢI bắt đầu bằng spec nghiệp vụ trước khi có implementation. Spec mô tả WHY/WHAT; plan mô tả HOW; tasks chia nhỏ công việc kiểm chứng được.
+**Quy định**: Mọi tính năng PHẢI bắt đầu bằng spec nghiệp vụ trước khi có implementation. Spec mô tả WHY/WHAT; plan mô tả HOW; tasks chia nhỏ công việc kiểm chứng được. Tùy độ phức tạp, Spec Track hỗ trợ hai chế độ: `Compact` (cho feature nằm gọn trong 1 repo, không đổi DB schema dùng chung và không tạo breaking public contract — nhúng thẳng research, data và quickstart vào `plan.md`) và `Full` (sinh đầy đủ bộ file Phase 0/1).
 
 **Lý do**: Spec là nguồn sự thật nghiệp vụ. Code theo sau spec để tránh scope creep, assumption âm thầm và implementation không trace được.
 
@@ -278,8 +276,7 @@ Một feature chỉ được xem là hoàn thành khi:
 - Contract/migration/rollback đã rõ nếu có.
 - Observability và smoke check sau release đã sẵn sàng.
 - Không còn ngoại lệ blocker chưa được phê duyệt.
-- `/speckit-converge` hoặc `$speckit-converge` không tìm thấy gap còn lại trong phạm vi đã specify.
-- Final review đã route bằng `flex-using-agent-skills` và hoàn tất mọi specialist skill được chọn cho artifact thay đổi.
+- `/speckit-converge` hoặc `$speckit-converge` đạt trạng thái `converged`: không còn gap trong phạm vi đã specify, đã hoàn tất Final Specialist Review (route qua `flex-using-agent-skills` cho mọi artifact thay đổi), đã thực hiện Spec Reconciliation (`Ngày reconcile cuối`), cập nhật `Trạng thái: Hoàn thành` và pass kiểm tra tĩnh `node scripts/speckit-cli.js validate --stage converge --verify-closed`.
 
 ---
 
@@ -350,6 +347,7 @@ Nếu ngoại lệ ảnh hưởng release, ngoại lệ PHẢI được phản �
 
 | Phiên bản | Ngày | Người thay đổi | Thay đổi | Lý do |
 |-----------|------|----------------|----------|-------|
+| 1.4.0 | 2026-11-26 | Nhóm Flex | Bổ sung chế độ `Compact` trong Spec Track, tích hợp Spec Reconciliation + Final Specialist Review + chốt `Trạng thái: Hoàn thành` vào nhánh `converged` của `speckit-converge`, và kiểm tra tĩnh qua `scripts/speckit-cli.js` | Giảm ~60% overhead template/artifact cho feature nhỏ và khép kín bước kết sổ cuối pipeline vốn dễ bị bỏ sót |
 | 1.3.0 | 2026-08-15 | Nhóm Flex | Bổ sung Specialist Skill Gate và final specialist review sau converge | Bảo đảm Speckit luôn route và áp dụng skill Flex phù hợp với artifact thực tế, không chỉ kiểm coverage spec/plan/tasks |
 | 1.2.1 | 2026-08-05 | Nhóm Flex | Bổ sung câu hỏi kiểm tra database đích/repo migration (Nguyên tắc VI) vào Checklist review tối thiểu (Section 9) | Section 9 thiếu mục kiểm tra tương ứng Nguyên tắc VI dù đã lan sang `plan-template.md`, khiến reviewer có thể bỏ sót rủi ro |
 | 1.2.0 | 2026-07-11 | Nhóm Flex | Mở rộng constitution theo template hiện hành, thêm gate/DoD/exception/source-of-truth và làm rõ cú pháp command đa agent | Đồng bộ constitution với template Speckit tiếng Việt và quy tắc làm việc của workspace |

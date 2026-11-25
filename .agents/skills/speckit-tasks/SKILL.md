@@ -61,24 +61,22 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Setup**: Run `.specify/scripts/powershell/setup-tasks.ps1 -Json` from repo root and parse FEATURE_DIR, TASKS_TEMPLATE, and AVAILABLE_DOCS list. `FEATURE_DIR` and `TASKS_TEMPLATE` must be absolute paths when provided. `AVAILABLE_DOCS` is a list of document names/relative paths available under `FEATURE_DIR` (for example `research.md` or `contracts/`). For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+1. **Setup**: Run `node scripts/speckit-cli.js setup-tasks --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root and parse `FEATURE_DIR`, `TASKS_TEMPLATE`, `AVAILABLE_DOCS`, and `PLAN_READINESS`.
 
-2. **Load design documents**: Read from FEATURE_DIR:
-   - **Required**: plan.md (tech stack, libraries, structure), spec.md (user stories with priorities)
-   - **Optional**: data-model.md (entities), contracts/ (interface contracts), research.md (decisions), quickstart.md (test scenarios)
-   - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints
-   - Read `plan.md` section `Tác động tài liệu nghiệp vụ` and `spec.md` §20. Do not infer a documentation task from the feature name or an example task.
-   - Note: Not all projects have all documents. Generate tasks based on what's available.
+2. **Load design documents & rules**:
+   - Read `.agents/skills/speckit-tasks/references/task-generation-rules.md` for atomic task sizing, Foundational scope boundaries, `[P]` file-conflict handling, Data/Migration safety, Contract rules, and multi-clause requirement coverage.
+   - Read from `FEATURE_DIR`:
+     - **Required**: `plan.md` (tech stack, libraries, structure, inline design if `Compact` mode), `spec.md` (user stories with priorities)
+     - **Optional** (present in `AVAILABLE_DOCS`): `data-model.md`, `contracts/`, `research.md`, `quickstart.md`, `repos.md`
+     - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints
+     - Read `plan.md` section `Tác động tài liệu nghiệp vụ` and `spec.md` §20. Do not infer a documentation task from the feature name or an example task.
 
-3. **Check plan readiness checklist** (in plan.md, section `Checklist sẵn sàng cho /speckit-tasks`):
-   - Count total items (`- [ ]` or `- [X]`/`- [x]`) and incomplete items (`- [ ]`) in that section.
-   - **If any item is incomplete**:
-     - List the incomplete items
-     - **STOP** and ask: "Plan chưa đủ sẵn sàng cho `/speckit-tasks` (còn N item chưa tick). Bạn muốn tiếp tục sinh tasks hay quay lại `/speckit-plan`? (proceed/stop)"
-     - Wait for user response before continuing
-     - If user says "stop" or "quay lại", halt execution
-     - If user says "proceed" or "tiếp tục", proceed to step 4
-   - **If the section is missing or all items are complete**: proceed to step 4 automatically.
+3. **Check plan readiness checklist** (using `PLAN_READINESS` returned by `setup-tasks`):
+   - **If `PLAN_READINESS.incomplete > 0`**:
+     - List `PLAN_READINESS.incompleteItems`
+     - **STOP** and ask: "Plan chưa đủ sẵn sàng cho `/speckit-tasks` (còn N item chưa tick). Bạn muốn tiếp tục sinh tasks hay quay lại `/speckit-plan`? (tiếp tục/quay lại)"
+     - Wait for user response before continuing; halt if user chooses to go back.
+   - **If `PLAN_READINESS.incomplete == 0`**: proceed to step 4 automatically.
 
 4. **Execute task generation workflow**:
    - Load plan.md and extract tech stack, libraries, project structure
@@ -101,9 +99,8 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Final Phase: Polish & cross-cutting concerns
    - All tasks must follow the strict checklist format (see Task Generation Rules below)
    - Clear file paths for each task
-   - Dependencies section showing story completion order
-   - Parallel execution examples per story
-   - Implementation strategy section (MVP first, incremental delivery)
+   - Dependencies section showing story completion order and parallel opportunities
+   - Run `node scripts/speckit-cli.js validate --feature "<FEATURE_DIR>" --stage tasks` to verify zero leftover template tokens, unique sequential `T###` IDs, and zero `[P]` same-file conflicts before reporting completion.
 
 ## Mandatory Post-Execution Hooks
 

@@ -154,9 +154,11 @@ function Get-FeaturePathsEnv {
     $currentBranch = Get-CurrentBranch
 
     # Resolve feature directory.  Priority:
-    #   1. SPECIFY_FEATURE_DIRECTORY env var (explicit override)
-    #   2. .specify/feature.json "feature_directory" key (persisted by specify command)
-    #   3. Error - no feature context available
+    #   1. SPECIFY_FEATURE_DIRECTORY env var (explicit override; never mutates shared feature.json)
+    #   2. .specify/feature.local.json "feature_directory" key (gitignored per-machine pointer)
+    #   3. .specify/feature.json "feature_directory" key (shared fallback persisted by specify command)
+    #   4. Error - no feature context available
+    $localFeatureJson = Join-Path $repoRoot '.specify/feature.local.json'
     $featureJson = Join-Path $repoRoot '.specify/feature.json'
     if ($env:SPECIFY_FEATURE_DIRECTORY) {
         $featureDir = $env:SPECIFY_FEATURE_DIRECTORY
@@ -164,10 +166,22 @@ function Get-FeaturePathsEnv {
         if (-not [System.IO.Path]::IsPathRooted($featureDir)) {
             $featureDir = Join-Path $repoRoot $featureDir
         }
-        # Persist to feature.json so future sessions without the env var still
-        # work - unless the caller opted out for read-only resolution (#3025).
-        if (-not $NoPersist) {
-            Save-FeatureJson -RepoRoot $repoRoot -FeatureDirectory $env:SPECIFY_FEATURE_DIRECTORY
+    } elseif (Test-Path $localFeatureJson) {
+        $localRaw = Get-Content -LiteralPath $localFeatureJson -Raw
+        try {
+            $localConfig = $localRaw | ConvertFrom-Json
+        } catch {
+            [Console]::Error.WriteLine("ERROR: Failed to parse .specify/feature.local.json: $_")
+            exit 1
+        }
+        if ($localConfig.feature_directory) {
+            $featureDir = $localConfig.feature_directory
+            if (-not [System.IO.Path]::IsPathRooted($featureDir)) {
+                $featureDir = Join-Path $repoRoot $featureDir
+            }
+        } else {
+            [Console]::Error.WriteLine("ERROR: .specify/feature.local.json does not contain feature_directory.")
+            exit 1
         }
     } elseif (Test-Path $featureJson) {
         $featureJsonRaw = Get-Content -LiteralPath $featureJson -Raw

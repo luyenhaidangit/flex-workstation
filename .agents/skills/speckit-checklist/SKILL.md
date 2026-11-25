@@ -82,9 +82,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Execution Steps
 
-1. **Setup**: Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json` from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS list.
+1. **Setup**: Run `node scripts/speckit-cli.js check-prereqs --paths-only --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root and parse JSON for `FEATURE_DIR` and `FEATURE_SPEC` / `IMPL_PLAN` / `TASKS`.
    - All file paths must be absolute.
-   - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
 
@@ -262,7 +261,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Depth level
    - Actor/timing
    - Any explicit user-specified must-have items incorporated
-   - Suggested next step: `/speckit-plan` to begin technical planning (or `/speckit-clarify` if the spec still has open ambiguities).
+   - Suggested next step: if `spec.md §20` is still `CHƯA ĐÁNH GIÁ`, run `/speckit-docbiz` first; otherwise `/speckit-plan` to begin technical planning (or `/speckit-clarify` if the spec still has open ambiguities).
 
 **Important**: Each `/speckit-checklist` command invocation uses a short, descriptive checklist filename and either creates a new file or appends to an existing one. This allows:
 

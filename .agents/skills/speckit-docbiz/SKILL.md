@@ -26,9 +26,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ### 1. Locate the current feature spec
 
-Resolve `FEATURE_DIR` using `SPECIFY_FEATURE_DIRECTORY`, falling back to
-`.specify/feature.json`. Load `<FEATURE_DIR>/spec.md`; if it does not exist, stop
-with: "spec.md not found in {FEATURE_DIR}. Run /speckit-specify first."
+Run `node scripts/speckit-cli.js check-prereqs --paths-only --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) to resolve `FEATURE_DIR` across `--feature`, `SPECIFY_FEATURE_DIRECTORY`, `.specify/feature.local.json`, and `.specify/feature.json`. Load `<FEATURE_DIR>/spec.md`; if it does not exist, stop with: "spec.md not found in {FEATURE_DIR}. Run /speckit-specify first."
 
 Extract the feature number prefix and short display name from the directory name.
 

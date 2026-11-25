@@ -46,12 +46,18 @@ For this nested route, retain the active Speckit skill as the lifecycle owner an
 return only additional specialist skills. Do not route the same `speckit-*` skill
 again and do not recursively invoke this router.
 
+Note on catalog visibility: `speckit-specify` is model-invocable so natural-language
+feature requests route to it directly; the remaining 10 `speckit-*` skills set
+`disable-model-invocation: true` to enforce user-gated transitions and reside on disk
+under `.agents/skills/speckit-*/SKILL.md` (even when hidden from auto-invoked `<skills>`
+lists until explicitly invoked via `/speckit-*` or `$speckit-*`).
+
 | Speckit lifecycle | Required routing behavior |
 | --- | --- |
-| `speckit-plan` | Use the technical context and planned artifacts to select applicable specialist skills before making architecture, data, API, or test decisions. |
+| `speckit-plan` | Ensure `repos.md` exists via `flex-repo-scope` when child repos are touched, then select applicable specialist skills before making architecture, data, API, or test decisions. |
 | `speckit-tasks` | If a task description already names a concrete artifact, symbol, or endpoint, route the applicable specialist skills before finalizing that task's wording; otherwise task breakdown stays artifact-agnostic and no additional route is needed. |
 | `speckit-implement` | After loading plan and tasks, select and apply applicable specialist skills before editing source; re-route only if a later task introduces a new artifact domain. |
-| `speckit-converge` | Assess spec/plan/task coverage only. A converged result still requires a separate final review task routed to the applicable specialist skills before the feature is considered complete. |
+| `speckit-converge` | Assess spec/plan/task coverage first; when 0 gaps remain (`converged` closeout), route changed artifacts to applicable specialist skills for Final Specialist Review before reconciling `spec.md` and marking `Trạng thái: Hoàn thành`. |
 
 Examples: C# changes add `flex-dotnet-engineering`; database migrations add
 `flex-database-engineering`; Angular UI adds `flex-frontend-engineering`; backend

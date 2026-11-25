@@ -73,14 +73,9 @@ Identify inconsistencies, duplications, ambiguities, and underspecified items ac
 
 ### 1. Initialize Analysis Context
 
-Run `.specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks` once from repo root and parse JSON for FEATURE_DIR and AVAILABLE_DOCS. Derive absolute paths:
+Run `node scripts/speckit-cli.js check-prereqs --require-tasks --include-tasks --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) and `node scripts/speckit-cli.js validate --stage tasks --json` from repo root. Parse JSON for `FEATURE_DIR`, `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`, `AVAILABLE_DOCS`, and deterministic validation issues.
 
-- SPEC = FEATURE_DIR/spec.md
-- PLAN = FEATURE_DIR/plan.md
-- TASKS = FEATURE_DIR/tasks.md
-
-Abort with an error message if any required file is missing (instruct the user to run missing prerequisite command).
-For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
+Abort with an error message if any required file is missing (instruct the user to run the missing prerequisite command). When `speckit-plan` or `speckit-tasks` ran earlier in the same conversation, prefer delegating the semantic detection pass (Step 4) to a fresh read-only `research` subagent (when subagents are available) to avoid author confirmation bias.
 
 ### 2. Load Artifacts (Progressive Disclosure)
 

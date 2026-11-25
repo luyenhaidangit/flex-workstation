@@ -31,6 +31,7 @@ const SECTION_EXEMPT_SKILLS = {
 const REQUIRED_SECTIONS = ['## Overview', '## When to Use', '## Common Rationalizations', '## Red Flags', '## Verification'];
 const USE_WHEN_PATTERN = /\buse (when|during|before|after)\b/i;
 const DESCRIPTION_SOFT_LIMIT = 1024;
+const LINE_SOFT_LIMIT = 400;
 
 function parseFrontmatter(content) {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -61,6 +62,12 @@ function checkSkill(dirName, content, routingTableText) {
   const errors = [];
   const warnings = [];
   const isHouseStyle = dirName.startsWith('flex-');
+  const isSpeckitSkill = dirName.startsWith('speckit-');
+  const lineCount = content.split(/\r?\n/).length;
+
+  if (isSpeckitSkill && lineCount > LINE_SOFT_LIMIT) {
+    warnings.push(`SKILL.md is ${lineCount} lines, above the ~${LINE_SOFT_LIMIT}-line progressive-disclosure guideline.`);
+  }
 
   const fm = parseFrontmatter(content);
   if (!fm) {
@@ -92,10 +99,19 @@ function checkSkill(dirName, content, routingTableText) {
     }
   }
 
-  if (isHouseStyle && dirName !== 'flex-using-agent-skills' && routingTableText) {
+  if ((isHouseStyle || isSpeckitSkill) && dirName !== 'flex-using-agent-skills' && routingTableText) {
     const inRoutingTable = routingTableText.includes(`\`${dirName}\``);
     if (!inRoutingTable) {
       warnings.push(`Not found in flex-using-agent-skills's routing table — the skill may be invisible under this workspace's mandatory routing rule.`);
+    }
+  }
+
+  if (isSpeckitSkill) {
+    if (!content.includes('HARD STOP')) {
+      errors.push('Speckit skill is missing mandatory `HARD STOP` gate instruction.');
+    }
+    if (dirName !== 'speckit-constitution' && !content.includes('ACTIVE_FEATURE_DIRECTORY')) {
+      warnings.push('Feature-scoped Speckit skill should report `ACTIVE_FEATURE_DIRECTORY` in its Completion Report.');
     }
   }
 

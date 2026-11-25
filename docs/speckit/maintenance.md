@@ -1,33 +1,22 @@
 # Speckit Maintenance
 
-Ghi chú bảo trì Speckit, runtime guidance và constitution cho `flex-workstation`.
+Ghi chú bảo trì Speckit, runtime guidance, CLI kiểm tra tĩnh và constitution cho `flex-workstation`.
 
-## Constitution
+## Constitution & Kiến trúc hiện hành
 
-- Constitution hiện ở version `1.3.0`, bổ sung Specialist Skill Gate: Speckit luôn route qua `flex-using-agent-skills` và chỉ áp dụng các skill Flex phù hợp với artifact thực tế.
-- Tài liệu workflow Speckit phải nêu rõ hai dạng command: `$speckit-*` cho Codex và `/speckit-*` cho Antigravity IDE/CLI cùng Claude Code. Ba runtime dùng chung source `.agents/skills/`; không thêm workflow tự chạy toàn bộ Speckit.
+- Constitution hiện ở version `1.4.0`: hỗ trợ phân tầng `Light Track` / `Compact Spec Track` / `Full Spec Track`, Specialist Skill Gate hai pha qua `flex-using-agent-skills`, kiểm tra tĩnh đa nền tảng qua `scripts/speckit-cli.js`, và quy trình Closeout khép kín ngay trong nhánh `converged` của `speckit-converge`.
+- Ba runtime (Codex `$speckit-*`, Antigravity `/speckit-*`, Claude Code `/speckit-*`) dùng chung source `.agents/skills/`.
+- `speckit-specify` bật model-invocation (không đặt `disable-model-invocation: true`) để nhận yêu cầu tạo feature bằng ngôn ngữ tự nhiên; 10 skill `speckit-*` còn lại giữ `disable-model-invocation: true` để khóa cứng cơ chế user-gated giữa các bước.
 
 ## Quy ước bảo trì
 
-- Khi thay đổi hành vi Speckit, template Speckit hoặc runtime guidance, cập nhật tài liệu tương ứng trong `docs/speckit/`.
-- Khi thay đổi onboarding hoặc cấu trúc workspace, cập nhật `docs/setup/onboarding.md` hoặc `docs/architecture/system-map.md`.
-- Khi thay đổi quy tắc hành vi chung trong `CLAUDE.md`, rà lại `AGENTS.md` để Codex nhận cùng tiêu chuẩn ở dạng phù hợp với Codex.
-- Khi sửa prompt hoặc skill, giữ diff tối thiểu, không lặp/mâu thuẫn và kiểm tra trực tiếp phần đã sửa.
-- `$speckit-specify` phải dò thư mục cùng short-name trước khi dispatch `before_specify` hook hoặc tạo feature; khi có kết quả trùng, phải dừng để người dùng chọn cập nhật spec hiện có hoặc tạo feature mới. Update mode giữ `requirements.md` hiện có và chỉ re-validate status/tổng hợp, không copy đè lịch sử review hay ngoại lệ.
-- `$speckit-tasks` phải tuân theo Test Gate trong constitution: sinh test task cho rủi ro cần xác minh trong `plan.md`, hoặc manual/command validation kèm lý do không áp dụng automated test; không được coi test là tùy chọn chỉ vì không có yêu cầu riêng.
-- `speckit-docbiz` là Documentation Impact Gate bắt buộc sau lần cập nhật cuối của `spec.md` và trước `speckit-plan`. Skill phải đánh giá tác động trước: chỉ cập nhật section của tài liệu hiện hữu khi thay đổi nghiệp vụ là đáng kể; chỉ tạo tài liệu mới khi không có tài liệu phù hợp, đồng thời cập nhật `docs/business/business-docs-index.md`. Không dùng hook tự chạy và không gắn sau `speckit-converge` vì converge chỉ append `tasks.md`.
-- `$speckit-plan` và `$speckit-implement` phải gọi `flex-using-agent-skills` một lần sau khi technical context hoặc artifact scope đã rõ; giữ Speckit là lifecycle owner và chỉ lấy specialist skill bổ sung, không route đệ quy cùng command.
-- Spec reconciliation (bước 10) là bước ghi trong docs, không có skill riêng và không gắn hook tự chạy; `speckit-converge` vẫn chỉ append `tasks.md`. Task thuộc Light Track không đi qua Speckit nên không cần reconcile.
-- `$speckit-converge` chỉ xác nhận coverage với spec/plan/tasks. Khi converged, feature vẫn phải đi qua một final specialist review được route bằng `flex-using-agent-skills` trước khi được xem là hoàn thành hoặc sẵn sàng PR.
-- `$speckit-analyze` và `$speckit-converge` phải inventory `MT`/`US`/`AC`/`FR`/`BR`/`SEC`/`NFR`/`SC`; `BR`/`SEC`/`NFR` có work phải có implementation, test hoặc validation coverage theo Traceability Gate.
-- Các command Speckit có feature scope phải mở đầu Completion Report bằng `ACTIVE_FEATURE_DIRECTORY`; khi làm song song, dùng `SPECIFY_FEATURE_DIRECTORY` trong từng PowerShell session thay vì tin vào `.specify/feature.json` là con trỏ duy nhất.
-- `$speckit-taskstoissues` ưu tiên GitHub MCP; khi MCP không có, dùng `gh issue list/create` với `--repo` lấy từ `origin`. Nếu không xác thực hoặc không deduplicate được issue hiện có, phải dừng trước khi tạo issue. Mỗi issue mới phải có mô tả task, trace `[US#]`, link/path đến `spec.md`/`plan.md`/`tasks.md`, và label `feature:<feature-dir>` để tự đứng được trên GitHub.
-- Không sửa trực tiếp skill gốc trong `.agents/skills/**` chỉ để đổi ngôn ngữ artifact. Nếu cần custom output, ưu tiên template workspace và tài liệu workflow.
-- Khi validate thay đổi template, chạy static search trên toàn bộ `.specify/templates` và rà `git diff -- .agents/skills`.
-- Khi upgrade Spec Kit, không nhận tự động file upstream mà manifest đang theo dõi. Diff từng file trong `.specify/integrations/claude.manifest.json` và `.specify/integrations/speckit.manifest.json` (integration hiện tại của repo này là `claude`, theo `.specify/integration.json`) với custom source hiện hành; chỉ merge thay đổi được review, rồi cập nhật manifest/hash theo cơ chế chính thức của tool. `claude.manifest.json` đã tắt hash-tracking cho `.claude/skills/speckit-*/SKILL.md` (xem `_disabled_files_note` trong file đó) để bảo vệ customization — diff các file này bằng tay, không dựa vào hash. `.specify/integrations/agy.manifest.json` chỉ xuất hiện sau khi chạy `scripts/migrate-speckit-antigravity.ps1` để chuyển sang Antigravity làm integration mặc định; nếu file đó tồn tại, diff luôn nó. Các skill `.agents/skills/` và template/script tùy biến phải được bảo toàn qua `scripts/migrate-speckit-antigravity.ps1`.
-
-## Requirements Quality Gate
-
-- `checklists/requirements.md` là quality gate bắt buộc của `$speckit-specify` và phải được sinh từ `.specify/templates/requirements-template.md`.
-- Trong `checklists/requirements.md`, `Status: Pass`, `Status: Không áp dụng` và `Status: Fail (ngoại lệ đã phê duyệt)` dùng checkbox `[x]`; chỉ `Status: Fail` chưa được phê duyệt dùng `[ ]` và chặn gate `$speckit-implement`. Ngoại lệ đã phê duyệt phải giữ fail evidence, owner, hạn xử lý và người phê duyệt/hạn xem lại.
-- `$speckit-checklist` tiếp tục dùng `.specify/templates/checklist-template.md` để tạo checklist tùy biến theo domain; không thay thế hoặc ghi đè requirements quality gate.
+- Khi thay đổi hành vi Speckit, template hoặc runtime guidance, đồng bộ `docs/speckit/` và chạy cả 2 lệnh kiểm tra cơ học:
+  - `node scripts/validate-skills.js` (kiểm tra frontmatter, routing table, độ dài dòng, `HARD STOP` và `ACTIVE_FEATURE_DIRECTORY` cho cả `flex-*` lẫn `speckit-*`).
+  - `powershell -NoProfile -File scripts/test-antigravity-runtime.ps1` (hoặc `pwsh` nếu có).
+- Mọi thao tác giải quyết đường dẫn feature và kiểm tra điều kiện tiên quyết ưu tiên gọi `node scripts/speckit-cli.js` (thuần Node stdlib, chạy giống hệt nhau trên Windows local và Linux Cloud container `CLAUDE_CODE_REMOTE=true`).
+- Không để biến môi trường `SPECIFY_FEATURE_DIRECTORY` ghi đè ngược vào `.specify/feature.json`; khi cần ghim cục bộ cho từng máy/phiên, dùng `.specify/feature.local.json` (đã gitignore, qua cờ `--pin`).
+- Giữ `.specify/templates/*.md` tinh gọn (chỉ chứa khung output và comment nhắc ngắn); quy tắc hướng dẫn dài cho AI phải đặt trong thư mục `references/` của skill tương ứng (như `.agents/skills/speckit-tasks/references/task-generation-rules.md`).
+- Trong `requirements-template.md`, giữ mặc định `- [ ] ... [Status: Chưa kiểm]` để `speckit-cli.js validate --stage specify` phát hiện được trường hợp AI bỏ sót không chấm từng mục `CHK###`.
+- `speckit-implement` chỉ đặt `Trạng thái: Đang triển khai`; việc chuyển sang `Trạng thái: Hoàn thành` và ghi `Ngày reconcile cuối` thuộc độc quyền nhánh `converged` của `speckit-converge` sau khi đã pass Final Specialist Review và `speckit-cli.js validate --stage converge --verify-closed`.
+- Không sửa nát nội dung tiếng Anh của các skill gốc trong `.agents/skills/speckit-*` chỉ để dịch câu chữ sang tiếng Việt; quy tắc xuất bảng báo cáo/câu hỏi tiếng Việt được điều phối tập trung từ `AGENTS.md`.
+- Khi upgrade `specify-cli` / Spec Kit upstream: không nhận tự động file đè lên `.agents/skills/` hoặc `.specify/templates/`. Diff thủ công với `.specify/integrations/claude.manifest.json` và `.specify/integrations/speckit.manifest.json` (xem `scripts/migrate-speckit-antigravity.ps1` cho danh sách `$protectedPaths` cần bảo toàn — bổ sung giữ `scripts/speckit-cli.js` và `.agents/skills/speckit-tasks/references/`).

@@ -41,8 +41,17 @@ if (-not (Test-Path $integrationPath)) {
 }
 else {
     $integration = Get-Content -Raw -Encoding UTF8 $integrationPath | ConvertFrom-Json
-    if ($integration.integration -ne "agy" -or $integration.default_integration -ne "agy") {
-        Add-Failure "Spec Kit integration and default_integration must both be 'agy'."
+    $allowedIntegrations = @("claude", "agy")
+    $activeKey = [string]$integration.default_integration
+    if (-not $activeKey) { $activeKey = [string]$integration.integration }
+    if ($allowedIntegrations -notcontains [string]$integration.integration -or $allowedIntegrations -notcontains $activeKey) {
+        Add-Failure "Spec Kit integration/default_integration must be 'claude' or 'agy' (shared .agents/skills runtime); found '$($integration.integration)' / '$activeKey'."
+    }
+    elseif ($integration.integration_settings -and $integration.integration_settings.PSObject.Properties[$activeKey]) {
+        $sep = $integration.integration_settings.PSObject.Properties[$activeKey].Value.invoke_separator
+        if ($sep -and $sep -ne "-") {
+            Add-Failure "Spec Kit invoke_separator for '$activeKey' must be '-' so /speckit-* commands match .agents/skills/."
+        }
     }
 }
 
