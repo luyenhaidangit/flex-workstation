@@ -70,7 +70,9 @@ Cập nhật chính Jenkins là thao tác thủ công, không có job tự build
 | --- | --- | --- |
 | `mounts/jenkins/Dockerfile`, `plugins/plugins.txt`, `JENKINS_VERSION` | Chạy tay `bash publish-jenkins.sh` (build, push Docker Hub, recreate container); sao lưu volume `jenkins_data` trước khi chạy trên production | `publish-jenkins.sh`, `flex-environment/AGENTS.md` mục "Boundaries" |
 | `mounts/jenkins/jenkins.yaml` | Không build lại: reload JCasC hoặc restart container `jenkins` | `docker-compose.infra.yml` (mount `:ro`) |
-| `mounts/jenkins/seeds/`, `mounts/jenkins/jobs/*.groovy` | Không build lại: Seed Job tự poll `main` mỗi ~5 phút | `seeds/seed.groovy` |
+| `mounts/jenkins/seeds/`, `mounts/jenkins/jobs/*.groovy` | Không build lại: Seed Job tự poll `main` mỗi ~5 phút. Poll chỉ hỏi GitHub commit mới nhất của `main`, không kéo code; có commit mới thì Seed Job mới checkout và chạy Job DSL | `seeds/seed.groovy` |
+
+Commit mới vào `flex-environment` chỉ làm Jenkins cập nhật định nghĩa job. Jenkins không `git pull` repo này trên server, không deploy và không restart container; các file compose, nginx, `jenkins.yaml` vẫn cần `git pull` riêng (`bash pull.sh` hoặc `bash restart.sh`). Chỉ Seed Job tự chạy theo commit; các pipeline còn lại chạy khi bấm tay (xem `c4-dynamic-cicd.md`).
 
 ## Chưa vẽ / cần xác minh
 
