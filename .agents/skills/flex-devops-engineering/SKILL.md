@@ -56,6 +56,9 @@ Before changing files or runtime state:
    `staging`, or `production`), host or cluster, and affected stateful resources.
 2. Read the nearest `AGENTS.md`, Compose entry point, deployment documentation,
    adjacent service definitions, scripts, proxy configuration, and monitoring setup.
+   Also search scripts, CI/CD jobs, and runbooks for existing automation of the action
+   at hand (for example a job that syncs secrets) and reuse it instead of designing a
+   parallel procedure; note which steps it covers and which still need manual work.
 3. Classify the request as design, review, diagnosis, configuration change, local
    deployment, production deployment, migration, or incident response.
 4. State success criteria, expected downtime, data risk, rollback path, and what
