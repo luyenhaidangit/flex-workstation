@@ -1,0 +1,39 @@
+{
+  "skill_name": "flex-repo-scope",
+  "description": "Repo scoping evals — verifies minimal Edit/Read/Skip selection against workstation.json.",
+  "evals": [
+    {
+      "id": "scope-ui-form-only",
+      "prompt": "Thêm validation số điện thoại cho form tạo user ở giao diện quản trị",
+      "expected_edit": ["flex-microfrontend"],
+      "expected_read": ["flex-auth-service"],
+      "expected_skip": ["flex-exchange-service", "flex-k8s", "flex-agent-service", "flex-environment"],
+      "assertions": [
+        "Marks `flex-microfrontend` as Edit",
+        "Skips unrelated backend/infra repos without scanning them"
+      ]
+    },
+    {
+      "id": "scope-migration-and-auth",
+      "prompt": "Thêm cột lock_reason vào bảng users trong PostgreSQL và cập nhật entity trong auth service",
+      "expected_edit": ["flex-database", "flex-auth-service"],
+      "expected_read": [],
+      "expected_skip": ["flex-microfrontend", "flex-exchange-service", "flex-k8s", "flex-agent-service"],
+      "assertions": [
+        "Marks both `flex-database` and `flex-auth-service` as Edit",
+        "Skips frontend, exchange, agent, and k8s repos"
+      ]
+    },
+    {
+      "id": "scope-k8s-ingress-review",
+      "prompt": "Kiểm tra cấu hình Ingress Kubernetes và route ở API Gateway cho dịch vụ mới",
+      "expected_edit": [],
+      "expected_read": ["flex-k8s", "flex-api-gateway"],
+      "expected_skip": ["flex-microfrontend", "flex-database", "flex-exchange-service", "flex-agent-service"],
+      "assertions": [
+        "Marks `flex-k8s` and `flex-api-gateway` as Read (review-only request)",
+        "Prints scope plan without editing any child repo"
+      ]
+    }
+  ]
+}

@@ -5,7 +5,15 @@ description: Generate architecture documentation using C4 model Mermaid diagrams
 
 # C4 Architecture Documentation
 
-Generate software architecture documentation using C4 model diagrams in Mermaid syntax.
+## Overview
+
+Generate software architecture documentation using C4 model diagrams in Mermaid syntax, grounded in actual repository structure rather than generic assumptions. Keep diagrams focused (Context + Container first) and write outputs under `core/architecture/`.
+
+## When to Use
+
+- Asked to create or update architecture diagrams, C4 diagrams, or visualize system structure.
+- Documenting system context, containers, components, deployment topology, or dynamic request flows.
+- Do not use for non-architecture flowcharts, ERDs, or low-level class diagrams; use standard Mermaid diagrams directly instead.
 
 ## Workflow
 
@@ -293,3 +301,25 @@ Write architecture documentation to `core/architecture/` (create the directory i
 - [references/c4-syntax.md](references/c4-syntax.md) - Complete Mermaid C4 syntax
 - [references/common-mistakes.md](references/common-mistakes.md) - Anti-patterns to avoid
 - [references/advanced-patterns.md](references/advanced-patterns.md) - Microservices, event-driven, deployment
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "Let's generate all 4 C4 levels upfront to be thorough" | Component/Code diagrams go stale fast; Context + Container cover most architectural decisions. |
+| "A single box for Kafka or RabbitMQ is cleaner" | Hiding individual topics/queues obscures event coupling and ownership between services. |
+| "BiRel saves arrows when two services talk" | Bidirectional arrows hide who initiates calls and the direction of dependency. |
+
+## Red Flags
+
+- More than 20 elements packed into a single diagram.
+- Containers and non-deployable components mixed in the same abstraction level.
+- Relationships missing action verbs or transport/protocol labels.
+- Diagrams invented from assumptions instead of inspected repos/configs.
+
+## Verification
+
+- [ ] Chosen C4 level(s) match the target audience (Context + Container by default).
+- [ ] Every element includes Name, Type, Technology (where applicable), and concise Description.
+- [ ] All arrows are unidirectional with action verbs and protocol/technology labels.
+- [ ] Each diagram stays under 20 elements and is saved under `core/architecture/` with the standard filename.

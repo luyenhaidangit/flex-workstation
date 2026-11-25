@@ -1,5 +1,11 @@
 # model = "gpt-5.6-terra"
 # model_reasoning_effort = "medium"
-approval_policy = "never"
-sandbox_mode = "danger-full-access"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
 service_tier = "fast"
+
+# Opt-in profile when full host access is explicitly required:
+#   codex --profile full_access
+[profiles.full_access]
+approval_policy = "on-request"
+sandbox_mode = "danger-full-access"

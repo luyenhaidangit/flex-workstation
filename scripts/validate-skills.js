@@ -65,7 +65,7 @@ function checkSkill(dirName, content, routingTableText) {
   const isSpeckitSkill = dirName.startsWith('speckit-');
   const lineCount = content.split(/\r?\n/).length;
 
-  if (isSpeckitSkill && lineCount > LINE_SOFT_LIMIT) {
+  if ((isHouseStyle || isSpeckitSkill) && lineCount > LINE_SOFT_LIMIT) {
     warnings.push(`SKILL.md is ${lineCount} lines, above the ~${LINE_SOFT_LIMIT}-line progressive-disclosure guideline.`);
   }
 

@@ -1,0 +1,61 @@
+{
+  "skill_name": "flex-using-agent-skills",
+  "description": "Routing precision evals for flex-using-agent-skills — verifies smallest applicable skill set selection.",
+  "evals": [
+    {
+      "id": "route-dotnet-feature-bugfix",
+      "prompt": "Sửa bug xử lý refresh token trong flex-auth-service bị race condition khi gọi song song",
+      "expected_primary": "flex-dotnet-engineering",
+      "expected_additional": ["flex-codebase-architect", "flex-repo-scope"],
+      "forbidden_skills": ["flex-frontend-engineering", "flex-database-engineering"],
+      "assertions": [
+        "Outputs the exact `Kết quả định tuyến` block before any file tool call",
+        "Selects `flex-dotnet-engineering` as Primary and includes `flex-codebase-architect` for non-trivial code change"
+      ]
+    },
+    {
+      "id": "route-infra-review-readonly",
+      "prompt": "Review cấu hình Nginx và Docker Compose hiện tại của hệ thống Flex xem có lỗ hổng TLS nào không",
+      "expected_primary": "flex-repo-scope",
+      "expected_additional": ["flex-devops-engineering"],
+      "forbidden_skills": ["flex-prod-troubleshooting", "flex-dotnet-engineering"],
+      "assertions": [
+        "Routes infrastructure review questions to `flex-repo-scope` + `flex-devops-engineering`",
+        "Does not guess infrastructure state before inspecting the selected repo"
+      ]
+    },
+    {
+      "id": "route-prod-incident",
+      "prompt": "Server prod đang trả 502 trên API gateway, kiểm tra log container giúp tôi",
+      "expected_primary": "flex-prod-troubleshooting",
+      "expected_additional": [],
+      "forbidden_skills": ["flex-devops-engineering"],
+      "assertions": [
+        "Selects `flex-prod-troubleshooting` for live prod diagnosis",
+        "Does not preemptively add `flex-devops-engineering` before a config fix is needed"
+      ]
+    },
+    {
+      "id": "route-context-review",
+      "prompt": "Review lại AGENTS.md và CLAUDE.md của flex-database xem có bị thừa hay lệch chuẩn không",
+      "expected_primary": "flex-context-engineering",
+      "expected_additional": [],
+      "forbidden_skills": ["flex-database-engineering", "flex-skill-creator"],
+      "assertions": [
+        "Routes project context audit to `flex-context-engineering` only",
+        "Does not pull in `flex-database-engineering` when only rules files are in scope"
+      ]
+    },
+    {
+      "id": "route-new-feature-speckit",
+      "prompt": "Thêm tính năng xuất báo cáo sao kê giao dịch theo tháng ra Excel cho người dùng cuối",
+      "expected_primary": "speckit-specify",
+      "expected_additional": [],
+      "forbidden_skills": ["speckit-implement", "speckit-plan"],
+      "assertions": [
+        "Routes new feature without existing business spec to `speckit-specify`",
+        "Does not skip straight to planning or implementation"
+      ]
+    }
+  ]
+}

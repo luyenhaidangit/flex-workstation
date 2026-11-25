@@ -68,35 +68,12 @@ Mọi tính năng bắt đầu bằng spec nghiệp vụ trước khi có bất 
 - **Full Spec Track** — feature lớn, thay đổi nhiều repo, có DB migration hoặc thay đổi domain/public contract quan trọng: đi Speckit đầy đủ kèm trọn bộ artifact Phase 0/1.
 - Chưa rõ thuộc track nào: hỏi người dùng, không tự chọn.
 
-### Cú pháp theo runtime
+### Cú pháp & vòng đời
 
-| Runtime | Cú pháp gọi skill Speckit |
-| --- | --- |
-| Codex | `$speckit-<command>` |
-| Antigravity IDE/CLI và Claude Code | `/speckit-<command>` |
-
-`speckit-specify` bật model-invocation cho câu mô tả feature tự nhiên; 10 skill `speckit-*` còn lại đặt `disable-model-invocation: true` tại `.agents/skills/` để bảo vệ gate người dùng chủ động gọi. Không tạo workflow `/speckit` tự chạy toàn bộ vòng đời.
-
-### Setup (chạy một lần cho project)
-
-Thiết lập nguyên tắc: `$speckit-constitution` hoặc `/speckit-constitution`
-
-### Mỗi feature (lặp lại — có thể truyền `--feature <id>` qua argument khi làm song song)
-
-| Bước | Codex | Antigravity / Claude | Ghi chú |
-| --- | --- | --- | --- |
-| 1 | `$speckit-specify <mô tả nghiệp vụ>` | `/speckit-specify <mô tả nghiệp vụ>` | Chỉ WHAT + WHY — tự gắn `Chế độ Spec: Compact` hoặc `Full` |
-| 2 | `$speckit-clarify` | `/speckit-clarify` | **Optional** — tối đa 5 câu làm rõ; chạy trước `docbiz`/`plan` để giảm rework |
-| 2a | `$speckit-docbiz` | `/speckit-docbiz` | **⚠️ Gate bắt buộc trước bước 4** — chạy sau lần cập nhật cuối `spec.md`; đánh giá và chỉ cập nhật doc khi có tác động nghiệp vụ đáng kể |
-| 3 | `$speckit-checklist [domain]` | `/speckit-checklist [domain]` | **Optional** — tạo checklist domain (ux, security, api) |
-| 4 | `$speckit-plan <tech stack + architecture>` | `/speckit-plan <tech stack + architecture>` | Tạo `repos.md` (qua `flex-repo-scope` nếu chạm sub-repo) + thiết kế kỹ thuật |
-| 5 | `$speckit-tasks` | `/speckit-tasks` | Sinh task list theo dependency order + chạy static validation |
-| 6 | `$speckit-taskstoissues` | `/speckit-taskstoissues` | **Optional** — chuyển tasks → GitHub Issues |
-| 7 | `$speckit-analyze` | `/speckit-analyze` | **Optional** — cross-artifact quality gate trước implement (ưu tiên `research` subagent) |
-| 8 | `$speckit-implement` | `/speckit-implement` | Thực thi tasks (`Trạng thái: Đang triển khai`); dừng hỏi nếu checklist chưa pass |
-| 9 | `$speckit-converge` | `/speckit-converge` | Còn gap/vi phạm kỹ thuật → append task vào `tasks.md` và quay lại bước 8; 0 gap → tự chạy Final Specialist Review + Spec Reconciliation (`Ngày reconcile cuối`) + chốt `Trạng thái: Hoàn thành` |
-
-Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho Codex, Antigravity và Claude Code. Mọi bảng báo cáo và câu hỏi tương tác của lệnh Speckit đều xuất tiếng Việt có dấu dù mẫu trong skill gốc viết tiếng Anh.
+- Codex gọi `$speckit-<command>`; Antigravity IDE/CLI và Claude Code gọi `/speckit-<command>`.
+- Chỉ `speckit-specify` bật model-invocation; 10 skill `speckit-*` còn lại đặt `disable-model-invocation: true` để giữ gate người dùng chủ động gọi. Không tạo workflow tự chạy toàn bộ vòng đời.
+- Thứ tự chuẩn: `specify` → (`clarify`) → **`docbiz` (gate bắt buộc trước `plan`)** → (`checklist`) → `plan` → `tasks` → (`analyze`) → `implement` → `converge`. Bảng chi tiết từng bước xem `.claude/rules/speckit.md` và `docs/speckit/workflow.md`.
+- Mọi bảng báo cáo và câu hỏi tương tác của lệnh Speckit đều xuất tiếng Việt có dấu.
 
 ### Gate bắt buộc giữa các bước
 
@@ -107,20 +84,26 @@ Skills Speckit nằm tại `.agents/skills/` — source of truth dùng chung cho
 - "Implement X" hay "thực hiện X" thuộc Spec Track chỉ tương đương bước 1 (`speckit-specify`), không phải toàn pipeline.
 - Spec của feature đã `Hoàn thành` là lịch sử; nguồn sự thật là code, test và `docs/business`. Khi spec mâu thuẫn với chúng, tin code/test/docs và báo lệch, không làm theo spec.
 
-## Tooling
+## Tooling & Verify Commands
+
+```bash
+node scripts/validate-skills.js        # Kiểm tra cấu trúc toàn bộ catalog skills
+node --test tests/harness.test.js      # Chạy unit test cho hooks, validators và JSON configs
+git config core.hooksPath .githooks    # Bật pre-commit hook dùng chung (chạy 1 lần hoặc qua SYNC_WORKSPACE.cmd)
+```
 
 | Tool | Mục đích |
 | --- | --- |
 | `codex` | Codex CLI — chạy tại workstation root qua `OPEN_CODEX.cmd` |
 | `rtk` | Proxy CLI giảm 60–90% token output; chi tiết và native-tool-priority xem `tooling/RTK.md` |
 | `node scripts/speckit-cli.js` | CLI đa nền tảng resolve feature song song (`--feature`, `feature.local.json`) và kiểm tra tĩnh gate/artifact Speckit |
-| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions |
+| `SYNC_WORKSPACE.cmd` | Bootstrap: clone/pull repos trong manifest, cài tool, sync skill junctions và `.githooks` |
 
 `rtk` chỉ dùng cho `git` và shell ops không có native tool thay thế; cấm bọc trong `powershell -Command` hoặc gọi PowerShell cmdlet — chi tiết đầy đủ nằm ở `tooling/RTK.md`, không lặp lại ở đây.
 
 ## Quy tắc làm việc
 
-- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo (chặn tự động qua `.claude/hooks/secret-guard.js` trên Write/Edit và `git commit`).
+- Không đưa token, mật khẩu, khóa API, connection string hoặc thông tin nhạy cảm vào repo (chặn tự động qua `.claude/hooks/secret-guard.js` trên Write/Edit/commit và `.githooks/pre-commit` cho mọi runtime).
 - Không tạo submodule/subtree hoặc liên kết version giữa repo nếu người dùng chưa yêu cầu rõ.
 - Không sửa mã nguồn project con khi yêu cầu chỉ thuộc workstation.
 - Không xóa hoặc revert thay đổi hiện có nếu không chắc đó là thay đổi do mình tạo.

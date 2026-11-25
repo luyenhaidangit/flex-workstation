@@ -1,0 +1,32 @@
+#!/bin/sh
+# Shared pre-commit hook for flex-workstation (installed via `git config core.hooksPath .githooks`).
+# Enforces secret scanning and skill validation consistently across Claude Code, Codex, Antigravity, and manual commits.
+
+set -eu
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "[pre-commit] WARN: node not found in PATH — skipping automated harness checks." >&2
+  exit 0
+fi
+
+# 1. Secret scan on staged diff (reuses .claude/hooks/secret-guard.js as single source of truth)
+node -e '
+  const path = require("path");
+  const { execSync } = require("child_process");
+  const root = process.argv[1];
+  const { findSecret } = require(path.join(root, ".claude", "hooks", "secret-guard.js"));
+  const diff = execSync("git diff --cached", { cwd: root, encoding: "utf8", maxBuffer: 10 * 1024 * 1024 });
+  const hit = findSecret(diff);
+  if (hit) {
+    console.error(`[pre-commit] BLOCKED: looks like a ${hit.name} in staged diff (${hit.snippet}).`);
+    console.error("Remove the secret (or use a placeholder like YOUR_API_KEY) before committing.");
+    process.exit(1);
+  }
+' "$REPO_ROOT"
+
+# 2. Validate skills whenever .agents/skills/ changes are staged
+if git diff --cached --name-only | grep -q '^\.agents/skills/'; then
+  node "$REPO_ROOT/scripts/validate-skills.js"
+fi

@@ -2,15 +2,15 @@
   "mcpServers": {
     "flex-exchange-db": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${FLEX_EXCHANGE_DB_URL}"]
+      "args": ["-y", "@modelcontextprotocol/server-postgres@0.6.2", "${FLEX_EXCHANGE_DB_URL}"]
     },
     "flex-broker-db": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${FLEX_BROKER_DB_URL}"]
+      "args": ["-y", "@modelcontextprotocol/server-postgres@0.6.2", "${FLEX_BROKER_DB_URL}"]
     },
     "flex-vsd-db": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${FLEX_VSD_DB_URL}"]
+      "args": ["-y", "@modelcontextprotocol/server-postgres@0.6.2", "${FLEX_VSD_DB_URL}"]
     }
   }
 }

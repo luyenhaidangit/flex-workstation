@@ -126,6 +126,12 @@ function Initialize-WorkspaceProjectConfig {
         Write-Warn "Codex CLI config is missing: $(Join-Path $codexRoot "config.toml")"
     }
 
+    $gitHooksDir = Join-Path $projectRoot ".githooks"
+    if ((Test-Command "git") -and (Test-Path $gitHooksDir)) {
+        git -C $projectRoot config core.hooksPath .githooks
+        Write-Ok "Git hooksPath configured to .githooks"
+    }
+
     Write-Ok "AI runtime config folders ready: $claudeRoot, $agentsRoot, $codexRoot"
 }
 
