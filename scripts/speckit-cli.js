@@ -5,7 +5,9 @@
 //
 // Subcommands:
 //   node scripts/speckit-cli.js paths [--feature <ref>] [--pin] [--update-shared] [--json]
-//   node scripts/speckit-cli.js check-prereqs [--feature <ref>] [--require-tasks] [--include-tasks] [--paths-only] [--json]
+//   node scripts/speckit-cli.js hooks --stage <stage> [--json]
+//   node scripts/speckit-cli.js check-prereqs [--feature <ref>] [--stage <stage>] [--require-tasks] [--include-tasks] [--paths-only] [--json]
+//   node scripts/speckit-cli.js setup-specify --short-name <slug> [--mode Compact|Full] [--feature <ref>] [--allow-duplicate] [--json]
 //   node scripts/speckit-cli.js setup-plan [--feature <ref>] [--json]
 //   node scripts/speckit-cli.js setup-tasks [--feature <ref>] [--json]
 //   node scripts/speckit-cli.js validate [--feature <ref>] --stage <specify|plan|tasks|implement|converge> [--verify-closed] [--json]
@@ -14,11 +16,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 const {
   countCheckboxes,
   scanChecklists,
   extractSection,
   getDocBizStatus,
+  isDocBizPending,
   validateStage,
 } = require('./validate-speckit-artifact');
 
@@ -27,6 +31,8 @@ const SPECIFY_DIR = path.join(REPO_ROOT, '.specify');
 const SPECS_DIR = path.join(REPO_ROOT, 'specs');
 const LOCAL_FEATURE_FILE = path.join(SPECIFY_DIR, 'feature.local.json');
 const SHARED_FEATURE_FILE = path.join(SPECIFY_DIR, 'feature.json');
+const EXTENSIONS_FILE = path.join(SPECIFY_DIR, 'extensions.yml');
+const INIT_OPTIONS_FILE = path.join(SPECIFY_DIR, 'init-options.json');
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -182,6 +188,159 @@ function resolveTemplate(templateName) {
   return candidates.find((c) => fs.existsSync(c)) || null;
 }
 
+function unquoteYaml(val) {
+  const s = String(val || '').trim();
+  if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+    return s.slice(1, -1);
+  }
+  return s;
+}
+
+function parseHooksForKey(yamlText, hookKey) {
+  const lines = yamlText.split(/\r?\n/);
+  let inHooks = false;
+  let hooksIndent = -1;
+  let inKey = false;
+  let keyIndent = -1;
+  const items = [];
+  let current = null;
+
+  for (const rawLine of lines) {
+    const trimmed = rawLine.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const indent = rawLine.length - rawLine.trimStart().length;
+
+    if (!inHooks) {
+      if (/^hooks:\s*\{\s*\}\s*$/.test(trimmed)) return [];
+      if (/^hooks:\s*$/.test(trimmed)) {
+        inHooks = true;
+        hooksIndent = indent;
+      }
+      continue;
+    }
+
+    if (indent <= hooksIndent) break;
+
+    if (!inKey) {
+      const km = trimmed.match(/^([a-zA-Z0-9_]+):\s*(.*)$/);
+      if (km && km[1] === hookKey) {
+        if (km[2] === '[]' || km[2] === '{}') return [];
+        inKey = true;
+        keyIndent = indent;
+      }
+      continue;
+    }
+
+    if (indent <= keyIndent) break;
+
+    if (trimmed.startsWith('- ')) {
+      if (current) items.push(current);
+      current = {};
+      const rest = trimmed.slice(2).trim();
+      const kv = rest.match(/^([a-zA-Z0-9_]+):\s*(.*)$/);
+      if (kv) current[kv[1]] = unquoteYaml(kv[2]);
+    } else if (current) {
+      const kv = trimmed.match(/^([a-zA-Z0-9_]+):\s*(.*)$/);
+      if (kv) current[kv[1]] = unquoteYaml(kv[2]);
+    }
+  }
+  if (current) items.push(current);
+
+  return items
+    .filter((h) => {
+      if (String(h.enabled || '').toLowerCase() === 'false') return false;
+      const cond = String(h.condition || '').trim().toLowerCase();
+      if (cond && cond !== 'null' && cond !== '~') return false;
+      return Boolean(h.command);
+    })
+    .map((h) => ({
+      extension: h.extension || 'unknown',
+      command: h.command,
+      slashCommand: `/${String(h.command).replace(/\./g, '-')}`,
+      description: h.description || '',
+      prompt: h.prompt || '',
+      optional: String(h.optional || '').toLowerCase() !== 'false',
+    }));
+}
+
+function loadExtensionHooks(stage) {
+  if (!stage || !fs.existsSync(EXTENSIONS_FILE)) return { before: [], after: [] };
+  try {
+    const content = fs.readFileSync(EXTENSIONS_FILE, 'utf8');
+    if (/^\s*hooks:\s*\{\s*\}\s*$/m.test(content)) return { before: [], after: [] };
+    return {
+      before: parseHooksForKey(content, `before_${stage}`),
+      after: parseHooksForKey(content, `after_${stage}`),
+    };
+  } catch {
+    return { before: [], after: [] };
+  }
+}
+
+function getGitUserName() {
+  try {
+    const out = execFileSync('git', ['config', 'user.name'], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return out || 'Chưa xác định';
+  } catch {
+    return 'Chưa xác định';
+  }
+}
+
+function getTodayIsoDate() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function computeNextFeaturePrefix() {
+  const initOpts = readJsonSafe(INIT_OPTIONS_FILE) || {};
+  let numbering = initOpts.feature_numbering;
+  let deprecatedWarning = null;
+  if (!numbering && initOpts.branch_numbering) {
+    numbering = initOpts.branch_numbering;
+    deprecatedWarning = '`branch_numbering` in .specify/init-options.json is deprecated. Rename to `feature_numbering`.';
+  }
+
+  if (numbering === 'timestamp') {
+    const now = new Date();
+    const y = now.getFullYear();
+    const mo = String(now.getMonth() + 1).padStart(2, '0');
+    const da = String(now.getDate()).padStart(2, '0');
+    const h = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    return { prefix: `${y}${mo}${da}-${h}${mi}${s}`, deprecatedWarning };
+  }
+
+  let maxNum = 0;
+  if (fs.existsSync(SPECS_DIR)) {
+    for (const entry of fs.readdirSync(SPECS_DIR, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const m = entry.name.match(/^(\d+)-/);
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (n > maxNum) maxNum = n;
+      }
+    }
+  }
+  return { prefix: String(maxNum + 1).padStart(6, '0'), deprecatedWarning };
+}
+
+function findShortNameMatches(shortName) {
+  if (!fs.existsSync(SPECS_DIR)) return [];
+  return fs
+    .readdirSync(SPECS_DIR, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name.endsWith(`-${shortName}`))
+    .map((e) => `specs/${e.name}`)
+    .sort();
+}
+
 function outputResult(data, asJson) {
   if (asJson) {
     process.stdout.write(JSON.stringify(data) + '\n');
@@ -209,26 +368,138 @@ function main() {
       return;
     }
 
+    if (sub === 'hooks') {
+      const stage = args.stage;
+      if (!stage) throw new Error('Missing --stage <stage> for hooks subcommand.');
+      outputResult({ STAGE: stage, HOOKS: loadExtensionHooks(stage) }, asJson);
+      return;
+    }
+
+    if (sub === 'setup-specify') {
+      const hooks = loadExtensionHooks('specify');
+      const gitUser = getGitUserName();
+      const today = getTodayIsoDate();
+
+      if (args.feature) {
+        const paths = resolveFeaturePaths({ feature: args.feature, pin: true, updateShared: true });
+        if (!fs.existsSync(paths.FEATURE_SPEC)) {
+          throw new Error(`spec.md not found in ${paths.FEATURE_DIR}. Remove --feature to create a new feature.`);
+        }
+        const reqPath = path.join(paths.CHECKLISTS_DIR, 'requirements.md');
+        outputResult(
+          {
+            STATUS: 'UPDATED_EXISTING',
+            ACTIVE_FEATURE_DIRECTORY: paths.FEATURE_REL,
+            BRANCH: paths.BRANCH,
+            FEATURE_DIR: paths.FEATURE_DIR,
+            FEATURE_SPEC: paths.FEATURE_SPEC,
+            REQUIREMENTS_CHECKLIST: reqPath,
+            REQUIREMENTS_EXISTS: fs.existsSync(reqPath),
+            GIT_USER_NAME: gitUser,
+            TODAY: today,
+            HOOKS: hooks,
+          },
+          asJson
+        );
+        return;
+      }
+
+      const rawSlug = String(args['short-name'] || '').trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+      if (!rawSlug) {
+        throw new Error('Missing --short-name <slug> (or --feature <existing-ref>) for setup-specify.');
+      }
+
+      if (!args['allow-duplicate']) {
+        const matches = findShortNameMatches(rawSlug);
+        if (matches.length > 0) {
+          outputResult(
+            {
+              STATUS: 'DUPLICATE_FOUND',
+              SHORT_NAME: rawSlug,
+              MATCHES: matches,
+              HOOKS: hooks,
+            },
+            asJson
+          );
+          return;
+        }
+      }
+
+      const specTpl = resolveTemplate('spec-template');
+      const reqTpl = resolveTemplate('requirements-template');
+      if (!specTpl) throw new Error('spec-template.md not found under .specify/templates/.');
+      if (!reqTpl) throw new Error('requirements-template.md not found under .specify/templates/.');
+
+      const { prefix, deprecatedWarning } = computeNextFeaturePrefix();
+      const dirName = `${prefix}-${rawSlug}`;
+      const featureDir = path.join(SPECS_DIR, dirName);
+      const checklistsDir = path.join(featureDir, 'checklists');
+      const specFile = path.join(featureDir, 'spec.md');
+      const reqFile = path.join(checklistsDir, 'requirements.md');
+      const specMode = args.mode ? String(args.mode).trim() : null;
+
+      fs.mkdirSync(checklistsDir, { recursive: true });
+
+      let specContent = fs
+        .readFileSync(specTpl, 'utf8')
+        .replace(/\[NNNNNN-ten-tinh-nang\]/g, dirName)
+        .replace(/\[NGÀY\]/g, today)
+        .replace(/\{\{GIT_USER_NAME\}\}/g, gitUser);
+      if (specMode) {
+        specContent = specContent.replace(/\[Full \/ Compact\]/g, specMode);
+      }
+      fs.writeFileSync(specFile, specContent, 'utf8');
+
+      const reqContent = fs
+        .readFileSync(reqTpl, 'utf8')
+        .replace(/\[NNNNNN\]/g, prefix)
+        .replace(/\[NGÀY\]/g, today)
+        .replace(/\{\{GIT_USER_NAME\}\}/g, gitUser);
+      fs.writeFileSync(reqFile, reqContent, 'utf8');
+
+      saveFeaturePointer(LOCAL_FEATURE_FILE, featureDir);
+      saveFeaturePointer(SHARED_FEATURE_FILE, featureDir);
+
+      outputResult(
+        {
+          STATUS: 'CREATED',
+          ACTIVE_FEATURE_DIRECTORY: toPosixRelative(featureDir),
+          BRANCH: dirName,
+          FEATURE_DIR: featureDir,
+          FEATURE_SPEC: specFile,
+          REQUIREMENTS_CHECKLIST: reqFile,
+          REQUIREMENTS_EXISTS: true,
+          SPEC_MODE: specMode || '[Full / Compact]',
+          GIT_USER_NAME: gitUser,
+          TODAY: today,
+          DEPRECATED_WARNING: deprecatedWarning,
+          HOOKS: hooks,
+        },
+        asJson
+      );
+      return;
+    }
+
     if (sub === 'check-prereqs') {
       const paths = resolveFeaturePaths({
         feature: args.feature,
         pin: Boolean(args.pin),
         includeTasks: Boolean(args['include-tasks']),
       });
+      const hooks = args.stage ? loadExtensionHooks(args.stage) : undefined;
       if (args['paths-only']) {
-        outputResult(
-          {
-            REPO_ROOT: paths.REPO_ROOT,
-            BRANCH: paths.BRANCH,
-            FEATURE_DIR: paths.FEATURE_DIR,
-            FEATURE_REL: paths.FEATURE_REL,
-            FEATURE_SPEC: paths.FEATURE_SPEC,
-            IMPL_PLAN: paths.IMPL_PLAN,
-            TASKS: paths.TASKS,
-            REPOS_FILE: paths.REPOS_FILE,
-          },
-          asJson
-        );
+        const payload = {
+          REPO_ROOT: paths.REPO_ROOT,
+          BRANCH: paths.BRANCH,
+          FEATURE_DIR: paths.FEATURE_DIR,
+          FEATURE_REL: paths.FEATURE_REL,
+          FEATURE_SPEC: paths.FEATURE_SPEC,
+          IMPL_PLAN: paths.IMPL_PLAN,
+          TASKS: paths.TASKS,
+          REPOS_FILE: paths.REPOS_FILE,
+        };
+        if (hooks) payload.HOOKS = hooks;
+        outputResult(payload, asJson);
         return;
       }
       if (!fs.existsSync(paths.FEATURE_SPEC)) {
@@ -240,19 +511,18 @@ function main() {
       if (args['require-tasks'] && !fs.existsSync(paths.TASKS)) {
         throw new Error(`tasks.md not found in ${paths.FEATURE_DIR}. Run /speckit-tasks first.`);
       }
-      outputResult(
-        {
-          ACTIVE_FEATURE_DIRECTORY: paths.FEATURE_REL,
-          FEATURE_DIR: paths.FEATURE_DIR,
-          FEATURE_SPEC: paths.FEATURE_SPEC,
-          IMPL_PLAN: paths.IMPL_PLAN,
-          TASKS: paths.TASKS,
-          REPOS_FILE: paths.REPOS_FILE,
-          AVAILABLE_DOCS: paths.AVAILABLE_DOCS,
-          CHECKLISTS: scanChecklists(paths.CHECKLISTS_DIR),
-        },
-        asJson
-      );
+      const payload = {
+        ACTIVE_FEATURE_DIRECTORY: paths.FEATURE_REL,
+        FEATURE_DIR: paths.FEATURE_DIR,
+        FEATURE_SPEC: paths.FEATURE_SPEC,
+        IMPL_PLAN: paths.IMPL_PLAN,
+        TASKS: paths.TASKS,
+        REPOS_FILE: paths.REPOS_FILE,
+        AVAILABLE_DOCS: paths.AVAILABLE_DOCS,
+        CHECKLISTS: scanChecklists(paths.CHECKLISTS_DIR),
+      };
+      if (hooks) payload.HOOKS = hooks;
+      outputResult(payload, asJson);
       return;
     }
 
@@ -263,7 +533,7 @@ function main() {
       }
       const specText = fs.readFileSync(paths.FEATURE_SPEC, 'utf8');
       const docBizStatus = getDocBizStatus(specText);
-      if (docBizStatus === 'CHƯA ĐÁNH GIÁ' || docBizStatus === 'MISSING') {
+      if (isDocBizPending(docBizStatus)) {
         console.error(`ERROR: Documentation Impact Gate in spec.md §20 is "${docBizStatus}". Run /speckit-docbiz before /speckit-plan.`);
         process.exit(2);
       }
@@ -288,6 +558,7 @@ function main() {
           DOCBIZ_STATUS: docBizStatus,
           COPIED_TEMPLATE: copiedTemplate,
           BRANCH: paths.BRANCH,
+          HOOKS: loadExtensionHooks('plan'),
         },
         asJson
       );
@@ -314,6 +585,7 @@ function main() {
           TASKS_TEMPLATE: tpl,
           AVAILABLE_DOCS: paths.AVAILABLE_DOCS,
           PLAN_READINESS: readiness,
+          HOOKS: loadExtensionHooks('tasks'),
         },
         asJson
       );
@@ -334,7 +606,7 @@ function main() {
       process.exit(res.ok ? 0 : 1);
     }
 
-    console.error('Usage: node scripts/speckit-cli.js <paths|check-prereqs|setup-plan|setup-tasks|validate> [options]');
+    console.error('Usage: node scripts/speckit-cli.js <paths|hooks|check-prereqs|setup-specify|setup-plan|setup-tasks|validate> [options]');
     process.exit(1);
   } catch (err) {
     console.error(`ERROR: ${err.message}`);
@@ -346,4 +618,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { resolveFeaturePaths, resolveTemplate, countCheckboxes, scanChecklists, validateStage };
+module.exports = { resolveFeaturePaths, resolveTemplate, loadExtensionHooks, countCheckboxes, scanChecklists, validateStage };

@@ -88,11 +88,13 @@ node scripts/speckit-cli.js validate --feature <id> --stage specify|plan|tasks|i
 ```
 
 ### Tránh tạo trùng `short-name` khi chạy lại `/speckit-specify`
-- Trước khi dispatch bất kỳ `before_specify` hook nào hoặc tạo thư mục, `specify` dò `specs/*-<short-name>` và hỏi người dùng chọn **cập nhật spec hiện có** hoặc **tạo feature mới**.
-- Khi cập nhật spec hiện có, `checklists/requirements.md` được giữ nguyên lịch sử review/ngoại lệ và chỉ đánh giá lại các mục `CHK###`.
+- `/speckit-specify` dùng `node scripts/speckit-cli.js setup-specify --short-name <slug> --mode <Compact|Full> --json` (đa nền tảng Windows/Linux): tự dò trùng `specs/*-<short-name>` trước khi tạo thư mục hoặc chạy `HOOKS.before`, rồi hỏi người dùng chọn **cập nhật spec hiện có** hoặc **tạo feature mới**.
+- Khi cập nhật spec hiện có (`--feature <selected>`), `checklists/requirements.md` được giữ nguyên lịch sử review/ngoại lệ và chỉ đánh giá lại các mục `CHK###`; đồng thời cả `.specify/feature.local.json` và `.specify/feature.json` đều được đồng bộ.
 
 ### Documentation Impact Gate (`speckit-docbiz`) & Repo Scope Gate (`repos.md`)
-- Sau lần sửa cuối của `spec.md` và trước `speckit-plan`, bắt buộc chạy `speckit-docbiz` để điền `spec.md` §20 (`setup-plan` sẽ chặn tự động nếu §20 còn `CHƯA ĐÁNH GIÁ`). Các lệnh `specify`, `clarify`, `checklist` đều gợi ý qua `/speckit-docbiz` trước `/speckit-plan` khi §20 chưa đánh giá.
+- Sau lần sửa cuối của `spec.md` và trước `speckit-plan`, bắt buộc chạy `speckit-docbiz` để điền `spec.md` §20 (`setup-plan` sẽ chặn tự động nếu §20 còn `CHƯA ĐÁNH GIÁ` hoặc `CẦN ĐÁNH GIÁ LẠI`).
+- Khi `/speckit-specify` (chế độ cập nhật) hoặc `/speckit-clarify` sửa các mục nghiệp vụ trọng yếu (`§3`, `§5`, `§7`, `§8`, `§9`, `§15`) trên spec đã từng đánh giá §20, agent đặt lại `§20 **Trạng thái**` thành `CẦN ĐÁNH GIÁ LẠI` để tránh gate bị stale.
+- `/speckit-clarify` ưu tiên gom tối đa 3–5 câu hỏi độc lập vào một lượt interactive picker (khi runtime hỗ trợ) và ghi `spec.md` theo batch; chỉ hỏi tuần tự 1 câu/lượt khi câu sau phụ thuộc câu trước hoặc runtime không có picker.
 - Ngay đầu `/speckit-plan`, nếu feature chạm bất kỳ sub-repo nào trong `workstation.json` mà chưa có `specs/<id>/repos.md`, agent bắt buộc chạy `flex-repo-scope` để khởi tạo `repos.md` (`Edit`/`Read`/`Skip`).
 
 ### Quality Gates & Khử thiên kiến tự chấm (Self-Grading Bias)

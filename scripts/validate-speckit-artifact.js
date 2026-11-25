@@ -13,7 +13,32 @@ function stripCodeFences(markdown) {
 }
 
 function stripChecklistSection(markdown) {
-  return markdown.replace(/##\s+Checklist chất lượng trước khi implement[\s\S]*$/i, '');
+  const lines = markdown.split(/\r?\n/);
+  const out = [];
+  let skipping = false;
+  for (const line of lines) {
+    if (/^##\s+Checklist chất lượng trước khi implement\b/i.test(line)) {
+      skipping = true;
+      continue;
+    }
+    if (skipping && /^##\s+/.test(line)) {
+      skipping = false;
+    }
+    if (!skipping) out.push(line);
+  }
+  return out.join('\n');
+}
+
+function extractFilePaths(text) {
+  const found = new Set();
+  for (const m of text.matchAll(/`([^`\s]+\.[a-z0-9]{1,8})`/gi)) {
+    found.add(m[1].replace(/\\/g, '/'));
+  }
+  const withoutBackticks = text.replace(/`[^`]*`/g, ' ');
+  for (const m of withoutBackticks.matchAll(/(?:^|[\s(,])(?!(?:https?|ftp):\/\/)([A-Za-z0-9_.\-]+(?:\/[A-Za-z0-9_.\-]+)+\.[a-zA-Z0-9]{1,8})\b/g)) {
+    found.add(m[1].replace(/\\/g, '/'));
+  }
+  return Array.from(found);
 }
 
 function countCheckboxes(markdown) {
@@ -83,6 +108,10 @@ function getDocBizStatus(specText) {
   return m ? m[1].trim() : 'MISSING';
 }
 
+function isDocBizPending(status) {
+  return /^(CHƯA ĐÁNH GIÁ|CẦN ĐÁNH GIÁ LẠI|MISSING)$/i.test(String(status || '').trim());
+}
+
 function getKnownChildRepos(repoRoot) {
   const wsFile = path.join(repoRoot, 'workstation.json');
   if (!fs.existsSync(wsFile)) return [];
@@ -114,10 +143,20 @@ function validateStage(paths, stage, options = {}) {
   info.specMode = trackMatch ? trackMatch[1].trim() : 'Full';
 
   if (stage === 'specify') {
-    for (const token of ['[TÊN TÍNH NĂNG]', '[NGÀY]', '{{GIT_USER_NAME}}', '[Tóm tắt mong muốn người dùng trong 1-2 câu]']) {
+    for (const token of [
+      '[TÊN TÍNH NĂNG]',
+      '[NNNNNN-ten-tinh-nang]',
+      '[NGÀY]',
+      '[Full / Compact]',
+      '{{GIT_USER_NAME}}',
+      '[Tóm tắt mong muốn người dùng trong 1-2 câu]',
+    ]) {
       if (cleanedSpec.includes(token)) {
         errors.push(`spec.md still contains unfilled template token: ${token}`);
       }
+    }
+    if (!/^(Full|Compact)\b/i.test(info.specMode)) {
+      warnings.push(`spec.md **Chế độ Spec** should be "Compact" or "Full" (found "${info.specMode}").`);
     }
     const clarifications = cleanedSpec.match(/\[(NEEDS CLARIFICATION|CẦN LÀM RÕ)[^\]]*\]/gi) || [];
     info.openClarifications = clarifications.length;
@@ -137,13 +176,13 @@ function validateStage(paths, stage, options = {}) {
     info.suggestedNextStep =
       clarifications.length > 0
         ? '/speckit-clarify'
-        : docBizStatus === 'CHƯA ĐÁNH GIÁ' || docBizStatus === 'MISSING'
+        : isDocBizPending(docBizStatus)
           ? '/speckit-docbiz'
           : '/speckit-plan';
   }
 
   if (stage === 'plan' || stage === 'tasks' || stage === 'implement' || stage === 'converge') {
-    if (docBizStatus === 'CHƯA ĐÁNH GIÁ' || docBizStatus === 'MISSING') {
+    if (isDocBizPending(docBizStatus)) {
       errors.push(`Documentation Impact Gate in spec.md §20 is "${docBizStatus}". Run /speckit-docbiz before planning or downstream steps.`);
     }
     if (!fs.existsSync(paths.IMPL_PLAN)) {
@@ -152,13 +191,20 @@ function validateStage(paths, stage, options = {}) {
     }
     const planText = fs.readFileSync(paths.IMPL_PLAN, 'utf8');
     const cleanedPlan = stripCodeFences(planText);
-    for (const token of ['[TÍNH NĂNG]', '[NNNNNN-ten-tinh-nang]']) {
+    for (const token of ['[TÍNH NĂNG]', '[NNNNNN-ten-tinh-nang]', '[NGÀY]', '[Full / Compact]']) {
       if (cleanedPlan.includes(token)) {
         errors.push(`plan.md still contains unfilled placeholder: ${token}`);
       }
     }
     if (planText.includes('# [XÓA NẾU KHÔNG DÙNG]')) {
       errors.push('plan.md still contains sample directory tree marker "# [XÓA NẾU KHÔNG DÙNG]". Replace with real project paths.');
+    }
+    if (/^Full\b/i.test(info.specMode)) {
+      const available = new Set(paths.AVAILABLE_DOCS || []);
+      const missingFullDocs = ['research.md', 'quickstart.md'].filter((doc) => !available.has(doc));
+      if (missingFullDocs.length > 0) {
+        warnings.push(`Spec mode is "Full" but Phase 0/1 artifact(s) are missing: ${missingFullDocs.join(', ')}. Generate them or switch **Chế độ Spec** to "Compact" if single-repo/simple.`);
+      }
     }
     const referencedRepos = getKnownChildRepos(paths.REPO_ROOT).filter((repo) => planText.includes(repo));
     if (referencedRepos.length > 0 && !fs.existsSync(paths.REPOS_FILE)) {
@@ -204,9 +250,8 @@ function validateStage(paths, stage, options = {}) {
       seenIds.add(id);
 
       if (/\[P\]/.test(rest)) {
-        const pathMatches = rest.match(/`([^`]+\.[a-z0-9]{1,8})`/gi) || [];
-        for (const rawP of pathMatches) {
-          const cleanP = rawP.slice(1, -1);
+        const pathMatches = extractFilePaths(rest);
+        for (const cleanP of pathMatches) {
           const key = `${currentPhase}::${cleanP}`;
           if (parallelFilesByPhase.has(key)) {
             warnings.push(`Parallel [P] conflict in "${currentPhase}": ${parallelFilesByPhase.get(key)} and ${id} both touch ${cleanP}`);
@@ -250,9 +295,12 @@ function validateStage(paths, stage, options = {}) {
 
 module.exports = {
   stripCodeFences,
+  stripChecklistSection,
+  extractFilePaths,
   countCheckboxes,
   scanChecklists,
   extractSection,
   getDocBizStatus,
+  isDocBizPending,
   validateStage,
 };

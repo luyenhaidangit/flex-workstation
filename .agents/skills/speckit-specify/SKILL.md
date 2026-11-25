@@ -1,6 +1,6 @@
 ---
 name: "speckit-specify"
-description: "Create or update the business feature specification from a natural-language feature description. Use when starting a new feature without an existing business spec or when invoking /speckit-specify or $speckit-specify."
+description: "Create or update the business feature specification from a natural-language feature description. Use when starting a new feature without an existing business spec or when invoking /speckit-specify or $speckit-specify. Do not use for small bug fixes with existing tests or behavior-preserving refactors (Light Track)."
 argument-hint: "Describe the feature you want to specify"
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
@@ -18,46 +18,17 @@ $ARGUMENTS
 
 ## Active Feature Reporting
 
-In the Completion Report, print `ACTIVE_FEATURE_DIRECTORY: <resolved SPECIFY_FEATURE_DIRECTORY>` as the first line before any other result.
+In the Completion Report, print `ACTIVE_FEATURE_DIRECTORY: <resolved ACTIVE_FEATURE_DIRECTORY>` as the first line before any other result.
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Pre-Execution Checks
+## Extension Hooks Protocol
 
-**Check for extension hooks (before specification)**:
-- Discover and validate eligible `before_specify` hooks here, but **do not dispatch them yet**. Resolve the duplicate-short-name guard in Outline step 2 first; this prevents a hook (including one that creates a branch) from running before the user chooses update mode or a new feature.
-- Check if `.specify/extensions.yml` exists in the project root.
-- If it exists, read it and look for entries under the `hooks.before_specify` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- After Outline step 2 resolves the guard, for each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Pre-Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-  - **Mandatory hook** (`optional: false`):
-    ```
-    ## Extension Hooks
-
-    **Automatic Pre-Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-
-    Wait for the result of the hook command before proceeding to Outline step 3.
-    ```
-    After the guard resolves and after emitting the block above, you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+`scripts/speckit-cli.js setup-specify --json` reads `.specify/extensions.yml` and returns `HOOKS: { before: [...], after: [...] }`.
+- If a hook list is empty, skip silently without reading `.specify/extensions.yml` again.
+- For each entry in `HOOKS.before` (only **after** the duplicate-short-name guard in Step 2 resolves) or `HOOKS.after` (before the Completion Report):
+  - If `optional: true`, list `Command: \`{slashCommand}\``, `Description`, and `Prompt` for the user.
+  - If `optional: false`, emit `EXECUTE_COMMAND: {command}` and invoke it (e.g. `/{slashCommand}` or `$speckit-...`) and wait for completion before continuing.
 
 ## Outline
 
@@ -65,239 +36,65 @@ The text the user typed after `/speckit-specify` in the triggering message **is*
 
 Given that feature description, do this:
 
-1. **Generate a concise short name** (2-4 words) for the feature:
-   - Analyze the feature description and extract the most meaningful keywords
-   - Create a 2-4 word short name that captures the essence of the feature
-   - Use action-noun format when possible (e.g., "add-user-auth", "fix-payment-bug")
-   - Preserve technical terms and acronyms (OAuth2, API, JWT, etc.)
-   - Keep it concise but descriptive enough to understand the feature at a glance
-   - Examples:
-     - "I want to add user authentication" → "user-auth"
-     - "Implement OAuth2 integration for the API" → "oauth2-api-integration"
-     - "Create a dashboard for analytics" → "analytics-dashboard"
-     - "Fix payment processing timeout bug" → "fix-payment-timeout"
+1. **Generate a concise short name and classify `Chế độ Spec`**:
+   - Extract the most meaningful keywords into a 2–4 word lowercase hyphenated `short-name` in action-noun format (e.g., `user-auth`, `oauth2-api-integration`, `analytics-dashboard`, `fix-payment-timeout`). Preserve technical acronyms (OAuth2, API, JWT).
+   - Classify `Chế độ Spec`: choose `Compact` when the feature fits within a single repository, requires no shared database schema migration, and introduces no breaking public contract; otherwise choose `Full` (user-provided mode overrides).
 
-2. **Guard against an existing short name**:
+2. **Initialize or select the feature directory via `speckit-cli.js`**:
+   - Run `node scripts/speckit-cli.js setup-specify --short-name "<short-name>" --mode "<Compact|Full>" --json` from repo root (if the user explicitly provided an existing directory or `SPECIFY_FEATURE_DIRECTORY`, pass `--feature "<ref>"` instead).
+   - Inspect `STATUS` in the JSON output:
+     - **`DUPLICATE_FOUND`**: Stop before creating any files or dispatching `HOOKS.before`. Ask the user:
+       - If 1 match: **"Đã có spec `<match>` cùng short-name `<short-name>`. Bạn muốn cập nhật spec hiện có hay tạo feature mới?"**
+       - If multiple matches: list `MATCHES` and ask the user to choose one directory to update or create a feature mới.
+       - After the user answers:
+         - **Cập nhật spec hiện có**: run `node scripts/speckit-cli.js setup-specify --feature "<selected>" --json` (preserves existing `spec.md` and `checklists/requirements.md`, and pins both `.specify/feature.local.json` and `.specify/feature.json`).
+         - **Tạo feature mới**: run `node scripts/speckit-cli.js setup-specify --short-name "<short-name>" --mode "<Compact|Full>" --allow-duplicate --json`.
+     - **`CREATED` / `UPDATED_EXISTING`**: Parse `ACTIVE_FEATURE_DIRECTORY`, `FEATURE_DIR`, `FEATURE_SPEC`, `REQUIREMENTS_CHECKLIST`, `REQUIREMENTS_EXISTS`, `DEPRECATED_WARNING`, and `HOOKS`. If `DEPRECATED_WARNING` is non-null, emit a one-line warning.
+   - Now dispatch `HOOKS.before` if non-empty (passing `GIT_BRANCH_NAME` if explicitly provided by the user). The spec directory and file are always created by this command, never by a hook; branch name and spec directory name are independent.
 
-   Before dispatching extension hooks or creating a branch/spec directory, scan `specs/` for directories whose name ends exactly with `-<short-name>`.
+3. **Load context**:
+   - Read `FEATURE_SPEC` (already scaffolded with `Branch`, `Ngày tạo`, `Chế độ Spec`, and `{{GIT_USER_NAME}}` for new features, or the existing spec in update mode).
+   - **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
 
-   - If no directory matches, continue normally.
-   - If exactly one directory matches, ask the user: **"Đã có spec `<existing-directory>` cùng short-name `<short-name>`. Bạn muốn cập nhật spec hiện có hay tạo feature mới?"** Stop and wait for the user's answer; do not invoke hooks or create files before it.
-   - If multiple directories match, list their paths and ask the user to select one directory to update or to create a feature mới. Stop and wait for the user's answer; do not invoke hooks or create files before it.
-   - If the user chooses **cập nhật spec hiện có**, set `SPECIFY_FEATURE_DIRECTORY` to the selected existing directory. Treat its `spec.md` as the document to update; do not copy the spec template over it or create a new directory. Preserve an existing `checklists/requirements.md`: re-validate its items and update their statuses and summary, but never replace its review metadata, fail evidence, approved-exception table, owner/deadline, or review history with a fresh template. Persist that selected path to `.specify/feature.json` after the spec is updated.
-   - If the user chooses **tạo feature mới**, continue with the normal auto-generated directory and numbering flow.
-   - If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY`, treat it as their selected target and do not run this guard. If it already contains `spec.md`, update that file rather than replacing it from the template.
+4. **Draft and write the specification to `FEATURE_SPEC`**:
+   - Parse the user description (if empty: ERROR "No feature description provided") and extract actors, actions, data, and constraints.
+   - Replace `[Tóm tắt mong muốn người dùng trong 1-2 câu]` with a concise 1–2 sentence summary of the user's intent (core goal and scope only; omit file paths, command syntax, and meta-instructions).
+   - Fill all sections in `FEATURE_SPEC` preserving section order and headings `§1–§20` (for non-applicable sections, keep the heading and write `Không áp dụng — <lý do ngắn>`; never delete a section):
+     - **User Scenarios & Testing (`§5`)**: if no clear user flow, ERROR "Cannot determine user scenarios".
+     - **Functional Requirements (`§7`)**: testable, using `PHẢI` / `KHÔNG ĐƯỢC`, traceable to `US`/`AC`; document defaults in Assumptions (`§14`).
+     - **Success Criteria (`§13`)**: measurable, technology-agnostic outcomes (quantitative + qualitative).
+     - **Key Entities (`§9`)**: business meaning and relationships only (no DB tables/API payloads).
+   - **Clarification markers**: Make informed guesses using context and standards. Use `[NEEDS CLARIFICATION: ...]` or `[CẦN LÀM RÕ: ...]` **only** when a choice significantly impacts scope, security/privacy, or UX with no reasonable default (**max 3 total**; prioritize scope > security/privacy > UX > technical details).
+   - **Stale Documentation Impact Gate (update mode only)**: If updating an existing `spec.md` whose `§20 **Trạng thái**` is already `CÓ CẬP NHẬT` or `KHÔNG CẦN CẬP NHẬT`, and this edit materially changes any core business section (`§3`, `§5`, `§7`, `§8`, `§9`, or `§15`), reset `§20 **Trạng thái**` to `CẦN ĐÁNH GIÁ LẠI` so `/speckit-docbiz` re-evaluates before `/speckit-plan`.
 
-3. **Branch creation** (optional, via hook):
+5. **Specification Quality Validation (`checklists/requirements.md`)**:
+   - For a new feature, `setup-specify` already copied `requirements-template.md` to `REQUIREMENTS_CHECKLIST` with metadata filled; replace `[TÊN TÍNH NĂNG]` with the feature title.
+   - For update mode when `REQUIREMENTS_EXISTS` is `true`, do not overwrite it: keep all existing review history, exception decisions, fail evidence, owner/deadline, and metadata. If it lacks a canonical `CHK###` item from `requirements-template.md`, report the gap and ask before adding it.
+   - Evaluate `FEATURE_SPEC` against every `CHK###` item:
+     - Set each item to `Status: Pass` (`[x]`), `Status: Không áp dụng` (`[x]`), `Status: Fail (ngoại lệ đã phê duyệt)` (`[x]`), or unapproved `Status: Fail` (`[ ]`).
+     - For every Fail, add `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`, `Owner`, and `Hạn xử lý` beneath the item.
+     - Treat `[NEEDS CLARIFICATION]` / `[CẦN LÀM RÕ]` markers affecting scope, security, data, permission, contract, or UX as Blocker failures (present at most 3 critical questions at once).
+     - Update summary counts, review status, conclusion, and next step (`Pass` if 0 Blocker/High fails; `Pass có điều kiện` if High items have approved exceptions; `Fail` if any Blocker fails — update spec and re-validate up to 3 iterations).
+   - Run `node scripts/speckit-cli.js validate --feature "<ACTIVE_FEATURE_DIRECTORY>" --stage specify` to confirm zero unfilled tokens and zero uninspected `[Status: Chưa kiểm]` items.
 
-   After the guard in step 2 has resolved, dispatch eligible `before_specify` hooks discovered during Pre-Execution Checks. If a hook runs successfully, it may create/switch to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
+6. **Post-Execution Hooks**: Dispatch `HOOKS.after` if non-empty per the Extension Hooks Protocol above.
 
-   If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
-
-4. **Resolve or create the spec feature directory**:
-
-   Specs live under the default `specs/` directory unless the user explicitly provides `SPECIFY_FEATURE_DIRECTORY`.
-
-   **Resolution order for `SPECIFY_FEATURE_DIRECTORY`**:
-   1. If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY` (e.g., via environment variable, argument, or configuration), use it as-is
-   2. Otherwise, auto-generate it under `specs/`:
-      - Check `.specify/init-options.json` for `feature_numbering` (preferred) or `branch_numbering` (deprecated, migration only — will be removed in a future release)
-      - If `"timestamp"`: prefix is `YYYYMMDD-HHMMSS` (current timestamp)
-      - If `"sequential"` or absent: prefix is `NNNNNN` (next available 6-digit number after scanning existing directories in `specs/`, e.g. `000001`)
-      - Construct the directory name: `<prefix>-<short-name>` (e.g., `003-user-auth` or `20260319-143022-user-auth`)
-      - Set `SPECIFY_FEATURE_DIRECTORY` to `specs/<directory-name>`
-      - If `branch_numbering` was used (and `feature_numbering` was absent), emit a one-line warning: "⚠️ `branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
-
-   **Create or update the directory and spec file**:
-   - For a new feature directory, run `mkdir -p SPECIFY_FEATURE_DIRECTORY`.
-   - For a selected existing directory, verify `SPECIFY_FEATURE_DIRECTORY/spec.md` exists and update it in place.
-   - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
-   - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` only for a new feature directory; for an existing directory, use its current `spec.md` as the starting point.
-   - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
-   - Replace `{{GIT_USER_NAME}}` in `SPEC_FILE` with `git config user.name` for both metadata fields; use `Chưa xác định` if unavailable. User-provided values take precedence.
-   - Classify `**Chế độ Spec**` in `SPEC_FILE` header: set `Compact` when the feature fits within a single repository, requires no shared database schema migration, and introduces no breaking public contract; otherwise set `Full` (user-provided mode overrides).
-   - Replace `[Tóm tắt mong muốn người dùng trong 1-2 câu]` in `SPEC_FILE` with a concise 1-2 sentence summary of the user's intent distilled from the feature description — not the raw input. Capture the core goal and scope only; omit file paths, command syntax, and meta-instructions.
-   - Persist the resolved path via `node scripts/speckit-cli.js paths --feature "<resolved feature dir>" --pin --update-shared --json` (which updates both gitignored `.specify/feature.local.json` for parallel local sessions and `.specify/feature.json` for shared CLI fallback):
-     ```json
-     {
-       "feature_directory": "<resolved feature dir>"
-     }
-     ```
-     Write the actual resolved directory path value (for example, `specs/000043-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
-     This allows downstream commands (`/speckit-docbiz`, `/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
-
-   **IMPORTANT**:
-   - You must only create one feature per `/speckit-specify` invocation
-   - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
-   - The spec directory and file are always created by this command, never by the hook
-
-4. Load the resolved active `spec-template` file to understand required sections.
-
-5. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
-
-6. Follow this execution flow:
-    1. Parse user description from arguments
-       If empty: ERROR "No feature description provided"
-    2. Extract key concepts from description
-       Identify: actors, actions, data, constraints
-    3. For unclear aspects:
-       - Make informed guesses based on context and industry standards
-       - Only mark with [NEEDS CLARIFICATION: specific question] if:
-         - The choice significantly impacts feature scope or user experience
-         - Multiple reasonable interpretations exist with different implications
-         - No reasonable default exists
-       - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
-       - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
-    4. Fill User Scenarios & Testing section
-       If no clear user flow: ERROR "Cannot determine user scenarios"
-    5. Generate Functional Requirements
-       Each requirement must be testable
-       Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
-    6. Define Success Criteria
-       Create measurable, technology-agnostic outcomes
-       Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
-       Each criterion must be verifiable without implementation details
-    7. Identify Key Entities (if data involved)
-    8. Return: SUCCESS (spec ready for planning)
-
-6. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
-
-7. **Specification Quality Validation**: After writing the initial spec, create and evaluate the mandatory requirements quality gate:
-
-   a. **Create Requirements Checklist from Template**:
-      - Resolve the active `requirements-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve requirements-template`).
-      - If the template cannot be resolved, stop with a clear error. Do not fall back to a hard-coded checklist.
-      - For a new feature, copy the resolved template to `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md`, then replace `[TÊN TÍNH NĂNG]`, `[NNNNNN]`, `[NGÀY]`, and `{{GIT_USER_NAME}}` with feature values. Use `Chưa xác định` when `git config user.name` is unavailable.
-      - For update mode when `requirements.md` already exists, do not copy or replace it. Keep all existing review history, exception decisions, fail evidence, owner/deadline, and metadata; use that file for step b re-validation. If it lacks a canonical `CHK###` item required by the resolved template, report the gap and ask the user before adding the missing item; never regenerate the whole file.
-      - Keep `requirements.md` as the mandatory quality gate for `spec.md`. It is distinct from domain checklists created by `$speckit-checklist` using `checklist-template.md`.
-
-   b. **Run Validation Check**:
-      - Review `spec.md` against every `CHK###` item in the generated requirements checklist.
-      - Set each item to `Status: Pass`, `Status: Fail`, or `Status: Không áp dụng`; update the checkbox consistently: `Pass` and `Không áp dụng` use `[x]`, while an unapproved `Fail` uses `[ ]`. An approved exception uses `[x]` with `Status: Fail (ngoại lệ đã phê duyệt)` so it remains visible as a fail but does not block the implementation checklist gate. A checked `Không áp dụng` item is reviewed and complete; it does not block the gate.
-      - For every Fail, add `Phát hiện`, `Ảnh hưởng`, `Đề xuất`, `Tham chiếu`, `Owner`, and `Hạn xử lý` directly beneath the item.
-      - Update the summary counts, review status, conclusion, and permitted next step after each review iteration.
-
-   c. **Handle Validation Results**:
-      - **If all Blocker and High items pass**: Set the checklist result to `Pass` and allow `/speckit-clarify` (if ambiguities remain) or `/speckit-docbiz` (mandatory Documentation Impact Gate before `/speckit-plan` whenever `spec.md §20` is `CHƯA ĐÁNH GIÁ`).
-      - **If no Blocker fails but High items have approved exceptions**: Set the result to `Pass có điều kiện`; document every exception and its approved owner/deadline.
-      - **If any Blocker fails**: Set the result to `Fail`, do not proceed to clarification, `docbiz`, or planning, and update the spec before re-validating.
-      - If non-blocking items fail, update the spec and re-run validation up to three iterations; document any remaining approved exception.
-      - Run `node scripts/speckit-cli.js validate --feature "<SPECIFY_FEATURE_DIRECTORY>" --stage specify` to mechanically confirm zero unfilled tokens and zero uninspected `[Status: Chưa kiểm]` items remain.
-
-   d. **Clarification Markers**:
-      - Treat `[NEEDS CLARIFICATION]` and `[CẦN LÀM RÕ]` markers that affect scope, security, data, permission, contract, or user experience as Blocker failures.
-      - Present no more than three critical clarification questions at once, then update the spec and requirements checklist after the user responds.
-
-## Mandatory Post-Execution Hooks
-
-**You MUST complete this section before reporting completion to the user.**
-
-Check if `.specify/extensions.yml` exists in the project root.
-- If it does not exist, or no hooks are registered under `hooks.after_specify`, skip to the Completion Report.
-- If it exists, read it and look for entries under the `hooks.after_specify` key.
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue to the Completion Report.
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Mandatory hook** (`optional: false`) — **You MUST emit `EXECUTE_COMMAND:` for each mandatory hook**:
-    ```
-    ## Extension Hooks
-
-    **Automatic Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-
-## Completion Report
-
-Report completion to the user with:
-- `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
-- `SPEC_FILE` — the spec file path and chosen `Chế độ Spec` (`Compact` or `Full`)
-- Checklist results summary
-- Readiness for the next phase: `/speckit-clarify` if ambiguities remain, otherwise `/speckit-docbiz` (mandatory Documentation Impact Gate before `/speckit-plan`)
+7. **Completion Report**:
+   - Print `ACTIVE_FEATURE_DIRECTORY: <ACTIVE_FEATURE_DIRECTORY>` as the first line.
+   - Report `SPEC_FILE`, chosen `Chế độ Spec` (`Compact` or `Full`), checklist results summary, and readiness for the next phase: `/speckit-clarify` if ambiguities remain, otherwise `/speckit-docbiz` (mandatory Documentation Impact Gate before `/speckit-plan` whenever `§20` is `CHƯA ĐÁNH GIÁ` or `CẦN ĐÁNH GIÁ LẠI`).
 
 **HARD STOP**: This command is complete. Do NOT auto-invoke `/speckit-clarify`, `/speckit-docbiz`, `/speckit-plan`, or any other command. Report completion and wait for the user to explicitly invoke the next step.
 
-**NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
-
 ## Quick Guidelines
 
-- Focus on **WHAT** users need and **WHY**.
-- Avoid HOW to implement (no tech stack, APIs, code structure).
-- Written for business stakeholders, not developers.
-- DO NOT create any checklists that are embedded in the spec. That will be a separate command.
-
-### Section Requirements
-
-- **Mandatory sections**: Must be completed for every feature
-- **Optional sections**: Include only when relevant to the feature
-- When a section doesn't apply, write `Không áp dụng` instead of removing it — the active Vietnamese spec template keeps every section present for AI/automation stability (see `docs/speckit/template-guidelines.md`). Never delete an optional section.
-
-### For AI Generation
-
-When creating this spec from a user prompt:
-
-1. **Make informed guesses**: Use context, industry standards, and common patterns to fill gaps
-2. **Document assumptions**: Record reasonable defaults in the Assumptions section
-3. **Limit clarifications**: Maximum 3 [NEEDS CLARIFICATION] markers - use only for critical decisions that:
-   - Significantly impact feature scope or user experience
-   - Have multiple reasonable interpretations with different implications
-   - Lack any reasonable default
-4. **Prioritize clarifications**: scope > security/privacy > user experience > technical details
-5. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
-6. **Common areas needing clarification** (only if no reasonable default exists):
-   - Feature scope and boundaries (include/exclude specific use cases)
-   - User types and permissions (if multiple conflicting interpretations possible)
-   - Security/compliance requirements (when legally/financially significant)
-
-**Examples of reasonable defaults** (don't ask about these):
-
-- Data retention: Industry-standard practices for the domain
-- Performance targets: Standard web/mobile app expectations unless specified
-- Error handling: User-friendly messages with appropriate fallbacks
-- Authentication method: Standard session-based or OAuth2 for web apps
-- Integration patterns: Use project-appropriate patterns (REST/GraphQL for web services, function calls for libraries, CLI args for tools, etc.)
-
-### Success Criteria Guidelines
-
-Success criteria must be:
-
-1. **Measurable**: Include specific metrics (time, percentage, count, rate)
-2. **Technology-agnostic**: No mention of frameworks, languages, databases, or tools
-3. **User-focused**: Describe outcomes from user/business perspective, not system internals
-4. **Verifiable**: Can be tested/validated without knowing implementation details
-
-**Good examples**:
-
-- "Users can complete checkout in under 3 minutes"
-- "System supports 10,000 concurrent users"
-- "95% of searches return results in under 1 second"
-- "Task completion rate improves by 40%"
-
-**Bad examples** (implementation-focused):
-
-- "API response time is under 200ms" (too technical, use "Users see results instantly")
-- "Database can handle 1000 TPS" (implementation detail, use user-facing metric)
-- "React components render efficiently" (framework-specific)
-- "Redis cache hit rate above 80%" (technology-specific)
+- Focus on **WHAT** users need and **WHY**; avoid **HOW** (no tech stack, APIs, code structure). Written for business stakeholders, not developers.
+- Do not embed checklists inside `spec.md`; use `checklists/requirements.md` (mandatory) or `/speckit-checklist` (domain checklists).
+- **Reasonable defaults** (don't ask): domain-standard data retention, standard web/mobile performance, user-friendly error messages, standard session/OAuth2 auth, project-appropriate integration patterns.
+- **Success Criteria**: measurable, technology-agnostic, user-focused, verifiable (e.g. *"Users can complete checkout in under 3 minutes"*, NOT *"API response time < 200ms"* or *"Redis cache hit rate > 80%"*).
 
 ## Done When
 
-- [ ] Specification written to `SPEC_FILE` and validated against quality checklist
-- [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with feature directory, spec file path, and checklist results
+- [ ] Feature directory initialized/selected via `speckit-cli.js setup-specify` (max 1 feature per invocation)
+- [ ] Specification written to `FEATURE_SPEC` and validated via `checklists/requirements.md` + `speckit-cli.js validate --stage specify`
+- [ ] `HOOKS.before` / `HOOKS.after` dispatched or skipped per Extension Hooks Protocol
+- [ ] Completion reported with `ACTIVE_FEATURE_DIRECTORY`, `SPEC_FILE`, `Chế độ Spec`, and checklist results

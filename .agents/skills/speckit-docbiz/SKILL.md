@@ -177,7 +177,7 @@ Report to the user:
 
 ## Done When
 
-- [ ] `FEATURE_DIR` resolved (`SPECIFY_FEATURE_DIRECTORY` env var, or `.specify/feature.json` fallback)
+- [ ] `FEATURE_DIR` resolved via `speckit-cli.js` (`--feature`, `SPECIFY_FEATURE_DIRECTORY`, `.specify/feature.local.json`, or `.specify/feature.json`)
 - [ ] `spec.md` loaded from the feature directory
 - [ ] Documentation impact assessed against concrete business changes
 - [ ] Existing documentation scanned and selected by evidence before any creation

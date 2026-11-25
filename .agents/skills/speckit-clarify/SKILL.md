@@ -23,41 +23,11 @@ In the Completion Report, print `ACTIVE_FEATURE_DIRECTORY: <resolved FEATURE_DIR
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Pre-Execution Checks
+## Extension Hooks Protocol
 
-**Check for extension hooks (before clarification)**:
-- Check if `.specify/extensions.yml` exists in the project root.
-- If it exists, read it and look for entries under the `hooks.before_clarify` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Pre-Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-  - **Mandatory hook** (`optional: false`):
-    ```
-    ## Extension Hooks
-
-    **Automatic Pre-Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-
-    Wait for the result of the hook command before proceeding to the Outline.
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+`scripts/speckit-cli.js check-prereqs --paths-only --stage clarify --json` reads `.specify/extensions.yml` and returns `HOOKS: { before: [...], after: [...] }`.
+- If a hook list is empty, skip silently without reading `.specify/extensions.yml` again.
+- For each entry in `HOOKS.before` (before Step 2) or `HOOKS.after` (before the Completion Report): if `optional: true`, display `Command: \`{slashCommand}\``, `Description`, and `Prompt`; if `optional: false`, emit `EXECUTE_COMMAND: {command}`, invoke it, and wait for completion.
 
 ## Outline
 
@@ -67,10 +37,9 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 
 Execution steps:
 
-1. Run `node scripts/speckit-cli.js check-prereqs --paths-only --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root **once**. Parse JSON payload fields:
-   - `FEATURE_DIR`
-   - `FEATURE_SPEC`
-   - (Optionally capture `IMPL_PLAN`, `TASKS` for future chained flows.)
+1. Run `node scripts/speckit-cli.js check-prereqs --paths-only --stage clarify --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) from repo root **once**. Parse JSON payload fields:
+   - `FEATURE_DIR`, `FEATURE_SPEC`, `HOOKS` (and optionally `IMPL_PLAN`, `TASKS`).
+   - Dispatch `HOOKS.before` if non-empty.
    - If resolution fails, abort and instruct user to re-run `/speckit-specify` or pass the feature ID explicitly.
 
 2. **IF EXISTS**: Load `.specify/memory/constitution.md` for project principles and governance constraints.
@@ -142,60 +111,27 @@ Execution steps:
     - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
     - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic.
 
-5. Sequential questioning loop (interactive):
-    - Present EXACTLY ONE question at a time.
-    - For multiple‑choice questions:
-       - **Analyze all options** and determine the **most suitable option** based on:
-          - Best practices for the project type
-          - Common patterns in similar implementations
-          - Risk reduction (security, performance, maintainability)
-          - Alignment with any explicit project goals or constraints visible in the spec
-       - Present your **recommended option prominently** at the top with clear reasoning (1-2 sentences explaining why this is the best choice).
-       - Format as: `**Recommended:** Option [X] - <reasoning>`
-       - Then render all options as a Markdown table:
-
-       | Option | Description |
-       |--------|-------------|
-       | A | <Option A description> |
-       | B | <Option B description> |
-       | C | <Option C description> (add D/E as needed up to 5) |
-       | Short | Provide a different short answer (<=5 words) (Include only if free-form alternative is appropriate) |
-
-       - After the table, add: `You can reply with the option letter (e.g., "A"), accept the recommendation by saying "yes" or "recommended", or provide your own short answer.`
-    - For short‑answer style (no meaningful discrete options):
-       - Provide your **suggested answer** based on best practices and context.
-       - Format as: `**Suggested:** <your proposed answer> - <brief reasoning>`
-       - Then output: `Format: Short answer (<=5 words). You can accept the suggestion by saying "yes" or "suggested", or provide your own answer.`
-    - After the user answers:
-       - If the user replies with "yes", "recommended", or "suggested", use your previously stated recommendation/suggestion as the answer.
-       - Otherwise, validate the answer maps to one option or fits the <=5 word constraint.
-       - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
-       - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
-    - Stop asking further questions when:
-       - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
-       - User signals completion ("done", "good", "no more"), OR
-       - You reach 5 asked questions.
-    - Never reveal future queued questions in advance.
+5. Questioning loop (batch interactive picker preferred, sequential fallback):
+    - **Batch mode with interactive picker (preferred when `ask_question` / `AskUserQuestion` is available and queued questions are independent)**:
+       - Group all independent high-impact questions (up to 5 total across the session) into a single picker call so the user can answer in one turn.
+       - For each question, put the best option first prefixed with `(Recommended)` and include a brief rationale in the option text or lead-in.
+       - If a follow-up question depends on an earlier answer, ask it in a second turn only if total asked questions remain ≤ 5.
+    - **Sequential text mode (fallback when no interactive picker exists, or when each question depends on the previous answer)**:
+       - Present ONE question at a time.
+       - For multiple-choice: state `**Recommended:** Option [X] - <reasoning>`, render a Markdown table (`Option | Description` for A–E + optional `Short <=5 words`), and let the user reply with the letter, `"yes"`/`"recommended"`, or a short answer.
+       - For short-answer: state `**Suggested:** <answer> - <reasoning>` (`<=5 words`) and accept `"yes"`/`"suggested"` or custom text.
+    - Stop asking further questions when all critical ambiguities are resolved, the user signals completion (`"done"`, `"good"`, `"no more"`), or 5 questions have been asked.
     - If no valid questions exist at start, immediately report no critical ambiguities.
 
-6. Integration after EACH accepted answer (incremental update approach):
-    - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
-    - For the first integrated answer in this session:
-       - Ensure a `## Clarifications` section exists immediately after `## 18. Câu hỏi mở` and before `## 19. Điều kiện sẵn sàng để lập plan kỹ thuật`; create it at that exact position if missing.
-       - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
-    - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
-    - Then immediately apply the clarification to the most appropriate section(s):
-       - Functional ambiguity → Update or add a bullet in Functional Requirements.
-       - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
-       - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
-       - Non-functional constraint → Add/modify measurable criteria in Success Criteria > Measurable Outcomes (convert vague adjective to metric or explicit target).
-       - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
-       - Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
-    - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
-    - If an accepted answer resolves an item in `## 18. Câu hỏi mở`, remove its `[CẦN LÀM RÕ]` marker or replace it with `[ĐÃ LÀM RÕ → Clarifications / Session YYYY-MM-DD]`. Do not leave a resolved question marked as open.
-    - Save the spec file AFTER each integration to minimize risk of context loss (atomic overwrite).
-    - Preserve formatting: do not reorder unrelated sections; keep heading hierarchy intact.
-    - Keep each inserted clarification minimal and testable (avoid narrative drift).
+6. Integration after each answered batch (or single answer in sequential mode):
+    - Maintain in-memory representation of the spec plus the raw file contents.
+    - Ensure a `## Clarifications` section exists immediately after `## 18. Câu hỏi mở` and before `## 19. Điều kiện sẵn sàng để lập plan kỹ thuật`; create it at that exact position if missing, with a `### Session YYYY-MM-DD` subheading for today.
+    - For every accepted answer in the batch:
+       - Append `- Q: <question> → A: <final answer>` under `### Session YYYY-MM-DD`.
+       - Apply the clarification to the target section(s) (Functional Requirements, User Stories/Actors, Data Model, Success Criteria, Edge Cases, or Terminology), replacing invalidated ambiguous text instead of duplicating.
+       - If an answer resolves an item in `## 18. Câu hỏi mở`, remove its `[CẦN LÀM RÕ]` marker or replace it with `[ĐÃ LÀM RÕ → Clarifications / Session YYYY-MM-DD]`.
+    - **Conditional Documentation Impact Gate reset**: If any accepted answer materially changes core business sections (`§3 Phạm vi MVP`, `§5 Kịch bản người dùng`, `§7 Yêu cầu chức năng`, `§8 Quy tắc nghiệp vụ`, `§9 Thực thể dữ liệu`, or `§15 Ngoài phạm vi`) and `§20 **Trạng thái**` currently reads `CÓ CẬP NHẬT` or `KHÔNG CẦN CẬP NHẬT`, update `§20 **Trạng thái**` to `CẦN ĐÁNH GIÁ LẠI` so `/speckit-docbiz` re-evaluates before `/speckit-plan`.
+    - Save `FEATURE_SPEC` once per batch (atomic overwrite), preserving heading hierarchy and unrelated formatting.
 
 7. Validation (performed after EACH write plus final pass):
    - Clarifications session contains exactly one bullet per accepted answer (no duplicates).
@@ -244,38 +180,7 @@ Context for prioritization: $ARGUMENTS
 
 ## Mandatory Post-Execution Hooks
 
-**You MUST complete this section before reporting completion to the user.**
-
-Check if `.specify/extensions.yml` exists in the project root.
-- If it does not exist, or no hooks are registered under `hooks.after_clarify`, skip to the Completion Report.
-- If it exists, read it and look for entries under the `hooks.after_clarify` key.
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue to the Completion Report.
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Mandatory hook** (`optional: false`) — **You MUST emit `EXECUTE_COMMAND:` for each mandatory hook**:
-    ```
-    ## Extension Hooks
-
-    **Automatic Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
+Dispatch `HOOKS.after` if non-empty per the Extension Hooks Protocol above; otherwise skip silently.
 
 ## Completion Report
 

@@ -23,41 +23,11 @@ In the Completion Report, print `ACTIVE_FEATURE_DIRECTORY: <resolved FEATURE_DIR
 
 You **MUST** consider the user input before proceeding (if not empty).
 
-## Pre-Execution Checks
+## Extension Hooks Protocol
 
-**Check for extension hooks (before analysis)**:
-- Check if `.specify/extensions.yml` exists in the project root.
-- If it exists, read it and look for entries under the `hooks.before_analyze` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Pre-Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-  - **Mandatory hook** (`optional: false`):
-    ```
-    ## Extension Hooks
-
-    **Automatic Pre-Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-
-    Wait for the result of the hook command before proceeding to the Goal.
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+`scripts/speckit-cli.js check-prereqs --stage analyze ... --json` reads `.specify/extensions.yml` and returns `HOOKS: { before: [...], after: [...] }`.
+- If a hook list is empty, skip silently without reading `.specify/extensions.yml` again.
+- For each entry in `HOOKS.before` (before Step 2) or `HOOKS.after` (before the Completion Report): if `optional: true`, display `Command: \`{slashCommand}\``, `Description`, and `Prompt`; if `optional: false`, emit `EXECUTE_COMMAND: {command}`, invoke it, and wait for completion.
 
 ## Goal
 
@@ -73,7 +43,7 @@ Identify inconsistencies, duplications, ambiguities, and underspecified items ac
 
 ### 1. Initialize Analysis Context
 
-Run `node scripts/speckit-cli.js check-prereqs --require-tasks --include-tasks --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`) and `node scripts/speckit-cli.js validate --stage tasks --json` from repo root. Parse JSON for `FEATURE_DIR`, `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`, `AVAILABLE_DOCS`, and deterministic validation issues.
+Run `node scripts/speckit-cli.js check-prereqs --stage analyze --require-tasks --include-tasks --json` (adding `--feature "<feature-ref>"` if the user named a feature ID/directory in `$ARGUMENTS`), then run `node scripts/speckit-cli.js validate --feature "<FEATURE_DIR>" --stage tasks --json` from repo root. Parse JSON for `FEATURE_DIR`, `FEATURE_SPEC`, `IMPL_PLAN`, `TASKS`, `AVAILABLE_DOCS`, `HOOKS`, and deterministic validation issues. Dispatch `HOOKS.before` if non-empty.
 
 Abort with an error message if any required file is missing (instruct the user to run the missing prerequisite command). When `speckit-plan` or `speckit-tasks` ran earlier in the same conversation, prefer delegating the semantic detection pass (Step 4) to a fresh read-only `research` subagent (when subagents are available) to avoid author confirmation bias.
 
@@ -213,38 +183,9 @@ At end of report, output a concise Next Actions block:
 
 Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply them automatically.)
 
-### 9. Check for extension hooks
+### 9. Post-Execution Hooks
 
-After reporting, check if `.specify/extensions.yml` exists in the project root.
-- If it exists, read it and look for entries under the `hooks.after_analyze` key
-- If the YAML cannot be parsed or is invalid, skip hook checking silently and continue normally
-- Filter out hooks where `enabled` is explicitly `false`. Treat hooks without an `enabled` field as enabled by default.
-- For each remaining hook, do **not** attempt to interpret or evaluate hook `condition` expressions:
-  - If the hook has no `condition` field, or it is null/empty, treat the hook as executable
-  - If the hook defines a non-empty `condition`, skip the hook and leave condition evaluation to the HookExecutor implementation
-- When constructing slash commands from hook command names, replace dots (`.`) with hyphens (`-`). For example, `speckit.git.commit` → `/speckit-git-commit`.
-- For each executable hook, output the following based on its `optional` flag:
-  - **Optional hook** (`optional: true`):
-    ```
-    ## Extension Hooks
-
-    **Optional Hook**: {extension}
-    Command: `/{command}`
-    Description: {description}
-
-    Prompt: {prompt}
-    To execute: `/{command}`
-    ```
-  - **Mandatory hook** (`optional: false`):
-    ```
-    ## Extension Hooks
-
-    **Automatic Hook**: {extension}
-    Executing: `/{command}`
-    EXECUTE_COMMAND: {command}
-    ```
-    After emitting the block above you MUST actually invoke the hook and wait for it to finish before continuing. Run it the same way you would run the command yourself in this agent/session (the invocation may differ from the literal `{command}` id shown above, e.g. a skills-mode agent runs it as `/skill:speckit-...` or `$speckit-...`). Emitting the block alone does not run the hook.
-- If no hooks are registered or `.specify/extensions.yml` does not exist, skip silently
+Dispatch `HOOKS.after` if non-empty per the Extension Hooks Protocol above; otherwise skip silently.
 
 ## Operating Principles
 
@@ -262,9 +203,5 @@ After reporting, check if `.specify/extensions.yml` exists in the project root.
 - **Prioritize constitution violations** (these are always CRITICAL)
 - **Use examples over exhaustive rules** (cite specific instances, not generic patterns)
 - **Report zero issues gracefully** (emit success report with coverage statistics)
-
-## Context
-
-$ARGUMENTS
 
 **HARD STOP**: This command is complete after all steps above (including extension hooks). Do NOT auto-invoke `/speckit-implement` or any other command — even if no CRITICAL issues were found. Report completion and wait for the user to explicitly invoke the next step.
