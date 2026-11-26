@@ -153,6 +153,32 @@ test('validate-skills enforces line soft limit on flex-* and detects routing tab
   assert.match(drift[0], /flex-ghost-skill/);
 });
 
+test('routing-block-guard blocks a tool-using turn until the routing block was printed once', () => {
+  const os = require('node:os');
+  const user = (text) => ({ type: 'user', message: { role: 'user', content: text } });
+  const toolUse = { type: 'assistant', message: { role: 'assistant', content: [{ type: 'tool_use', name: 'Read', input: {} }] } };
+  const text = (t) => ({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text: t }] } });
+  const run = (entries, extra = {}) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'routing-guard-'));
+    const file = path.join(dir, 'transcript.jsonl');
+    fs.writeFileSync(file, entries.map((e) => JSON.stringify(e)).join('\n'));
+    try {
+      return runHook('.claude/hooks/routing-block-guard.js', { transcript_path: file, ...extra });
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  const blocked = run([user('xem file'), toolUse]);
+  assert.equal(blocked.status, 2);
+  assert.match(blocked.stderr, /Kết quả định tuyến/);
+
+  assert.equal(run([user('xem file'), toolUse], { stop_hook_active: true }).status, 0);
+  assert.equal(run([user('hỏi đáp'), text('trả lời thẳng')]).status, 0);
+  assert.equal(run([user('xem file'), text('Kết quả định tuyến\n- Primary: none'), toolUse]).status, 0);
+  assert.equal(run([user('việc cũ'), text('Kết quả định tuyến'), user('việc mới'), toolUse]).status, 0);
+});
+
 // ---------------------------------------------------------------------------
 // 4. validate-speckit-artifact.js
 // ---------------------------------------------------------------------------
@@ -200,6 +226,7 @@ test('shared JSON configs are valid and all referenced Claude hooks exist on dis
   assert.ok(referencedHookFiles.includes('.claude/hooks/prod-ssh-guard.js'), 'prod-ssh-guard.js must be wired in settings.json');
   assert.ok(referencedHookFiles.includes('.claude/hooks/secret-guard.js'), 'secret-guard.js must be wired in settings.json');
   assert.ok(referencedHookFiles.includes('.claude/hooks/skill-format-guard.js'), 'skill-format-guard.js must be wired in settings.json');
+  assert.ok(referencedHookFiles.includes('.claude/hooks/routing-block-guard.js'), 'routing-block-guard.js must be wired in settings.json');
 
   for (const rel of referencedHookFiles) {
     assert.ok(fs.existsSync(path.join(REPO_ROOT, rel)), `Referenced hook missing: ${rel}`);
