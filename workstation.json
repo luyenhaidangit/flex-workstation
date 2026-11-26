@@ -5,12 +5,14 @@
       {
         "name": "flex-auth-service",
         "url": "https://github.com/luyenhaidangit/flex-auth-service",
-        "scope": "Service xác thực/ủy quyền (.NET): đăng nhập, token, phân quyền, user/role; đang migrate khỏi Oracle sang PostgreSQL"
+        "scope": "Service xác thực/ủy quyền (.NET): đăng nhập, token, phân quyền, user/role; đang migrate khỏi Oracle sang PostgreSQL",
+        "preload": true
       },
       {
         "name": "flex-api-gateway",
         "url": "https://github.com/luyenhaidangit/flex-api-gateway.git",
-        "scope": "API Gateway (.NET): route, proxy, cấu hình gateway, Dockerfile/Jenkinsfile của gateway"
+        "scope": "API Gateway (.NET): route, proxy, cấu hình gateway, Dockerfile/Jenkinsfile của gateway",
+        "preload": true
       },
       {
         "name": "flex-microfrontend",
@@ -20,7 +22,8 @@
       {
         "name": "flex-environment",
         "url": "https://github.com/luyenhaidangit/flex-environment",
-        "scope": "Stack hạ tầng local/dev (Docker Compose): docker-compose*.yml, service phụ trợ, biến môi trường dev"
+        "scope": "Stack hạ tầng local/dev (Docker Compose): docker-compose*.yml, service phụ trợ, biến môi trường dev",
+        "preload": true
       },
       {
         "name": "flex-agent-service",

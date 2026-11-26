@@ -59,11 +59,13 @@ When a Speckit feature is active (a `specs/<feature>/` directory exists for the 
 
 ### 4. Attach and clone, one repo at a time (cloud mode only)
 
-For each Edit repo: `add_repo` (with `access: push` only when the session must push), clone from the manifest `url` into `<workstation root>/<name>` so it stays ignored by the workstation's git, then `register_repo_root` so its own `CLAUDE.md` and skills load. If `add_repo` is denied, relay the reason and continue with what is available; do not work around the denial.
+For each Edit repo: `add_repo` (with `access: push` only when the session must push), clone with the command it returns into the `workspace` path it returns (`/home/user/<name>`; the system rejects other paths), symlink it to `<workstation root>/<name>` (already in `.git/info/exclude` via the SessionStart hook), then `register_repo_root` with the `workspace` path so its own `CLAUDE.md` and skills load. If `add_repo` is denied, relay the reason and continue with what is available; do not work around the denial.
+
+If `add_repo` returns `status: read_available` (public repo, nothing attached), clone to the returned `workspace` path (`/home/user/<owner>/<name>`) and symlink it the same way; skip `register_repo_root` (it does not cover unattached repos) and read that repo's `CLAUDE.md` directly when needed.
 
 #### Preload (cloud mode only)
 
-When the SessionStart hook output lists "Preload repo cloud" repos (every manifest entry with `cloudEnabled` not `false` whose folder is missing), attach and clone all of them right after the routing step and before the first task, with `access: read`. Do this for every request, including analysis-only ones and questions about which repos are cloned, and do not ask for confirmation first: the hook list is the standing instruction, and the analysis-only rule of step 2 applies only to repos outside it. This replaces steps 2-3 for those repos only; print the list as one line instead of the full block. This one-line form applies only to repos in the Preload list; any other repo still gets the full `Kế hoạch repo` block. The repos are independent, so run each phase for all of them at once instead of repo by repo: `add_repo` for every repo in one parallel batch, then the clone commands that the `add_repo` results return (they carry the session's credentials; the manifest `url` may not) in one Bash call, each into `<workstation root>/<name>`, then `register_repo_root` for every cloned repo in one parallel batch. End with one line of result: cloned repos, and denied repos with the reason. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
+When the SessionStart hook output lists "Preload repo cloud" repos (manifest entries with `preload: true`, `cloudEnabled` not `false`, folder missing), attach and clone them right after the routing step and before the first task, with `access: read`, but only when the request reads or changes code in a child repo. A request that needs no child repo (workstation docs, skills, `.claude/`, or an answer from `workstation.json` alone) skips Preload. Do not ask for confirmation first: the hook list is the standing instruction for those requests. This replaces steps 2-3 for the listed repos only; print the list as one line instead of the full block. Any repo outside the list still goes through steps 1-4 with the full `Kế hoạch repo` block and is cloned on demand. The listed repos are independent, so run each phase for all of them at once: `add_repo` for every repo in one parallel batch, then the clone commands that the `add_repo` results return (they carry the session's credentials; the manifest `url` may not) in one Bash call, each into the returned `workspace` path, then symlink and `register_repo_root` per step 4. End with one line of result: cloned repos, and denied repos with the reason. Re-attach a repo with `access: push` only when a change must be pushed. A denied `add_repo` is relayed and skipped, never worked around.
 
 ### 5. Keep changes in the right repo
 
@@ -73,7 +75,7 @@ Edits and commits for a child repo belong to that repo's own branch and pull req
 
 | Rationalization | Reality |
 | --- | --- |
-| "Clone everything so nothing is missing." | Slow, one prompt per repo, and most tasks touch one or two. Re-run the gate when a new need appears. Exception: repos the SessionStart hook lists under Preload. |
+| "Clone everything so nothing is missing." | Slow, one prompt per repo, and most tasks touch one or two. Re-run the gate when a new need appears. Exception: the few `preload: true` repos the SessionStart hook lists, when the request needs a child repo. |
 | "The folder name tells me what the repo does." | `scope` was written to disambiguate; read it, especially for `flex-environment` vs `flex-k8s`. |
 | "I can read the whole repo through the file API instead of cloning." | Fine for a few files; for edits or wide search it is slower and cannot run tests. Clone it. |
 | "It is only a design question, general knowledge is enough." | A design is only valid against the real topology. Attach the owning repo as Read, open the 1-3 relevant files, and state what was verified. Example: a WAF question needs `flex-environment` (`docker-compose.infra.yml`, `mounts/nginx/conf.d/`), not a guess. |
@@ -90,9 +92,9 @@ Edits and commits for a child repo belong to that repo's own branch and pull req
 ## Verification
 
 - [ ] Plan listed Edit, Read and Skip with assumptions before any `add_repo`.
-- [ ] For an analysis-only request, no repo was cloned unless the user asked for changes, except repos in the Preload list.
+- [ ] For an analysis-only request, no repo was cloned unless the user asked for changes, except repos in the Preload list when the request needs a child repo.
 - [ ] With an active Speckit feature, `specs/<feature>/repos.md` matches the final plan.
 - [ ] Only repos declared in `workstation.json` were attached.
-- [ ] Each cloned repo sits at `<workstation root>/<name>` and was registered with `register_repo_root`.
+- [ ] Each cloned repo sits at the `workspace` path `add_repo` returned, is symlinked to `<workstation root>/<name>`, and (unless `read_available`) was registered with `register_repo_root`.
 - [ ] Child-repo changes went to that repo's own branch, with the branch name confirmed.
 - [ ] A mid-task need for another repo re-ran this gate for that repo only.
