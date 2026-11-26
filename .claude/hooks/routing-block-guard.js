@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 // routing-block-guard.js
-// Stop hook. Chặn kết thúc lượt khi agent đã dùng tool đọc/sửa file trong lượt này
-// nhưng cả session chưa từng in khối `Kết quả định tuyến` (xem AGENTS.md, mục Skill routing bắt buộc).
-// Lượt hỏi đáp thuần không gọi tool thì không bị chặn.
+// PreToolUse hook. Chặn tool đọc/sửa file đầu tiên nếu agent chưa in khối `Kết quả định tuyến`
+// (xem AGENTS.md, mục Skill routing bắt buộc). Tool `Skill` không bị chặn vì cần đọc router trước khi in khối.
+// Lượt hỏi đáp thuần không gọi tool thì không bị ảnh hưởng. Subagent bỏ qua vì transcript của chúng tách riêng.
 
 'use strict';
 
 const fs = require('fs');
 
 const MARKER = 'Kết quả định tuyến';
-const FILE_TOOLS = new Set(['Read', 'Grep', 'Glob', 'Bash', 'Edit', 'Write', 'NotebookEdit']);
 
 function contentOf(entry) {
   const content = entry && entry.message && entry.message.content;
@@ -17,27 +16,10 @@ function contentOf(entry) {
   return Array.isArray(content) ? content : [];
 }
 
-function isRealUserPrompt(entry) {
-  if (!entry || entry.type !== 'user' || entry.isMeta) return false;
-  const blocks = contentOf(entry);
-  const texts = blocks.filter((b) => b.type === 'text' && typeof b.text === 'string');
-  if (!texts.length || blocks.some((b) => b.type === 'tool_result')) return false;
-  return !texts.every((b) => /^\s*(Base directory for this skill|<system-reminder>)/.test(b.text));
-}
-
-function needsRoutingBlock(entries) {
-  let lastPrompt = -1;
-  entries.forEach((entry, i) => { if (isRealUserPrompt(entry)) lastPrompt = i; });
-
-  const usedFileTool = entries.slice(lastPrompt + 1).some((entry) => (
-    entry.type === 'assistant' && contentOf(entry).some((b) => b.type === 'tool_use' && FILE_TOOLS.has(b.name))
-  ));
-  if (!usedFileTool) return false;
-
-  const printedBlock = entries.some((entry) => (
+function hasPrintedBlock(entries) {
+  return entries.some((entry) => (
     entry.type === 'assistant' && contentOf(entry).some((b) => b.type === 'text' && String(b.text).includes(MARKER))
   ));
-  return !printedBlock;
 }
 
 function main() {
@@ -47,7 +29,7 @@ function main() {
   } catch {
     process.exit(0);
   }
-  if (payload.stop_hook_active || !payload.transcript_path) process.exit(0);
+  if (payload.agent_id || !payload.transcript_path) process.exit(0);
 
   let entries;
   try {
@@ -59,10 +41,11 @@ function main() {
     process.exit(0);
   }
 
-  if (needsRoutingBlock(entries)) {
+  if (!hasPrintedBlock(entries)) {
     process.stderr.write(
-      `routing-block-guard: chưa thấy khối \`${MARKER}\` trong session này dù đã dùng tool. ` +
-      'In khối đúng mẫu ở mục `Routing result` của flex-using-agent-skills, nêu skill đã chọn cho phạm vi hiện tại, rồi mới kết thúc lượt.\n'
+      `routing-block-guard: chưa thấy khối \`${MARKER}\` trước tool này. ` +
+      'Đọc router bằng Skill `flex-using-agent-skills`, in khối đúng mẫu ở mục `Routing result` ' +
+      '(nêu skill đã chọn) ngay trong văn bản của lượt này, rồi mới gọi lại tool.\n'
     );
     process.exit(2);
   }

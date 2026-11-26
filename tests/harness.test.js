@@ -153,30 +153,28 @@ test('validate-skills enforces line soft limit on flex-* and detects routing tab
   assert.match(drift[0], /flex-ghost-skill/);
 });
 
-test('routing-block-guard blocks a tool-using turn until the routing block was printed once', () => {
+test('routing-block-guard blocks file tools until the routing block was printed', () => {
   const os = require('node:os');
   const user = (text) => ({ type: 'user', message: { role: 'user', content: text } });
-  const toolUse = { type: 'assistant', message: { role: 'assistant', content: [{ type: 'tool_use', name: 'Read', input: {} }] } };
   const text = (t) => ({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text: t }] } });
   const run = (entries, extra = {}) => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'routing-guard-'));
     const file = path.join(dir, 'transcript.jsonl');
     fs.writeFileSync(file, entries.map((e) => JSON.stringify(e)).join('\n'));
     try {
-      return runHook('.claude/hooks/routing-block-guard.js', { transcript_path: file, ...extra });
+      return runHook('.claude/hooks/routing-block-guard.js', { transcript_path: file, tool_name: 'Read', ...extra });
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
   };
 
-  const blocked = run([user('xem file'), toolUse]);
+  const blocked = run([user('xem file'), text('Tôi sẽ định tuyến trước')]);
   assert.equal(blocked.status, 2);
   assert.match(blocked.stderr, /Kết quả định tuyến/);
 
-  assert.equal(run([user('xem file'), toolUse], { stop_hook_active: true }).status, 0);
-  assert.equal(run([user('hỏi đáp'), text('trả lời thẳng')]).status, 0);
-  assert.equal(run([user('xem file'), text('Kết quả định tuyến\n- Primary: none'), toolUse]).status, 0);
-  assert.equal(run([user('việc cũ'), text('Kết quả định tuyến'), user('việc mới'), toolUse]).status, 0);
+  assert.equal(run([user('xem file'), text('Kết quả định tuyến\n- Primary: none')]).status, 0);
+  assert.equal(run([user('việc cũ'), text('Kết quả định tuyến'), user('việc mới')]).status, 0);
+  assert.equal(run([user('xem file')], { agent_id: 'sub-1' }).status, 0);
 });
 
 // ---------------------------------------------------------------------------

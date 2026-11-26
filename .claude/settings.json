@@ -39,17 +39,16 @@
         ]
       }
     ],
-    "Stop": [
+    "PreToolUse": [
       {
+        "matcher": "Read|Grep|Glob|Bash|Edit|Write|NotebookEdit",
         "hooks": [
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/routing-block-guard.js\""
           }
         ]
-      }
-    ],
-    "PreToolUse": [
+      },
       {
         "matcher": "Bash|PowerShell",
         "hooks": [
