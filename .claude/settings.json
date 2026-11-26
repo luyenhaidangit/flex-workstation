@@ -41,11 +41,20 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Read|Grep|Glob|Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/routing-block-guard.js\""
+          }
+        ]
+      },
+      {
         "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
-            "command": "rtk hook claude"
+            "command": "command -v rtk >/dev/null 2>&1 && rtk hook claude || true"
           },
           {
             "type": "command",

@@ -41,6 +41,7 @@
 | `branch` | Không | nhánh mặc định của remote | sync | Nhánh cần clone. |
 | `scope` | Nên có | — | `flex-repo-scope` | Mô tả repo sở hữu gì, dùng để chọn repo cho từng yêu cầu. |
 | `cloudEnabled` | Không | `true` | `flex-repo-scope` | `false` = repo bị tắt trong cloud session: không attach, không clone, không đọc qua GitHub MCP. |
+| `preload` | Không | `false` | hook `SessionStart`, `flex-repo-scope` | `true` = repo lõi được nạp sẵn ở cloud khi yêu cầu cần repo con; repo khác clone theo nhu cầu. |
 
 ## `cloudEnabled`
 
@@ -50,11 +51,11 @@
 
 ## Nạp sẵn repo ở cloud (Preload)
 
-Hook `SessionStart` (`.claude/hooks/setup-container.sh`, chỉ chạy khi `CLAUDE_CODE_REMOTE=true`) đọc manifest và in ra các repo có `cloudEnabled` khác `false` mà thư mục chưa tồn tại. Hook chỉ chạy khi session `startup` hoặc `resume`, không chạy lại sau compact. Danh sách này vào context của Claude; theo `flex-repo-scope` (mục Preload), sau bước route Claude chạy song song `add_repo` (read) cho mọi repo → clone bằng lệnh mà `add_repo` trả về vào `<workstation root>/<name>` → `register_repo_root`, rồi báo kết quả một dòng.
+Hook `SessionStart` (`.claude/hooks/setup-container.sh`, chỉ chạy khi `CLAUDE_CODE_REMOTE=true`) đọc manifest và in ra các repo có `preload: true`, `cloudEnabled` khác `false` mà thư mục chưa tồn tại. Hook cũng nối symlink `/home/user/<name>` vào workstation root và thêm repo con vào `.git/info/exclude`, và tắt các MCP server trong `.mcp.json` thiếu biến môi trường (ghi vào `.claude/settings.local.json`, gitignore). Hook chỉ chạy khi session `startup` hoặc `resume`, không chạy lại sau compact. Danh sách này vào context của Claude; theo `flex-repo-scope` (mục Preload), sau bước route Claude chạy song song `add_repo` (read) cho các repo đó → clone bằng lệnh mà `add_repo` trả về vào đường dẫn `workspace` (`/home/user/<name>`) → symlink vào workstation root → `register_repo_root`, rồi báo kết quả một dòng. Yêu cầu không cần repo con thì bỏ qua preload.
 
 - Hook chỉ liệt kê, không clone: repo private cần quyền của tài khoản qua `add_repo`, token trong container không đủ.
 - Mỗi repo có thể kéo theo một lần duyệt quyền `add_repo` tùy giao diện.
-- Muốn bỏ một repo khỏi danh sách nạp sẵn, đặt `"cloudEnabled": false`.
+- Muốn bỏ một repo khỏi danh sách nạp sẵn, xóa `"preload": true` (vẫn clone theo nhu cầu) hoặc đặt `"cloudEnabled": false` (tắt hẳn ở cloud).
 
 ## Thêm repo mới
 

@@ -61,6 +61,7 @@ Khai báo repo cần có trong workspace tại `workstation.json`:
 - `repositories.items[].url`: Git remote URL.
 - `repositories.items[].branch`: nhánh cần clone, tùy chọn.
 - `repositories.items[].cloudEnabled`: `false` để tắt repo trong cloud session, tùy chọn (mặc định `true`).
+- `repositories.items[].preload`: `true` để nạp sẵn repo lõi ở cloud session, tùy chọn (mặc định `false`).
 
 Chi tiết từng trường xem [docs/setup/workstation-manifest.md](docs/setup/workstation-manifest.md).
 
