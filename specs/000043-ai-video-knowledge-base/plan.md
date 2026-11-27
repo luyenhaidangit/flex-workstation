@@ -52,7 +52,7 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 | DEC-009 | Khởi chạy xử lý | Quản trị viên chủ động bấm; có trần số video mỗi lần | Chưa có chặn chi phí ở MVP | Tự xử lý toàn thư mục khi đồng bộ |
 | DEC-010 | Route | Frontend gọi trực tiếp `agentApiBaseUrl` | Khớp `agent-catalog` | Qua gateway |
 
-**Hai điểm lệch nhẹ so với spec cần người dùng xác nhận** (nguồn: DEC-008, DEC-009): (1) ở MVP chỉ quản trị viên xem được tóm tắt, dù US-002/US-003 nói "người dùng"; (2) "tự động tạo tóm tắt" áp dụng cho pipeline sau khi quản trị viên khởi chạy, không phải ngay khi đồng bộ thấy video mới. Cả hai là hệ quả của việc P2 (đối chiếu quyền, chặn chi phí) nằm ngoài MVP.
+**Hai điểm lệch nhẹ so với spec** (nguồn: DEC-008, DEC-009). Người dùng đã xác nhận ngày 2026-11-27: "Chỉ quản trị thôi" cho MVP; điểm (2) chưa có phản hồi riêng nên giữ như thiết kế. (1) ở MVP chỉ quản trị viên xem được tóm tắt, dù US-002/US-003 nói "người dùng"; (2) "tự động tạo tóm tắt" áp dụng cho pipeline sau khi quản trị viên khởi chạy, không phải ngay khi đồng bộ thấy video mới. Cả hai là hệ quả của việc P2 (đối chiếu quyền, chặn chi phí) nằm ngoài MVP.
 
 ## Thiết kế tổng quan
 
@@ -171,7 +171,7 @@ flex-microfrontend/
 | Đặt miền video trong `flex-agent-service` (nền tảng AI Agent đa tenant) | Người dùng chọn; tái dùng OAuth, mã hóa token, JWT, logging | Repo mới sạch ranh giới hơn nhưng phải nhân bản hạ tầng; agent đã nêu rủi ro lẫn miền | Người dùng đã chấp nhận ở bước plan; xem lại khi P2/P3 làm module phình to (tách repo) |
 | Hai DbContext/hai database trong một service | Hiến pháp VI yêu cầu database riêng | Dùng chung `agentdb` bị loại theo lựa chọn người dùng | Người dùng đã chấp nhận |
 | Schema `hangfire` ngoài Liquibase | Thư viện tự quản lý schema | Tự viết migration cho bảng Hangfire dễ lệch phiên bản | Ghi ở README `flex-database` khi implement |
-| Thêm gói NuGet (Hangfire, Google, xUnit) | Cần cho tính năng và test | Tự viết (tái phát minh) | **Chờ người dùng xác nhận** theo `AGENTS.md` của repo, ở `/speckit-tasks` hoặc `/speckit-implement` |
+| Thêm gói NuGet (Hangfire, Google, xUnit) | Cần cho tính năng và test | Tự viết (tái phát minh) | Người dùng đã xác nhận (2026-11-27) cho thêm các gói cần thiết theo `AGENTS.md` của repo; phiên bản chốt khi implement sau khi kiểm tra tương thích `net9.0` |
 
 ## Checklist sẵn sàng cho `/speckit-tasks`
 
