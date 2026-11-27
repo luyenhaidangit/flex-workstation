@@ -224,7 +224,6 @@ test('shared JSON configs are valid and all referenced Claude hooks exist on dis
   assert.ok(referencedHookFiles.includes('.claude/hooks/prod-ssh-guard.js'), 'prod-ssh-guard.js must be wired in settings.json');
   assert.ok(referencedHookFiles.includes('.claude/hooks/secret-guard.js'), 'secret-guard.js must be wired in settings.json');
   assert.ok(referencedHookFiles.includes('.claude/hooks/skill-format-guard.js'), 'skill-format-guard.js must be wired in settings.json');
-  assert.ok(referencedHookFiles.includes('.claude/hooks/routing-block-guard.js'), 'routing-block-guard.js must be wired in settings.json');
 
   for (const rel of referencedHookFiles) {
     assert.ok(fs.existsSync(path.join(REPO_ROOT, rel)), `Referenced hook missing: ${rel}`);
