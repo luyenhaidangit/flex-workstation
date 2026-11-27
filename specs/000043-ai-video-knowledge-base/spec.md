@@ -410,6 +410,6 @@ Hệ thống tự gom video vào nhóm chủ đề, gắn thẻ nhất quán và
 
 <!-- Gate bắt buộc do /speckit-docbiz cập nhật sau lần sửa cuối của spec.md và trước /speckit-plan. -->
 
-- **Trạng thái**: CẦN ĐÁNH GIÁ LẠI
-- **Căn cứ**: §3, §5, §8 và §9 thêm luồng nghiệp vụ đầu-cuối mới (Drive → phân tích → kho tri thức), quy tắc xử lý một lần theo phiên bản, kế thừa quyền Drive, giới hạn chi phí và các thực thể mới; không có tài liệu nghiệp vụ hiện hữu cùng miền (các tài liệu `00`–`13` đều thuộc nghiệp vụ FlexSim).
-- **Tài liệu đã cập nhật**: `docs/business/14-ai-video-knowledge-base.md` (tạo mới), `docs/business/business-docs-index.md` (thêm mục 5)
+- **Trạng thái**: CÓ CẬP NHẬT
+- **Căn cứ**: Lần 1: §3, §5, §8, §9 thêm luồng nghiệp vụ đầu-cuối mới (Drive → phân tích → kho tri thức), quy tắc xử lý một lần theo phiên bản, kế thừa quyền Drive, giới hạn chi phí và các thực thể mới; không có tài liệu cùng miền (các tài liệu `00`–`13` thuộc nghiệp vụ FlexSim). Lần 2 (sau clarify 2026-11-27): §7, §8, §10, §15 thêm BR-008 (gửi AI ngoài chỉ với thư mục được chọn), BR-009/FR-027 (ẩn ngay, xóa hẳn sau 30 ngày), BR-010/FR-028 (chỉ tiếng Việt) và mục ngoài phạm vi mới.
+- **Tài liệu đã cập nhật**: `docs/business/14-ai-video-knowledge-base.md` (tạo mới, cập nhật lần 2), `docs/business/business-docs-index.md` (thêm mục 5)
