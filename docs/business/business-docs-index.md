@@ -30,6 +30,12 @@ Không gắn với một MVP cụ thể — đào sâu kỹ thuật/nghiệp v�
 | [12-agent-creation-and-configuration.md](12-agent-creation-and-configuration.md) | MVP 12 | Tạo Agent, mở khóa cấu hình và điều kiện kiểm thử |
 | [13-meta-channel-connections.md](13-meta-channel-connections.md) | MVP 13 | Kết nối tài khoản Instagram và trang Facebook qua Meta |
 
+## 5. Nghiệp vụ Kho tri thức video
+
+| Tài liệu | MVP | Nghiệp vụ |
+| --- | --- | --- |
+| [14-ai-video-knowledge-base.md](14-ai-video-knowledge-base.md) | MVP 43 | Biến video trên Google Drive thành kho tri thức: tóm tắt tự động, quyền truy cập, theo dõi xử lý |
+
 ## Quy ước
 
 - Mỗi tài liệu tổng quan (mục 2) phải ref về tài liệu nền `00` và, nếu có, tài liệu chi tiết liên quan (mục 3) trong phần "Truy vết và nguồn tham khảo".
