@@ -52,7 +52,7 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 | DEC-009 | Khởi chạy xử lý | Quản trị viên chủ động bấm; có trần số video mỗi lần | Chưa có chặn chi phí ở MVP | Tự xử lý toàn thư mục khi đồng bộ |
 | DEC-010 | Route | Frontend gọi trực tiếp `agentApiBaseUrl` | Khớp `agent-catalog` | Qua gateway |
 
-**Bốn điểm lệch so với spec — người dùng đã chấp nhận ngày 2026-11-28** (xem `tasks.md` T002): (1) ở MVP chỉ quản trị viên xem được tóm tắt, dù US-002 nói "người dùng" (DEC-008); (2) "tự động tạo tóm tắt" áp dụng cho pipeline sau khi quản trị viên khởi chạy, không phải ngay khi đồng bộ thấy video mới (DEC-009); (3) `video_analyses` chưa có tóm tắt nhanh và MVP không lưu transcript, dù FR-004, FR-006, AC-004 yêu cầu; (4) tìm theo từ khóa (FR-019, P3) được kéo vào MVP. (1) và (2) là hệ quả của việc P2 (đối chiếu quyền, chặn chi phí) nằm ngoài MVP; (3) và (4) giữ nguyên `data-model.md`.
+**Năm điểm lệch so với spec — người dùng đã chấp nhận ngày 2026-11-28** (xem `tasks.md` T002): (1) ở MVP chỉ quản trị viên xem được tóm tắt, dù US-002 nói "người dùng" (DEC-008); (2) "tự động tạo tóm tắt" áp dụng cho pipeline sau khi quản trị viên khởi chạy, không phải ngay khi đồng bộ thấy video mới (DEC-009); (3) `video_analyses` chưa có tóm tắt nhanh và MVP không lưu transcript, dù FR-004, FR-006, AC-004 yêu cầu; (4) tìm theo từ khóa (FR-019, P3) được kéo vào MVP; (5) audit theo spec §11 ở MVP chỉ là log có cấu trúc (event `video_*` kèm `userId`) xem qua truy vấn log, chưa có bảng hay màn hình audit riêng, còn lịch sử xử lý từng video xem được qua `jobs` ở `GET /videos/{id}`. (1) và (2) là hệ quả của việc P2 (đối chiếu quyền, chặn chi phí) nằm ngoài MVP; (3) và (4) giữ nguyên `data-model.md`.
 
 **Quyết định bổ sung khi lập tasks**: (a) `state` OAuth dùng kho riêng `IDriveOAuthStateStore` trên Redis vì `IIntegrationSessionStore` hiện có gắn với `agentId` và `channel` của Meta; (b) tổng quan theo trạng thái (AC-008) do frontend lấy `total` từ `GET /videos?status=&pageSize=1` cho từng trạng thái, không thêm endpoint; (c) khi cờ tắt API trả `404`, frontend hiển thị "Tính năng chưa được bật" thay vì ẩn menu (menu sidebar là tĩnh).
 
@@ -124,7 +124,7 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 
 - **Kết quả Documentation Impact Gate (`spec.md` §20)**: CÓ CẬP NHẬT.
 - **Tài liệu hiện hữu đã cập nhật**: `docs/business/14-ai-video-knowledge-base.md`, `docs/business/business-docs-index.md` (mục 5) — đã làm ở bước docbiz.
-- **Cập nhật còn lại sau implementation**: `docs/architecture/system-map.md` (thêm `videodb` và module Video Knowledge); `docs/business/14-...` chỉ cập nhật nếu bốn điểm lệch MVP ở trên được xác nhận khác đi (hiện đã chấp nhận).
+- **Cập nhật còn lại sau implementation**: `docs/architecture/system-map.md` (thêm `videodb` và module Video Knowledge); `docs/business/14-...` chỉ cập nhật nếu năm điểm lệch MVP ở trên được xác nhận khác đi (hiện đã chấp nhận).
 
 ## Cấu trúc project
 
@@ -163,7 +163,7 @@ flex-microfrontend/
 
 ## Observability & Debug
 
-- **Log / Metric / Trace cần có**: Serilog/ECS theo `SeriLogger` (`service.name = agent-service`); event `video_connection.connected`, `video_sync.completed`, `video_job.started|completed|failed` kèm `videoId`, `jobId`, `status`, `failureCode`, `traceId`, `userId` (`sub`).
+- **Log / Metric / Trace cần có**: Serilog/ECS theo `SeriLogger` (`service.name = agent-service`); event `video_connection.connected`, `video_sync.completed`, `video_job.started|completed|failed`, `video_job.reprocess_requested` kèm `videoId`, `jobId`, `status`, `failureCode`, `traceId`, `userId` (`sub`).
 - **Dữ liệu KHÔNG ĐƯỢC log**: access/refresh token, `client_secret`, API key Gemini, `TokenEncryption:Key`, chuỗi kết nối, nội dung/transcript video, URL tải có chữ ký, tiêu đề Authorization.
 - **Cách kiểm tra sau release**: gọi `GET /connections/drive`, chạy đồng bộ + xử lý một video mẫu, truy vấn log theo `video_job.*`, xác nhận thư mục tạm trống. Việc gửi log tới backend tập trung chỉ được xác nhận khi truy vấn thực tế; nếu chưa chạy thì báo "đã cấu hình, chưa kiểm chứng".
 

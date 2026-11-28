@@ -26,14 +26,25 @@
 
 | Method | Đường dẫn | Mô tả | Phản hồi |
 | --- | --- | --- | --- |
-| GET | `/videos?keyword=&status=&page=&pageSize=` | Danh sách phân trang; `keyword` khớp tên, `summary`, `tags` (FR-019, kéo sớm vào MVP); `status` + `pageSize=1` dùng để đếm theo trạng thái (FR-009) | `200 { items, page, pageSize, total }` |
-| GET | `/videos/{id}` | Chi tiết: metadata, trạng thái, `failureCode`, phân tích mới nhất (tóm tắt, `keyPoints`, `tags`, `topicGroup`, `difficulty`, `chapters[{ orderNo, startSeconds, endSeconds, title, summary, visualNotes }]`), cờ `contentChanged` | `200` / `404` |
+| GET | `/videos?keyword=&status=&page=&pageSize=` | Danh sách phân trang; `keyword` khớp tên, `summary`, `tags` (FR-019, kéo sớm vào MVP); `status` + `pageSize=1` dùng để đếm theo trạng thái (FR-009) | `200 { items: [{ id, name, durationSeconds, driveModifiedAt, driveUrl, status, failureCode, sourceId }], page, pageSize, total }` |
+| GET | `/videos/{id}` | Chi tiết: metadata, trạng thái, `failureCode`, phân tích mới nhất (tóm tắt, `keyPoints`, `tags`, `topicGroup`, `difficulty`, `chapters[{ orderNo, startSeconds, endSeconds, title, summary, visualNotes }]`), `driveUrl`, cờ `contentChanged`, `jobs[{ status, attempt, failureCode, startedAt, finishedAt }]` (tối đa 20 job gần nhất, mới nhất trước; lịch sử xử lý theo spec §11) | `200` / `404` |
 | POST | `/videos/process` | Đưa vào hàng đợi `{ videoIds: [] }` (tối đa theo cấu hình `VideoKnowledge:MaxBatchSize`); video đang chạy bị bỏ qua | `202 { queued, skipped }` |
 | POST | `/videos/{id}/reprocess` | Xử lý lại thủ công cho `failed`/`completed`/`access_denied` | `202` / `409` nếu đang chạy |
 
 ## Mã lỗi nghiệp vụ
 
 `not_connected`, `connection_revoked`, `folder_not_found`, `video_not_found`, `video_in_progress`, `batch_too_large`, `access_denied`, `download_not_allowed`, `file_too_large`, `unsupported_language`, `provider_error`. Hai mã sau cùng và `unsupported_language` chỉ xuất hiện ở `failureCode` của video, không phải mã HTTP.
+
+### Ánh xạ mã lỗi sang HTTP status
+
+Lỗi trả về dạng `{ code, message }`. Mã không có trong bảng chỉ xuất hiện ở `failureCode` của video.
+
+| Mã | HTTP |
+| --- | --- |
+| `batch_too_large` | `400` |
+| `access_denied` | `403` |
+| `folder_not_found`, `video_not_found` | `404` |
+| `not_connected`, `connection_revoked`, `video_in_progress` | `409` |
 
 ## Tương thích
 
