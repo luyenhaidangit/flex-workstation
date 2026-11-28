@@ -3,8 +3,8 @@
 **Branch**: `000044-postgres-database-deployment`  
 **Ngày tạo**: 2026-11-28  
 **Chế độ Spec**: Full  
-**Trạng thái**: Đang triển khai  
-**Ngày reconcile cuối**: Chưa reconcile  
+**Trạng thái**: Hoàn thành
+**Ngày reconcile cuối**: 2026-11-29 — không đổi
 **Người phụ trách**: Luyện Hải Đăng  
 **Stakeholder xác nhận**: Luyện Hải Đăng  
 **Đầu vào**: Dựng một PostgreSQL duy nhất (không replica) trên cụm Kubernetes của server mới, chứa nhiều database riêng cho các service Flex, cấu hình vừa đủ cho tài nguyên server hiện có.

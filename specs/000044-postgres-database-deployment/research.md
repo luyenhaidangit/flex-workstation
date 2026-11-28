@@ -62,4 +62,4 @@ Căn cứ đọc thực tế (2026-11-28): `flex-k8s/AGENTS.md`, `manifests/flex
 ## Câu hỏi kỹ thuật còn lại (không chặn thiết kế)
 
 - **TQ-001**: Đã giải quyết (2026-11-28): `postgres:16.16-alpine`, có manifest `linux/amd64`.
-- **TQ-002**: Chưa xác minh (2026-11-28): máy dev chưa có context `kubectl` và người dùng chưa chọn cách truy cập cụm. Đang giả định k3s có StorageClass mặc định `local-path` và CNI có enforce NetworkPolicy; cần kiểm bằng `kubectl get storageclass` và pod thử khi truy cập được cụm.
+- **TQ-002**: Chưa xác minh (2026-11-28): máy dev chưa có context `kubectl` và người dùng chưa chọn cách truy cập cụm. Đang giả định k3s có StorageClass mặc định `local-path` và CNI có enforce NetworkPolicy; cần kiểm bằng `kubectl get storageclass` và pod thử khi truy cập được cụm. **Cập nhật 2026-11-29:** người dùng tự kiểm tra thủ công trên cụm và xác nhận mọi bước đạt (không đính kèm output); không có đo đạc số liệu lưu lại.
