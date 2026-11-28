@@ -76,7 +76,7 @@ Chỉ mục thường: `(drive_connection_id, status)`.
 
 Chỉ mục thường: `(video_id, created_at)`.
 
-### `video_analyses` (FR-006, FR-007, FR-009, FR-011)
+### `video_analyses` (FR-004, FR-006, FR-007, FR-008)
 
 | Cột | Kiểu | Null | Ghi chú |
 | --- | --- | --- | --- |

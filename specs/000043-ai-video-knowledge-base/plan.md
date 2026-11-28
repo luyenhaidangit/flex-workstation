@@ -5,7 +5,7 @@
 
 ## Tóm tắt
 
-- **Yêu cầu chính từ spec**: Phạm vi MVP (P1) gồm US-001 (kết nối Google Drive và chọn thư mục), US-002 (tự động tạo tóm tắt có mục lục/mốc thời gian/thông tin hình ảnh), US-003 (tìm kiếm và duyệt kho tri thức theo từ khóa), cùng FR-001–FR-011, FR-026, FR-028, BR, SEC, NFR liên quan. P2 (cập nhật tự động, đối chiếu quyền, chi phí) và P3 (vector, RAG, phân tích sâu) chỉ để sẵn chỗ mở rộng.
+- **Yêu cầu chính từ spec**: Phạm vi MVP (P1) gồm US-001 (kết nối Google Drive và chọn thư mục), US-002 (tự động tạo tóm tắt có mục lục/mốc thời gian/thông tin hình ảnh), US-003 (theo dõi tiến độ, nguyên nhân lỗi và xử lý lại), cùng FR-001–FR-011, FR-026, FR-028, BR, SEC, NFR liên quan. Ngoài ra MVP kéo sớm phần tìm theo từ khóa trên tên, `summary`, `tags` (spec xếp là FR-019, P3) để duyệt kho; đây là điểm lệch đã được chấp nhận ở mục Câu hỏi kỹ thuật. P2 (cập nhật tự động, đối chiếu quyền, chi phí) và P3 (vector, RAG, phân tích sâu) chỉ để sẵn chỗ mở rộng.
 - **Hướng tiếp cận kỹ thuật**: Thêm vertical slice `Videos` vào `flex-agent-service` (.NET 9, MediatR, Hangfire chạy cùng host, `VideoDbContext` trên database riêng `videodb`), tích hợp Google Drive (OAuth chỉ đọc, refresh token mã hóa) và Gemini qua cổng `IVideoAnalyzer`; migration Liquibase ở `flex-database/videodb/`; giao diện Angular `video-knowledge` trong `flex-microfrontend` theo mẫu `agent-catalog`. Toàn bộ nằm sau cờ `VideoKnowledge:Enabled`.
 - **Kết quả research**: [research.md](./research.md) chốt TQ-001…TQ-014; không còn câu hỏi chặn thiết kế. Các điểm `Xác minh khi implement` (API Drive/Gemini hiện hành, phiên bản gói) không đổi kiến trúc.
 
@@ -52,12 +52,14 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 | DEC-009 | Khởi chạy xử lý | Quản trị viên chủ động bấm; có trần số video mỗi lần | Chưa có chặn chi phí ở MVP | Tự xử lý toàn thư mục khi đồng bộ |
 | DEC-010 | Route | Frontend gọi trực tiếp `agentApiBaseUrl` | Khớp `agent-catalog` | Qua gateway |
 
-**Hai điểm lệch nhẹ so với spec cần người dùng xác nhận** (nguồn: DEC-008, DEC-009): (1) ở MVP chỉ quản trị viên xem được tóm tắt, dù US-002/US-003 nói "người dùng"; (2) "tự động tạo tóm tắt" áp dụng cho pipeline sau khi quản trị viên khởi chạy, không phải ngay khi đồng bộ thấy video mới. Cả hai là hệ quả của việc P2 (đối chiếu quyền, chặn chi phí) nằm ngoài MVP.
+**Bốn điểm lệch so với spec — người dùng đã chấp nhận ngày 2026-11-28** (xem `tasks.md` T002): (1) ở MVP chỉ quản trị viên xem được tóm tắt, dù US-002 nói "người dùng" (DEC-008); (2) "tự động tạo tóm tắt" áp dụng cho pipeline sau khi quản trị viên khởi chạy, không phải ngay khi đồng bộ thấy video mới (DEC-009); (3) `video_analyses` chưa có tóm tắt nhanh và MVP không lưu transcript, dù FR-004, FR-006, AC-004 yêu cầu; (4) tìm theo từ khóa (FR-019, P3) được kéo vào MVP. (1) và (2) là hệ quả của việc P2 (đối chiếu quyền, chặn chi phí) nằm ngoài MVP; (3) và (4) giữ nguyên `data-model.md`.
+
+**Quyết định bổ sung khi lập tasks**: (a) `state` OAuth dùng kho riêng `IDriveOAuthStateStore` trên Redis vì `IIntegrationSessionStore` hiện có gắn với `agentId` và `channel` của Meta; (b) tổng quan theo trạng thái (AC-008) do frontend lấy `total` từ `GET /videos?status=&pageSize=1` cho từng trạng thái, không thêm endpoint; (c) khi cờ tắt API trả `404`, frontend hiển thị "Tính năng chưa được bật" thay vì ẩn menu (menu sidebar là tĩnh).
 
 ## Thiết kế tổng quan
 
 - **Luồng xử lý chính**: (1) Quản trị viên kết nối Drive qua OAuth → refresh token mã hóa lưu `drive_connections`. (2) Chọn thư mục → `video_sources`. (3) Đồng bộ quét đệ quy, upsert `videos` theo (`drive_connection_id`, `drive_file_id`), đặt `pending`. (4) Khởi chạy xử lý → mỗi video một job Hangfire: kiểm tra `canDownload` → tải luồng ra file tạm → tải lên Gemini → phân tích theo cửa sổ → gộp → lưu `video_analyses`/`video_chapters` → xóa file tạm và file trên Gemini → `completed`. (5) Giao diện duyệt, tìm theo từ khóa, xem chi tiết.
-- **Component / Module tham gia & Boundary**: `Domain/Videos` (thực thể, trạng thái, quy tắc chuyển trạng thái); `Application/Videos` (command/query MediatR theo use case; cổng `IDriveClient`, `IVideoAnalyzer`, `IVideoRepository`); `Infrastructures/Videos` (`VideoDbContext`, repository, Drive client, Gemini analyzer, Hangfire job); `Api` (`VideoKnowledgeController` chỉ gửi `ISender`). Ranh giới cũ không đổi.
+- **Component / Module tham gia & Boundary**: `Domain/Videos` (thực thể, trạng thái, quy tắc chuyển trạng thái); `Application/Videos` (command/query MediatR theo use case; cổng `IDriveClient`, `IVideoAnalyzer`, `IVideoRepository`, `IDriveOAuthStateStore`, `IDriveTokenProtector`, `IVideoJobScheduler`; `VideoKnowledgeOptions` là POCO đặt ở đây vì handler cần đọc `MaxBatchSize`); `Infrastructures/Videos` (`VideoDbContext`, repository, Drive client, Gemini analyzer, Hangfire job, kho `state` OAuth trên Redis); `Api` (`VideoKnowledgeController` chỉ gửi `ISender`). Ranh giới cũ không đổi.
 - **Luồng lỗi & Idempotency / Concurrency**: Job idempotent theo (`video_id`, `content_key`); khóa tư vấn PostgreSQL theo `video_id` chặn chạy song song; Hangfire retry hữu hạn cho lỗi tạm thời (mạng, 429/5xx), lỗi vĩnh viễn (`unsupported_language`, `file_too_large`, `download_not_allowed`) không retry. Ràng buộc duy nhất ở DB là nguồn sự thật; adapter dịch vi phạm ràng buộc thành kết quả "đã tồn tại". Mất quyền hoặc token bị thu hồi → `access_denied`/`connection_revoked`.
 
 ## Traceability từ spec sang thiết kế kỹ thuật
@@ -65,14 +67,15 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 | Spec ID | Ưu tiên | Hướng xử lý kỹ thuật | Module / Path dự kiến | API / Contract | Data / Entity | Kiểm thử |
 |---|---|---|---|---|---|---|
 | US-001 / FR-001, SEC-001, SEC-003, SEC-004 | P1 | OAuth Drive chỉ đọc; `state` ở Redis; mã hóa refresh token | `Application/Videos/Connections`, `Api/Controllers/VideoKnowledgeController.cs` | `/connections/drive*` | `drive_connections` | Unit (state, mã hóa), integration callback |
-| US-001 / FR-002 | P1 | Duyệt thư mục, chọn nguồn | `Application/Videos/Sources` | `/drive/folders`, `/sources*` | `video_sources` | Unit handler, UI manual |
-| US-001 / FR-003, FR-004, BR-001, BR-007 | P1 | Đồng bộ upsert theo `drive_file_id`, cập nhật `content_key`/tên | `Application/Videos/Sync` | `/sources/{id}/sync` | `videos` | Unit upsert; integration unique index |
-| US-002 / FR-005, FR-010, FR-026 | P1 | Job Hangfire, máy trạng thái, file tạm xóa trong `finally` | `Infrastructures/Videos/Processing` | `/videos/process`, `/videos/{id}/reprocess` | `video_processing_jobs`, `videos.status` | Unit chuyển trạng thái, test dọn file tạm |
-| US-002 / FR-006, FR-007, FR-008, FR-009 | P1 | Phân tích theo cửa sổ + gộp, JSON schema cố định | `Infrastructures/Videos/Gemini`, `Application/Videos/Analysis` | (nội bộ) | `video_analyses`, `video_chapters` | Unit parser/gộp bằng analyzer giả; benchmark SC-002/003/008 thủ công |
+| US-001 / FR-001 (chọn một hoặc nhiều thư mục) | P1 | Duyệt thư mục, chọn nguồn; thông báo gửi AI ngoài trước khi chọn (SEC-005, BR-008) | `Application/Videos/Sources` | `/drive/folders`, `/sources*` | `video_sources` | Unit handler, UI manual |
+| US-001 / FR-002, FR-003, BR-001, BR-002, BR-007 | P1 | Đồng bộ upsert theo `drive_file_id`, cập nhật `content_key`/tên | `Application/Videos/Sync` | `/sources/{id}/sync` | `videos` | Unit upsert; integration unique index |
+| US-002 / FR-005, FR-026; US-003 / FR-009, FR-010 | P1 | Job Hangfire, máy trạng thái, thử lại có giới hạn, file tạm xóa trong `finally` | `Infrastructures/Videos/Processing` | `/videos/process`, `/videos/{id}/reprocess` | `video_processing_jobs`, `videos.status` | Unit chuyển trạng thái, test dọn file tạm |
+| US-002 / FR-004, FR-006, FR-007, FR-008 | P1 | Phân tích theo cửa sổ + gộp, JSON schema cố định | `Infrastructures/Videos/Gemini`, `Application/Videos/Analysis` | (nội bộ) | `video_analyses`, `video_chapters` | Unit parser/gộp bằng analyzer giả; benchmark SC-002/003/008 thủ công |
 | US-002 / FR-028 | P1 | Phát hiện ngôn ngữ không phải tiếng Việt → `failed/unsupported_language` | `Application/Videos/Analysis` | `failureCode` | `videos.failure_code` | Unit |
-| US-003 / FR-011 | P1 | Tìm từ khóa trên tên, `summary`, `tags`; phân trang | `Application/Videos/Queries` | `GET /videos`, `GET /videos/{id}` | `videos`, `video_analyses` | Unit query, UI manual |
+| US-003 / FR-009, FR-011 | P1 | Tổng quan theo 8 trạng thái (frontend gọi `GET /videos?status=&pageSize=1` lấy `total`), nguyên nhân lỗi từ `failureCode`, xử lý lại | `Application/Videos/Queries`, `Application/Videos/Processing` | `GET /videos`, `POST /videos/{id}/reprocess` | `videos` | Unit query, UI manual |
+| FR-019 (kéo sớm, P3) | P1 (giới hạn) | Tìm từ khóa không phân biệt hoa thường trên tên, `summary`, `tags`; thoát wildcard; phân trang | `Application/Videos/Queries` | `GET /videos?keyword=` | `videos`, `video_analyses` | Integration PostgreSQL, UI manual |
 | SEC-002, SEC-005, BR-003 | P1 (giới hạn) | Chỉ quản trị viên; không log token/nội dung | Controller + `ApplicationAuthorization` | mọi endpoint | — | Permission test 403 |
-| NFR-001..004 | P1 | Giới hạn song song/kích thước/lô bằng cấu hình | `VideoKnowledgeOptions` | `batch_too_large` | — | Unit giới hạn |
+| NFR-001..004 | P1 | Giới hạn song song/kích thước/lô bằng cấu hình | `Application/Videos/VideoKnowledgeOptions.cs` | `batch_too_large` | — | Unit giới hạn |
 | US-004..009, FR-012..025, FR-027 | P2/P3 | Không thực hiện; `IVideoAnalyzer`, cột `input/output_tokens`, `content_key` là chỗ mở rộng | — | — | — | Không áp dụng |
 
 ## Phân tích tác động
@@ -121,7 +124,7 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 
 - **Kết quả Documentation Impact Gate (`spec.md` §20)**: CÓ CẬP NHẬT.
 - **Tài liệu hiện hữu đã cập nhật**: `docs/business/14-ai-video-knowledge-base.md`, `docs/business/business-docs-index.md` (mục 5) — đã làm ở bước docbiz.
-- **Cập nhật còn lại sau implementation**: `docs/architecture/system-map.md` (thêm `videodb` và module Video Knowledge); `docs/business/14-...` chỉ cập nhật nếu hai điểm lệch MVP ở trên được xác nhận khác đi.
+- **Cập nhật còn lại sau implementation**: `docs/architecture/system-map.md` (thêm `videodb` và module Video Knowledge); `docs/business/14-...` chỉ cập nhật nếu bốn điểm lệch MVP ở trên được xác nhận khác đi (hiện đã chấp nhận).
 
 ## Cấu trúc project
 
@@ -133,8 +136,8 @@ Chi tiết lý do và phương án loại ở [research.md](./research.md).
 ```text
 flex-agent-service/
 ├── src/Flex.Agent.Domain/Videos/            # Video, DriveConnection, VideoAnalysis, VideoStatus
-├── src/Flex.Agent.Application/Videos/       # Connections/, Sources/, Sync/, Processing/, Queries/, cổng IDriveClient, IVideoAnalyzer
-├── src/Flex.Agent.Infrastructures/Videos/   # VideoDbContext, repositories, Drive/, Gemini/, Jobs/, VideoKnowledgeOptions, đăng ký DI
+├── src/Flex.Agent.Application/Videos/       # Connections/, Sources/, Sync/, Processing/, Analysis/, Queries/, Abstractions/ (IDriveClient, IVideoAnalyzer, ...), VideoKnowledgeOptions
+├── src/Flex.Agent.Infrastructures/Videos/   # VideoDbContext, repositories, Drive/, Gemini/, Jobs/, kho state OAuth (Redis), đăng ký DI
 ├── src/Flex.Agent.Api/Controllers/VideoKnowledgeController.cs
 ├── src/Flex.Agent.Api/appsettings.Example.json   # chỉ placeholder
 └── tests/Flex.Agent.Tests/                  # project mới (xUnit)
@@ -155,7 +158,7 @@ flex-microfrontend/
 ## Rollout & Rollback
 
 - **Kế hoạch rollout & Feature flag/config**: (1) chạy migration `videodb`; (2) thêm cấu hình và bí mật qua môi trường; (3) deploy `flex-agent-service` với `VideoKnowledge:Enabled=true`; (4) deploy frontend. Cờ mặc định tắt.
-- **Rollback code/config**: đặt `VideoKnowledge:Enabled=false` hoặc revert bản deploy; frontend ẩn menu khi API không phản hồi.
+- **Rollback code/config**: đặt `VideoKnowledge:Enabled=false` hoặc revert bản deploy; khi API trả `404` (cờ tắt) trang `video-knowledge` hiển thị "Tính năng chưa được bật" (menu sidebar là tĩnh nên không ẩn được).
 - **Rollback dữ liệu/migration & Điều kiện kích hoạt**: database mới nên không ảnh hưởng dữ liệu cũ; lỗi schema xử lý bằng changeset forward-fix, không sửa changeset đã chạy. Kích hoạt khi tỷ lệ job lỗi vượt ngưỡng hoặc phát hiện lộ token.
 
 ## Observability & Debug

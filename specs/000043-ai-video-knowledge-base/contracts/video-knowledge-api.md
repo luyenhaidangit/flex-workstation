@@ -7,7 +7,7 @@
 
 | Method | Đường dẫn | Mô tả | Phản hồi |
 | --- | --- | --- | --- |
-| POST | `/connections/drive/connect` | Bắt đầu OAuth, lưu `state` ở `IIntegrationSessionStore` | `200 { authorizationUrl }` |
+| POST | `/connections/drive/connect` | Bắt đầu OAuth, lưu `state` một lần dùng ở kho `IDriveOAuthStateStore` (Redis) | `200 { authorizationUrl }` |
 | GET | `/connections/drive/callback` | Google gọi lại (`AllowAnonymous`); đổi mã lấy token, mã hóa và lưu; chuyển hướng về frontend `/video-knowledge?connection=success\|error` | `302` |
 | GET | `/connections/drive` | Trạng thái kết nối hiện tại | `200 { connected, accountEmail, status }` (không trả token) |
 | DELETE | `/connections/drive` | Ngắt kết nối (thu hồi và xóa token) | `204` |
@@ -26,7 +26,7 @@
 
 | Method | Đường dẫn | Mô tả | Phản hồi |
 | --- | --- | --- | --- |
-| GET | `/videos?keyword=&status=&page=&pageSize=` | Danh sách phân trang; `keyword` khớp tên, `summary`, `tags` (FR-011) | `200 { items, page, pageSize, total }` |
+| GET | `/videos?keyword=&status=&page=&pageSize=` | Danh sách phân trang; `keyword` khớp tên, `summary`, `tags` (FR-019, kéo sớm vào MVP); `status` + `pageSize=1` dùng để đếm theo trạng thái (FR-009) | `200 { items, page, pageSize, total }` |
 | GET | `/videos/{id}` | Chi tiết: metadata, trạng thái, `failureCode`, phân tích mới nhất (tóm tắt, `keyPoints`, `tags`, `topicGroup`, `difficulty`, `chapters[{ orderNo, startSeconds, endSeconds, title, summary, visualNotes }]`), cờ `contentChanged` | `200` / `404` |
 | POST | `/videos/process` | Đưa vào hàng đợi `{ videoIds: [] }` (tối đa theo cấu hình `VideoKnowledge:MaxBatchSize`); video đang chạy bị bỏ qua | `202 { queued, skipped }` |
 | POST | `/videos/{id}/reprocess` | Xử lý lại thủ công cho `failed`/`completed`/`access_denied` | `202` / `409` nếu đang chạy |
